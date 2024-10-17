@@ -1,25 +1,103 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, lazy, Suspense, useEffect } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  Outlet,
+} from "react-router-dom";
+import "./App.css";
+import axios from "axios";
+import { Helmet } from "react-helmet";
 
-function App() {
+// Import components
+
+import Contact from "./Components/Pages/Contact Us/Contact";
+import Press from "./Components/Pages/In The Press/Press";
+import Are from "./Components/Pages/Who we are/Are";
+import Circle from "./Components/Pages/The Winners Circle/Circle";
+import Weekly from "./Components/Pages/Live Weekly Winner/Weekly";
+import Legal from "./Components/Pages/Legal Terms/Legal";
+import Profile from "./Components/My Account/Profile";
+import Checkout from "./Components/Pages/Play/Checkout";
+import Screen from "./Components/Pages/Play/Screen";
+import PageNot from "./Components/PageNot/PageNot";
+
+// Lazy load components
+const Loader = lazy(() => import("./Components/Loader/Loader"));
+const Home = lazy(() => import("./Components/Home/Home"));
+const Header = lazy(() => import("./Components/Layout/Header/Header"));
+const Footer = lazy(() => import("./Components/Layout/Footer/Footer"));
+
+axios.defaults.baseURL = "http://localhost:10077/api/";
+
+const ProtectedRoute = () => {
+  if (!localStorage.getItem("token")) {
+    return <Navigate to="/" />;
+  }
+  return <Outlet />;
+};
+
+// Axios interceptor with redirect on 403 error
+axios.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 403) {
+      localStorage.removeItem("token");
+      window.location.href = "/"; // Redirect using window.location.href
+    }
+    return Promise.reject(error);
+  }
+);
+
+const App = () => {
+  const [loader, setLoading] = useState(false);
+
+  useEffect(() => {
+    const handleStart = () => setLoading(true);
+    const handleStop = () => setLoading(false);
+
+    // Start loading when a new route is loading
+    window.addEventListener("beforeunload", handleStart);
+    window.addEventListener("load", handleStop);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleStart);
+      window.removeEventListener("load", handleStop);
+    };
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <Helmet>
+        <title>{loader ? "loader....." : "Home"}</title>
+      </Helmet>
+      <Router basename="/sportsball">
+        <Suspense fallback={<Loader />}>
+          <Header />
+          <Routes>
+            <Route element={<ProtectedRoute />}>
+              <Route path="/my_account" element={<Profile />} />
+              <Route path="/in_the_press" element={<Press />} />
+              <Route path="/play_screen" element={<Screen />} />
+              <Route path="/cart" element={<Checkout />} />
+            </Route>
+            <Route path="/" element={<Home />} />
+            <Route path="/load" element={<Loader />} />
+            <Route path="/legal_terms" element={<Legal />} />
+            <Route path="/contact_us" element={<Contact />} />
+            <Route path="/who_we_are" element={<Are />} />
+            <Route path="/the_winners_circle" element={<Circle />} />
+            <Route path="/live_weekly_winner" element={<Weekly />} />
+
+            {/* Catch-all for 404 */}
+            {/* <Route path="*" element={<PageNot />} /> */}
+          </Routes>
+          <Footer />
+        </Suspense>
+      </Router>
+    </>
   );
-}
+};
 
 export default App;
