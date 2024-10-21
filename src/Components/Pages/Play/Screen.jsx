@@ -12,7 +12,7 @@ function Screen() {
 
   const [usedTickets, setUsedTickets] = useState(0);
   const [totalTickets, setTotalTickets] = useState(
-    responseData.ticket_limit || ""
+    responseData.maxTickets || ""
   );
   const [tickets, setTickets] = useState([]);
   const [coordinates, setCoordinates] = useState({ x: 0, y: 0 });
@@ -30,7 +30,6 @@ function Screen() {
       setTickets((prev) => [...prev, newTicket]);
       setUsedTickets((prev) => prev + 1);
     } else {
-      // Use a toast notification here instead of alert
       alert("No more tickets available.");
     }
   };

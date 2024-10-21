@@ -1,290 +1,137 @@
-import React from 'react'
+import React, { useEffect, useState } from "react";
+import axios from "axios"; 
+import Swal from "sweetalert2";
 
 function PastPayment() {
+  const [payments, setPayments] = useState([]);
+  const [download, setDownload] = useState([]);
+
+ useEffect(() => {
+   const fetchPayments = async () => {
+     const token = localStorage.getItem("token");
+
+     try {
+       const response = await axios.get("v1/app/contest/get-contest-payments", {
+         headers: {
+           Authorization: `Bearer ${token}`,
+         },
+       });
+
+       console.log("newww", response.data);
+
+       // Check if payments data is empty
+       if (response.data.data && response.data.data.length > 0) {
+         setPayments(response.data.data);
+       } else {
+         // Show Swal message if no past payments
+         Swal.fire({
+           icon: "info",
+           title: "No Past Payments",
+           text: "No past payments have been done.",
+           confirmButtonText: "OK",
+         });
+       }
+     } catch (error) {
+       console.error("Error fetching payments:", error);
+       Swal.fire({
+         icon: "error",
+         title: "Error",
+         text: "There was an error fetching payments. Please try again later.",
+         confirmButtonText: "OK",
+       });
+     }
+   };
+
+   fetchPayments();
+ }, []);
+
+
+  useEffect(() => {
+    const fetchDownloadData = async () => {
+      try {
+        const response = await axios.get(
+          "v1/app/contest/get-bill"
+        ); // Replace with your API endpoint
+        setDownload(response.data);
+      } catch (error) {
+        console.error("Error fetching payment data:", error);
+      }
+    };
+
+    fetchDownloadData();
+  }, []);
+
+
   return (
     <>
       <div className="payment_methoddiv pastpay_detailmaindiv_new">
         <div className="cartwithcordinatetables">
-          <div className="cartstripe pastpaydetail_maindiv">
-            <div className="checkout_cartdiv">
-              <div className="cart_jackpotdetails">
-                <div className="cart_windiv">
-                  Win <span className="winprice_cart">₹50,000</span>
+          {payments.map((payment) => (
+            <div key={payment._id} className="cartstripe pastpaydetail_maindiv">
+              <div className="checkout_cartdiv">
+                <div className="cart_jackpotdetails">
+                  <div className="cart_windiv">
+                    Win <span className="winprice_cart">₹50,000</span>
+                  </div>
+                  <div className="jackpot_ticket_cart pastpayment_detailleft">
+                    <h3>₹50,000 Jackpot</h3>
+                    <span>{new Date(payment.createdAt).toLocaleString()}</span>
+                    <h4>{payment.tickets} Tickets</h4>
+                    <p>Payment Mode: UPI</p>
+                  </div>
                 </div>
-                <div className="jackpot_ticket_cart pastpayment_detailleft">
-                  <h3>₹50,000 Jackpot</h3>
-                  <span>Thu, 9 Aug 07:12 pm</span>
-                  <h4>10 Tickets</h4>
-                  <p>Payment Mode: UPI</p>
-                </div>
-              </div>
-              <div className="cart_gametotalprice pastpay_right">
-                <div className="pastpay_invoicediv">
-                  <a href="#!" className="downloadinvoice_hreftag" download="">
-                    <img src="images/download_invoice.png" />
-                    <p>Download Invoice</p>
-                  </a>
-                </div>
-                <p>Txn. Id.: 616161611</p>
-                <h3>₹990</h3>
-                <div className="pastpay_dropdownicon">
-                  <button type="button" className="dropbtn_pastpy">
-                    <img
-                      src="images/arrow_icon_payment.png"
-                      className="rotate_pastpayicon"
-                    />
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div className="cordinates_table_cart pastgamecordinate_payment">
-              <table className="table table-bordered cordtable_new">
-                <tbody>
-                  <tr>
-                    <th>Tickets</th>
-                    <th>X- Coordinates</th>
-                    <th>Y- Coordinates</th>
-                  </tr>
-                  <tr>
-                    <td>1</td>
-                    <td>2809</td>
-                    <td>1466</td>
-                  </tr>
-                  <tr>
-                    <td>2</td>
-                    <td>2809</td>
-                    <td>1466</td>
-                  </tr>
-                  <tr>
-                    <td>3</td>
-                    <td>2809</td>
-                    <td>1466</td>
-                  </tr>
-                  <tr>
-                    <td>4</td>
-                    <td>2809</td>
-                    <td>1466</td>
-                  </tr>
-                  <tr>
-                    <td>5</td>
-                    <td>2809</td>
-                    <td>1466</td>
-                  </tr>
-                  <tr>
-                    <td>6</td>
-                    <td>2809</td>
-                    <td>1466</td>
-                  </tr>
-                  <tr>
-                    <td>7</td>
-                    <td>2809</td>
-                    <td>1466</td>
-                  </tr>
-                  <tr>
-                    <td>8</td>
-                    <td>2809</td>
-                    <td>1466</td>
-                  </tr>
-                  <tr>
-                    <td>9</td>
-                    <td>2809</td>
-                    <td>1466</td>
-                  </tr>
-                  <tr>
-                    <td>10</td>
-                    <td>2809</td>
-                    <td>1466</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div className="cartstripe pastpaydetail_maindiv">
-            <div className="checkout_cartdiv">
-              <div className="cart_jackpotdetails">
-                <div className="cart_windiv">
-                  Win <span className="winprice_cart">₹50,000</span>
-                </div>
-                <div className="jackpot_ticket_cart pastpayment_detailleft">
-                  <h3>₹50,000 Jackpot</h3>
-                  <span>Thu, 9 Aug 07:12 pm</span>
-                  <h4>10 Tickets</h4>
-                  <p>Payment Mode: UPI</p>
+                <div className="cart_gametotalprice pastpay_right">
+                  <div className="pastpay_invoicediv">
+                    <a
+                      href={download.pdf}
+                      className="downloadinvoice_hreftag"
+                      download
+                    >
+                      <img
+                        src="images/download_invoice.png"
+                        alt="Download Invoice"
+                      />
+                      <p>Download Invoice</p>
+                    </a>
+                  </div>
+                  <p>Txn. Id.: {payment.paymentId}</p>
+                  <h3>₹990</h3>
+                  <div className="pastpay_dropdownicon">
+                    <button type="button" className="dropbtn_pastpy">
+                      <img
+                        src="images/arrow_icon_payment.png"
+                        alt="Toggle Details"
+                      />
+                    </button>
+                  </div>
                 </div>
               </div>
-              <div className="cart_gametotalprice pastpay_right">
-                <div className="pastpay_invoicediv">
-                  <a href="#!" className="downloadinvoice_hreftag" download="">
-                    <img src="images/download_invoice.png" />
-                    <p>Download Invoice</p>
-                  </a>
-                </div>
-                <p>Txn. Id.: 616161611</p>
-                <h3>₹990</h3>
-                <div className="pastpay_dropdownicon">
-                  <button type="button" className="dropbtn_pastpy">
-                    <img src="images/arrow_icon_payment.png" />
-                  </button>
-                </div>
+              <div className="cordinates_table_cart pastgamecordinate_payment">
+                <table className="table table-bordered cordtable_new">
+                  <thead>
+                    <tr>
+                      <th>Tickets</th>
+                      <th>X- Coordinates</th>
+                      <th>Y- Coordinates</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {payment.coordinates.map((coordinate, index) => (
+                      <tr key={coordinate._id}>
+                        <td>{index + 1}</td>
+                        <td>{coordinate.x}</td>
+                        <td>{coordinate.y}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
-            <div className="cordinates_table_cart pastgamecordinate_payment hide">
-              <table className="table table-bordered cordtable_new">
-                <tbody>
-                  <tr>
-                    <th>Tickets</th>
-                    <th>X- Coordinates</th>
-                    <th>Y- Coordinates</th>
-                  </tr>
-                  <tr>
-                    <td>1</td>
-                    <td>2809</td>
-                    <td>1466</td>
-                  </tr>
-                  <tr>
-                    <td>2</td>
-                    <td>2809</td>
-                    <td>1466</td>
-                  </tr>
-                  <tr>
-                    <td>3</td>
-                    <td>2809</td>
-                    <td>1466</td>
-                  </tr>
-                  <tr>
-                    <td>4</td>
-                    <td>2809</td>
-                    <td>1466</td>
-                  </tr>
-                  <tr>
-                    <td>5</td>
-                    <td>2809</td>
-                    <td>1466</td>
-                  </tr>
-                  <tr>
-                    <td>6</td>
-                    <td>2809</td>
-                    <td>1466</td>
-                  </tr>
-                  <tr>
-                    <td>7</td>
-                    <td>2809</td>
-                    <td>1466</td>
-                  </tr>
-                  <tr>
-                    <td>8</td>
-                    <td>2809</td>
-                    <td>1466</td>
-                  </tr>
-                  <tr>
-                    <td>9</td>
-                    <td>2809</td>
-                    <td>1466</td>
-                  </tr>
-                  <tr>
-                    <td>10</td>
-                    <td>2809</td>
-                    <td>1466</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div className="cartstripe pastpaydetail_maindiv">
-            <div className="checkout_cartdiv">
-              <div className="cart_jackpotdetails">
-                <div className="cart_windiv">
-                  Win <span className="winprice_cart">₹50,000</span>
-                </div>
-                <div className="jackpot_ticket_cart pastpayment_detailleft">
-                  <h3>₹50,000 Jackpot</h3>
-                  <span>Thu, 9 Aug 07:12 pm</span>
-                  <h4>10 Tickets</h4>
-                  <p>Payment Mode: UPI</p>
-                </div>
-              </div>
-              <div className="cart_gametotalprice pastpay_right">
-                <div className="pastpay_invoicediv">
-                  <a href="#!" className="downloadinvoice_hreftag" download="">
-                    <img src="images/download_invoice.png" />
-                    <p>Download Invoice</p>
-                  </a>
-                </div>
-                <p>Txn. Id.: 616161611</p>
-                <h3>₹990</h3>
-                <div className="pastpay_dropdownicon">
-                  <button type="button" className="dropbtn_pastpy">
-                    <img src="images/arrow_icon_payment.png" />
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div className="cordinates_table_cart pastgamecordinate_payment hide">
-              <table className="table table-bordered cordtable_new">
-                <tbody>
-                  <tr>
-                    <th>Tickets</th>
-                    <th>X- Coordinates</th>
-                    <th>Y- Coordinates</th>
-                  </tr>
-                  <tr>
-                    <td>1</td>
-                    <td>2809</td>
-                    <td>1466</td>
-                  </tr>
-                  <tr>
-                    <td>2</td>
-                    <td>2809</td>
-                    <td>1466</td>
-                  </tr>
-                  <tr>
-                    <td>3</td>
-                    <td>2809</td>
-                    <td>1466</td>
-                  </tr>
-                  <tr>
-                    <td>4</td>
-                    <td>2809</td>
-                    <td>1466</td>
-                  </tr>
-                  <tr>
-                    <td>5</td>
-                    <td>2809</td>
-                    <td>1466</td>
-                  </tr>
-                  <tr>
-                    <td>6</td>
-                    <td>2809</td>
-                    <td>1466</td>
-                  </tr>
-                  <tr>
-                    <td>7</td>
-                    <td>2809</td>
-                    <td>1466</td>
-                  </tr>
-                  <tr>
-                    <td>8</td>
-                    <td>2809</td>
-                    <td>1466</td>
-                  </tr>
-                  <tr>
-                    <td>9</td>
-                    <td>2809</td>
-                    <td>1466</td>
-                  </tr>
-                  <tr>
-                    <td>10</td>
-                    <td>2809</td>
-                    <td>1466</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
     </>
   );
 }
 
-export default PastPayment
+export default PastPayment;

@@ -56,8 +56,9 @@ function Login({ isVisible, onClose }) {
         showConfirmButton: false,
         timer: 2000,
       });
+      window.location.reload();
 
-      navigate("/");
+      // navigate("/sportsball");
       onClose();
     } catch (error) {
       console.error(
@@ -122,8 +123,10 @@ function Login({ isVisible, onClose }) {
 
                         <Formik
                           initialValues={LoginValues}
-                          validationSchema={validation}
+                          // validationSchema={validation}
                           onSubmit={Login}
+                          validateOnChange={true}
+                          validateOnBlur={true}
                         >
                           {({ isSubmitting }) => (
                             <Form>

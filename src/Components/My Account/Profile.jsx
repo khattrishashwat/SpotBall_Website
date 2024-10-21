@@ -86,7 +86,7 @@ function Profile() {
         Swal.fire({
           title: response.data.message,
         }).then(() => {
-          navigate("/");
+      window.location.reload();
         });
       } else {
         Swal.fire({
@@ -104,13 +104,13 @@ function Profile() {
 
   const Logout = async () => {
     localStorage.clear();
-    navigate("/");
+      window.location.reload();
   };
 
   return (
     <>
       {isLoading ? (
-        <Loader /> // Show loader
+        <Loader /> 
       ) : (
         <>
           <section className="maincont_section myacocunt_sectionforbgimg">

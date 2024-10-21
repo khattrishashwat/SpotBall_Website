@@ -99,12 +99,21 @@ function Account() {
         },
       });
 
+      // Refresh the page after a successful update
+      window.location.reload();
+
+      // Show success message
       Swal.fire("Success!", "Profile updated successfully", "success");
     } catch (error) {
-      Swal.fire("Error!", "Failed to update profile", "error");
+      // Handle error message from response if available
+      const errorMessage =
+        error.response?.data?.message || "Failed to update profile";
+
+      Swal.fire("Error!", errorMessage, "error");
       console.error("Error updating profile:", error);
     }
   };
+
 
   return (
     <div className="profilesection_inner">

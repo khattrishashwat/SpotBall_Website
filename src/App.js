@@ -22,6 +22,8 @@ import Profile from "./Components/My Account/Profile";
 import Checkout from "./Components/Pages/Play/Checkout";
 import Screen from "./Components/Pages/Play/Screen";
 import PageNot from "./Components/PageNot/PageNot";
+import Login from "./Components/Auth/Login";
+import Signup from "./Components/Auth/Signup";
 
 // Lazy load components
 const Loader = lazy(() => import("./Components/Loader/Loader"));
@@ -29,7 +31,8 @@ const Home = lazy(() => import("./Components/Home/Home"));
 const Header = lazy(() => import("./Components/Layout/Header/Header"));
 const Footer = lazy(() => import("./Components/Layout/Footer/Footer"));
 
-axios.defaults.baseURL = "http://localhost:10077/api/";
+// axios.defaults.baseURL = "http://localhost:10077/api/";
+axios.defaults.baseURL = "http://44.195.125.80:10077/api/";
 
 const ProtectedRoute = () => {
   if (!localStorage.getItem("token")) {
@@ -39,16 +42,16 @@ const ProtectedRoute = () => {
 };
 
 // Axios interceptor with redirect on 403 error
-axios.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response && error.response.status === 403) {
-      localStorage.removeItem("token");
-      window.location.href = "/"; // Redirect using window.location.href
-    }
-    return Promise.reject(error);
-  }
-);
+// axios.interceptors.response.use(
+//   (response) => response,
+//   (error) => {
+//     if (error.response && error.response.status === 403) {
+//       localStorage.removeItem("token");
+//       window.location.href = "/"; // Redirect using window.location.href
+//     }
+//     return Promise.reject(error);
+//   }
+// );
 
 const App = () => {
   const [loader, setLoading] = useState(false);
@@ -83,6 +86,8 @@ const App = () => {
               <Route path="/cart" element={<Checkout />} />
             </Route>
             <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/sign" element={<Signup />} />
             <Route path="/load" element={<Loader />} />
             <Route path="/legal_terms" element={<Legal />} />
             <Route path="/contact_us" element={<Contact />} />

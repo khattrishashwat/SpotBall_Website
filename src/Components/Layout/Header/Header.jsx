@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import Login from "../../Auth/Login";
 import axios from "axios";
 
 function Header() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [headerClass, setHeaderClass] = useState("");
+  const [lastScrollY, setLastScrollY] = useState(0);
 
   // const [token, setToken] = useState(null);
   const [profile, setProfile] = useState({});
@@ -31,9 +34,35 @@ function Header() {
     setIsLogout(false);
   };
 
+  const isHomePage = location.pathname === "/";
+  const handleScroll = () => {
+    const currentScrollY = window.scrollY;
+
+    if (currentScrollY > lastScrollY) {
+      // Scrolling down
+      setHeaderClass(
+        isHomePage ? "headerfixed" : "innerheader_new headerfixed"
+      );
+    } else {
+      // Scrolling up
+      setHeaderClass(isHomePage ? "" : "innerheader_new");
+    }
+
+    setLastScrollY(currentScrollY);
+  };
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [lastScrollY, isHomePage]);
+
   const handleLogout = () => {
+        setIsLogout(false);
+
     localStorage.clear();
-    navigate("/");
+    // navigate("/");
   };
   const fetchProfile = async () => {
     try {
@@ -89,7 +118,7 @@ function Header() {
 
   return (
     <>
-      <header className="headerfixed">
+      <header className={headerClass}>
         <div className="topfirstbar">
           <div className="ends_compititionssiv_top">
             <a className="topmainbar">
@@ -112,7 +141,10 @@ function Header() {
               <div className="h3-navbar">
                 <div className="container contmainformob_newshi">
                   <nav className="navbar navbar-expand-lg h3-nav navbar_mainnavdiv_shi">
-                    <a className="navbar-brand navbarlogodiv">
+                    <a
+                      href="/sportsball"
+                      className="navbar-brand navbarlogodiv"
+                    >
                       <img
                         src={`${process.env.PUBLIC_URL}/images/logo.png`}
                         // src="images/logo.png"

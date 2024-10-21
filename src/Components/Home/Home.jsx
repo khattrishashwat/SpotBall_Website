@@ -4,6 +4,7 @@ import axios from "axios";
 import Login from "../Auth/Login";
 import Swal from "sweetalert2";
 import Loader from "../Loader/Loader";
+import GeolocationPopup from "../Location/GeolocationPopup";
 
 function Home() {
   const navigate = useNavigate();
@@ -17,6 +18,10 @@ function Home() {
   const [isLoginPopup, setLoginPopup] = useState(false);
   const [banner, setBanner] = useState(false);
   const [quantity, setQuantity] = useState(3);
+  const [isGeolocationPopupVisible, setGeolocationPopupVisible] =
+    useState(false);
+
+  const location = localStorage.getItem("location");
 
   const open = async () => {
     setIsModals(true);
@@ -36,7 +41,7 @@ function Home() {
     setIsModals(false);
     const videoElement = document.getElementById("video_howtoplay");
     if (videoElement) {
-      videoElement.pause();
+      videoElement.pause(); // Pause video on close
       videoElement.currentTime = 0; // Reset video time on close
     }
   };
@@ -129,42 +134,46 @@ function Home() {
     // Update the countdown every second
     const interval = setInterval(updateCountdown, 1000);
 
-    return () => clearInterval(interval);
+    return () => clearInterval(interval); // Cleanup interval on component unmount
   }, []);
 
   const fetchData = async () => {
-    setLoading(true); // Set loading to true before fetching
     try {
-      const response = await axios.get(
-        token ? "get-all-contests" : "get-banner",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const token = localStorage.getItem("token");
+
       if (token) {
+        // Hit the 'get-all-contests' API if the token is present
+        const response = await axios.get("get-all-contests", {
+          headers: {
+            Authorization: `Bearer ${token}`, // Send the token with the request
+          },
+        });
+        console.log("res", response.data.data);
         const { banner_details, contests } = response.data.data;
+
         setBanner(banner_details[0]);
         setContests(contests);
       } else {
-        setBanner(response.data.data[0]);
+        // Hit the 'get-banner' API if no token is present
+        const response = await axios.get("get-banner");
+        console.log("baner", response.data.data[0]);
+
+        setBanner(response.data.data[0]); // Set banner data if token is not present
       }
     } catch (error) {
       console.error("Error fetching data:", error);
-    } finally {
-      setLoading(false); // Set loading to false after fetching or on error
     }
   };
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [token]);
 
   const handleIncrease = () => {
     if (quantity < selectedContest?.ticket_limit) {
       setQuantity((prev) => prev + 1);
     } else {
+      // Show SweetAlert when max limit is reached
       Swal.fire({
         icon: "warning",
         title: "Max Ticket Limit Reached",
@@ -193,6 +202,19 @@ function Home() {
     navigate("/play_screen", { state: { payload } });
   };
 
+  useEffect(() => {
+    if (token) {
+      setGeolocationPopupVisible(true);
+    } else if (location && Object.keys(location).length > 0) {
+      setGeolocationPopupVisible(false);
+    } else {
+      setGeolocationPopupVisible(false);
+    }
+  }, [token, location]);
+
+  const handleCloseGeolocationPopup = () => {
+    setGeolocationPopupVisible(false); // Close the geolocation popup
+  };
   return (
     <>
       {loading ? (
@@ -209,16 +231,68 @@ function Home() {
                   <div className="marquee">
                     <div className="track">
                       <div className="srcolltext_div">
-                        {/* Your existing scrolling text and stars */}
-                        {/* ... */}
+                        <div className="guranteewinnertext">
+                          Always a guaranteed winner
+                        </div>
+                        <div className="auto_scroll_staricon_cntr">
+                          <img src="images/star.png" />
+                        </div>
+                        <div className="jackpottext">
+                          Weekly jackpot ₹50,000
+                        </div>
+                        <div className="auto_scroll_staricon_cntr">
+                          <img src="images/star.png" />
+                        </div>
+                        <div className="guranteewinnertext">
+                          Always a guaranteed winner
+                        </div>
+                        <div className="auto_scroll_staricon_cntr">
+                          <img src="images/star.png" />
+                        </div>
+                        <div className="jackpottext">
+                          Weekly jackpot ₹50,000
+                        </div>
+                        <div className="auto_scroll_staricon_cntr">
+                          <img src="images/star.png" />
+                        </div>
+                        <div className="guranteewinnertext">
+                          Always a guaranteed winner
+                        </div>
+                        <div className="auto_scroll_staricon_cntr">
+                          <img src="images/star.png" />
+                        </div>
+                        <div className="jackpottext">
+                          Weekly jackpot ₹50,000
+                        </div>
+                        <div className="auto_scroll_staricon_cntr">
+                          <img src="images/star.png" />
+                        </div>
+                        <div className="guranteewinnertext">
+                          Always a guaranteed winner
+                        </div>
+                        <div className="auto_scroll_staricon_cntr">
+                          <img src="images/star.png" />
+                        </div>
+                        <div className="jackpottext">
+                          Weekly jackpot ₹50,000
+                        </div>
+                        <div className="auto_scroll_staricon_cntr">
+                          <img src="images/star.png" />
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
                 <div className="banner_fixedtext_div_top">
                   <div className="everyweekfixedtext">
-                    <h4>{banner.sub_title}</h4>
-                    <h4>{banner.title}</h4>
+                    <h4>
+                      {/* Every week a <span>₹50,000</span> jackpot!{" "} */}
+                      {banner.sub_title}
+                    </h4>
+                    <h4>
+                      {/* Can you pinpoint the hidden cricket ball? */}
+                      {banner.title}
+                    </h4>
                   </div>
                 </div>
                 <div className="bottomfixedonbannertext_banner">
@@ -245,14 +319,60 @@ function Home() {
                     </div>
                   </div>
                   <div className="entriesdate_withcountdown">
-                    {/* Countdown timer */}
-                    {/* ... */}
+                    <div className="countdowndate_newshi">
+                      <div className="countheading_endsin">
+                        <h2>Ends in</h2>
+                      </div>
+                      <div id="countdown" className="countdown">
+                        <div className="countdown-number">
+                          <span className="days countdown-time">
+                            {timeLeft.days}
+                          </span>
+                          <span className="countdown-text">Days</span>
+                        </div>
+                        <div className="countdown_doubledots">:</div>
+                        <div className="countdown-number">
+                          <span className="hours countdown-time">
+                            {timeLeft.hours}
+                          </span>
+                          <span className="countdown-text">Hours</span>
+                        </div>
+                        <div className="countdown_doubledots">:</div>
+                        <div className="countdown-number">
+                          <span className="minutes countdown-time">
+                            {timeLeft.minutes}
+                          </span>
+                          <span className="countdown-text">Minutes</span>
+                        </div>
+                        <div className="countdown_doubledots">:</div>
+                        <div className="countdown-number">
+                          <span className="seconds countdown-time">
+                            {timeLeft.seconds}
+                          </span>
+                          <span className="countdown-text">Seconds</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="saprationdiv" />
+                    <div className="entriesdate_div">
+                      <div className="entries_openclosediv">
+                        <div className="entriesdiv_inner opendiv_entries">
+                          <h3>Entries Open:</h3>
+                          <p>Monday</p>
+                          <p>12:00 hrs</p>
+                        </div>
+                        <div className="entriesdiv_inner closediv_entries">
+                          <h3>Entries Close:</h3>
+                          <p>Sunday</p>
+                          <p>23:59 hrs</p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </section>
-
           {token && contests && (
             <section className="compitionsection" id="compitions_div">
               <div className="container contcompitions">
@@ -276,8 +396,50 @@ function Home() {
                         <div className="compitionsbox">
                           <div className="compitiontextinfodivmain">
                             <div className="contestpoints_main">
-                              {/* Contest details */}
-                              {/* ... */}
+                              <div className="contesteveryweekdiv">
+                                <div className="contest_newtiming_strip">
+                                  <img
+                                    src="images/ball_icon.png"
+                                    alt="Ball Icon"
+                                  />
+                                  <h4>Every Week’s Contest Ends</h4>
+                                </div>
+                                <div className="contestrightdaysdate">
+                                  <h4 className="contslist_span_inner">
+                                    Sunday- 21:59hrs
+                                  </h4>
+                                </div>
+                              </div>
+                              <div className="contesteveryweekdiv">
+                                <div className="contest_newtiming_strip">
+                                  <img
+                                    src="images/ball_icon.png"
+                                    alt="Ball Icon"
+                                  />
+                                  <h4>
+                                    Every Week We Live Stream SpotsBall’s
+                                    “Weekly Winner Show”
+                                  </h4>
+                                </div>
+                                <div className="contestrightdaysdate">
+                                  <h4 className="contslist_span_inner">
+                                    Monday- 21:00hrs
+                                  </h4>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="everyweek_livewatchdiv">
+                              <div className="watchondiv">
+                                <h4>Watch On</h4>
+                                <img
+                                  src="images/fb_live_icon.png"
+                                  alt="Facebook Live"
+                                />
+                                <img
+                                  src="images/yb_live_icon.png"
+                                  alt="YouTube Live"
+                                />
+                              </div>
                             </div>
                             <div className="jackpotpricewithpayment">
                               <div className="gamejackpotdiv">
@@ -315,8 +477,13 @@ function Home() {
           )}
         </>
       )}
-
       <Login isVisible={isLoginPopup} onClose={ClosePopup} />
+      {isGeolocationPopupVisible && (
+        <GeolocationPopup
+          onClose={handleCloseGeolocationPopup}
+          contests={selectedContest}
+        />
+      )}
 
       <div
         className={`howtoplay_popup_new ${isModals ? "show" : ""}`}
@@ -347,11 +514,12 @@ function Home() {
                             controls
                             id="video_howtoplay"
                             preload="metadata"
-                            poster={videoData.thumbnail_url}
-                            style={{ width: "100%", height: "auto" }}
+                            poster={videoData.thumbnail_url} // Set the thumbnail
+                            style={{ width: "100%", height: "auto" }} // Optional: responsive styles
+                            // onPlay={() => console.log(videoData.video_url)} // Log URL when video plays
                           >
                             <source
-                              src={videoData.video_url}
+                              src={videoData.video_url} // Use the video URL from the fetched data
                               type="video/mp4"
                             />
                             Your browser does not support the video tag.
@@ -365,11 +533,18 @@ function Home() {
                                 playVideo();
                               }}
                               style={{ cursor: "pointer" }} // Add cursor pointer for better UX
-                            ></div>
+                            >
+                              {/* <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 80 80"
+                              >
+                                <path d="M40 0a40 40 0 1040 40A40 40 0 0040 0zM26 61.56V18.44L64 40z" />
+                              </svg> */}
+                            </div>
                           </div>
                         </>
                       ) : (
-                        <p>Loading video...</p>
+                        <p>Loading video...</p> // Display loading message if no video data is available
                       )}
                     </div>
                   </div>
@@ -436,9 +611,7 @@ function Home() {
                 </div>
                 <div className="addcart_contst_textinfo">
                   <img src="images/ball_icon.png" alt="Icon" />
-                  <h2>
-                    Max {selectedContest?.ticket_limit} tickets per person
-                  </h2>
+                  <h2>Max {selectedContest?.maxTickets} tickets per person</h2>
                 </div>
               </div>
               <div className="bulkticketdiv">
@@ -446,11 +619,12 @@ function Home() {
                   <h2 className="bulkticketheading">Buy Bulk Tickets</h2>
                 </div>
                 <div className="chooseforinputsdiv_bulkticket">
-                  {[3, 5, 7, 10].map((value) => (
+                  {(selectedContest?.quantities || []).map((value) => (
                     <div className="choosefor_input action" key={value}>
-                      <label>
+                      <label htmlFor={`choosefor-${value}`}>
                         <input
                           type="radio"
+                          id={`choosefor-${value}`} // Unique ID for each radio button
                           name="choosefor"
                           className="radio-custom"
                           onChange={() => handleBulkSelect(value)}
