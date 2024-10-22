@@ -21,15 +21,24 @@ function Home() {
   const [isGeolocationPopupVisible, setGeolocationPopupVisible] =
     useState(false);
 
-  const location = localStorage.getItem("location");
-
   const open = async () => {
     setIsModals(true);
   };
-  const handleBuyTicketClick = (contest) => {
+const handleBuyTicketClick = (contest) => {
+  if (!contest.allowance) {
+    // Show a SweetAlert message if the user has already participated
+    Swal.fire({
+      icon: "warning",
+      title: "Participation Alert",
+      text: "You have already participated in this contest!",
+    });
+  } else {
+    // Proceed to set selected contest and update the onCarts state
     setSelectedContest(contest);
     setOnCarts(true);
-  };
+  }
+};
+
 
   const ClosedCarts = async () => {
     setOnCarts(false);
@@ -170,14 +179,14 @@ function Home() {
   }, [token]);
 
   const handleIncrease = () => {
-    if (quantity < selectedContest?.ticket_limit) {
+    if (quantity < selectedContest?.maxTickets) {
       setQuantity((prev) => prev + 1);
     } else {
       // Show SweetAlert when max limit is reached
       Swal.fire({
         icon: "warning",
         title: "Max Ticket Limit Reached",
-        text: `You can only purchase a maximum of ${selectedContest?.ticket_limit} tickets per person.`,
+        text: `You can only purchase a maximum of ${selectedContest?.maxTickets} tickets per person.`,
         confirmButtonText: "OK",
       });
     }
@@ -203,18 +212,30 @@ function Home() {
   };
 
   useEffect(() => {
-    if (token) {
+    const location = JSON.parse(localStorage.getItem("location"));
+
+    // Check if token and location exist
+    if (token && location && Object.keys(location).length > 0) {
+      // If both token and location exist, hide the popup
+      setGeolocationPopupVisible(false);
+    } else if (token) {
+      // If only token exists, show the popup
       setGeolocationPopupVisible(true);
     } else if (location && Object.keys(location).length > 0) {
+      // If only location exists, hide the popup
       setGeolocationPopupVisible(false);
     } else {
-      setGeolocationPopupVisible(false);
+      // If neither exists, show the popup
+      setGeolocationPopupVisible(true);
     }
-  }, [token, location]);
+  }, [token]);
 
   const handleCloseGeolocationPopup = () => {
     setGeolocationPopupVisible(false); // Close the geolocation popup
   };
+
+  // console.log("contests", contests[0]?.allowance);
+  
   return (
     <>
       {loading ? (

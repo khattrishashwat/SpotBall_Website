@@ -1,66 +1,86 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios"; 
+import axios from "axios";
 import Swal from "sweetalert2";
 
 function PastPayment() {
+    const [isOpen, setIsOpen] = useState(false);
+
   const [payments, setPayments] = useState([]);
   const [download, setDownload] = useState([]);
-
- useEffect(() => {
-   const fetchPayments = async () => {
-     const token = localStorage.getItem("token");
-
-     try {
-       const response = await axios.get("v1/app/contest/get-contest-payments", {
-         headers: {
-           Authorization: `Bearer ${token}`,
-         },
-       });
-
-       console.log("newww", response.data);
-
-       // Check if payments data is empty
-       if (response.data.data && response.data.data.length > 0) {
-         setPayments(response.data.data);
-       } else {
-         // Show Swal message if no past payments
-         Swal.fire({
-           icon: "info",
-           title: "No Past Payments",
-           text: "No past payments have been done.",
-           confirmButtonText: "OK",
-         });
-       }
-     } catch (error) {
-       console.error("Error fetching payments:", error);
-       Swal.fire({
-         icon: "error",
-         title: "Error",
-         text: "There was an error fetching payments. Please try again later.",
-         confirmButtonText: "OK",
-       });
-     }
-   };
-
-   fetchPayments();
- }, []);
-
-
+const toggleDropdown = () => {
+  setIsOpen(!isOpen);
+};
   useEffect(() => {
-    const fetchDownloadData = async () => {
+    const fetchPayments = async () => {
+      const token = localStorage.getItem("token");
+
       try {
         const response = await axios.get(
-          "v1/app/contest/get-bill"
-        ); // Replace with your API endpoint
-        setDownload(response.data);
+          "v1/app/contest/get-contest-payments",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        console.log("newww", response.data);
+
+        // Check if payments data is empty
+        if (response.data.data && response.data.data.length > 0) {
+          setPayments(response.data.data);
+        } else {
+          // Show Swal message if no past payments
+          Swal.fire({
+            icon: "info",
+            title: "No Past Payments",
+            text: "No past payments have been done.",
+            confirmButtonText: "OK",
+          });
+        }
       } catch (error) {
-        console.error("Error fetching payment data:", error);
+        console.error("Error fetching payments:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "There was an error fetching payments. Please try again later.",
+          confirmButtonText: "OK",
+        });
       }
     };
 
-    fetchDownloadData();
+    fetchPayments();
   }, []);
 
+  const handleDownload = async (e, paymentId) => {
+    e.preventDefault();
+    const token = localStorage.getItem("token");
+
+    try {
+      const response = await axios.get(`v1/app/contest/get-bill/${paymentId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+console.log("pdf",response.data.data[0].pdf);
+
+      const pdfUrl = response.data.data[0].pdf;
+      const link = document.createElement("a");
+      link.href = pdfUrl;
+      link.download = `invoice_${paymentId}.pdf`; // Dynamic filename
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error("Error downloading the invoice:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Download Failed",
+        text: "There was an error downloading your invoice. Please try again later.",
+      });
+    }
+  };
+console.log("jackpot_price", payments);
 
   return (
     <>
@@ -71,10 +91,13 @@ function PastPayment() {
               <div className="checkout_cartdiv">
                 <div className="cart_jackpotdetails">
                   <div className="cart_windiv">
-                    Win <span className="winprice_cart">₹50,000</span>
+                    Win{" "}
+                    <span className="winprice_cart">
+                      ₹{payment?.contestId?.jackpot_price}
+                    </span>
                   </div>
                   <div className="jackpot_ticket_cart pastpayment_detailleft">
-                    <h3>₹50,000 Jackpot</h3>
+                    <h3>₹{payment?.contestId?.jackpot_price} Jackpot</h3>
                     <span>{new Date(payment.createdAt).toLocaleString()}</span>
                     <h4>{payment.tickets} Tickets</h4>
                     <p>Payment Mode: UPI</p>
@@ -83,30 +106,39 @@ function PastPayment() {
                 <div className="cart_gametotalprice pastpay_right">
                   <div className="pastpay_invoicediv">
                     <a
-                      href={download.pdf}
                       className="downloadinvoice_hreftag"
-                      download
+                      onClick={(e) => handleDownload(e, payment._id)} // Pass paymentId
                     >
                       <img
-                        src="images/download_invoice.png"
-                        alt="Download Invoice"
+                        src={`${process.env.PUBLIC_URL}/images/download_invoice.png`}
+                        // src="images/download_invoice.png"
+                        style={{ cursor: "pointer" }}
                       />
                       <p>Download Invoice</p>
                     </a>
                   </div>
                   <p>Txn. Id.: {payment.paymentId}</p>
-                  <h3>₹990</h3>
+                  <h3>₹{payment.amount}</h3>
                   <div className="pastpay_dropdownicon">
-                    <button type="button" className="dropbtn_pastpy">
+                    <button
+                      type="button"
+                      className="dropbtn_pastpy"
+                      onClick={toggleDropdown}
+                    >
                       <img
-                        src="images/arrow_icon_payment.png"
-                        alt="Toggle Details"
+                        src={`${process.env.PUBLIC_URL}/images/arrow_icon_payment.png`}
+                        className={isOpen ? "" : "rotate_pastpayicon"}
                       />
                     </button>
                   </div>
                 </div>
               </div>
-              <div className="cordinates_table_cart pastgamecordinate_payment">
+              <div
+                className={`cordinates_table_cart pastgamecordinate_payment ${
+                  isOpen ? "" : "hide"
+                }`}
+                // className="cordinates_table_cart pastgamecordinate_payment"
+              >
                 <table className="table table-bordered cordtable_new">
                   <thead>
                     <tr>

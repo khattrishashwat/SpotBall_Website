@@ -5407,3 +5407,20 @@ ul.list-inline li a:hover {
     padding: 20px;
     border-radius: 10px;
 }
+.apply_button_cart {
+      margin-left: 438px;
+  padding: 8px 16px; 
+  background-color: #4CAF50; 
+  color: white;
+  border: none; 
+  border-radius: 4px; 
+  cursor: pointer; 
+}
+
+.apply_button_cart:hover {
+  background-color: #45a049; 
+}
+img.showcardinputonclick_icon.rotate {
+    margin-left: 350px;
+    margin-bottom: -33px;
+}

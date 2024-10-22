@@ -1,13 +1,44 @@
-import React,{useState} from "react";
+import React,{useState,useEffect} from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import Loader from "../../Loader/Loader";
+import axios from "axios";
 
 function Contact() {
-    const [loading, setLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+
+const [contacts, setContacts] = useState("");
+
+const fetchContact = async () => {
+  const token = localStorage.getItem("token");
+  try {
+    setIsLoading(true);
+    const response = await axios.get("/get-all-static-content/contact_us", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response.data.data) {
+      console.log("Fetched Contacts ", response.data.data);
+      setContacts(response.data.data[0]||{});
+    }
+  } catch (error) {
+    console.error("Error fetching :", error);
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+useEffect(() => {
+  fetchContact();
+}, []);
+
+
+console.log("contacts",contacts);
 
   return (
     <>
-      {loading ? (
+      {isLoading ? (
         <Loader /> // Show loader
       ) : (
         <>
@@ -16,13 +47,8 @@ function Contact() {
               <div className="row rowmainheading_inner">
                 <div className="col-md-12 colmainheading_innerpages">
                   <div className="pageheading_main">
-                    <h2>Contact Us</h2>
-                    <p>
-                      If you need to reach us, see the details below where you
-                      should send your inquiry. We are a Indian-based company,
-                      so watch for a reply within 24 hours of us receiving your
-                      email.
-                    </p>
+                    <h2>{contacts.title}</h2>
+                    <p>{contacts.titleDescription}</p>
                   </div>
                 </div>
               </div>
@@ -32,75 +58,47 @@ function Contact() {
                 <div className="col-md-5 col5forcontactdetails">
                   <div className="contactdetails_div">
                     <h3>Contact Information</h3>
-                    <div className="helpdeksdiv_all">
-                      <h2>General Questions/ Customer Service/ Help Desk</h2>
-                      <div className="helpsupport_info">
-                        <img
-                          src={`${process.env.PUBLIC_URL}/images/mail.png`}
-                        />
-                        <p>
-                          {" "}
-                          <a href="mailto:support_india@spotsball.com">
-                            support_india@spotsball.com
-                          </a>{" "}
-                        </p>
+                    {contacts.emailInfo?.map((contact) => (
+                      <div className="helpdeksdiv_all" key={contact._id}>
+                        <h2>{contact.info}</h2>
+                        <div className="helpsupport_info">
+                          <img
+                            src={`${process.env.PUBLIC_URL}/images/mail.png`}
+                            alt="Mail"
+                          />
+                          <p>
+                            <a href={`mailto:${contact.email}`}>
+                              {contact.email}
+                            </a>
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                    <div className="helpdeksdiv_all">
-                      <h2>Website or Mobile App Technical Issues</h2>
-                      <div className="helpsupport_info">
-                        <img
-                          src={`${process.env.PUBLIC_URL}/images/mail.png`}
-                        />
-                        <p>
-                          {" "}
-                          <a href="mailto:support_india@spotsball.com">
-                            technical_india@spotsball.com
-                          </a>{" "}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="helpdeksdiv_all">
-                      <h2>
-                        Partnership/ Business Development/ Alliance Inquiries
-                      </h2>
-                      <div className="helpsupport_info">
-                        <img
-                          src={`${process.env.PUBLIC_URL}/images/mail.png`}
-                        />
-                        <p>
-                          {" "}
-                          <a href="mailto:support_india@spotsball.com">
-                            bizdev_india@spotsball.com{" "}
-                          </a>{" "}
-                        </p>
-                      </div>
-                    </div>
+                    ))}
                     <div className="contact_socialicons">
                       <div className="social_inner">
                         <ul>
                           <li>
                             <a href="#!" className="bggreen">
-                              {" "}
                               <img
                                 src={`${process.env.PUBLIC_URL}/images/facebook_contact.png`}
-                              />{" "}
-                            </a>{" "}
+                                alt="Facebook"
+                              />
+                            </a>
                           </li>
                           <li>
                             <a href="#!">
-                              {" "}
                               <img
                                 src={`${process.env.PUBLIC_URL}/images/instagram_contact.png`}
-                              />{" "}
+                                alt="Instagram"
+                              />
                             </a>
                           </li>
                           <li>
                             <a href="#!" className="bggreen">
-                              {" "}
                               <img
                                 src={`${process.env.PUBLIC_URL}/images/twitter_contact.png`}
-                              />{" "}
+                                alt="Twitter"
+                              />
                             </a>
                           </li>
                         </ul>

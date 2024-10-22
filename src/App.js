@@ -73,7 +73,7 @@ const App = () => {
   return (
     <>
       <Helmet>
-        <title>{loader ? "loader....." : "Home"}</title>
+        <title>{loader ? "loader....." : "SpotsBall"}</title>
       </Helmet>
       <Router basename="/sportsball">
         <Suspense fallback={<Loader />}>
