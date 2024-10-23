@@ -9,12 +9,17 @@ function Screen() {
 
   const location = useLocation();
   const { quantity, responseData } = location.state.payload || {};
-
+  const [isIncreasingQuantity, setIsIncreasingQuantity] = useState(false);
+  const [increaseCount, setIncreaseCount] = useState(0);
   const [usedTickets, setUsedTickets] = useState(0);
-  const [totalTickets, setTotalTickets] = useState(
-    responseData.maxTickets || ""
+  const [totalTickets, setTotalTickets] = useState(quantity || "");
+  const [tickets, setTickets] = useState(
+    Array.from({ length: quantity }, (_, i) => ({
+      id: i + 1,
+      xCord: "____",
+      yCord: "____",
+    }))
   );
-  const [tickets, setTickets] = useState([]);
   const [coordinates, setCoordinates] = useState({ x: 0, y: 0 });
   const [clickedPoints, setClickedPoints] = useState([]);
   const [clickCount, setClickCount] = useState(0);
@@ -68,19 +73,249 @@ function Screen() {
 
   const videoData = movies.length > 0 ? movies[0] : null;
 
-  const handleAddTicket = () => {
-    if (usedTickets < totalTickets) {
+  useEffect(() => {
+    setUsedTickets(tickets.length);
+  }, [tickets]);
+
+  // const handleTicket = () => {
+  //   if (usedTickets < totalTickets) {
+  //     const newTicket = {
+  //       id: usedTickets + 1,
+  //       xCord: "____",
+  //       yCord: "____",
+  //     };
+  //     setTickets((prev) => [...prev, newTicket]);
+  //     setUsedTickets((prev) => prev + 1);
+  //   } else {
+  //     if (usedTickets < responseData.maxTickets) {
+  //       // Check against max tickets
+  //       Swal.fire({
+  //         title: "You have reached your ticket limit",
+  //         text: "Do you want to increase your ticket quantity?",
+  //         icon: "warning",
+  //         showCancelButton: true,
+  //         confirmButtonText: "Yes, increase",
+  //         cancelButtonText: "No, keep it the same",
+  //       }).then((result) => {
+  //         if (result.isConfirmed) {
+  //           setTotalTickets((prev) => prev + 1); // Increment totalTickets
+  //           setUsedTickets((prev) => prev + 1); // Increment usedTickets
+  //           setIncreaseCount((prev) => prev + 1); // Track how many times the user confirmed to increase
+
+  //           const newTicket = {
+  //             id: usedTickets + 1,
+  //             xCord: "____",
+  //             yCord: "____",
+  //           };
+  //           setTickets((prev) => [...prev, newTicket]); // Add the new ticket
+  //           setIsIncreasingQuantity(true); // Set the flag to true
+
+  //           Swal.fire({
+  //             icon: "success",
+  //             title: "Ticket quantity increased!",
+  //             showConfirmButton: false,
+  //             timer: 1500,
+  //           });
+  //         } else {
+  //           Swal.fire({
+  //             icon: "info",
+  //             title: "No more tickets added.",
+  //             showConfirmButton: false,
+  //             timer: 1500,
+  //           });
+  //         }
+  //       });
+  //     } else {
+  //       Swal.fire({
+  //         icon: "error",
+  //         title: "Maximum ticket limit reached!",
+  //         text: `You cannot add more than ${responseData.maxTickets} tickets.`,
+  //       });
+  //     }
+  //   }
+  // };
+
+  //   const handleTicket = () => {
+  //     if (usedTickets < totalTickets) {
+  //       const newTicket = {
+  //         id: usedTickets + 1,
+  //         xCord: "____",
+  //         yCord: "____",
+  //       };
+  //       setTickets((prev) => [...prev, newTicket]);
+  //       setUsedTickets((prev) => prev + 1);
+  //     } else {
+  //       if (!isIncreasingQuantity) {
+  //         Swal.fire({
+  //           title: "You have reached your ticket limit",
+  //           text: "Do you want to increase your ticket quantity?",
+  //           icon: "warning",
+  //           showCancelButton: true,
+  //           confirmButtonText: "Yes, increase",
+  //           cancelButtonText: "No, keep it the same",
+  //         }).then((result) => {
+  //           if (result.isConfirmed) {
+  //             setTotalTickets((prev) => prev + 1);
+  //             setIncreaseCount((prev) => prev + 1);
+  //             const newTicket = {
+  //               id: usedTickets + 1,
+  //               xCord: "____",
+  //               yCord: "____",
+  //             };
+  //             setTickets((prev) => [...prev, newTicket]);
+  //             setUsedTickets((prev) => prev + 1); // Increment usedTickets
+  //             setIsIncreasingQuantity(true);
+  //             Swal.fire({
+  //               icon: "success",
+  //               title: "Ticket quantity increased!",
+  //               showConfirmButton: false,
+  //               timer: 1500,
+  //             });
+  //           } else {
+  //             Swal.fire({
+  //               icon: "info",
+  //               title: "No more tickets added.",
+  //               showConfirmButton: false,
+  //               timer: 1500,
+  //             });
+  //           }
+  //         });
+  //       } else {
+  //         // If already increasing quantity, directly add a new ticket
+  //         const newTicket = {
+  //           id: usedTickets + 1,
+  //           xCord: "____",
+  //           yCord: "____",
+  //         };
+  //         setTickets((prev) => [...prev, newTicket]);
+  //         setUsedTickets((prev) => prev + 1);
+  //         setTotalTickets((prev) => prev + 1);
+  //       }
+  //     }
+  //   };
+
+  // const handleAddTicket = () => {
+  //   // Check if usedTickets is less than totalTickets and also less than maxTickets
+  //   if (usedTickets < totalTickets && usedTickets < responseData.maxTickets) {
+  //     const newTicket = {
+  //       id: usedTickets + 1,
+  //       xCord: "____",
+  //       yCord: "____",
+  //     };
+  //     setTickets((prev) => [...prev, newTicket]);
+  //     setUsedTickets((prev) => prev + 1); // Increment usedTickets
+  //   } else {
+  //     // Show a message if the maximum limit is reached
+  //     Swal.fire({
+  //       icon: "warning",
+  //       title: "Maximum ticket limit reached",
+  //       text: `You cannot add more than ${responseData.maxTickets} tickets.`,
+  //       confirmButtonText: "OK",
+  //     });
+  //   }
+  // };
+
+  const handleTicket = () => {
+    // Check if usedTickets is less than totalTickets and also less than maxTickets
+    if (usedTickets < totalTickets && usedTickets < responseData.maxTickets) {
       const newTicket = {
         id: usedTickets + 1,
         xCord: "____",
         yCord: "____",
       };
       setTickets((prev) => [...prev, newTicket]);
-      setUsedTickets((prev) => prev + 1);
+      setUsedTickets((prev) => prev + 1); // Increment usedTickets
+    } else if (usedTickets >= totalTickets && !isIncreasingQuantity) {
+      // If usedTickets has reached totalTickets, prompt to increase
+      Swal.fire({
+        title: "You have reached your ticket limit",
+        text: "Do you want to increase your ticket quantity?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, increase",
+        cancelButtonText: "No, keep it the same",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          setTotalTickets((prev) => prev + 1);
+          const newTicket = {
+            id: usedTickets + 1,
+            xCord: "____",
+            yCord: "____",
+          };
+          setTickets((prev) => [...prev, newTicket]);
+          setUsedTickets((prev) => prev + 1); // Increment usedTickets
+          setIsIncreasingQuantity(true);
+          Swal.fire({
+            icon: "success",
+            title: "Ticket quantity increased!",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+        } else {
+          Swal.fire({
+            icon: "info",
+            title: "No more tickets added.",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+        }
+      });
     } else {
-      alert("No more tickets available.");
+      // Show a message if the maximum limit is reached
+      Swal.fire({
+        icon: "warning",
+        title: "Maximum ticket limit reached",
+        text: `You cannot add more than ${responseData.maxTickets} tickets.`,
+        confirmButtonText: "OK",
+      });
     }
   };
+
+  const handleAddTicket = () => {
+    // Check if usedTickets is less than maxTickets
+    if (usedTickets < responseData.maxTickets) {
+      const newTicket = {
+        id: usedTickets + 1,
+        xCord: "____",
+        yCord: "____",
+      };
+
+      // Add the new ticket
+      setTickets((prev) => [...prev, newTicket]);
+
+      // Increment usedTickets and totalTickets
+      setUsedTickets((prev) => prev + 1); // Increment usedTickets
+      setTotalTickets((prev) => prev + 1); // Increment totalTickets
+    } else {
+      // Show a message if the maximum limit is reached
+      Swal.fire({
+        icon: "warning",
+        title: "Maximum ticket limit reached",
+        text: `You cannot add more than ${responseData.maxTickets} tickets.`,
+        confirmButtonText: "OK",
+      });
+    }
+  };
+
+  //   // Check if usedTickets is less than maxTickets
+  //   if (usedTickets < responseData.maxTickets) {
+  //     const newTicket = {
+  //       id: usedTickets + 1,
+  //       xCord: "____",
+  //       yCord: "____",
+  //     };
+  //     setTickets((prev) => [...prev, newTicket]);
+  //     setUsedTickets((prev) => prev + 1); // Increment usedTickets
+  //   } else {
+  //     // Show a message if the maximum limit is reached
+  //     Swal.fire({
+  //       icon: "warning",
+  //       title: "Maximum ticket limit reached",
+  //       text: `You cannot add more than ${responseData.maxTickets} tickets.`,
+  //       confirmButtonText: "OK",
+  //     });
+  //   }
+  // };
 
   const handleRefreshAll = () => {
     setTickets((prev) =>
@@ -93,13 +328,135 @@ function Screen() {
     setClickedPoints([]);
     setClickCount(0);
   };
-
   const handleDeleteTicket = (id) => {
-    setTickets((prev) =>
-      prev.map((ticket) =>
-        ticket.id === id ? { ...ticket, xCord: "____", yCord: "____" } : ticket
-      )
+    const updatedTickets = tickets.filter((ticket) => ticket.id !== id);
+
+    const reindexedTickets = updatedTickets.map((ticket, index) => ({
+      ...ticket,
+      id: index + 1,
+    }));
+
+    setTickets(reindexedTickets);
+
+    const ticketToDelete = tickets.find((ticket) => ticket.id === id);
+    if (ticketToDelete) {
+      setClickedPoints((prev) =>
+        prev.filter(
+          (point) =>
+            point.x !== ticketToDelete.xCord && point.y !== ticketToDelete.yCord
+        )
+      );
+
+      setClickCount((prev) => prev - 1);
+      setUsedTickets((prev) => prev - 1); // Decrement usedTickets
+      setTotalTickets((prev) => prev - 1); // Decrement totalTickets
+    }
+  };
+
+  // const handleReply = (id) => {
+  //   setTickets((prev) =>
+  //     prev.map((ticket) =>
+  //       ticket.id === id ? { ...ticket, xCord: "____", yCord: "____" } : ticket
+  //     )
+  //   );
+
+  //   const ticketToUpdate = tickets.find((ticket) => ticket.id === id);
+
+  //   if (ticketToUpdate) {
+  //     setClickedPoints((prev) =>
+  //       prev.filter(
+  //         (point) =>
+  //           point.x !== ticketToUpdate.xCord || point.y !== ticketToUpdate.yCord
+  //       )
+  //     );
+  //   }
+  // };
+
+  // const handleReply = (id) => {
+  //   setTickets((prev) =>
+  //     prev.map((ticket) =>
+  //       ticket.id === id ? { ...ticket, xCord: "____", yCord: "____" } : ticket
+  //     )
+  //   );
+
+  //   // Get the ticket that was updated
+  //   const ticketToUpdate = tickets.find((ticket) => ticket.id === id);
+
+  //   if (ticketToUpdate) {
+  //     // Update clickedPoints to remove the ticket's previous coordinates
+  //     setClickedPoints((prev) =>
+  //       prev.filter(
+  //         (point) =>
+  //           point.x !== ticketToUpdate.xCord || point.y !== ticketToUpdate.yCord
+  //       )
+  //     );
+
+  //     // Add back the reset coordinates, ensuring they can be reused
+  //     setClickedPoints((prev) => [...prev, { x: "____", y: "____" }]);
+  //   }
+  // };
+
+  // const handleReply = (id) => {
+  //   const updatedTickets = tickets.map((ticket) =>
+  //     ticket.id === id ? { ...ticket, xCord: "____", yCord: "____" } : ticket
+  //   );
+
+  //   setTickets(updatedTickets);
+
+  //   const ticketToUpdate = tickets.find((ticket) => ticket.id === id);
+  //   if (ticketToUpdate) {
+  //     setClickedPoints((prev) =>
+  //       prev.filter(
+  //         (point) =>
+  //           point.x !== ticketToUpdate.xCord || point.y !== ticketToUpdate.yCord
+  //       )
+  //     );
+
+  //     // Optionally decrement usedTickets if you want to track that too
+  //     setUsedTickets((prev) => prev - 1);
+  //   }
+  // };
+
+  // const handleReply = (id) => {
+  //   const updatedTickets = tickets.map((ticket) =>
+  //     ticket.id === id ? { ...ticket, xCord: "____", yCord: "____" } : ticket
+  //   );
+
+  //   setTickets(updatedTickets);
+
+  //   // Here we do not decrement usedTickets or clickCount
+  //   const ticketToUpdate = tickets.find((ticket) => ticket.id === id);
+  //   if (ticketToUpdate) {
+  //     // Optionally keep clicked points in sync
+  //     setClickedPoints((prev) =>
+  //       prev.filter(
+  //         (point) =>
+  //           point.x !== ticketToUpdate.xCord || point.y !== ticketToUpdate.yCord
+  //       )
+  //     );
+  //   }
+  // };
+
+  const handleReply = (id) => {
+    const updatedTickets = tickets.map((ticket) =>
+      ticket.id === id ? { ...ticket, xCord: "____", yCord: "____" } : ticket
     );
+
+    setTickets(updatedTickets);
+
+    const ticketToUpdate = tickets.find((ticket) => ticket.id === id);
+    if (ticketToUpdate) {
+      setClickedPoints((prev) =>
+        prev.filter(
+          (point) =>
+            point.x !== ticketToUpdate.xCord || point.y !== ticketToUpdate.yCord
+        )
+      );
+
+      // Decrement clickCount and usedTickets in one go
+      setClickCount((prevClickCount) => prevClickCount - 1);
+      setUsedTickets((prevUsedTickets) => prevUsedTickets - 1);
+    }
   };
 
   const handleMouseMove = (e) => {
@@ -117,38 +474,141 @@ function Screen() {
     setShowTooltip(false);
   };
 
+  // const handleClick = (e) => {
+  //   if (clickCount >= totalTickets) {
+  //     alert("You have used all your chances.");
+  //     return;
+  //   }
+
+  //   const image = e.target;
+  //   const rect = image.getBoundingClientRect();
+  //   const x = (e.clientX - rect.left).toFixed(2); // Format to two decimal places
+  //   const y = (e.clientY - rect.top).toFixed(2); // Format to two decimal places
+
+  //   const updatedTickets = [...tickets];
+  //   const ticketIndex = updatedTickets.findIndex(
+  //     (ticket) => ticket.xCord === "____" && ticket.yCord === "____"
+  //   );
+
+  //   if (ticketIndex !== -1) {
+  //     updatedTickets[ticketIndex] = {
+  //       xCord: x,
+  //       yCord: y,
+  //       id: updatedTickets[ticketIndex].id,
+  //     };
+  //     setTickets(updatedTickets);
+  //     setClickedPoints((prev) => [...prev, { x, y }]);
+  //     setClickCount((prev) => prev + 1);
+  //   } else {
+  //     alert("All tickets are already filled.");
+  //   }
+  // };
+
+  // const handleClick = (e) => {
+  //   if (clickCount >= usedTickets) {
+  //     alert("You have used all your chances.");
+  //     return;
+  //   }
+
+  //   const image = e.target;
+  //   const rect = image.getBoundingClientRect();
+  //   const x = (e.clientX - rect.left).toFixed(2);
+  //   const y = (e.clientY - rect.top).toFixed(2);
+
+  //   const updatedTickets = [...tickets];
+  //   const ticketIndex = updatedTickets.findIndex(
+  //     (ticket) => ticket.xCord === "____" && ticket.yCord === "____"
+  //   );
+
+  //   if (ticketIndex !== -1) {
+  //     updatedTickets[ticketIndex] = {
+  //       xCord: x,
+  //       yCord: y,
+  //       id: updatedTickets[ticketIndex].id,
+  //     };
+  //     setTickets(updatedTickets);
+  //     setClickedPoints((prev) => [...prev, { x, y }]);
+  //     setClickCount((prev) => prev + 1);
+  //     // setUsedTickets((prev) => prev + 1); // Increment usedTickets here
+  //     // setTotalTickets((prev) => prev + 1); // Optionally, if you want to increase total tickets on click
+  //   } else {
+  //     alert("All tickets are already filled.");
+  //   }
+  // };
+
+  // const handleClick = (e) => {
+  //   // Check if the user has used all their chances
+  //   if (clickCount >= usedTickets) {
+  //     alert("You have used all your chances.");
+  //     return;
+  //   }
+
+  //   const image = e.target;
+  //   const rect = image.getBoundingClientRect();
+  //   const x = (e.clientX - rect.left).toFixed(2);
+  //   const y = (e.clientY - rect.top).toFixed(2);
+
+  //   const updatedTickets = [...tickets];
+  //   const ticketIndex = updatedTickets.findIndex(
+  //     (ticket) => ticket.xCord === "____" // Allow filling empty tickets
+  //   );
+
+  //   if (ticketIndex !== -1) {
+  //     // Update the ticket's coordinates
+  //     updatedTickets[ticketIndex] = {
+  //       ...updatedTickets[ticketIndex],
+  //       xCord: x,
+  //       yCord: y,
+  //     };
+
+  //     // Update the state
+  //     setTickets(updatedTickets);
+  //     setClickedPoints((prev) => [...prev, { x, y }]);
+  //     setClickCount((prev) => prev + 1);
+  //     setUsedTickets((prev) => prev + 1); // Increment usedTickets here
+  //   } else {
+  //     alert("All tickets are already filled.");
+  //   }
+  // };
+
   const handleClick = (e) => {
-    if (clickCount >= quantity) {
+    // Check if the user has used all their chances
+    if (clickCount >= usedTickets) {
       alert("You have used all your chances.");
       return;
     }
 
     const image = e.target;
     const rect = image.getBoundingClientRect();
-    const x = (e.clientX - rect.left).toFixed(2); // Format to two decimal places
-    const y = (e.clientY - rect.top).toFixed(2); // Format to two decimal places
+    const x = (e.clientX - rect.left).toFixed(2);
+    const y = (e.clientY - rect.top).toFixed(2);
 
     const updatedTickets = [...tickets];
+    // Allow filling empty tickets
     const ticketIndex = updatedTickets.findIndex(
-      (ticket) => ticket.xCord === "____" && ticket.yCord === "____"
+      (ticket) => ticket.xCord === "____"
     );
 
     if (ticketIndex !== -1) {
+      // Update the ticket's coordinates
       updatedTickets[ticketIndex] = {
+        ...updatedTickets[ticketIndex],
         xCord: x,
         yCord: y,
-        id: updatedTickets[ticketIndex].id,
-      }; // Maintain ticket ID
+      };
+
+      // Update the state
       setTickets(updatedTickets);
       setClickedPoints((prev) => [...prev, { x, y }]);
-      setClickCount((prev) => prev + 1);
+      setClickCount((prev) => prev + 1); // Increment clickCount only when filling a new ticket
+      setUsedTickets((prev) => prev + 1); // Increment usedTickets here if needed
     } else {
       alert("All tickets are already filled.");
     }
   };
 
   const handleCheckout = async () => {
-    const contest_id = responseData._id; // Assuming responseData has concertId
+    const contest_id = responseData._id;
     const usedTicketCoordinates = tickets
       .filter((ticket) => ticket.xCord !== "____" && ticket.yCord !== "____")
       .map((ticket) => ({
@@ -238,8 +698,8 @@ function Screen() {
                   <div
                     style={{
                       position: "absolute",
-                      left: coordinates.x + 10, // Offset for visibility
-                      top: coordinates.y + 10, // Offset for visibility
+                      left: coordinates.x + 10,
+                      top: coordinates.y + 10,
                       backgroundColor: "rgba(0, 0, 0, 0.7)",
                       color: "#fff",
                       padding: "1px 1px",
@@ -267,7 +727,7 @@ function Screen() {
                       src={`${process.env.PUBLIC_URL}/images/user_guide_icon.png`}
                     />
                   </div>
-                  <div className="threeicons_action" onClick={handleAddTicket}>
+                  <div className="threeicons_action" onClick={handleTicket}>
                     <img
                       src={`${process.env.PUBLIC_URL}/images/ticket_icon.png`}
                       alt="Add Ticket"
@@ -320,7 +780,10 @@ function Screen() {
                         </div>
                         <div className="contestaction_div">
                           <div className="cord_actiondiv">
-                            <div className="actionicondiv">
+                            <div
+                              className="actionicondiv"
+                              onClick={() => handleReply(ticket.id)}
+                            >
                               <img
                                 src={`${process.env.PUBLIC_URL}/images/refresh_cord.png`}
                               />

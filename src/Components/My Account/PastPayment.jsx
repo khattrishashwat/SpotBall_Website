@@ -100,7 +100,7 @@ console.log("jackpot_price", payments);
                     <h3>₹{payment?.contestId?.jackpot_price} Jackpot</h3>
                     <span>{new Date(payment.createdAt).toLocaleString()}</span>
                     <h4>{payment.tickets} Tickets</h4>
-                    <p>Payment Mode: UPI</p>
+                    {/* <p>Payment Mode: UPI</p> */}
                   </div>
                 </div>
                 <div className="cart_gametotalprice pastpay_right">

@@ -7,6 +7,8 @@ import axios from "axios";
 import Forget from "./Forget";
 import Signup from "./Signup";
 import Loader from "../Loader/Loader";
+import { GoogleLogin } from "@react-oauth/google";
+
 
 function Login({ isVisible, onClose }) {
   const [showPassword, setShowPassword] = useState(false);
@@ -92,6 +94,18 @@ function Login({ isVisible, onClose }) {
     onClose(); // Close the login popup
   };
 
+  const handleGoogleLogin = () => {
+    return (
+      <GoogleLogin
+        onSuccess={(credentialResponse) => {
+          console.log(credentialResponse);
+        }}
+        onError={() => {
+          console.log("Login Failed");
+        }}
+      />
+    );
+  };
   return (
     <>
       <div
@@ -212,8 +226,29 @@ function Login({ isVisible, onClose }) {
                                   <p>or Sign Up using</p>
                                   <div className="signupsociallinks">
                                     <ul>
+                                      {/* <li>
+                                        <GoogleLogin
+                                          onSuccess={(credentialResponse) => {
+                                            console.log(credentialResponse);
+                                          }}
+                                          onError={() => {
+                                            console.log("Login Failed");
+                                          }}
+                                          render={(renderProps) => (
+                                            <a
+                                              onClick={renderProps.onClick}
+                                              disabled={renderProps.disabled}
+                                            >
+                                              <img
+                                                src="images/google_icon.png"
+                                                alt="Google"
+                                              />
+                                            </a>
+                                          )}
+                                        />
+                                      </li> */}
                                       <li>
-                                        <a href="#">
+                                        <a>
                                           <img
                                             src="images/google_icon.png"
                                             alt="Google"
@@ -221,7 +256,7 @@ function Login({ isVisible, onClose }) {
                                         </a>
                                       </li>
                                       <li>
-                                        <a href="#">
+                                        <a>
                                           <img
                                             src="images/facebook_icon.png"
                                             alt="Facebook"

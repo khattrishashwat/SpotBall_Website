@@ -24,16 +24,20 @@ function Home() {
   const open = async () => {
     setIsModals(true);
   };
+// const handleBuyTicketClick = (contest) => {
+  
+//     setSelectedContest(contest);
+//     setOnCarts(true);
+  
+// };
 const handleBuyTicketClick = (contest) => {
   if (!contest.allowance) {
-    // Show a SweetAlert message if the user has already participated
     Swal.fire({
       icon: "warning",
       title: "Participation Alert",
       text: "You have already participated in this contest!",
     });
   } else {
-    // Proceed to set selected contest and update the onCarts state
     setSelectedContest(contest);
     setOnCarts(true);
   }
@@ -246,7 +250,12 @@ const handleBuyTicketClick = (contest) => {
             <div className="container-fluid contfld_mainvideobanner">
               <div className="mainbannervideodiv">
                 <div className="banner_video">
-                  <img src={banner.banner_url} alt="Banner" />
+                  <img
+                    // src={`${process.env.PUBLIC_URL}/images/cricket_contest.jpg`}
+                    src={banner.banner_url}
+
+                    // alt="Banner"
+                  />
                 </div>
                 <div className="autoscroll_section">
                   <div className="marquee">
@@ -411,7 +420,17 @@ const handleBuyTicketClick = (contest) => {
                             <img
                               src={contests[0].contest_banner?.file_url}
                               alt="Contest Banner"
+                              width="750" // Intrinsic width
+                              height="500" // Intrinsic height
+                              style={{
+                                width: "459px",
+                                height: "306px",
+                                objectFit: "cover",
+                              }}
                             />
+                            {/* <img
+                              src={`${process.env.PUBLIC_URL}/images/cricket_contest.jpg`}
+                            /> */}
                           </div>
                         </div>
                         <div className="compitionsbox">

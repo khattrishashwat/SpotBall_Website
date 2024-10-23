@@ -1576,10 +1576,10 @@ ul.list-inline li a:hover {
   color: #009e49;
   border: 2px solid #009e49;
   padding: 1px;
-  font-size: 12px;
+  font-size: 16px;
   width: 20px;
   height: 20px;
-  line-height: 17px;
+  line-height: 14px;
   text-align: center;
   border-radius: 50%;
 }
@@ -4114,8 +4114,8 @@ ul.list-inline li a:hover {
 .passinputdiv .frmctrldiv .eyeiconforpass {
   position: absolute;
   right: 20px;
-  top: 20px;
-  width: 20px;
+      top: 16px;
+    width: 12px;
   cursor: pointer;
 }
 .changepassforminputs .savepass_btndiv {
@@ -5407,20 +5407,34 @@ ul.list-inline li a:hover {
     padding: 20px;
     border-radius: 10px;
 }
-.apply_button_cart {
-      margin-left: 438px;
-  padding: 8px 16px; 
-  background-color: #4CAF50; 
-  color: white;
-  border: none; 
-  border-radius: 4px; 
-  cursor: pointer; 
+.promotionalinput_cart {
+  position: relative; /* Create a positioning context for the button */
+  width: 100%; /* Adjust the width as necessary */
 }
 
-.apply_button_cart:hover {
-  background-color: #45a049; 
+.discountinput_cart {
+  width: 100%; /* Full width for the input */
+  padding-right: 80px; /* Add some padding to the right to avoid overlap */
 }
+
+.apply_button_cart {
+  position: absolute; /* Position the button absolutely */
+  right: 10px; /* Adjust as needed for spacing */
+  top: 50%; /* Center the button vertically */
+  transform: translateY(-50%); /* Adjust vertical centering */
+  border: none; /* Optional: style button */
+  background-color: #007bff; /* Example background color */
+  color: white; /* Example text color */
+  cursor: pointer; /* Pointer on hover */
+  padding: 5px 10px; /* Button padding */
+}
+
 img.showcardinputonclick_icon.rotate {
+    margin-left: 350px;
+    margin-bottom: -33px;
+}
+
+img.showcardinputonclick_icon {
     margin-left: 350px;
     margin-bottom: -33px;
 }

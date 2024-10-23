@@ -6,7 +6,7 @@ import Swal from "sweetalert2";
 
 function Checkout() {
   const navigate = useNavigate();
-const location = useLocation();
+  const location = useLocation();
   const [isLoading, setIsLoading] = useState(false);
   const [carts, setCarts] = useState("");
   const [isCardActive, setIsCardActive] = useState(false);
@@ -23,7 +23,6 @@ const location = useLocation();
   const [validUpto, setValidUpto] = useState("");
   const [cvv, setCvv] = useState("");
 
-
   const fetchData = async () => {
     const token = localStorage.getItem("token");
     try {
@@ -34,28 +33,28 @@ const location = useLocation();
         },
       });
 
-    //  if (response.data.data.length === 0 && location.pathname === "/cart") {
-     if (response.data.data.length === 0 ) {
-       Swal.fire({
-         icon: "info",
-         title: "No Cart Items",
-         text: "Your cart is currently empty.",
-         confirmButtonText: "OK",
-       }).then((result) => {
-         if (result.isConfirmed) {
-           navigate("/");
-         }
-       });
-     } else {
-       setCarts(response.data.data || {});
+      //  if (response.data.data.length === 0 && location.pathname === "/cart") {
+      if (response.data.data.length === 0) {
+        Swal.fire({
+          icon: "info",
+          title: "No Cart Items",
+          text: "Your cart is currently empty.",
+          confirmButtonText: "OK",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            navigate("/");
+          }
+        });
+      } else {
+        setCarts(response.data.data || {});
 
-       const contest = response.data.data[0]; // Assuming you want the first contest
-       setContestDetails(contest);
-       setContestId(contest.contest_id._id); // Set contest ID
-       setTickets(contest.tickets_count); // Set the number of tickets
-       setCoordinates(contest.user_coordinates); // Set user coordinates
-       setPromoCodeApplied(contest.contest_id.promocodes);
-     }
+        const contest = response.data.data[0]; // Assuming you want the first contest
+        setContestDetails(contest);
+        setContestId(contest.contest_id._id); // Set contest ID
+        setTickets(contest.tickets_count); // Set the number of tickets
+        setCoordinates(contest.user_coordinates); // Set user coordinates
+        setPromoCodeApplied(contest.contest_id.promocodes);
+      }
     } catch (error) {
       console.error("Error data:", error);
     } finally {
@@ -142,17 +141,13 @@ const location = useLocation();
     const promo = promoCodeApplied.find((p) => p.promocode === promoCode);
 
     if (promo) {
-      // Calculate total before discount
       const totalBeforeDiscount = calculatedCarts.reduce((total, cart) => {
         return total + parseFloat(cart.totalPayment);
       }, 0);
 
-      // Apply the discount amount
-      const discount = promo.amount || DEFAULT_DISCOUNT; // Default to 0 if undefined
+     const discount = promo.amount || DEFAULT_DISCOUNT; // Default to 0 if undefined
       setDiscountAmount(discount);
     } else {
-      // Use a notification library instead of alert
-      // Example: Swal.fire({ title: "Invalid promo code", icon: "error" });
       console.log("Invalid promo code");
     }
   };
@@ -241,7 +236,7 @@ const location = useLocation();
         "Your payment has been recorded successfully.",
         "success"
       ).then(() => {
-        navigate("/my_account");
+        window.location.reload();
       });
     } catch (error) {
       Swal.fire(
@@ -264,7 +259,7 @@ const location = useLocation();
 
     const options = {
       key: "rzp_test_TYK1sgruH0AHoM", // Your Razorpay test key
-      amount: Math.round(totalPayments * 100), // Amount in paise
+      amount: Math.round(totalPayments * 100),
       currency: "INR",
       name: "SpotsBall",
       description: "Buy ticket to play",
@@ -275,7 +270,7 @@ const location = useLocation();
           paymentId: response.razorpay_payment_id,
           coordinates: carts[0]?.user_coordinates, // Replace with actual coordinates
           tickets: carts[0]?.tickets_count,
-          amount: options.amount,
+          amount: totalPayments,
           promoCodeApplied: carts[0]?.contest_id?.promocodes?.map(
             ({ promocode, amount }) => ({ promocode, amount })
           ),
@@ -325,9 +320,9 @@ const location = useLocation();
   };
 
   const handlePaymentClick = () => {
-    if (validateInputs()) {
-      displayRazorpay();
-    }
+    displayRazorpay();
+    // if (validateInputs()) {
+    // }
   };
 
   return (

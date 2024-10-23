@@ -47,10 +47,13 @@ function Circle() {
                       <div className="col-md-12 colmainwinnerbox">
                         <div className="jackpotwinner_div">
                           <div className="winnercrclimg">
-                            <img src="images/winner_img.png" />
+                            <img
+                              src={`${process.env.PUBLIC_URL}/images/winner_img.png`}
+                              // src="images/winner_img.png"
+                            />
                           </div>
                           <div className="winnerabouttext">
-                            <h3>Subbiah T</h3>
+                            <h3>SHASHWAT KHATTRI</h3>
                             <p>Jackpot March 06, 2024</p>
                             <h4>₹1,50,000</h4>
                           </div>
@@ -67,10 +70,13 @@ function Circle() {
                       <div className="col-md-12 colmainwinnerbox">
                         <div className="jackpotwinner_div">
                           <div className="winnercrclimg">
-                            <img src="images/winner_img.png" />
+                            <img
+                              src={`${process.env.PUBLIC_URL}/images/winner_img.png`}
+                              // src="images/winner_img.png"
+                            />
                           </div>
                           <div className="winnerabouttext">
-                            <h3>Subbiah T</h3>
+                            <h3>RAVI</h3>
                             <p>Jackpot March 06, 2024</p>
                             <h4>₹1,50,000</h4>
                           </div>
@@ -87,7 +93,10 @@ function Circle() {
                       <div className="col-md-6 colmainwinnerbox">
                         <div className="jackpotwinner_div">
                           <div className="winnercrclimg">
-                            <img src="images/winner_img2.png" />
+                            <img
+                              src={`${process.env.PUBLIC_URL}/images/winner_img2.png`}
+                              // src="images/winner_img2.png"
+                            />
                           </div>
                           <div className="winnerabouttext">
                             <h3>Subbiah T</h3>

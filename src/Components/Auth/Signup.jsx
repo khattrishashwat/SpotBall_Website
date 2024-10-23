@@ -103,10 +103,10 @@ const Signup = ({ onClose }) => {
 
                       <Formik
                         initialValues={initialValues}
-                        validationSchema={validation}
+                        // validationSchema={validation}
                         onSubmit={handleSignup}
                       >
-                        {({ isSubmitting,errors }) => (
+                        {({ isSubmitting, errors }) => (
                           <Form className="formstart">
                             {/* First Name */}
                             <div className="form-control frmctrldiv">
@@ -221,15 +221,9 @@ const Signup = ({ onClose }) => {
                                 />
                                 <label className="labelrememebrme">
                                   I have read & agree with{" "}
-                                  <Link to="/legal_terms">
+                                  <Link to="/legal_terms" onClick={onClose}>
                                     Terms & Conditions
                                   </Link>
-                                  ,{" "}
-                                  <Link to="/privacy_policy">
-                                    Privacy Policy
-                                  </Link>
-                                  , &{" "}
-                                  <Link to="/cookie_policy">Cookie Policy</Link>
                                 </label>
                               </div>
                             </div>
@@ -244,7 +238,7 @@ const Signup = ({ onClose }) => {
                                 />
                                 <label className="labelrememebrme">
                                   I have read & agree with{" "}
-                                  <Link to="/legal_terms">
+                                  <Link to="/legal_terms" onClick={onClose}>
                                     Rules of Play & FAQ's
                                   </Link>
                                 </label>

@@ -192,7 +192,9 @@ function Legal() {
                           >
                             <h4 className="panel-title">
                               <a
-                                className="collapsed"
+                                className={
+                                  activeIndex === index ? "" : "collapsed"
+                                }
                                 role="button"
                                 data-toggle="collapse"
                                 data-parent="#accordion"

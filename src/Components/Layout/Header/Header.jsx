@@ -105,17 +105,21 @@ function Header() {
     return () => clearInterval(timer);
   }, []);
 
-  const formatTime = (milliseconds) => {
-    const totalSeconds = Math.max(0, Math.floor(milliseconds / 1000));
-    const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, "0");
-    const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(
-      2,
-      "0"
-    );
-    const seconds = String(totalSeconds % 60).padStart(2, "0");
-    return `${hours}:${minutes}:${seconds}`;
-  };
+ const formatTime = (milliseconds) => {
+   const totalSeconds = Math.max(0, Math.floor(milliseconds / 1000));
+   const days = String(Math.floor(totalSeconds / 86400)).padStart(2, "0"); // 86400 seconds in a day
+   const hours = String(Math.floor((totalSeconds % 86400) / 3600)).padStart(
+     2,
+     "0"
+   );
+   const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(
+     2,
+     "0"
+   );
+   const seconds = String(totalSeconds % 60).padStart(2, "0");
 
+   return `${days} days:${hours} hours:${minutes} mintues:${seconds} seconds`;
+ };
   return (
     <>
       <header className={headerClass}>
@@ -290,7 +294,10 @@ function Header() {
                         {!token && (
                           <li className="mainmenulist">
                             <a
-                              onClick={OpenSignIn}
+                              onClick={() => {
+                                OpenSignIn(); 
+                                setIsMenuVisible(false); 
+                              }}
                               className="showsigninpopup_onclick"
                             >
                               <div className="menubar_divmain">

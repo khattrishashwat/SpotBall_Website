@@ -17,7 +17,10 @@ function Weekly() {
           <div className="row rowlivewinnermain">
             <div className="col-md-4 weeklywinner_boxcol4">
               <div className="winnerbox_live_imgdiv">
-                <img src="images/weekly_winner.png" />
+                <img
+                  src={`${process.env.PUBLIC_URL}/images/weekly_winner.png`}
+                  // src="images/weekly_winner.png"
+                />
               </div>
             </div>
             <div className="col-md-8 weeklywinner_col8">
@@ -25,7 +28,10 @@ function Weekly() {
                 <div className="daystripe_div">
                   <h3>Every Sunday</h3>
                   <div className="gamewinnertimingdiv">
-                    <img src="images/ball_icon.png" />
+                    <img
+                      src={`${process.env.PUBLIC_URL}/images/ball_icon.png`}
+                      // src="images/ball_icon.png"
+                    />
                     <h4>
                       entry deadline for last week’s contest{" "}
                       <span>- 23:59hrs</span>
