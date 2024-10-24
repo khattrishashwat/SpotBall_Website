@@ -2,6 +2,7 @@ import React,{useState,useEffect} from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import Loader from "../../Loader/Loader";
 import axios from "axios";
+import * as Yup from "yup";
 
 function Contact() {
     const [isLoading, setIsLoading] = useState(false);
@@ -33,6 +34,35 @@ useEffect(() => {
   fetchContact();
 }, []);
 
+const capitalizeFirstLetter = (value) => {
+  if (!value) return value;
+  return value.charAt(0).toUpperCase() + value.slice(1);
+};
+
+const handleNumericInput = (value) => {
+  return value.replace(/\D/g, "");
+};
+
+const validationContact = Yup.object().shape({
+  firstName: Yup.string()
+    .required("First Name is required")
+    .matches(/^[A-Z]/, "First letter must be capital"),
+  lastName: Yup.string()
+    .required("Last Name is required")
+    .matches(/^[A-Z]/, "First letter must be capital"),
+  email: Yup.string()
+    .email("Invalid email address")
+    .required("Email is required"),
+  phone: Yup.string()
+    .matches(/^[0-9]+$/, "Phone number must be numeric")
+    .min(10, "Phone number must be at least 10 digits")
+    .max(15, "Phone number cannot exceed 15 digits")
+    .required("Phone number is required"),
+  subject: Yup.string().required("Subject is required"),
+  message: Yup.string()
+    .required("Message is required")
+    .matches(/^[A-Z]/, "First letter of the message must be capital"),
+});
 
 console.log("contacts",contacts);
 
@@ -67,7 +97,11 @@ console.log("contacts",contacts);
                             alt="Mail"
                           />
                           <p>
-                            <a href={`mailto:${contact.email}`}>
+                            <a
+                              href={`https://mail.google.com/mail/?view=cm&fs=1&to=${contact.email}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
                               {contact.email}
                             </a>
                           </p>
@@ -108,112 +142,200 @@ console.log("contacts",contacts);
                 </div>
                 <div className="col-md-7 col7contformdiv">
                   <div className="form_contactus">
-                    <Formik>
-                      <Form>
-                        <div className="row rowcontactform_inner">
-                          <div className="col-md-6 colcontactinputsdiv">
-                            <div className="inputformdiv">
-                              <label className="contactlbl">First Name</label>
-                              <Field
-                                type="text"
-                                className="contactinputs"
-                                placeholder="John"
-                              />
+                    <Formik
+                      initialValues={{
+                        firstName: "",
+                        lastName: "",
+                        email: "",
+                        phone: "",
+                        subject: "",
+                        message: "",
+                      }}
+                      validationSchema={validationContact}
+                      onSubmit={(values) => {
+                        console.log(values);
+                      }}
+                    >
+                      {({ setFieldValue }) => (
+                        <Form>
+                          <div className="row rowcontactform_inner">
+                            <div className="col-md-6 colcontactinputsdiv">
+                              <div className="inputformdiv">
+                                <label className="contactlbl">First Name</label>
+                                <Field
+                                  name="firstName"
+                                  type="text"
+                                  className="contactinputs"
+                                  placeholder="John"
+                                  onChange={(e) =>
+                                    setFieldValue(
+                                      "firstName",
+                                      capitalizeFirstLetter(e.target.value)
+                                    )
+                                  }
+                                />
+                                <ErrorMessage
+                                  name="firstName"
+                                  component="div"
+                                  className="error-message"
+                                />
+                              </div>
                             </div>
-                          </div>
-                          <div className="col-md-6 colcontactinputsdiv">
-                            <div className="inputformdiv">
-                              <label className="contactlbl">Last Name</label>
-                              <Field
-                                type="text"
-                                className="contactinputs"
-                                placeholder="Doe"
-                              />
+                            <div className="col-md-6 colcontactinputsdiv">
+                              <div className="inputformdiv">
+                                <label className="contactlbl">Last Name</label>
+                                <Field
+                                  name="lastName"
+                                  type="text"
+                                  className="contactinputs"
+                                  placeholder="Doe"
+                                  onChange={(e) =>
+                                    setFieldValue(
+                                      "lastName",
+                                      capitalizeFirstLetter(e.target.value)
+                                    )
+                                  }
+                                />
+                                <ErrorMessage
+                                  name="lastName"
+                                  component="div"
+                                  className="error-message"
+                                />
+                              </div>
                             </div>
-                          </div>
-                          <div className="col-md-6 colcontactinputsdiv">
-                            <div className="inputformdiv">
-                              <label className="contactlbl">Email</label>
-                              <Field
-                                type="email"
-                                className="contactinputs"
-                                placeholder="John@gmail.com"
-                              />
+                            <div className="col-md-6 colcontactinputsdiv">
+                              <div className="inputformdiv">
+                                <label className="contactlbl">Email</label>
+                                <Field
+                                  name="email"
+                                  type="email"
+                                  className="contactinputs"
+                                  placeholder="John@gmail.com"
+                                />
+                                <ErrorMessage
+                                  name="email"
+                                  component="div"
+                                  className="error-message"
+                                />
+                              </div>
                             </div>
-                          </div>
-                          <div className="col-md-6 colcontactinputsdiv">
-                            <div className="inputformdiv">
-                              <label className="contactlbl">Phone Number</label>
-                              <Field
-                                type="tel"
-                                className="contactinputs"
-                                placeholder="+1 012 3456 789"
-                              />
+                            <div className="col-md-6 colcontactinputsdiv">
+                              <div className="inputformdiv">
+                                <label className="contactlbl">
+                                  Phone Number
+                                </label>
+                                <Field
+                                  name="phone"
+                                  type="tel"
+                                  className="contactinputs"
+                                  placeholder="+1 012 3456 789"
+                                  onChange={(e) =>
+                                    setFieldValue(
+                                      "phone",
+                                      handleNumericInput(e.target.value)
+                                    )
+                                  }
+                                />
+                                <ErrorMessage
+                                  name="phone"
+                                  component="div"
+                                  className="error-message"
+                                />
+                              </div>
                             </div>
-                          </div>
-                          <div className="col-md-12 colcontactinputsdiv">
-                            <div className="inputformdiv">
-                              <label className="contactlbl">
-                                Select Subject?
-                              </label>
-                              <div className="subjectradioninputs">
-                                <div className="form-group">
-                                  <Field
-                                    type="radio"
-                                    id="gnrl1"
-                                    name="subject"
-                                  />
-                                  <label htmlFor="gnrl1">General Inquiry</label>
+                            <div className="col-md-12 colcontactinputsdiv">
+                              <div className="inputformdiv">
+                                <label className="contactlbl">
+                                  Select Subject?
+                                </label>
+                                <div className="subjectradioninputs">
+                                  <div className="form-group">
+                                    <Field
+                                      type="radio"
+                                      id="gnrl1"
+                                      name="subject"
+                                      value="General Inquiry 1"
+                                    />
+                                    <label htmlFor="gnrl1">
+                                      General Inquiry 1
+                                    </label>
+                                  </div>
+                                  <div className="form-group">
+                                    <Field
+                                      type="radio"
+                                      id="gnrl2"
+                                      name="subject"
+                                      value="General Inquiry 2"
+                                    />
+                                    <label htmlFor="gnrl2">
+                                      General Inquiry 2
+                                    </label>
+                                  </div>
+                                  <div className="form-group">
+                                    <Field
+                                      type="radio"
+                                      id="gnrl3"
+                                      name="subject"
+                                      value="General Inquiry 3"
+                                    />
+                                    <label htmlFor="gnrl3">
+                                      General Inquiry 3
+                                    </label>
+                                  </div>
+                                  <div className="form-group">
+                                    <Field
+                                      type="radio"
+                                      id="gnrl4"
+                                      name="subject"
+                                      value="General Inquiry 4"
+                                    />
+                                    <label htmlFor="gnrl4">
+                                      General Inquiry 4
+                                    </label>
+                                  </div>
                                 </div>
-                                <div className="form-group">
-                                  <Field
-                                    type="radio"
-                                    id="gnrl2"
-                                    name="subject"
-                                  />
-                                  <label htmlFor="gnrl2">General Inquiry</label>
-                                </div>
-                                <div className="form-group">
-                                  <Field
-                                    type="radio"
-                                    id="gnrl3"
-                                    name="subject"
-                                  />
-                                  <label htmlFor="gnrl3">General Inquiry</label>
-                                </div>
-                                <div className="form-group">
-                                  <Field
-                                    type="radio"
-                                    id="gnrl4"
-                                    name="subject"
-                                  />
-                                  <label htmlFor="gnrl4">General Inquiry</label>
-                                </div>
+                                <ErrorMessage
+                                  name="subject"
+                                  component="div"
+                                  className="error-message"
+                                />
+                              </div>
+                            </div>
+                            <div className="col-md-12 colcontactinputsdiv">
+                              <div className="inputformdiv">
+                                <label className="contactlbl">Message</label>
+                                <Field
+                                  name="message"
+                                  type="text"
+                                  className="contactinputs"
+                                  placeholder="Write your message.."
+                                  onChange={(e) =>
+                                    setFieldValue(
+                                      "message",
+                                      capitalizeFirstLetter(e.target.value)
+                                    )
+                                  }
+                                />
+                                <ErrorMessage
+                                  name="message"
+                                  component="div"
+                                  className="error-message"
+                                />
+                              </div>
+                            </div>
+                            <div className="col-md-12 contcolmsgsendbtn">
+                              <div className="sendmsgbtndiv">
+                                <button
+                                  type="submit"
+                                  className="sendmsg_contformbtn"
+                                >
+                                  Send Message
+                                </button>
                               </div>
                             </div>
                           </div>
-                          <div className="col-md-12 colcontactinputsdiv">
-                            <div className="inputformdiv">
-                              <label className="contactlbl">Message</label>
-                              <Field
-                                type="text"
-                                className="contactinputs"
-                                placeholder="Write your message.."
-                              />
-                            </div>
-                          </div>
-                          <div className="col-md-12 contcolmsgsendbtn">
-                            <div className="sendmsgbtndiv">
-                              <button
-                                type="button"
-                                className="sendmsg_contformbtn"
-                              >
-                                Send Message
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </Form>
+                        </Form>
+                      )}
                     </Formik>
                   </div>
                 </div>

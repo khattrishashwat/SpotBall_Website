@@ -174,6 +174,10 @@ function Account() {
                     className="updateinput"
                     placeholder="Enter First Name"
                   />
+                  <img
+                    src={`${process.env.PUBLIC_URL}/images/edit_pro.png`}
+                    class="editicon_input"
+                  />
                   <ErrorMessage
                     name="first_name"
                     component="div"
@@ -187,6 +191,10 @@ function Account() {
                     type="text"
                     className="updateinput"
                     placeholder="Enter Last Name"
+                  />
+                  <img
+                    src={`${process.env.PUBLIC_URL}/images/edit_pro.png`}
+                    class="editicon_input"
                   />
                   <ErrorMessage
                     name="last_name"

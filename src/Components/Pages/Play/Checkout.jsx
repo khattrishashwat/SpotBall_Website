@@ -22,7 +22,8 @@ function Checkout() {
   const [cardNumber, setCardNumber] = useState("");
   const [validUpto, setValidUpto] = useState("");
   const [cvv, setCvv] = useState("");
-
+  const [promoApplied, setPromoApplied] = useState(false); // Tracks if the promo is successfully applied
+  const [promoMessage, setPromoMessage] = useState("");
   const fetchData = async () => {
     const token = localStorage.getItem("token");
     try {
@@ -130,6 +131,8 @@ function Checkout() {
     ); // Ensure it returns an empty array if carts is not an array
   }, [carts]);
 
+  console.log("calculatedCarts", calculatedCarts);
+
   // Total calculations
   const totalBeforeDiscount = calculatedCarts.reduce((total, cart) => {
     return total + parseFloat(cart.totalPayment);
@@ -145,10 +148,15 @@ function Checkout() {
         return total + parseFloat(cart.totalPayment);
       }, 0);
 
-     const discount = promo.amount || DEFAULT_DISCOUNT; // Default to 0 if undefined
+      const discount = promo.amount || DEFAULT_DISCOUNT; // Default to 0 if undefined
       setDiscountAmount(discount);
+      setPromoApplied(true);
+      setPromoMessage(
+        `Promo code applied successfully. Discount ₹${discount}.`
+      );
     } else {
-      console.log("Invalid promo code");
+      setPromoApplied(false);
+      setPromoMessage("Invalid promo code");
     }
   };
 
@@ -231,13 +239,19 @@ function Checkout() {
           },
         }
       );
-      Swal.fire(
-        "Payment recorded!",
-        "Your payment has been recorded successfully.",
-        "success"
-      ).then(() => {
-        window.location.reload();
-      });
+
+      // Check if the response is successful (you can customize this condition based on your API response)
+      if (response) {
+        Swal.fire(
+          "Payment recorded!",
+          "Your payment has been recorded successfully.",
+          "success"
+        ).then(() => {
+          setTimeout(() => {
+            navigate("/my_account");
+          }, 5000);
+        });
+      }
     } catch (error) {
       Swal.fire(
         "Error!",
@@ -346,14 +360,14 @@ function Checkout() {
                 <div className="col-md-5 coltabbingdiv">
                   <div className="cartwithcordinatetables">
                     {carts &&
-                      carts.map((cart, index) => (
+                      carts.map((cart) => (
                         <div key={cart._id} className="cartstripe">
                           <div className="checkout_cartdiv">
                             <div className="cart_jackpotdetails cartwindiv_mainformov">
                               <div className="cart_windiv">
                                 Win{" "}
                                 <span className="winprice_cart">
-                                  ₹{cart.contest_id.title}
+                                  ₹{cart.contest_id.jackpot_price}
                                 </span>
                               </div>
                               <div className="jackpot_ticket_cart">
@@ -384,7 +398,7 @@ function Checkout() {
                             </button>
                           </div>
 
-                          <div className="cordinates_table_cart">
+                          {/* <div className="cordinates_table_cart">
                             <table className="table table-bordered cordtable_new">
                               <thead>
                                 <tr>
@@ -405,24 +419,24 @@ function Checkout() {
                                 )}
                               </tbody>
                             </table>
-                          </div>
+                          </div> */}
                           <div className="entry">
                             <div className="detailes">
                               <img
                                 src={`${process.env.PUBLIC_URL}/images/arrow_icon_payment.png`}
-                                className={`showcardinputonclick_icon ${
+                                className={`showclick_icon ${
                                   isImageRotated ? "rotate" : ""
                                 }`}
                                 alt="Arrow Icon"
                                 onClick={handleImageClick}
                               />
-                              <div className="cardmethod_design">
-                                <div className="creditdebit_carddiv">
-                                  <p>Details</p>
+                              <div className="cardbills">
+                                <div className="creditbils_div">
+                                  <h4>Bill Details</h4>
                                 </div>
                               </div>
                               <div
-                                className={`detalis_inputs details_div ${
+                                className={`details_inputs details_div ${
                                   isEntrysActive ? "active" : ""
                                 }`}
                                 style={{
@@ -430,71 +444,60 @@ function Checkout() {
                                 }}
                               >
                                 {calculatedCarts.map((cart, index) => (
-                                  <div key={index} className="cart-item">
-                                    <h3>Cart Item {index + 1}</h3>
+                                  <div key={index} className="cart-itemss">
                                     <p>
-                                      <strong>Ticket Price: </strong>₹
-                                      {cart.ticketPrice}
-                                    </p>
-                                    <p>
-                                      <strong>Tickets Count: </strong>
-                                      {cart.tickets_count}
-                                    </p>
-                                    <p>
-                                      <strong>Total Ticket Price: </strong>₹
+                                      <strong>Items Total: </strong>₹
                                       {cart.totalTicketPrice}
                                     </p>
+                                    {/* <p>
+                                      <strong>Discount: </strong>-₹
+                                      {cart.discount}
+                                    </p>
+                                    <p>
+                                      <strong>After Discount: </strong>₹
+                                      {cart.afterDiscount}
+                                    </p> */}
                                     <p>
                                       <strong>
-                                        GST ({cart.contest_id.gstRate}
-                                        %):{" "}
+                                        +GST (@{cart.contest_id.gstRate}%):{" "}
                                       </strong>
                                       ₹{cart.gstAmount}
                                     </p>
                                     <p>
-                                      <strong>Subtotal: </strong>₹
-                                      {cart.subtotal}
+                                      <strong>
+                                        Subtotal (Base Amount + GST):{" "}
+                                      </strong>
+                                      ₹{cart.subtotal}
                                     </p>
                                     <hr />
                                     <p>
                                       <strong>
-                                        Platform Fee (
-                                        {cart.contest_id.platformFeeRate}
-                                        %):{" "}
+                                        Platform Fee (@
+                                        {
+                                          cart.contest_id.platformFeeRate
+                                        }%):{" "}
                                       </strong>
                                       ₹{cart.platformFee}
                                     </p>
                                     <p>
                                       <strong>
                                         GST on Platform Fee (@
-                                        {/* {(
-                                          cart.contest_id.gstOnPlatformFeeRate *
-                                          100
-                                        ).toFixed(2)} */}
-                                        {cart.gstOnPlatformFee}
+                                        {cart.contest_id.gstOnPlatformFeeRate}
                                         %):{" "}
                                       </strong>
                                       ₹{cart.gstOnPlatformFee}
                                     </p>
                                     <p>
-                                      <strong>Total Razorpay Fee: </strong>₹
+                                      <h5>Total Razorpay Fee: </h5>₹
                                       {cart.totalRazorpayFee}
                                     </p>
                                     <hr />
                                     <p>
-                                      <strong>Total Payment: </strong>₹
-                                      {cart.totalPayment}
+                                      <strong>
+                                        Grand Total (Subtotal + Razorpay):{" "}
+                                      </strong>
+                                      ₹{cart.totalPayment}
                                     </p>
-                                    <div>
-                                      <p>After Apply Coupons</p>
-                                      <p>
-                                        Discount: ${discountAmount.toFixed(2)}
-                                      </p>
-                                      <p>
-                                        Total Discount Payment: $
-                                        {totalAfterDiscount.toFixed(2)}
-                                      </p>
-                                    </div>
                                   </div>
                                 ))}
                               </div>
@@ -502,6 +505,41 @@ function Checkout() {
                           </div>
                         </div>
                       ))}
+                    <div className="cordinates_table_cart">
+                      <table className="table table-bordered cordtable_new">
+                        <thead>
+                          <tr>
+                            <th>Tickets</th>
+                            <th>X- Coordinates</th>
+                            <th>Y- Coordinates</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {carts &&
+                            carts.map((cart) =>
+                              cart.user_coordinates.map((coordinate, idx) => (
+                                <tr key={coordinate._id}>
+                                  <td>{idx + 1}</td>
+                                  <td>{coordinate.x}</td>
+                                  <td>{coordinate.y}</td>
+                                </tr>
+                              ))
+                            )}
+                        </tbody>
+                      </table>
+                    </div>
+                    <div className="methodsdivnew mt-4">
+                      <div className="cardpay">
+                        <div className="creditpays">
+                          <div
+                            className="cardpayment"
+                            onClick={handlePaymentClick}
+                          >
+                            <p>Proceed to Pay</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -524,10 +562,21 @@ function Checkout() {
                         </button>
                       </div>
 
+                      {promoMessage && (
+                        <div
+                          className={`promo-message ${
+                            promoApplied ? "success" : "error"
+                          }`}
+                        >
+                          {promoMessage}
+                        </div>
+                      )}
+
                       <div className="methodsdivnew">
                         <div className="paymentmethodsheaidng">
                           <h4>CARDS</h4>
                         </div>
+
                         <div className="cardmethod_design">
                           <div
                             className="creditdebit_carddiv"
@@ -614,7 +663,9 @@ function Checkout() {
                                   <p>ICICI</p>
                                 </div>
                                 <div className="arrowicondiv rotate270forotherpayment">
-                                  <img src="images/arrow_icon_payment.png" />
+                                  <img
+                                    src={`${process.env.PUBLIC_URL}/images/arrow_icon_payment.png`}
+                                  />
                                 </div>
                               </div>
                             </div>

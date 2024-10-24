@@ -109,12 +109,12 @@ function ChangePassword() {
                       }
                     ></i>
                   </span>
-                </div>
                 <ErrorMessage
                   name="old_password"
                   component="div"
                   className="error"
                 />
+                </div>
               </div>
               <div className="passinputdiv">
                 <div className="frmctrldiv">
@@ -138,12 +138,12 @@ function ChangePassword() {
                       }
                     ></i>
                   </span>
-                </div>
                 <ErrorMessage
                   name="new_password"
                   component="div"
                   className="error"
                 />
+                </div>
               </div>
               <div className="passinputdiv">
                 <div className="frmctrldiv">
@@ -167,12 +167,12 @@ function ChangePassword() {
                       }
                     ></i>
                   </span>
-                </div>
                 <ErrorMessage
                   name="confirm_password"
                   component="div"
                   className="error"
                 />
+                </div>
               </div>
               <div className="savepass_btndiv">
                 <button type="submit" className="savepass_change_myacc">

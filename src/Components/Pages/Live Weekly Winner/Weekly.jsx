@@ -41,13 +41,19 @@ function Weekly() {
                 <div className="daystripe_div">
                   <h3>Every Monday</h3>
                   <div className="gamewinnertimingdiv">
-                    <img src="images/ball_icon.png" />
+                    <img
+                      src={`${process.env.PUBLIC_URL}/images/ball_icon.png`}
+                      // src="images/ball_icon.png"
+                    />
                     <h4>
                       new weekly games begins&nbsp;<span>- 12:00hrs</span>
                     </h4>
                   </div>
                   <div className="gamewinnertimingdiv">
-                    <img src="images/ball_icon.png" />
+                    <img
+                      src={`${process.env.PUBLIC_URL}/images/ball_icon.png`}
+                      // src="images/ball_icon.png"
+                    />
                     <h4>
                       live Facebook and YouTube stream of “The SpotsBall Weekly
                       Winner Show”<span>- 21:00hrs</span>
@@ -59,10 +65,16 @@ function Weekly() {
                     <h2>Watch Live</h2>
                     <div className="liveicons">
                       <a href="#!">
-                        <img src="images/fb_live_icon.png" />
+                        <img
+                          src={`${process.env.PUBLIC_URL}/images/fb_live_icon.png`}
+                          // src="images/fb_live_icon.png"
+                        />
                       </a>
                       <a href="#!">
-                        <img src="images/yb_live_icon.png" />
+                        <img
+                          src={`${process.env.PUBLIC_URL}/images/yb_live_icon.png`}
+                          // src="images/yb_live_icon.png"
+                        />
                       </a>
                     </div>
                   </div>
