@@ -70,10 +70,14 @@ function Weekly() {
                           // src="images/fb_live_icon.png"
                         />
                       </a>
-                      <a href="#!">
+                      <a
+                        href="https://www.youtube.com/watch?v=e_8kd2FHcGI&ab_channel=SandeepSingh"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
                         <img
                           src={`${process.env.PUBLIC_URL}/images/yb_live_icon.png`}
-                          // src="images/yb_live_icon.png"
+                          alt="YouTube Live Icon"
                         />
                       </a>
                     </div>

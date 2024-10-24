@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Loader from "../../Loader/Loader";
 
-
 function Tearm() {
   const [terms, setTerms] = useState("");
   const [isLoading, setIsLoading] = useState("");
@@ -35,15 +34,13 @@ function Tearm() {
 
   return (
     <>
-      {isLoading ? (
-        <Loader />
-      ) : (
-        <div className="legaltermsdata_div">
-          <div className="innerlegal_heaidngwithpara">
+      <div className="legaltermsdata_div">
+        <div className="innerlegal_heaidngwithpara">
+          
             <div dangerouslySetInnerHTML={{ __html: terms }} />
-          </div>
+          
         </div>
-      )}
+      </div>
     </>
   );
 }

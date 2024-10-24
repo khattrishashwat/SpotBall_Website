@@ -27,7 +27,7 @@ function Checkout() {
   const fetchData = async () => {
     const token = localStorage.getItem("token");
     try {
-      setIsLoading(true);
+      // setIsLoading(true);
       const response = await axios.get(`get-all-cart-items`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -58,9 +58,10 @@ function Checkout() {
       }
     } catch (error) {
       console.error("Error data:", error);
-    } finally {
-      setIsLoading(false);
-    }
+    } 
+    // finally {
+    //   setIsLoading(false);
+    // }
   };
 
   useEffect(() => {
@@ -164,7 +165,6 @@ function Checkout() {
     discountAmount > 0 ? totalAfterDiscount : totalBeforeDiscount;
 
   const totalPayments = finalTotalPayment.toFixed(2);
-  console.log("totalPayments", totalPayments);
 
   const handleCrossClick = async (cart) => {
     const { contest_id, tickets_count, user_coordinates } = cart;
@@ -248,8 +248,8 @@ function Checkout() {
           "success"
         ).then(() => {
           setTimeout(() => {
-            navigate("/my_account");
-          }, 5000);
+            navigate("/");
+          }, 1000);
         });
       }
     } catch (error) {
@@ -285,7 +285,7 @@ function Checkout() {
           coordinates: carts[0]?.user_coordinates, // Replace with actual coordinates
           tickets: carts[0]?.tickets_count,
           amount: totalPayments,
-          promoCodeApplied: carts[0]?.contest_id?.promocodes?.map(
+          promocodesApplied: carts[0]?.contest_id?.promocodes?.map(
             ({ promocode, amount }) => ({ promocode, amount })
           ),
         };
@@ -379,7 +379,11 @@ function Checkout() {
                               </div>
                             </div>
                             <div className="cart_gametotalprice">
-                              <h3>₹{totalPayments}</h3>
+                              <h3>
+                                ₹
+                                {cart.contest_id?.ticket_price *
+                                  cart?.tickets_count}
+                              </h3>
                               <p className="addgsttext_cart">
                                 + GST (@{cart.contest_id.gstRate}%)
                               </p>
@@ -398,38 +402,18 @@ function Checkout() {
                             </button>
                           </div>
 
-                          {/* <div className="cordinates_table_cart">
-                            <table className="table table-bordered cordtable_new">
-                              <thead>
-                                <tr>
-                                  <th>Tickets</th>
-                                  <th>X- Coordinates</th>
-                                  <th>Y- Coordinates</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {cart.user_coordinates.map(
-                                  (coordinate, idx) => (
-                                    <tr key={coordinate._id}>
-                                      <td>{idx + 1}</td>
-                                      <td>{coordinate.x}</td>
-                                      <td>{coordinate.y}</td>
-                                    </tr>
-                                  )
-                                )}
-                              </tbody>
-                            </table>
-                          </div> */}
                           <div className="entry">
                             <div className="detailes">
-                              <img
-                                src={`${process.env.PUBLIC_URL}/images/arrow_icon_payment.png`}
-                                className={`showclick_icon ${
-                                  isImageRotated ? "rotate" : ""
-                                }`}
-                                alt="Arrow Icon"
-                                onClick={handleImageClick}
-                              />
+                              <div className="arrowicondiv">
+                                <img
+                                  src={`${process.env.PUBLIC_URL}/images/arrow_icon_payment.png`}
+                                  className={`showclick_icon ${
+                                    isImageRotated ? "rotate" : ""
+                                  }`}
+                                  alt="Arrow Icon"
+                                  onClick={handleImageClick}
+                                />
+                              </div>
                               <div className="cardbills">
                                 <div className="creditbils_div">
                                   <h4>Bill Details</h4>
@@ -444,19 +428,15 @@ function Checkout() {
                                 }}
                               >
                                 {calculatedCarts.map((cart, index) => (
-                                  <div key={index} className="cart-itemss">
+                                  <div
+                                    key={index}
+                                    className="cart-itemss table-blockk"
+                                  >
                                     <p>
                                       <strong>Items Total: </strong>₹
                                       {cart.totalTicketPrice}
                                     </p>
-                                    {/* <p>
-                                      <strong>Discount: </strong>-₹
-                                      {cart.discount}
-                                    </p>
-                                    <p>
-                                      <strong>After Discount: </strong>₹
-                                      {cart.afterDiscount}
-                                    </p> */}
+
                                     <p>
                                       <strong>
                                         +GST (@{cart.contest_id.gstRate}%):{" "}
@@ -488,15 +468,30 @@ function Checkout() {
                                       ₹{cart.gstOnPlatformFee}
                                     </p>
                                     <p>
-                                      <h5>Total Razorpay Fee: </h5>₹
+                                      <strong>Total Razorpay Fee: </strong>₹
                                       {cart.totalRazorpayFee}
                                     </p>
                                     <hr />
+                                    {promoApplied ? (
+                                      <>
+                                        <p>
+                                          <strong>Discount: </strong>-₹
+                                          {discountAmount.toFixed(2)}
+                                        </p>
+                                        {/* <p>
+                                          <strong>After Discount: </strong>₹
+                                          {totalAfterDiscount.toFixed(2)}
+                                        </p> */}
+                                      </>
+                                    ) : null}
                                     <p>
                                       <strong>
                                         Grand Total (Subtotal + Razorpay):{" "}
                                       </strong>
-                                      ₹{cart.totalPayment}
+                                      ₹
+                                      {promoApplied
+                                        ? totalAfterDiscount.toFixed(2)
+                                        : cart.totalPayment}
                                     </p>
                                   </div>
                                 ))}
@@ -527,18 +522,6 @@ function Checkout() {
                             )}
                         </tbody>
                       </table>
-                    </div>
-                    <div className="methodsdivnew mt-4">
-                      <div className="cardpay">
-                        <div className="creditpays">
-                          <div
-                            className="cardpayment"
-                            onClick={handlePaymentClick}
-                          >
-                            <p>Proceed to Pay</p>
-                          </div>
-                        </div>
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -572,7 +555,19 @@ function Checkout() {
                         </div>
                       )}
 
-                      <div className="methodsdivnew">
+                      <div className="methodsdivnew mt-4">
+                        <div className="cardpay">
+                          <div className="creditpays">
+                            <div
+                              className="cardpayment"
+                              onClick={handlePaymentClick}
+                            >
+                              <p>Proceed to Pay</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      {/* <div className="methodsdivnew">
                         <div className="paymentmethodsheaidng">
                           <h4>CARDS</h4>
                         </div>
@@ -752,7 +747,7 @@ function Checkout() {
                             </div>
                           </div>
                         </a>
-                      </div>
+                      </div> */}
                     </div>
                   </div>
                 </div>

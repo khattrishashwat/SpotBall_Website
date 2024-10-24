@@ -2883,6 +2883,8 @@ ul.list-inline li a:hover {
   width: 44px !important;
   position: absolute;
   top: -3px;
+  border-radius: 50%;
+  height: 44px;
 }
 .userprofilediv_new .userverifyimg img {
   width: 24px !important;
@@ -4901,7 +4903,7 @@ ul.list-inline li a:hover {
 }
 .pastpay_right p {
   margin-bottom: 8px;
-  font-size: 16px;
+  font-size: 12px;
   color: #000;
   font-weight: 500;
 }
@@ -5435,12 +5437,13 @@ ul.list-inline li a:hover {
 
 img.showclick_icon.rotate {
   margin-left: 350px;
-  margin-bottom: -33px;
+  margin-bottom: -61px;
+  transform: rotate(180deg);
 }
 
 img.showclick_icon {
   margin-left: 350px;
-  margin-bottom: -33px;
+  margin-bottom: -66px;
 }
 
 .methodsdivnew .cardpay {
@@ -5521,38 +5524,45 @@ img.showclick_icon {
   border-top: 1px solid #e0e0e0;
 }
 
-p {
+/* p {
   display: flex;
   justify-content: space-between;
-}
+} */
 
 p strong {
   flex-grow: 1;
 }
 
-p:last-child {
+/* p:last-child {
   font-size: 18px;
   color: #222;
-}
+} */
 
-p:last-child strong {
+/* p:last-child strong {
   font-size: 18px;
   color: #000;
-}
+} */
 
 .cart-itemss p small {
   font-size: 14px;
   color: #888;
 }
 
-p span {
+/* p span {
   font-size: 14px;
   color: #777;
-}
+} */
 
-.error-message{
+.error-message {
   color: red;
 }
-.error{
+.error {
   color: red;
 }
+.cart-itemss.table-blockk p {
+  display: flex;
+  justify-content: space-between;
+}
+/* .input:disabled{
+  background-color: white!important;
+} */

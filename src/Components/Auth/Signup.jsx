@@ -5,10 +5,20 @@ import * as Yup from "yup";
 import Swal from "sweetalert2";
 import axios from "axios";
 
-const Signup = ({ onClose }) => {
+const Signup = ({ isOpenness, onCloseness }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isModals, setIsModals] = useState("");
+  const [otp, setOtp] = useState(["", "", "", ""]);
+  const [isOtpResendEnabled, setIsOtpResendEnabled] = useState(false);
+
+  const openModals = () => {
+    setIsModals(true);
+  };
+  const closeModals = () => {
+    setIsModals(false);
+  };
 
   const initialValues = {
     first_name: "",
@@ -44,15 +54,43 @@ const Signup = ({ onClose }) => {
       .required("Confirm Password is required"),
   });
 
+  const toggleNewPasswordVisibility = () => {
+    setShowNewPassword((prev) => !prev);
+  };
+
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword((prev) => !prev);
+  };
+
+  const handleInputChange = (index, value) => {
+    const newOtp = [...otp];
+    newOtp[index] = value.slice(-1); // Only take the last digit
+    setOtp(newOtp);
+
+    // Move to the next input
+    if (value && index < otp.length - 1) {
+      const nextInput = document.querySelector(
+        `.otp__digit:nth-child(${index + 2})`
+      );
+      if (nextInput) nextInput.focus();
+    }
+  };
+
   const handleSignup = async (values) => {
     setIsLoading(true);
     try {
       const response = await axios.post("sign-up", values);
+
+      const tokens = response.data.data.token;
+      localStorage.setItem("tokens", tokens);
+
       Swal.fire({
-        icon: "success",
-        title: response.data.message, // Assuming response data has message
+        title: response.data.message,
         showConfirmButton: false,
         timer: 1000,
+      }).then(() => {
+        openModals();
+        onCloseness();
       });
     } catch (error) {
       Swal.fire({
@@ -65,212 +103,352 @@ const Signup = ({ onClose }) => {
     }
   };
 
-  const toggleNewPasswordVisibility = () => {
-    setShowNewPassword((prev) => !prev);
+  // Function to verify the OTP
+  const verifyOtp = async () => {
+    try {
+      const token = localStorage.getItem("tokens");
+      const response = await axios.post(
+        "verify-user",
+        { otp: otp.join("") }, // Join OTP array into a string
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.data.success) {
+        Swal.fire({
+          icon: "success",
+          text: "OTP verified successfully!",
+        }).then(() => {
+          localStorage.clear();
+          window.location.reload();
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          text: response.data.message || "OTP verification failed!",
+        });
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        text: error.response ? error.response.data.message : error.message,
+      });
+    }
   };
 
-  const toggleConfirmPasswordVisibility = () => {
-    setShowConfirmPassword((prev) => !prev);
+  // Function to resend OTP
+  const resendOtp = async (email) => {
+    if (!isOtpResendEnabled) return; // Prevent API call if button is not enabled
+
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await axios.post(
+        "resend-otp-user-verification",
+        { email },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      Swal.fire({
+        icon: "success",
+        text: "OTP resent successfully!",
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        text: error.response ? error.response.data.message : error.message,
+      });
+    }
   };
 
   return (
-    <div
-      className="signinpopup_main show"
-      id="signup_popup"
-      style={{ display: "block" }}
-    >
-      <div className="popup_mianSingindiv mainpopupfrsignupdiv_new">
-        <div className="adminloginsection">
-          <div className="container contfld-loginform">
-            <div className="col-md-12 col12mainloginform">
-              <div className="row rowmaqinloginform">
-                <div className="col-md-6 offset-md-3 col12loginseconddiv">
-                  <div className="col-md-12 col6formsidediv">
-                    <div className="colformlogin">
-                      <div className="crossbtndiv_signinpopup">
-                        <button
-                          type="button"
-                          className="crossbtn_signinpopupclose singupcrossbtn"
-                          onClick={onClose}
+    <>
+      <div
+        className={`signinpopup_main ${isOpenness ? "show" : ""}`}
+        id="signup_popup"
+        style={{ display: isOpenness ? "block" : "none" }}
+      >
+        <div className="popup_mianSingindiv mainpopupfrsignupdiv_new">
+          <div className="adminloginsection">
+            <div className="container contfld-loginform">
+              <div className="col-md-12 col12mainloginform">
+                <div className="row rowmaqinloginform">
+                  <div className="col-md-6 offset-md-3 col12loginseconddiv">
+                    <div className="col-md-12 col6formsidediv">
+                      <div className="colformlogin">
+                        <div className="crossbtndiv_signinpopup">
+                          <button
+                            type="button"
+                            className="crossbtn_signinpopupclose singupcrossbtn"
+                            onClick={onCloseness}
+                          >
+                            <img
+                              src={`${process.env.PUBLIC_URL}/images/cross_icon.png`}
+                              alt="Close"
+                            />
+                          </button>
+                        </div>
+                        <h2>Sign Up</h2>
+
+                        <Formik
+                          initialValues={initialValues}
+                          // validationSchema={validation}
+                          onSubmit={handleSignup}
                         >
-                          <img
-                            src={`${process.env.PUBLIC_URL}/images/cross_icon.png`}
-                            alt="Close"
-                          />
-                        </button>
-                      </div>
-                      <h2>Sign Up</h2>
-
-                      <Formik
-                        initialValues={initialValues}
-                        // validationSchema={validation}
-                        onSubmit={handleSignup}
-                      >
-                        {({ isSubmitting, errors }) => (
-                          <Form className="formstart">
-                            {/* First Name */}
-                            <div className="form-control frmctrldiv">
-                              <Field
-                                type="text"
-                                name="first_name"
-                                placeholder="First Name"
-                              />
-                              <ErrorMessage
-                                name="first_name"
-                                component="div"
-                                className="field_required"
-                              />
-                            </div>
-
-                            {/* Last Name */}
-                            <div className="form-control frmctrldiv">
-                              <Field
-                                type="text"
-                                name="last_name"
-                                placeholder="Last Name"
-                              />
-                              <ErrorMessage
-                                name="last_name"
-                                component="div"
-                                className="field_required"
-                              />
-                            </div>
-
-                            {/* Email */}
-                            <div className="form-control frmctrldiv">
-                              <Field
-                                type="email"
-                                name="email"
-                                placeholder="Email (Optional)"
-                              />
-                            </div>
-
-                            {/* Phone */}
-                            <div className="form-control frmctrldiv">
-                              <Field
-                                type="text"
-                                name="phone"
-                                placeholder="Mobile number"
-                              />
-                              <ErrorMessage
-                                name="phone"
-                                component="div"
-                                className="field_required"
-                              />
-                            </div>
-
-                            {/* Password */}
-                            <div className="form-control frmctrldiv">
-                              <Field
-                                type={showNewPassword ? "text" : "password"}
-                                name="password"
-                                placeholder="Password"
-                              />
-                              <span
-                                onClick={toggleNewPasswordVisibility}
-                                className="eyeiconfor"
-                              >
-                                <i
-                                  className={
-                                    showNewPassword
-                                      ? "fa fa-eye"
-                                      : "fa fa-eye-slash"
-                                  }
-                                ></i>
-                              </span>
-                              <ErrorMessage
-                                name="password"
-                                component="div"
-                                className="field_required"
-                              />
-                            </div>
-
-                            {/* Confirm Password */}
-                            <div className="form-control frmctrldiv">
-                              <Field
-                                type={showConfirmPassword ? "text" : "password"}
-                                name="confirm_password"
-                                placeholder="Confirm Password"
-                              />
-                              <span
-                                onClick={toggleConfirmPasswordVisibility}
-                                className="eyeiconfor"
-                              >
-                                <i
-                                  className={
-                                    showConfirmPassword
-                                      ? "fa fa-eye"
-                                      : "fa fa-eye-slash"
-                                  }
-                                ></i>
-                              </span>
-                              <ErrorMessage
-                                name="confirm_password"
-                                component="div"
-                                className="field_required"
-                              />
-                            </div>
-
-                            {/* Terms & Conditions */}
-                            <div className="remeberrecoverydiv">
-                              <div className="rememebrmediv">
+                          {({ isSubmitting, errors }) => (
+                            <Form className="formstart">
+                              {/* First Name */}
+                              <div className="form-control frmctrldiv">
                                 <Field
-                                  type="checkbox"
-                                  name="agreeTerms"
-                                  className="checkboxemeber"
+                                  type="text"
+                                  name="first_name"
+                                  placeholder="First Name"
                                 />
-                                <label className="labelrememebrme">
-                                  I have read & agree with{" "}
-                                  <Link to="/legal_terms" onClick={onClose}>
-                                    Terms & Conditions
-                                  </Link>
-                                </label>
+                                <ErrorMessage
+                                  name="first_name"
+                                  component="div"
+                                  className="field_required"
+                                />
                               </div>
-                            </div>
 
-                            {/* Rules of Play & FAQ */}
-                            <div className="remeberrecoverydiv">
-                              <div className="rememebrmediv">
+                              {/* Last Name */}
+                              <div className="form-control frmctrldiv">
                                 <Field
-                                  type="checkbox"
-                                  name="agreeRules"
-                                  className="checkboxemeber"
+                                  type="text"
+                                  name="last_name"
+                                  placeholder="Last Name"
                                 />
-                                <label className="labelrememebrme">
-                                  I have read & agree with{" "}
-                                  <Link to="/legal_terms" onClick={onClose}>
-                                    Rules of Play & FAQ's
-                                  </Link>
-                                </label>
+                                <ErrorMessage
+                                  name="last_name"
+                                  component="div"
+                                  className="field_required"
+                                />
                               </div>
-                            </div>
 
-                            {/* Submit Button */}
-                            <div className="form-control loginformctrl">
-                              <button
-                                type="submit"
-                                className="loginbtn"
-                                disabled={isSubmitting || isLoading}
-                              >
-                                {isLoading ? "Loading..." : "Sign Up"}
-                              </button>
-                            </div>
+                              {/* Email */}
+                              <div className="form-control frmctrldiv">
+                                <Field
+                                  type="email"
+                                  name="email"
+                                  placeholder="Email (Optional)"
+                                />
+                              </div>
 
-                            {/* Already have an account */}
-                            <div className="registerdiv">
-                              <p>
-                                Already have an account?{" "}
-                                <a
-                                  onClick={onClose}
-                                  className="showsigninbtn_div"
+                              {/* Phone */}
+                              <div className="form-control frmctrldiv">
+                                <Field
+                                  type="text"
+                                  name="phone"
+                                  placeholder="Mobile number"
+                                />
+                                <ErrorMessage
+                                  name="phone"
+                                  component="div"
+                                  className="field_required"
+                                />
+                              </div>
+
+                              {/* Password */}
+                              <div className="form-control frmctrldiv">
+                                <Field
+                                  type={showNewPassword ? "text" : "password"}
+                                  name="password"
+                                  placeholder="Password"
+                                />
+                                <span
+                                  onClick={toggleNewPasswordVisibility}
+                                  className="eyeiconfor"
                                 >
-                                  Sign In
-                                </a>
-                              </p>
-                            </div>
-                          </Form>
-                        )}
-                      </Formik>
+                                  <i
+                                    className={
+                                      showNewPassword
+                                        ? "fa fa-eye"
+                                        : "fa fa-eye-slash"
+                                    }
+                                  ></i>
+                                </span>
+                                <ErrorMessage
+                                  name="password"
+                                  component="div"
+                                  className="field_required"
+                                />
+                              </div>
+
+                              {/* Confirm Password */}
+                              <div className="form-control frmctrldiv">
+                                <Field
+                                  type={
+                                    showConfirmPassword ? "text" : "password"
+                                  }
+                                  name="confirm_password"
+                                  placeholder="Confirm Password"
+                                />
+                                <span
+                                  onClick={toggleConfirmPasswordVisibility}
+                                  className="eyeiconfor"
+                                >
+                                  <i
+                                    className={
+                                      showConfirmPassword
+                                        ? "fa fa-eye"
+                                        : "fa fa-eye-slash"
+                                    }
+                                  ></i>
+                                </span>
+                                <ErrorMessage
+                                  name="confirm_password"
+                                  component="div"
+                                  className="field_required"
+                                />
+                              </div>
+
+                              {/* Terms & Conditions */}
+                              <div className="remeberrecoverydiv">
+                                <div className="rememebrmediv">
+                                  <Field
+                                    type="checkbox"
+                                    name="agreeTerms"
+                                    className="checkboxemeber"
+                                  />
+                                  <label className="labelrememebrme">
+                                    I have read & agree with{" "}
+                                    <Link
+                                      to="/legal_terms"
+                                      onClick={onCloseness}
+                                    >
+                                      Terms & Conditions
+                                    </Link>
+                                  </label>
+                                </div>
+                              </div>
+
+                              {/* Rules of Play & FAQ */}
+                              <div className="remeberrecoverydiv">
+                                <div className="rememebrmediv">
+                                  <Field
+                                    type="checkbox"
+                                    name="agreeRules"
+                                    className="checkboxemeber"
+                                  />
+                                  <label className="labelrememebrme">
+                                    I have read & agree with{" "}
+                                    <Link
+                                      to="/legal_terms"
+                                      onClick={onCloseness}
+                                    >
+                                      Rules of Play & FAQ's
+                                    </Link>
+                                  </label>
+                                </div>
+                              </div>
+
+                              {/* Submit Button */}
+                              <div className="form-control loginformctrl">
+                                <button
+                                  type="submit"
+                                  className="loginbtn"
+                                  disabled={isSubmitting || isLoading}
+                                >
+                                  {isLoading ? "Loading..." : "Sign Up"}
+                                </button>
+                              </div>
+
+                              <div className="signupwithsocial_div signup_page_socialdiv">
+                                <div className="signupsociallinks">
+                                  <ul>
+                                    {/* <li>
+                                        <GoogleLogin
+                                          onSuccess={(credentialResponse) => {
+                                            console.log(credentialResponse);
+                                          }}
+                                          onError={() => {
+                                            console.log("Login Failed");
+                                          }}
+                                          render={(renderProps) => (
+                                            <a
+                                              onClick={renderProps.onClick}
+                                              disabled={renderProps.disabled}
+                                            >
+                                              <img
+                                                src="images/google_icon.png"
+                                                alt="Google"
+                                              />
+                                            </a>
+                                          )}
+                                        />
+                                      </li> */}
+                                    <li>
+                                      <a>
+                                        <img
+                                          src={`${process.env.PUBLIC_URL}/images/google_icon.png`}
+                                          // src="images/google_icon.png"
+                                          alt="Google"
+                                        />
+                                      </a>
+                                    </li>
+                                    <li>
+                                      <a>
+                                        <img
+                                          src={`${process.env.PUBLIC_URL}/images/facebook_icon.png`}
+                                          // src="images/facebook_icon.png"
+                                          alt="Facebook"
+                                        />
+                                      </a>
+                                    </li>
+                                    <li>
+                                      <a href="#">
+                                        <img
+                                          src={`${process.env.PUBLIC_URL}/images/twiiter_x_icon.png`}
+                                          // src="images/twiiter_x_icon.png"
+                                          alt="Twitter"
+                                        />
+                                      </a>
+                                    </li>
+                                    <li>
+                                      <a href="#">
+                                        <img
+                                          src={`${process.env.PUBLIC_URL}/images/apple_icon.png`}
+                                          // src="images/apple_icon.png"
+                                          alt="Apple"
+                                        />
+                                      </a>
+                                    </li>
+                                    <li>
+                                      <a href="#">
+                                        <img
+                                          src={`${process.env.PUBLIC_URL}/images/insta_icon.png`}
+                                          // src="images/insta_icon.png"
+                                          alt="Instagram"
+                                        />
+                                      </a>
+                                    </li>
+                                  </ul>
+                                </div>
+                              </div>
+
+                              {/* Already have an account */}
+                              <div className="registerdiv">
+                                <p>
+                                  Already have an account?{" "}
+                                  <a
+                                    // onClick={onClose}
+                                    className="showsigninbtn_div"
+                                  >
+                                    Sign In
+                                  </a>
+                                </p>
+                              </div>
+                            </Form>
+                          )}
+                        </Formik>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -279,7 +457,85 @@ const Signup = ({ onClose }) => {
           </div>
         </div>
       </div>
-    </div>
+
+      <div
+        className={`signinpopup_main ${isModals ? "show" : ""}`}
+        style={{ display: isModals ? "block" : "none" }}
+      >
+        <div className="popup_mianSingindiv">
+          <div className="adminloginsection">
+            <div className="container contfld-loginform">
+              <div className="col-md-12 col12mainloginform">
+                <div className="row rowmaqinloginform">
+                  <div className="col-md-6 offset-md-3 col12loginseconddiv">
+                    <div className="col-md-12 col6formsidediv">
+                      <div className="colformlogin">
+                        <div className="crossbtndiv_signinpopup">
+                          <button
+                            type="button"
+                            className="crossbtn_signinpopupclose otpverificationcrossbtn"
+                            onClick={closeModals}
+                          >
+                            <img
+                              src={`${process.env.PUBLIC_URL}/images/cross_icon.png`}
+                              alt="Close"
+                            />
+                          </button>
+                        </div>
+                        <h2>OTP Verification</h2>
+                        <p className="forgotheadingtext">
+                          OTP is sent to your registered Email / Mobile Number{" "}
+                        </p>
+                        <div className="formstart forgotpass_inputmaindiv">
+                          <div className="otpinputdiv_verify">
+                            <div className="enterotp_text_heaidng">
+                              Enter OTP
+                            </div>
+                            <div className="otp-input-fields">
+                              {otp.map((digit, index) => (
+                                <input
+                                  key={index}
+                                  type="text"
+                                  className="otp__digit"
+                                  value={digit}
+                                  onChange={(e) =>
+                                    handleInputChange(index, e.target.value)
+                                  }
+                                  maxLength={1}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                          {/* <div className="resentdivforotp">
+                            <button
+                              type="button"
+                              className="resentotpbtn"
+                              onClick={resendOtp}
+                              disabled={!isOtpResendEnabled}
+                            >
+                              Resend OTP
+                            </button>
+                          </div> */}
+                          <div className="form-control loginformctrl">
+                            <button
+                              type="button"
+                              className="loginbtn otpverify_sbmtbtn"
+                              onClick={verifyOtp}
+                            >
+                              Submit
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 };
 

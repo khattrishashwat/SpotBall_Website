@@ -114,7 +114,6 @@ function Account() {
     }
   };
 
-
   return (
     <div className="profilesection_inner">
       <div className="update_profile_main">
@@ -209,6 +208,7 @@ function Account() {
                     type="email"
                     className="updateinput"
                     placeholder="Enter Email"
+                    // disabled
                   />
                   <ErrorMessage
                     name="email"
@@ -223,6 +223,7 @@ function Account() {
                     type="tel"
                     className="updateinput"
                     placeholder="Enter Phone Number"
+                    // disabled
                   />
                   <ErrorMessage
                     name="phone"

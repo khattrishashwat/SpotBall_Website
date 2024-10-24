@@ -59,11 +59,10 @@ function Header() {
   }, [lastScrollY, isHomePage]);
 
   const handleLogout = () => {
-        setIsLogout(false);
+    setIsLogout(false);
 
     localStorage.clear();
-    // navigate("/");
-  };
+navigate('/')  };
   const fetchProfile = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -105,21 +104,21 @@ function Header() {
     return () => clearInterval(timer);
   }, []);
 
- const formatTime = (milliseconds) => {
-   const totalSeconds = Math.max(0, Math.floor(milliseconds / 1000));
-   const days = String(Math.floor(totalSeconds / 86400)).padStart(2, "0"); // 86400 seconds in a day
-   const hours = String(Math.floor((totalSeconds % 86400) / 3600)).padStart(
-     2,
-     "0"
-   );
-   const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(
-     2,
-     "0"
-   );
-   const seconds = String(totalSeconds % 60).padStart(2, "0");
+  const formatTime = (milliseconds) => {
+    const totalSeconds = Math.max(0, Math.floor(milliseconds / 1000));
+    const days = String(Math.floor(totalSeconds / 86400)).padStart(2, "0"); // 86400 seconds in a day
+    const hours = String(Math.floor((totalSeconds % 86400) / 3600)).padStart(
+      2,
+      "0"
+    );
+    const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(
+      2,
+      "0"
+    );
+    const seconds = String(totalSeconds % 60).padStart(2, "0");
 
-   return `${days} days:${hours} hours:${minutes} mintues:${seconds} seconds`;
- };
+    return `${days} days:${hours} hours:${minutes} mintues:${seconds} seconds`;
+  };
   return (
     <>
       <header className={headerClass}>
@@ -164,7 +163,7 @@ function Header() {
                                 src={`${process.env.PUBLIC_URL}/images/bell_icon.png`}
                                 alt="bell"
                               />
-                              <span className="cartcount">3</span>
+                              {/* <span className="cartcount">3</span> */}
                             </a>
                             <div
                               className="notificationdiv_popup"
@@ -225,7 +224,7 @@ function Header() {
                                 // src="images/cart_icon.png"
                                 // alt="cart"
                               />
-                              <span className="cartcount">1</span>
+                              {/* <span className="cartcount">1</span> */}
                             </Link>
                           </li>
                           <li className="nav-item afterlogin_icons_nav userprofilediv_new">
@@ -295,8 +294,8 @@ function Header() {
                           <li className="mainmenulist">
                             <a
                               onClick={() => {
-                                OpenSignIn(); 
-                                setIsMenuVisible(false); 
+                                OpenSignIn();
+                                setIsMenuVisible(false);
                               }}
                               className="showsigninpopup_onclick"
                             >

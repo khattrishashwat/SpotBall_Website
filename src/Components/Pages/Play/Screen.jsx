@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { RxCross2 } from "react-icons/rx";
 import axios from "axios";
@@ -6,11 +6,10 @@ import Swal from "sweetalert2";
 
 function Screen() {
   const navigate = useNavigate();
+  const imgRef = useRef(null);
 
   const location = useLocation();
   const { quantity, responseData } = location.state.payload || {};
-  const [isIncreasingQuantity, setIsIncreasingQuantity] = useState(false);
-  const [increaseCount, setIncreaseCount] = useState(0);
   const [usedTickets, setUsedTickets] = useState(0);
   const [totalTickets, setTotalTickets] = useState(quantity || "");
   const [tickets, setTickets] = useState(
@@ -27,6 +26,19 @@ function Screen() {
 
   const [isModals, setIsModals] = useState("");
   const [movies, setMovies] = useState("");
+
+  const [imageDimensions, setImageDimensions] = useState({
+    width: 0,
+    height: 0,
+  });
+
+  const handleImageLoad = () => {
+    if (imgRef.current) {
+      const { width, height } = imgRef.current.getBoundingClientRect();
+      setImageDimensions({ width, height });
+    }
+  };
+  console.log("sizes", imageDimensions);
 
   const open = async () => {
     setIsModals(true);
@@ -74,194 +86,25 @@ function Screen() {
   const videoData = movies.length > 0 ? movies[0] : null;
 
   useEffect(() => {
-    setUsedTickets(tickets.length);
+    setUsedTickets(
+      tickets.filter(
+        (ticket) => ticket.xCord !== "____" && ticket.yCord !== "____"
+      ).length
+    );
   }, [tickets]);
 
-  // const handleTicket = () => {
-  //   if (usedTickets < totalTickets) {
-  //     const newTicket = {
-  //       id: usedTickets + 1,
-  //       xCord: "____",
-  //       yCord: "____",
-  //     };
-  //     setTickets((prev) => [...prev, newTicket]);
-  //     setUsedTickets((prev) => prev + 1);
-  //   } else {
-  //     if (usedTickets < responseData.maxTickets) {
-  //       // Check against max tickets
-  //       Swal.fire({
-  //         title: "You have reached your ticket limit",
-  //         text: "Do you want to increase your ticket quantity?",
-  //         icon: "warning",
-  //         showCancelButton: true,
-  //         confirmButtonText: "Yes, increase",
-  //         cancelButtonText: "No, keep it the same",
-  //       }).then((result) => {
-  //         if (result.isConfirmed) {
-  //           setTotalTickets((prev) => prev + 1); // Increment totalTickets
-  //           setUsedTickets((prev) => prev + 1); // Increment usedTickets
-  //           setIncreaseCount((prev) => prev + 1); // Track how many times the user confirmed to increase
-
-  //           const newTicket = {
-  //             id: usedTickets + 1,
-  //             xCord: "____",
-  //             yCord: "____",
-  //           };
-  //           setTickets((prev) => [...prev, newTicket]); // Add the new ticket
-  //           setIsIncreasingQuantity(true); // Set the flag to true
-
-  //           Swal.fire({
-  //             icon: "success",
-  //             title: "Ticket quantity increased!",
-  //             showConfirmButton: false,
-  //             timer: 1500,
-  //           });
-  //         } else {
-  //           Swal.fire({
-  //             icon: "info",
-  //             title: "No more tickets added.",
-  //             showConfirmButton: false,
-  //             timer: 1500,
-  //           });
-  //         }
-  //       });
-  //     } else {
-  //       Swal.fire({
-  //         icon: "error",
-  //         title: "Maximum ticket limit reached!",
-  //         text: `You cannot add more than ${responseData.maxTickets} tickets.`,
-  //       });
-  //     }
-  //   }
-  // };
-
-  //   const handleTicket = () => {
-  //     if (usedTickets < totalTickets) {
-  //       const newTicket = {
-  //         id: usedTickets + 1,
-  //         xCord: "____",
-  //         yCord: "____",
-  //       };
-  //       setTickets((prev) => [...prev, newTicket]);
-  //       setUsedTickets((prev) => prev + 1);
-  //     } else {
-  //       if (!isIncreasingQuantity) {
-  //         Swal.fire({
-  //           title: "You have reached your ticket limit",
-  //           text: "Do you want to increase your ticket quantity?",
-  //           icon: "warning",
-  //           showCancelButton: true,
-  //           confirmButtonText: "Yes, increase",
-  //           cancelButtonText: "No, keep it the same",
-  //         }).then((result) => {
-  //           if (result.isConfirmed) {
-  //             setTotalTickets((prev) => prev + 1);
-  //             setIncreaseCount((prev) => prev + 1);
-  //             const newTicket = {
-  //               id: usedTickets + 1,
-  //               xCord: "____",
-  //               yCord: "____",
-  //             };
-  //             setTickets((prev) => [...prev, newTicket]);
-  //             setUsedTickets((prev) => prev + 1); // Increment usedTickets
-  //             setIsIncreasingQuantity(true);
-  //             Swal.fire({
-  //               icon: "success",
-  //               title: "Ticket quantity increased!",
-  //               showConfirmButton: false,
-  //               timer: 1500,
-  //             });
-  //           } else {
-  //             Swal.fire({
-  //               icon: "info",
-  //               title: "No more tickets added.",
-  //               showConfirmButton: false,
-  //               timer: 1500,
-  //             });
-  //           }
-  //         });
-  //       } else {
-  //         // If already increasing quantity, directly add a new ticket
-  //         const newTicket = {
-  //           id: usedTickets + 1,
-  //           xCord: "____",
-  //           yCord: "____",
-  //         };
-  //         setTickets((prev) => [...prev, newTicket]);
-  //         setUsedTickets((prev) => prev + 1);
-  //         setTotalTickets((prev) => prev + 1);
-  //       }
-  //     }
-  //   };
-
-  // const handleAddTicket = () => {
-  //   // Check if usedTickets is less than totalTickets and also less than maxTickets
-  //   if (usedTickets < totalTickets && usedTickets < responseData.maxTickets) {
-  //     const newTicket = {
-  //       id: usedTickets + 1,
-  //       xCord: "____",
-  //       yCord: "____",
-  //     };
-  //     setTickets((prev) => [...prev, newTicket]);
-  //     setUsedTickets((prev) => prev + 1); // Increment usedTickets
-  //   } else {
-  //     // Show a message if the maximum limit is reached
-  //     Swal.fire({
-  //       icon: "warning",
-  //       title: "Maximum ticket limit reached",
-  //       text: `You cannot add more than ${responseData.maxTickets} tickets.`,
-  //       confirmButtonText: "OK",
-  //     });
-  //   }
-  // };
-
   const handleTicket = () => {
-    // Check if usedTickets is less than totalTickets and also less than maxTickets
-    if (usedTickets < totalTickets && usedTickets < responseData.maxTickets) {
+    // Check if totalTickets is less than responseData.maxTickets
+    if (totalTickets < responseData.maxTickets) {
       const newTicket = {
-        id: usedTickets + 1,
+        id: tickets.length + 1,
         xCord: "____",
         yCord: "____",
       };
+
       setTickets((prev) => [...prev, newTicket]);
-      setUsedTickets((prev) => prev + 1); // Increment usedTickets
-    } else if (usedTickets >= totalTickets && !isIncreasingQuantity) {
-      // If usedTickets has reached totalTickets, prompt to increase
-      Swal.fire({
-        title: "You have reached your ticket limit",
-        text: "Do you want to increase your ticket quantity?",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Yes, increase",
-        cancelButtonText: "No, keep it the same",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          setTotalTickets((prev) => prev + 1);
-          const newTicket = {
-            id: usedTickets + 1,
-            xCord: "____",
-            yCord: "____",
-          };
-          setTickets((prev) => [...prev, newTicket]);
-          setUsedTickets((prev) => prev + 1); // Increment usedTickets
-          setIsIncreasingQuantity(true);
-          Swal.fire({
-            icon: "success",
-            title: "Ticket quantity increased!",
-            showConfirmButton: false,
-            timer: 1500,
-          });
-        } else {
-          Swal.fire({
-            icon: "info",
-            title: "No more tickets added.",
-            showConfirmButton: false,
-            timer: 1500,
-          });
-        }
-      });
+      setTotalTickets((prev) => prev + 1); // Increment totalTickets, but not usedTickets yet
     } else {
-      // Show a message if the maximum limit is reached
       Swal.fire({
         icon: "warning",
         title: "Maximum ticket limit reached",
@@ -297,26 +140,6 @@ function Screen() {
     }
   };
 
-  //   // Check if usedTickets is less than maxTickets
-  //   if (usedTickets < responseData.maxTickets) {
-  //     const newTicket = {
-  //       id: usedTickets + 1,
-  //       xCord: "____",
-  //       yCord: "____",
-  //     };
-  //     setTickets((prev) => [...prev, newTicket]);
-  //     setUsedTickets((prev) => prev + 1); // Increment usedTickets
-  //   } else {
-  //     // Show a message if the maximum limit is reached
-  //     Swal.fire({
-  //       icon: "warning",
-  //       title: "Maximum ticket limit reached",
-  //       text: `You cannot add more than ${responseData.maxTickets} tickets.`,
-  //       confirmButtonText: "OK",
-  //     });
-  //   }
-  // };
-
   const handleRefreshAll = () => {
     setTickets((prev) =>
       prev.map((ticket) => ({
@@ -328,18 +151,21 @@ function Screen() {
     setClickedPoints([]);
     setClickCount(0);
   };
-  const handleDeleteTicket = (id) => {
-    const updatedTickets = tickets.filter((ticket) => ticket.id !== id);
+const handleDeleteTicket = (id) => {
+  const updatedTickets = tickets.filter((ticket) => ticket.id !== id);
 
-    const reindexedTickets = updatedTickets.map((ticket, index) => ({
-      ...ticket,
-      id: index + 1,
-    }));
+  const reindexedTickets = updatedTickets.map((ticket, index) => ({
+    ...ticket,
+    id: index + 1,
+  }));
 
-    setTickets(reindexedTickets);
+  setTickets(reindexedTickets);
 
-    const ticketToDelete = tickets.find((ticket) => ticket.id === id);
-    if (ticketToDelete) {
+  const ticketToDelete = tickets.find((ticket) => ticket.id === id);
+
+  if (ticketToDelete) {
+    // Check if the xCord and yCord are not empty or undefined
+    if (ticketToDelete.xCord && ticketToDelete.yCord) {
       setClickedPoints((prev) =>
         prev.filter(
           (point) =>
@@ -347,95 +173,14 @@ function Screen() {
         )
       );
 
-      setClickCount((prev) => prev - 1);
-      setUsedTickets((prev) => prev - 1); // Decrement usedTickets
-      setTotalTickets((prev) => prev - 1); // Decrement totalTickets
+      setClickCount((prev) => prev - 1); // Decrement click count if valid ticket
+      setUsedTickets((prev) => prev - 1); // Decrement used tickets if valid
     }
-  };
 
-  // const handleReply = (id) => {
-  //   setTickets((prev) =>
-  //     prev.map((ticket) =>
-  //       ticket.id === id ? { ...ticket, xCord: "____", yCord: "____" } : ticket
-  //     )
-  //   );
-
-  //   const ticketToUpdate = tickets.find((ticket) => ticket.id === id);
-
-  //   if (ticketToUpdate) {
-  //     setClickedPoints((prev) =>
-  //       prev.filter(
-  //         (point) =>
-  //           point.x !== ticketToUpdate.xCord || point.y !== ticketToUpdate.yCord
-  //       )
-  //     );
-  //   }
-  // };
-
-  // const handleReply = (id) => {
-  //   setTickets((prev) =>
-  //     prev.map((ticket) =>
-  //       ticket.id === id ? { ...ticket, xCord: "____", yCord: "____" } : ticket
-  //     )
-  //   );
-
-  //   // Get the ticket that was updated
-  //   const ticketToUpdate = tickets.find((ticket) => ticket.id === id);
-
-  //   if (ticketToUpdate) {
-  //     // Update clickedPoints to remove the ticket's previous coordinates
-  //     setClickedPoints((prev) =>
-  //       prev.filter(
-  //         (point) =>
-  //           point.x !== ticketToUpdate.xCord || point.y !== ticketToUpdate.yCord
-  //       )
-  //     );
-
-  //     // Add back the reset coordinates, ensuring they can be reused
-  //     setClickedPoints((prev) => [...prev, { x: "____", y: "____" }]);
-  //   }
-  // };
-
-  // const handleReply = (id) => {
-  //   const updatedTickets = tickets.map((ticket) =>
-  //     ticket.id === id ? { ...ticket, xCord: "____", yCord: "____" } : ticket
-  //   );
-
-  //   setTickets(updatedTickets);
-
-  //   const ticketToUpdate = tickets.find((ticket) => ticket.id === id);
-  //   if (ticketToUpdate) {
-  //     setClickedPoints((prev) =>
-  //       prev.filter(
-  //         (point) =>
-  //           point.x !== ticketToUpdate.xCord || point.y !== ticketToUpdate.yCord
-  //       )
-  //     );
-
-  //     // Optionally decrement usedTickets if you want to track that too
-  //     setUsedTickets((prev) => prev - 1);
-  //   }
-  // };
-
-  // const handleReply = (id) => {
-  //   const updatedTickets = tickets.map((ticket) =>
-  //     ticket.id === id ? { ...ticket, xCord: "____", yCord: "____" } : ticket
-  //   );
-
-  //   setTickets(updatedTickets);
-
-  //   // Here we do not decrement usedTickets or clickCount
-  //   const ticketToUpdate = tickets.find((ticket) => ticket.id === id);
-  //   if (ticketToUpdate) {
-  //     // Optionally keep clicked points in sync
-  //     setClickedPoints((prev) =>
-  //       prev.filter(
-  //         (point) =>
-  //           point.x !== ticketToUpdate.xCord || point.y !== ticketToUpdate.yCord
-  //       )
-  //     );
-  //   }
-  // };
+    // Decrement total tickets if a ticket is deleted, regardless of x and y coordinates
+    setTotalTickets((prev) => prev - 1);
+  }
+};
 
   const handleReply = (id) => {
     const updatedTickets = tickets.map((ticket) =>
@@ -460,10 +205,18 @@ function Screen() {
   };
 
   const handleMouseMove = (e) => {
-    setCoordinates({
-      x: e.nativeEvent.offsetX,
-      y: e.nativeEvent.offsetY,
-    });
+    const image = e.target;
+    const rect = image.getBoundingClientRect();
+
+    // Calculate the X and Y position relative to the displayed image
+    const xRelative = e.clientX - rect.left;
+    const yRelative = e.clientY - rect.top;
+
+    // Map the coordinates to the original image dimensions
+    const x = ((xRelative / rect.width) * image.naturalWidth).toFixed(2);
+    const y = ((yRelative / rect.height) * image.naturalHeight).toFixed(2);
+
+    setCoordinates({ x, y });
   };
 
   const handleMouseEnter = () => {
@@ -473,68 +226,6 @@ function Screen() {
   const handleMouseLeave = () => {
     setShowTooltip(false);
   };
-
-  // const handleClick = (e) => {
-  //   if (clickCount >= totalTickets) {
-  //     alert("You have used all your chances.");
-  //     return;
-  //   }
-
-  //   const image = e.target;
-  //   const rect = image.getBoundingClientRect();
-  //   const x = (e.clientX - rect.left).toFixed(2); // Format to two decimal places
-  //   const y = (e.clientY - rect.top).toFixed(2); // Format to two decimal places
-
-  //   const updatedTickets = [...tickets];
-  //   const ticketIndex = updatedTickets.findIndex(
-  //     (ticket) => ticket.xCord === "____" && ticket.yCord === "____"
-  //   );
-
-  //   if (ticketIndex !== -1) {
-  //     updatedTickets[ticketIndex] = {
-  //       xCord: x,
-  //       yCord: y,
-  //       id: updatedTickets[ticketIndex].id,
-  //     };
-  //     setTickets(updatedTickets);
-  //     setClickedPoints((prev) => [...prev, { x, y }]);
-  //     setClickCount((prev) => prev + 1);
-  //   } else {
-  //     alert("All tickets are already filled.");
-  //   }
-  // };
-
-  // const handleClick = (e) => {
-  //   if (clickCount >= usedTickets) {
-  //     alert("You have used all your chances.");
-  //     return;
-  //   }
-
-  //   const image = e.target;
-  //   const rect = image.getBoundingClientRect();
-  //   const x = (e.clientX - rect.left).toFixed(2);
-  //   const y = (e.clientY - rect.top).toFixed(2);
-
-  //   const updatedTickets = [...tickets];
-  //   const ticketIndex = updatedTickets.findIndex(
-  //     (ticket) => ticket.xCord === "____" && ticket.yCord === "____"
-  //   );
-
-  //   if (ticketIndex !== -1) {
-  //     updatedTickets[ticketIndex] = {
-  //       xCord: x,
-  //       yCord: y,
-  //       id: updatedTickets[ticketIndex].id,
-  //     };
-  //     setTickets(updatedTickets);
-  //     setClickedPoints((prev) => [...prev, { x, y }]);
-  //     setClickCount((prev) => prev + 1);
-  //     // setUsedTickets((prev) => prev + 1); // Increment usedTickets here
-  //     // setTotalTickets((prev) => prev + 1); // Optionally, if you want to increase total tickets on click
-  //   } else {
-  //     alert("All tickets are already filled.");
-  //   }
-  // };
 
   // const handleClick = (e) => {
   //   // Check if the user has used all their chances
@@ -549,8 +240,9 @@ function Screen() {
   //   const y = (e.clientY - rect.top).toFixed(2);
 
   //   const updatedTickets = [...tickets];
+  //   // Allow filling empty tickets
   //   const ticketIndex = updatedTickets.findIndex(
-  //     (ticket) => ticket.xCord === "____" // Allow filling empty tickets
+  //     (ticket) => ticket.xCord === "____"
   //   );
 
   //   if (ticketIndex !== -1) {
@@ -564,8 +256,8 @@ function Screen() {
   //     // Update the state
   //     setTickets(updatedTickets);
   //     setClickedPoints((prev) => [...prev, { x, y }]);
-  //     setClickCount((prev) => prev + 1);
-  //     setUsedTickets((prev) => prev + 1); // Increment usedTickets here
+  //     setClickCount((prev) => prev + 1); // Increment clickCount only when filling a new ticket
+  //     setUsedTickets((prev) => prev + 1); // Increment usedTickets here if needed
   //   } else {
   //     alert("All tickets are already filled.");
   //   }
@@ -573,20 +265,27 @@ function Screen() {
 
   const handleClick = (e) => {
     // Check if the user has used all their chances
-    if (clickCount >= usedTickets) {
+    if (clickCount >= totalTickets) {
       alert("You have used all your chances.");
       return;
     }
 
     const image = e.target;
-    const rect = image.getBoundingClientRect();
-    const x = (e.clientX - rect.left).toFixed(2);
-    const y = (e.clientY - rect.top).toFixed(2);
+    const rect = image.getBoundingClientRect(); // Get the image position and size in the viewport
+
+    // Get the relative position of the click within the image
+    const xRelative = e.clientX - rect.left; // X coordinate relative to the image
+    const yRelative = e.clientY - rect.top; // Y coordinate relative to the image
+
+    // Calculate the click's position based on the image's natural size
+    const x = ((xRelative / rect.width) * image.naturalWidth).toFixed(2); // X based on image's intrinsic width
+    const y = ((yRelative / rect.height) * image.naturalHeight).toFixed(2); // Y based on image's intrinsic height
 
     const updatedTickets = [...tickets];
-    // Allow filling empty tickets
+
+    // Find a ticket with empty coordinates
     const ticketIndex = updatedTickets.findIndex(
-      (ticket) => ticket.xCord === "____"
+      (ticket) => ticket.xCord === "____" && ticket.yCord === "____"
     );
 
     if (ticketIndex !== -1) {
@@ -597,11 +296,13 @@ function Screen() {
         yCord: y,
       };
 
-      // Update the state
+      // Update state
       setTickets(updatedTickets);
       setClickedPoints((prev) => [...prev, { x, y }]);
-      setClickCount((prev) => prev + 1); // Increment clickCount only when filling a new ticket
-      setUsedTickets((prev) => prev + 1); // Increment usedTickets here if needed
+      setClickCount((prev) => prev + 1); // Increment clickCount
+
+      // Only now increment usedTickets, since a ticket is now fully filled
+      setUsedTickets((prev) => prev + 1);
     } else {
       alert("All tickets are already filled.");
     }
@@ -666,48 +367,73 @@ function Screen() {
         <div className="container contfld_playgame">
           <div className="row rowmain_playgame">
             <div className="col-md-8 col9playgame_mainscreen">
-              <div className="gamescreenimg_right">
+              <div
+                className="gamescreenimg_right"
+                style={{ position: "relative" }}
+              >
                 <img
+                  ref={imgRef}
                   src={responseData?.player_image?.file_url || ""}
                   onMouseMove={handleMouseMove}
                   onClick={handleClick}
+                  onLoad={handleImageLoad}
                   onMouseEnter={handleMouseEnter}
                   onMouseLeave={handleMouseLeave}
-                  style={{ cursor: "crosshair" }}
+                  style={{
+                    cursor: "crosshair",
+                    display: "block",
+                    position: "relative",
+                  }}
                   alt="Player"
                 />
+
                 {clickedPoints.map((point, index) => (
                   <div
                     key={index}
                     style={{
                       position: "absolute",
-                      left: `${parseFloat(point.x).toFixed(2)}px`,
-                      top: `${parseFloat(point.y).toFixed(2)}px`,
+                      left: `${
+                        (point.x / imgRef.current.naturalWidth) *
+                        imgRef.current.clientWidth
+                      }px`,
+                      top: `${
+                        (point.y / imgRef.current.naturalHeight) *
+                        imgRef.current.clientHeight
+                      }px`,
+                      transform: "translate(-50%, -50%)", // Center the cross
                     }}
                   >
                     <RxCross2
                       style={{
                         color: "black",
-                        fontSize: "30px",
+                        fontSize: "20px",
                         position: "absolute",
                       }}
                     />
                   </div>
                 ))}
+
                 {showTooltip && (
                   <div
                     style={{
                       position: "absolute",
-                      left: coordinates.x + 10,
-                      top: coordinates.y + 10,
+                      left: `${
+                        (coordinates.x / imgRef.current.naturalWidth) *
+                          imgRef.current.clientWidth +
+                        1
+                      }px`,
+                      top: `${
+                        (coordinates.y / imgRef.current.naturalHeight) *
+                          imgRef.current.clientHeight +
+                        1
+                      }px`,
                       backgroundColor: "rgba(0, 0, 0, 0.7)",
                       color: "#fff",
-                      padding: "1px 1px",
                       pointerEvents: "none",
                     }}
                   >
                     <p>
-                      ({"X-" + coordinates.x}, {"Y-" + coordinates.y})
+                      (X: {coordinates.x}, Y: {coordinates.y})
                     </p>
                   </div>
                 )}

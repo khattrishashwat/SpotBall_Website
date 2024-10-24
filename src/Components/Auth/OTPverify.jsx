@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import NewPassword from "./NewPassword";
 
-function OTPverify({ onClose, token, email }) {
+function OTPverify({ onClosedss, token, email }) {
   const [otp, setOtp] = useState(["", "", "", ""]);
   const [showNewPassword, setShowNewPassword] = useState(false);
+  const inputRefs = useRef([]);
 
   // Function to handle OTP input change
   const handleInputChange = (index, value) => {
@@ -15,10 +16,10 @@ function OTPverify({ onClose, token, email }) {
 
     // Move to the next input
     if (value && index < otp.length - 1) {
-      const nextInput = document.querySelector(
-        `.otp__digit:nth-child(${index + 2})`
-      );
-      if (nextInput) nextInput.focus();
+      inputRefs.current[index + 1]?.focus();
+    } else if (!value && index > 0) {
+      // Handle backspace, move to the previous input if empty
+      inputRefs.current[index - 1]?.focus();
     }
   };
 
@@ -27,10 +28,10 @@ function OTPverify({ onClose, token, email }) {
     try {
       const response = await axios.post(
         "submit-otp",
-        { otp: otp.join("") }, // Join OTP array into a string
+        { otp: otp.join("") },
         {
           headers: {
-            Authorization: `Bearer ${token}`, // Use the token from props
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -40,18 +41,21 @@ function OTPverify({ onClose, token, email }) {
           icon: "success",
           text: "OTP verified successfully!",
         });
-        setShowNewPassword(true); // Show new password form
+        setShowNewPassword(true);
+        // onClosedss(); // Close OTP popup when NewPassword is opened
       } else {
         Swal.fire({
           icon: "error",
           text: response.data.message || "OTP verification failed!",
         });
+        setOtp(["", "", "", ""]); // Clear OTP input
       }
     } catch (error) {
       Swal.fire({
         icon: "error",
         text: error.response ? error.response.data.message : error.message,
       });
+      setOtp(["", "", "", ""]); // Clear OTP input on error
     }
   };
 
@@ -60,10 +64,10 @@ function OTPverify({ onClose, token, email }) {
     try {
       const response = await axios.post(
         "resend-otp-user-verification",
-        { email }, // Send the email when resending OTP
+        { email },
         {
           headers: {
-            Authorization: `Bearer ${token}`, // Use the token from props
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -82,7 +86,11 @@ function OTPverify({ onClose, token, email }) {
 
   return (
     <>
-      <div className="signinpopup_main" style={{ display: "block" }}>
+      {/* OTP Verification Popup */}
+      <div
+        className="signinpopup_main"
+        style={{ display: showNewPassword ? "none" : "block" }}
+      >
         <div className="popup_mianSingindiv">
           <div className="adminloginsection">
             <div className="container contfld-loginform">
@@ -95,7 +103,7 @@ function OTPverify({ onClose, token, email }) {
                           <button
                             type="button"
                             className="crossbtn_signinpopupclose otpverificationcrossbtn"
-                            onClick={onClose}
+                            onClick={onClosedss}
                           >
                             <img
                               src={`${process.env.PUBLIC_URL}/images/cross_icon.png`}
@@ -123,6 +131,7 @@ function OTPverify({ onClose, token, email }) {
                                     handleInputChange(index, e.target.value)
                                   }
                                   maxLength={1}
+                                  ref={(el) => (inputRefs.current[index] = el)} // Use refs for inputs
                                 />
                               ))}
                             </div>
@@ -131,7 +140,7 @@ function OTPverify({ onClose, token, email }) {
                             <button
                               type="button"
                               className="resentotpbtn"
-                              onClick={resendOtp} // Handle Resend OTP
+                              onClick={resendOtp}
                             >
                               Resend OTP
                             </button>
@@ -140,7 +149,8 @@ function OTPverify({ onClose, token, email }) {
                             <button
                               type="button"
                               className="loginbtn otpverify_sbmtbtn"
-                              onClick={verifyOtp} // Submit the OTP for verification
+                              onClick={verifyOtp}
+                              disabled={otp.includes("")} // Disable if any field is empty
                             >
                               Submit
                             </button>
@@ -155,8 +165,13 @@ function OTPverify({ onClose, token, email }) {
           </div>
         </div>
       </div>
+
+      {/* NewPassword Popup */}
       {showNewPassword && (
-        <NewPassword onClose={() => setShowNewPassword(false)} email={email} />
+        <NewPassword
+          onCloseds={() => setShowNewPassword(false)}
+          email={email}
+        />
       )}
     </>
   );

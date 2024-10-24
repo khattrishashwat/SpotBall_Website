@@ -9,7 +9,6 @@ import Signup from "./Signup";
 import Loader from "../Loader/Loader";
 import { GoogleLogin } from "@react-oauth/google";
 
-
 function Login({ isVisible, onClose }) {
   const [showPassword, setShowPassword] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
@@ -250,7 +249,8 @@ function Login({ isVisible, onClose }) {
                                       <li>
                                         <a>
                                           <img
-                                            src="images/google_icon.png"
+                                            src={`${process.env.PUBLIC_URL}/images/google_icon.png`}
+                                            // src="images/google_icon.png"
                                             alt="Google"
                                           />
                                         </a>
@@ -258,7 +258,8 @@ function Login({ isVisible, onClose }) {
                                       <li>
                                         <a>
                                           <img
-                                            src="images/facebook_icon.png"
+                                            src={`${process.env.PUBLIC_URL}/images/facebook_icon.png`}
+                                            // src="images/facebook_icon.png"
                                             alt="Facebook"
                                           />
                                         </a>
@@ -266,7 +267,8 @@ function Login({ isVisible, onClose }) {
                                       <li>
                                         <a href="#">
                                           <img
-                                            src="images/twiiter_x_icon.png"
+                                            src={`${process.env.PUBLIC_URL}/images/twiiter_x_icon.png`}
+                                            // src="images/twiiter_x_icon.png"
                                             alt="Twitter"
                                           />
                                         </a>
@@ -274,7 +276,8 @@ function Login({ isVisible, onClose }) {
                                       <li>
                                         <a href="#">
                                           <img
-                                            src="images/apple_icon.png"
+                                            src={`${process.env.PUBLIC_URL}/images/apple_icon.png`}
+                                            // src="images/apple_icon.png"
                                             alt="Apple"
                                           />
                                         </a>
@@ -282,7 +285,8 @@ function Login({ isVisible, onClose }) {
                                       <li>
                                         <a href="#">
                                           <img
-                                            src="images/insta_icon.png"
+                                            src={`${process.env.PUBLIC_URL}/images/insta_icon.png`}
+                                            // src="images/insta_icon.png"
                                             alt="Instagram"
                                           />
                                         </a>
@@ -306,7 +310,7 @@ function Login({ isVisible, onClose }) {
 
       {/* Forgot Password Modal */}
       {showForgotPassword && (
-        <Forget onClose={() => setShowForgotPassword(false)} />
+        <Forget onClosed={() => setShowForgotPassword(false)} />
       )}
 
       {/* Sign Up Modal */}

@@ -4,7 +4,7 @@ import * as Yup from "yup"; // for validation
 import axios from "axios";
 import Swal from "sweetalert2";
 
-function NewPassword({ onClose, email }) {
+function NewPassword({ onCloseds, email }) {
   const [showPassword, setShowPassword] = useState(false);
   const [seePassword, setSeePassword] = useState(false);
 
@@ -41,7 +41,8 @@ function NewPassword({ onClose, email }) {
         icon: "success",
         text: response.data.message,
       });
-      onClose(); // Close the popup on success
+      onCloseds(); 
+    window.location.reload();
     } catch (error) {
       Swal.fire({
         icon: "error",
@@ -69,7 +70,7 @@ function NewPassword({ onClose, email }) {
                           <button
                             type="button"
                             className="crossbtn_signinpopupclose crreatenewpass_crosicon"
-                            onClick={onClose}
+                            onClick={onCloseds}
                           >
                             <img
                               src={`${process.env.PUBLIC_URL}/images/cross_icon.png`}

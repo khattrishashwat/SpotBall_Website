@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import Loader from "../../Loader/Loader";
 
 function Are() {
   const [whos, setWhos] = useState([]);
@@ -33,53 +34,47 @@ function Are() {
   return (
     <>
       <section className="maincont_section">
-        <div className="container contforinner_mainheading">
-          <div className="row rowmainheading_inner">
-            <div className="col-md-12 colmainheading_innerpages">
-              <div className="pageheading_main">
-                <h2>{whos[0]?.title || ""}</h2>
+        {isLoading ? (
+          <Loader /> 
+        ) : (
+          <div className="container contforinner_mainheading">
+            <div className="row rowmainheading_inner">
+              <div className="col-md-12 colmainheading_innerpages">
+                <div className="pageheading_main">
+                  <h2>{whos[0]?.title || ""}</h2>
+                </div>
+              </div>
+            </div>
+            <div className="container cont_maindata_inner_aboutus">
+              <div className="row rowmaindatainner_aboutus">
+                <div className="col-md-8 colaboutusdiv_inner">
+                  <div className="aboutusdiv_text">
+                    <h3>{whos[0]?.subTitle || ""}</h3>
+                    <p>{whos[0]?.description}</p>
+                  </div>
+                </div>
+                <div className="col-md-4 col4aboutus_imgdiv">
+                  <div className="about_img">
+                    <img src={whos[0]?.images || ""} alt="About Us" />
+                  </div>
+                </div>
+              </div>
+              <div className="row rowmaindatainner_aboutus">
+                <div className="col-md-4 col4aboutus_imgdiv">
+                  <div className="about_img">
+                    <img src={whos[1]?.images} alt="Cricket Passion" />
+                  </div>
+                </div>
+                <div className="col-md-8 colaboutusdiv_inner">
+                  <div className="aboutusdiv_text">
+                    <h3>{whos[1]?.subTitle}</h3>
+                    <p>{whos[1]?.description}</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <div className="container cont_maindata_inner_aboutus">
-          <div className="row rowmaindatainner_aboutus">
-            <div className="col-md-8 colaboutusdiv_inner">
-              <div className="aboutusdiv_text">
-                <h3>{whos[0]?.subTitle || ""}</h3>
-                <p>
-                  {whos[0]?.description }
-                </p>
-              </div>
-            </div>
-            <div className="col-md-4 col4aboutus_imgdiv">
-              <div className="about_img">
-                <img
-                  src={whos[0]?.images || ""}
-                  alt="About Us"
-                />
-              </div>
-            </div>
-          </div>
-          <div className="row rowmaindatainner_aboutus">
-            <div className="col-md-4 col4aboutus_imgdiv">
-              <div className="about_img">
-                <img
-                  src={whos[1]?.images}
-                  alt="Cricket Passion"
-                />
-              </div>
-            </div>
-            <div className="col-md-8 colaboutusdiv_inner">
-              <div className="aboutusdiv_text">
-                <h3>{whos[1]?.subTitle }</h3>
-                <p>
-                  {whos[1]?.description }
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+        )}
       </section>
     </>
   );

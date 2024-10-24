@@ -5,7 +5,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import OTPverify from "./OTPverify";
 
-function Forget({ onClose }) {
+function Forget({ onClosed }) {
   const [showOTPS, setShowOTPS] = useState(false);
   const [responseData, setResponseData] = useState(null); // Store the token and email
 
@@ -25,7 +25,6 @@ function Forget({ onClose }) {
         email: values.email, // Store email
       });
       handleOTP();
-      setShowOTPS(true);
     } catch (error) {
       Swal.fire({
         icon: "error",
@@ -36,7 +35,7 @@ function Forget({ onClose }) {
 
   const handleOTP = () => {
     setShowOTPS(true);
-    // onClose(); 
+    // onClosed();
   };
 
   return (
@@ -57,7 +56,7 @@ function Forget({ onClose }) {
                         <button
                           type="button"
                           className="crossbtn_signinpopupclose forgotpass_popup_crossbtn"
-                          onClick={onClose}
+                          onClick={onClosed}
                         >
                           <img
                             src={`${process.env.PUBLIC_URL}/images/cross_icon.png`}
@@ -111,7 +110,7 @@ function Forget({ onClose }) {
       </div>
       {showOTPS && (
         <OTPverify
-          onClose={() => setShowOTPS(false)}
+          onClosedss={() => setShowOTPS(false)}
           token={responseData?.token} // Pass token to OTPverify
           email={responseData?.email} // Pass email to OTPverify
         />

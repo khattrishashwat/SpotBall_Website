@@ -24,25 +24,22 @@ function Home() {
   const open = async () => {
     setIsModals(true);
   };
-const handleBuyTicketClick = (contest) => {
-  
+  const handleBuyTicketClick = (contest) => {
     setSelectedContest(contest);
     setOnCarts(true);
-  
-};
-// const handleBuyTicketClick = (contest) => {
-//   if (!contest.allowance) {
-//     Swal.fire({
-//       icon: "warning",
-//       title: "Participation Alert",
-//       text: "You have already participated in this contest!",
-//     });
-//   } else {
-//     setSelectedContest(contest);
-//     setOnCarts(true);
-//   }
-// };
-
+  };
+  // const handleBuyTicketClick = (contest) => {
+  //   if (!contest.allowance) {
+  //     Swal.fire({
+  //       icon: "warning",
+  //       title: "Participation Alert",
+  //       text: "You have already participated in this contest!",
+  //     });
+  //   } else {
+  //     setSelectedContest(contest);
+  //     setOnCarts(true);
+  //   }
+  // };
 
   const ClosedCarts = async () => {
     setOnCarts(false);
@@ -239,7 +236,7 @@ const handleBuyTicketClick = (contest) => {
   };
 
   // console.log("contests", contests[0]?.allowance);
-  
+
   return (
     <>
       {loading ? (
@@ -425,7 +422,7 @@ const handleBuyTicketClick = (contest) => {
                               style={{
                                 width: "459px",
                                 height: "306px",
-                                objectFit: "cover",
+                                // objectFit: "cover",
                               }}
                             />
                             {/* <img
@@ -446,7 +443,7 @@ const handleBuyTicketClick = (contest) => {
                                 </div>
                                 <div className="contestrightdaysdate">
                                   <h4 className="contslist_span_inner">
-                                    Sunday- 21:59hrs
+                                    Sunday- 23:59hrs
                                   </h4>
                                 </div>
                               </div>
@@ -463,7 +460,7 @@ const handleBuyTicketClick = (contest) => {
                                 </div>
                                 <div className="contestrightdaysdate">
                                   <h4 className="contslist_span_inner">
-                                    Monday- 21:00hrs
+                                    Monday- 00:00hrs
                                   </h4>
                                 </div>
                               </div>
