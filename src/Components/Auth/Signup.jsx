@@ -5,7 +5,7 @@ import * as Yup from "yup";
 import Swal from "sweetalert2";
 import axios from "axios";
 
-const Signup = ({ isOpenness, onCloseness }) => {
+const Signup = ({ isOpenness, onClose }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -90,7 +90,7 @@ const Signup = ({ isOpenness, onCloseness }) => {
         timer: 1000,
       }).then(() => {
         openModals();
-        onCloseness();
+        // onClose();
       });
     } catch (error) {
       Swal.fire({
@@ -171,9 +171,12 @@ const Signup = ({ isOpenness, onCloseness }) => {
   return (
     <>
       <div
-        className={`signinpopup_main ${isOpenness ? "show" : ""}`}
+        // className={`signinpopup_main ${isOpenness ? "show" : ""}`}
+        className="signinpopup_main"
         id="signup_popup"
-        style={{ display: isOpenness ? "block" : "none" }}
+        style={{ display: "block" }}
+
+        // style={{ display: isOpenness ? "block" : "none" }}
       >
         <div className="popup_mianSingindiv mainpopupfrsignupdiv_new">
           <div className="adminloginsection">
@@ -187,7 +190,7 @@ const Signup = ({ isOpenness, onCloseness }) => {
                           <button
                             type="button"
                             className="crossbtn_signinpopupclose singupcrossbtn"
-                            onClick={onCloseness}
+                            onClick={onClose}
                           >
                             <img
                               src={`${process.env.PUBLIC_URL}/images/cross_icon.png`}
@@ -317,13 +320,21 @@ const Signup = ({ isOpenness, onCloseness }) => {
                                     name="agreeTerms"
                                     className="checkboxemeber"
                                   />
-                                  <label className="labelrememebrme">
-                                    I have read & agree with{" "}
-                                    <Link
-                                      to="/legal_terms"
-                                      onClick={onCloseness}
-                                    >
-                                      Terms & Conditions
+                                  <label
+                                    htmlFor="rememebrbtn"
+                                    className="labelrememebrme"
+                                  >
+                                    I have read &amp; agree with{" "}
+                                    <Link to="/legal_terms" onClick={onClose}>
+                                      Terms &amp; Conditions
+                                    </Link>
+                                    ,{" "}
+                                    <Link to="/legal_terms" onClick={onClose}>
+                                      Privacy Policy
+                                    </Link>{" "}
+                                    &amp;{" "}
+                                    <Link to="/legal_terms" onClick={onClose}>
+                                      Cookie Policy
                                     </Link>
                                   </label>
                                 </div>
@@ -339,10 +350,7 @@ const Signup = ({ isOpenness, onCloseness }) => {
                                   />
                                   <label className="labelrememebrme">
                                     I have read & agree with{" "}
-                                    <Link
-                                      to="/legal_terms"
-                                      onClick={onCloseness}
-                                    >
+                                    <Link to="/legal_terms" onClick={onClose}>
                                       Rules of Play & FAQ's
                                     </Link>
                                   </label>

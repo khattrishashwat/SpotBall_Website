@@ -24,22 +24,22 @@ function Home() {
   const open = async () => {
     setIsModals(true);
   };
-  const handleBuyTicketClick = (contest) => {
-    setSelectedContest(contest);
-    setOnCarts(true);
-  };
   // const handleBuyTicketClick = (contest) => {
-  //   if (!contest.allowance) {
-  //     Swal.fire({
-  //       icon: "warning",
-  //       title: "Participation Alert",
-  //       text: "You have already participated in this contest!",
-  //     });
-  //   } else {
-  //     setSelectedContest(contest);
-  //     setOnCarts(true);
-  //   }
+  //   setSelectedContest(contest);
+  //   setOnCarts(true);
   // };
+  const handleBuyTicketClick = (contest) => {
+    if (!contest.allowance) {
+      Swal.fire({
+        icon: "warning",
+        title: "Participation Alert",
+        text: "You have already participated in this contest!",
+      });
+    } else {
+      setSelectedContest(contest);
+      setOnCarts(true);
+    }
+  };
 
   const ClosedCarts = async () => {
     setOnCarts(false);
