@@ -1,70 +1,103 @@
-import React,{useState,useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import Loader from "../../Loader/Loader";
 import axios from "axios";
 import * as Yup from "yup";
+import Swal from "sweetalert2";
 
 function Contact() {
-    const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-const [contacts, setContacts] = useState("");
+  const [contacts, setContacts] = useState("");
 
-const fetchContact = async () => {
-  const token = localStorage.getItem("token");
-  try {
-    setIsLoading(true);
-    const response = await axios.get("/get-all-static-content/contact_us", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+  const fetchContact = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      setIsLoading(true);
+      const response = await axios.get("/get-all-static-content/contact_us", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-    if (response.data.data) {
-      console.log("Fetched Contacts ", response.data.data);
-      setContacts(response.data.data[0]||{});
+      if (response.data.data) {
+        console.log("Fetched Contacts ", response.data.data);
+        setContacts(response.data.data[0] || {});
+      }
+    } catch (error) {
+      console.error("Error fetching :", error);
+    } finally {
+      setIsLoading(false);
     }
-  } catch (error) {
-    console.error("Error fetching :", error);
-  } finally {
-    setIsLoading(false);
-  }
-};
+  };
 
-useEffect(() => {
-  fetchContact();
-}, []);
+  useEffect(() => {
+    fetchContact();
+  }, []);
 
-const capitalizeFirstLetter = (value) => {
-  if (!value) return value;
-  return value.charAt(0).toUpperCase() + value.slice(1);
-};
+  const capitalizeFirstLetter = (value) => {
+    if (!value) return value;
+    return value.charAt(0).toUpperCase() + value.slice(1);
+  };
 
-const handleNumericInput = (value) => {
-  return value.replace(/\D/g, "");
-};
+  const handleNumericInput = (value) =>
+    value.replace(/[^0-9]/g, "").slice(0, 10);
 
-const validationContact = Yup.object().shape({
-  firstName: Yup.string()
-    .required("First Name is required")
-    .matches(/^[A-Z]/, "First letter must be capital"),
-  lastName: Yup.string()
-    .required("Last Name is required")
-    .matches(/^[A-Z]/, "First letter must be capital"),
-  email: Yup.string()
-    .email("Invalid email address")
-    .required("Email is required"),
-  phone: Yup.string()
-    .matches(/^[0-9]+$/, "Phone number must be numeric")
-    .min(10, "Phone number must be at least 10 digits")
-    .max(15, "Phone number cannot exceed 15 digits")
-    .required("Phone number is required"),
-  subject: Yup.string().required("Subject is required"),
-  message: Yup.string()
-    .required("Message is required")
-    .matches(/^[A-Z]/, "First letter of the message must be capital"),
-});
+  const validationContact = Yup.object().shape({
+    first_name: Yup.string()
+      .required("First Name is required")
+      .matches(/^[A-Z]/, "First letter must be capital"),
+    last_name: Yup.string()
+      .required("Last Name is required")
+      .matches(/^[A-Z]/, "First letter must be capital"),
+    email: Yup.string()
+      .email("Invalid email address")
+      .required("Email is required"),
+    phone: Yup.string()
+      .required("Phone number is required")
+      .matches(/^(?:\+91)?[6-9][0-9]{9}$/, "Invalid Indian phone number"),
+    subject: Yup.string().required("Subject is required"),
+    message: Yup.string()
+      .required("Message is required")
+      .matches(/^[A-Z]/, "First letter of the message must be capital"),
+  });
 
-console.log("contacts",contacts);
+  const Contact_Us = async (values, { resetForm }) => {
+    const token = localStorage.getItem("token");
+    const formattedPhone = values.phone.startsWith("+91")
+      ? values.phone
+      : `+91${values.phone}`;
+
+    try {
+      const response = await axios.post(
+        "v1/app/static/contact-support",
+        { ...values, phone: formattedPhone },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response) {
+        Swal.fire({
+          icon: "success",
+
+          text: response?.data?.message,
+          confirmButtonText: "OK",
+        });
+      }
+      resetForm();
+      // console.log("Response:", response);
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        text: error.response?.data?.message,
+        confirmButtonText: "OK",
+      });
+      console.error("Error submitting contact form:", error);
+    }
+  };
 
   return (
     <>
@@ -144,17 +177,15 @@ console.log("contacts",contacts);
                   <div className="form_contactus">
                     <Formik
                       initialValues={{
-                        firstName: "",
-                        lastName: "",
+                        first_name: "",
+                        last_name: "",
                         email: "",
                         phone: "",
                         subject: "",
                         message: "",
                       }}
                       validationSchema={validationContact}
-                      onSubmit={(values) => {
-                        console.log(values);
-                      }}
+                      onSubmit={Contact_Us}
                     >
                       {({ setFieldValue }) => (
                         <Form>
@@ -163,19 +194,19 @@ console.log("contacts",contacts);
                               <div className="inputformdiv">
                                 <label className="contactlbl">First Name</label>
                                 <Field
-                                  name="firstName"
+                                  name="first_name"
                                   type="text"
                                   className="contactinputs"
-                                  placeholder="John"
+                                  placeholder="First name"
                                   onChange={(e) =>
                                     setFieldValue(
-                                      "firstName",
+                                      "first_name",
                                       capitalizeFirstLetter(e.target.value)
                                     )
                                   }
                                 />
                                 <ErrorMessage
-                                  name="firstName"
+                                  name="first_name"
                                   component="div"
                                   className="error-message"
                                 />
@@ -185,19 +216,19 @@ console.log("contacts",contacts);
                               <div className="inputformdiv">
                                 <label className="contactlbl">Last Name</label>
                                 <Field
-                                  name="lastName"
+                                  name="last_name"
                                   type="text"
                                   className="contactinputs"
-                                  placeholder="Doe"
+                                  placeholder="Last name"
                                   onChange={(e) =>
                                     setFieldValue(
-                                      "lastName",
+                                      "last_name",
                                       capitalizeFirstLetter(e.target.value)
                                     )
                                   }
                                 />
                                 <ErrorMessage
-                                  name="lastName"
+                                  name="last_name"
                                   component="div"
                                   className="error-message"
                                 />
@@ -210,7 +241,7 @@ console.log("contacts",contacts);
                                   name="email"
                                   type="email"
                                   className="contactinputs"
-                                  placeholder="John@gmail.com"
+                                  placeholder="xxx@gmail.com"
                                 />
                                 <ErrorMessage
                                   name="email"
@@ -228,7 +259,7 @@ console.log("contacts",contacts);
                                   name="phone"
                                   type="tel"
                                   className="contactinputs"
-                                  placeholder="+1 012 3456 789"
+                                  placeholder="+91 xxxxxxxx"
                                   onChange={(e) =>
                                     setFieldValue(
                                       "phone",
@@ -236,6 +267,7 @@ console.log("contacts",contacts);
                                     )
                                   }
                                 />
+
                                 <ErrorMessage
                                   name="phone"
                                   component="div"
@@ -254,44 +286,36 @@ console.log("contacts",contacts);
                                       type="radio"
                                       id="gnrl1"
                                       name="subject"
-                                      value="General Inquiry 1"
+                                      value="technical"
                                     />
-                                    <label htmlFor="gnrl1">
-                                      General Inquiry 1
-                                    </label>
+                                    <label htmlFor="gnrl1">Technical</label>
                                   </div>
                                   <div className="form-group">
                                     <Field
                                       type="radio"
                                       id="gnrl2"
                                       name="subject"
-                                      value="General Inquiry 2"
+                                      value="support"
                                     />
-                                    <label htmlFor="gnrl2">
-                                      General Inquiry 2
-                                    </label>
+                                    <label htmlFor="gnrl2">Support</label>
                                   </div>
                                   <div className="form-group">
                                     <Field
                                       type="radio"
                                       id="gnrl3"
                                       name="subject"
-                                      value="General Inquiry 3"
+                                      value="technical"
                                     />
-                                    <label htmlFor="gnrl3">
-                                      General Inquiry 3
-                                    </label>
+                                    <label htmlFor="gnrl3">Technical</label>
                                   </div>
                                   <div className="form-group">
                                     <Field
                                       type="radio"
                                       id="gnrl4"
                                       name="subject"
-                                      value="General Inquiry 4"
+                                      value="business"
                                     />
-                                    <label htmlFor="gnrl4">
-                                      General Inquiry 4
-                                    </label>
+                                    <label htmlFor="gnrl4">Business</label>
                                   </div>
                                 </div>
                                 <ErrorMessage

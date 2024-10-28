@@ -9,6 +9,7 @@ import GeolocationPopup from "../Location/GeolocationPopup";
 function Home() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [corousal, setCorousal] = useState([]);
   const [movies, setMovies] = useState("");
   const [contests, setContests] = useState("");
   const [selectedContest, setSelectedContest] = useState("");
@@ -51,8 +52,8 @@ function Home() {
     setIsModals(false);
     const videoElement = document.getElementById("video_howtoplay");
     if (videoElement) {
-      videoElement.pause(); // Pause video on close
-      videoElement.currentTime = 0; // Reset video time on close
+      videoElement.pause();
+      videoElement.currentTime = 0; 
     }
   };
 
@@ -73,13 +74,10 @@ function Home() {
         },
       });
 
-      if (response.data.data) {
-        console.log("Fetched video data:", response.data.data);
+      if (response) {
         setMovies(response.data.data);
-      } else {
-        console.error("No video data found.");
       }
-    } catch (error) {
+      } catch (error) {
       console.error("Error fetching video data:", error);
     }
   };
@@ -104,22 +102,20 @@ function Home() {
     seconds: 0,
   });
 
-  // Function to get the next Sunday at 11:59 PM
   const getNextSunday = () => {
     const now = new Date();
     const dayOfWeek = now.getDay();
-    const daysUntilNextSunday = (7 - dayOfWeek) % 7; // Calculate how many days until next Sunday
+    const daysUntilNextSunday = (7 - dayOfWeek) % 7; 
     const nextSunday = new Date(
       now.getFullYear(),
       now.getMonth(),
       now.getDate() + daysUntilNextSunday
     );
-    nextSunday.setHours(23, 59, 59, 999); // Set time to 11:59 PM
-    return nextSunday.getTime();
+    nextSunday.setHours(23, 59, 59, 999); 
+        return nextSunday.getTime();
   };
 
   useEffect(() => {
-    // Set the initial countdown date to the next Sunday
     let countDownDate = getNextSunday();
 
     const updateCountdown = () => {
@@ -127,7 +123,7 @@ function Home() {
       const distance = countDownDate - now;
 
       if (distance < 0) {
-        // If countdown is over, reset for the next week
+
         countDownDate = getNextSunday();
       }
 
@@ -141,10 +137,10 @@ function Home() {
       setTimeLeft({ days, hours, minutes, seconds });
     };
 
-    // Update the countdown every second
+
     const interval = setInterval(updateCountdown, 1000);
 
-    return () => clearInterval(interval); // Cleanup interval on component unmount
+    return () => clearInterval(interval);
   }, []);
 
   const fetchData = async () => {
@@ -158,17 +154,16 @@ function Home() {
             Authorization: `Bearer ${token}`, // Send the token with the request
           },
         });
-        console.log("res", response.data.data);
         const { banner_details, contests } = response.data.data;
 
         setBanner(banner_details[0]);
         setContests(contests);
+        setCorousal(banner_details[0]?.corousal);
       } else {
-        // Hit the 'get-banner' API if no token is present
         const response = await axios.get("get-banner");
-        console.log("baner", response.data.data[0]);
 
-        setBanner(response.data.data[0]); // Set banner data if token is not present
+        setBanner(response.data.data[0]);
+        setCorousal(response.data.data[0]?.corousal || []);
       }
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -183,8 +178,7 @@ function Home() {
     if (quantity < selectedContest?.maxTickets) {
       setQuantity((prev) => prev + 1);
     } else {
-      // Show SweetAlert when max limit is reached
-      Swal.fire({
+       Swal.fire({
         icon: "warning",
         title: "Max Ticket Limit Reached",
         text: `You can only purchase a maximum of ${selectedContest?.maxTickets} tickets per person.`,
@@ -215,32 +209,26 @@ function Home() {
   useEffect(() => {
     const location = JSON.parse(localStorage.getItem("location"));
 
-    // Check if token and location exist
-    if (token && location && Object.keys(location).length > 0) {
-      // If both token and location exist, hide the popup
-      setGeolocationPopupVisible(false);
+     if (token && location && Object.keys(location).length > 0) {
+       setGeolocationPopupVisible(false);
     } else if (token) {
-      // If only token exists, show the popup
-      setGeolocationPopupVisible(true);
+       setGeolocationPopupVisible(true);
     } else if (location && Object.keys(location).length > 0) {
-      // If only location exists, hide the popup
-      setGeolocationPopupVisible(false);
+       setGeolocationPopupVisible(false);
     } else {
-      // If neither exists, show the popup
       setGeolocationPopupVisible(true);
     }
   }, [token]);
 
   const handleCloseGeolocationPopup = () => {
-    setGeolocationPopupVisible(false); // Close the geolocation popup
-  };
+    setGeolocationPopupVisible(false); 
+    };
 
-  // console.log("contests", contests[0]?.allowance);
 
   return (
     <>
       {loading ? (
-        <Loader /> // Show loader
+        <Loader /> 
       ) : (
         <>
           <section className="bannersection">
@@ -258,54 +246,22 @@ function Home() {
                   <div className="marquee">
                     <div className="track">
                       <div className="srcolltext_div">
-                        <div className="guranteewinnertext">
-                          Always a guaranteed winner
-                        </div>
-                        <div className="auto_scroll_staricon_cntr">
-                          <img src="images/star.png" />
-                        </div>
-                        <div className="jackpottext">
-                          Weekly jackpot ₹50,000
-                        </div>
-                        <div className="auto_scroll_staricon_cntr">
-                          <img src="images/star.png" />
-                        </div>
-                        <div className="guranteewinnertext">
-                          Always a guaranteed winner
-                        </div>
-                        <div className="auto_scroll_staricon_cntr">
-                          <img src="images/star.png" />
-                        </div>
-                        <div className="jackpottext">
-                          Weekly jackpot ₹50,000
-                        </div>
-                        <div className="auto_scroll_staricon_cntr">
-                          <img src="images/star.png" />
-                        </div>
-                        <div className="guranteewinnertext">
-                          Always a guaranteed winner
-                        </div>
-                        <div className="auto_scroll_staricon_cntr">
-                          <img src="images/star.png" />
-                        </div>
-                        <div className="jackpottext">
-                          Weekly jackpot ₹50,000
-                        </div>
-                        <div className="auto_scroll_staricon_cntr">
-                          <img src="images/star.png" />
-                        </div>
-                        <div className="guranteewinnertext">
-                          Always a guaranteed winner
-                        </div>
-                        <div className="auto_scroll_staricon_cntr">
-                          <img src="images/star.png" />
-                        </div>
-                        <div className="jackpottext">
-                          Weekly jackpot ₹50,000
-                        </div>
-                        <div className="auto_scroll_staricon_cntr">
-                          <img src="images/star.png" />
-                        </div>
+                        {corousal.map((text, index) => (
+                          <React.Fragment key={index}>
+                            <div
+                              className={
+                                text.includes("JACKPOT")
+                                  ? "jackpottext"
+                                  : "guranteewinnertext"
+                              }
+                            >
+                              {text}
+                            </div>
+                            <div className="auto_scroll_staricon_cntr">
+                              <img src="images/star.png" alt="star icon" />
+                            </div>
+                          </React.Fragment>
+                        ))}
                       </div>
                     </div>
                   </div>

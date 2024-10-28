@@ -21,12 +21,12 @@ function Login({ isVisible, onClose }) {
   };
 
   const LoginValues = {
-    email: "",
+    emailOrPhone: "",
     password: "",
   };
 
   const validation = Yup.object().shape({
-    email: Yup.string().required("Phone number or email is required"),
+    emailOrPhone: Yup.string().required("Phone number or email is required"),
     password: Yup.string()
       .required("Password is required")
       .min(8, "Password should be between 8-16 characters long")
@@ -147,13 +147,13 @@ function Login({ isVisible, onClose }) {
                                 <div className="form-control frmctrldiv">
                                   <Field
                                     type="text"
-                                    name="email"
+                                    name="emailOrPhone"
                                     className="error"
                                     placeholder="Email / Mobile Number"
                                     aria-label="Email or Phone Number"
                                   />
                                   <ErrorMessage
-                                    name="email"
+                                    name="emailOrPhone"
                                     component="span"
                                     className="field_required"
                                   />

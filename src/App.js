@@ -9,6 +9,7 @@ import {
 import "./App.css";
 import axios from "axios";
 import { Helmet } from "react-helmet";
+import Swal from "sweetalert2";
 
 // Import components
 
@@ -35,9 +36,27 @@ const Footer = lazy(() => import("./Components/Layout/Footer/Footer"));
 axios.defaults.baseURL = "http://44.195.125.80:10077/api/";
 
 const ProtectedRoute = () => {
-  if (!localStorage.getItem("token")) {
+  // if (!localStorage.getItem("token")) {
+  //   return <Navigate to="/" />;
+  // }
+  // return <Outlet />;
+
+  const isAuthenticated = localStorage.getItem("token");
+
+  if (!isAuthenticated) {
+    // Show Swal alert
+    Swal.fire({
+      title: "Access Denied",
+      text: "Please login first to access this page.",
+      icon: "warning",
+      confirmButtonText: "OK",
+    }).then(() => {
+      return <Navigate to="/" />;
+    });
+
     return <Navigate to="/" />;
   }
+
   return <Outlet />;
 };
 
@@ -84,13 +103,13 @@ const App = () => {
               <Route path="/in_the_press" element={<Press />} />
               <Route path="/play_screen" element={<Screen />} />
               <Route path="/cart" element={<Checkout />} />
+              <Route path="/contact_us" element={<Contact />} />
             </Route>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/sign" element={<Signup />} />
             <Route path="/load" element={<Loader />} />
             <Route path="/legal_terms" element={<Legal />} />
-            <Route path="/contact_us" element={<Contact />} />
             <Route path="/who_we_are" element={<Are />} />
             <Route path="/the_winners_circle" element={<Circle />} />
             <Route path="/live_weekly_winner" element={<Weekly />} />

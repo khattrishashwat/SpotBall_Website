@@ -9,14 +9,23 @@ function Header() {
   const [headerClass, setHeaderClass] = useState("");
   const [lastScrollY, setLastScrollY] = useState(0);
 
-  // const [token, setToken] = useState(null);
   const [profile, setProfile] = useState({});
 
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const [isLogout, setIsLogout] = useState("");
-  const [isLoginPopup, setLoginPopup] = useState(false);
+  const [loginPopup, setLoginPopup] = useState(false);
+  const [isNot, setIsNot] = useState(false);
 
   const token = localStorage.getItem("token");
+
+  const NotificationOpen = () => {
+    setIsNot(true);
+  };
+
+  const NotificationClose = () => {
+    setIsNot(false);
+  };
+
   const OpenSignIn = () => {
     setLoginPopup(true);
   };
@@ -39,12 +48,10 @@ function Header() {
     const currentScrollY = window.scrollY;
 
     if (currentScrollY > lastScrollY) {
-      // Scrolling down
       setHeaderClass(
         isHomePage ? "headerfixed" : "innerheader_new headerfixed"
       );
     } else {
-      // Scrolling up
       setHeaderClass(isHomePage ? "" : "innerheader_new");
     }
 
@@ -62,7 +69,8 @@ function Header() {
     setIsLogout(false);
 
     localStorage.clear();
-navigate('/')  };
+    navigate("/");
+  };
   const fetchProfile = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -72,7 +80,7 @@ navigate('/')  };
           Authorization: `Bearer ${token}`,
         },
       });
-      // setUserToken(token);
+
       setProfile(response.data.data);
       console.log("profile-----", response.data.data);
     } catch (error) {
@@ -162,12 +170,15 @@ navigate('/')  };
                               <img
                                 src={`${process.env.PUBLIC_URL}/images/bell_icon.png`}
                                 alt="bell"
+                                onClick={NotificationOpen}
                               />
-                              {/* <span className="cartcount">3</span> */}
                             </a>
                             <div
-                              className="notificationdiv_popup"
+                              className={`notificationdiv_popup ${
+                                isNot ? "show" : ""
+                              }`}
                               id="notificationPopup"
+                              style={{ display: isNot ? "block" : "none" }}
                             >
                               <div
                                 className="topnoticationdiv_main"
@@ -177,7 +188,6 @@ navigate('/')  };
                                   <h2>Notifications</h2>
                                 </div>
                                 <div className="notifi_innerdiv">
-                                  {/* Notification items */}
                                   {[1, 2, 3].map((item, index) => (
                                     <div className="notifystrip" key={index}>
                                       <a className="notifylinkdiv">
@@ -207,6 +217,7 @@ navigate('/')  };
                                     type="button"
                                     className="crossbtn_notification"
                                     id="closeNotificationPopup"
+                                    onClick={() => setIsNot(false)}
                                   >
                                     <img
                                       src="images/cross_icon.png"
@@ -518,7 +529,7 @@ navigate('/')  };
             </div>
           </div>
         </div>
-        <Login isVisible={isLoginPopup} onClose={ClosePopup} />
+        <Login isVisible={loginPopup} onClose={ClosePopup} />
       </header>
 
       <div
@@ -542,7 +553,10 @@ navigate('/')  };
               onClick={CloseLogout}
             >
               {" "}
-              <img src="images/cross_icon.png" />{" "}
+              <img
+                src={`${process.env.PUBLIC_URL}/images/cross_icon.png`}
+                //  src="images/cross_icon.png"
+              />{" "}
             </button>
             <div className="modal-body mdlbdy_delete_account logoutaccount_divmain">
               <div className="deleteacc_text_data logoutdatamain">

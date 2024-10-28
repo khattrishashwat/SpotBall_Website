@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import axios from 'axios';
 
 function Footer() {
+  const [footer, setFooter] = useState({});
   const [movies, setMovies] = useState("");
   const [isModals, setIsModals] = useState("");
 
@@ -24,11 +25,8 @@ function Footer() {
       });
 
       if (response.data.data) {
-        console.log("Fetched video data:", response.data.data);
         setMovies(response.data.data);
-      } else {
-        console.error("No video data found.");
-      }
+      } 
     } catch (error) {
       console.error("Error fetching video data:", error);
     }
@@ -36,6 +34,21 @@ function Footer() {
 
   useEffect(() => {
     fetchVideoData();
+  }, []);
+  const fetchFooter = async () => {
+    try {
+      const response = await axios.get("/get-all-static-content/footer");
+
+      if (response) {
+        setFooter(response.data.data[0]?.description||{});
+      } 
+    } catch (error) {
+      console.error("Error fetching video data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchFooter();
   }, []);
 
   const playVideo = () => {
@@ -56,18 +69,7 @@ function Footer() {
               <div className="col-md-4 col4footerightside">
                 <div className="footertextinfodiv">
                   <div className="winnergurantee_footer">
-                    <h2>A Guaranteed ₹50,000 Weekly Jackpot</h2>
-                    <p>
-                      SpotsBall operates skilled prize competitions resulting in
-                      the allocation of prizes in accordance with the Terms and
-                      Conditions of the website.
-                    </p>
-                    <p>
-                      These Competitions are governed by Indian Law, and any
-                      matters relating to the Competitions will be resolved
-                      under Indian Law, and the Courts of India shall have
-                      exclusive jurisdiction.
-                    </p>
+                    <div dangerouslySetInnerHTML={{ __html: footer }} />
                   </div>
                 </div>
               </div>
@@ -311,7 +313,6 @@ function Footer() {
                   >
                     <img
                       src={`${process.env.PUBLIC_URL}/images/cross_icon.png`}
-                      
                       alt="Close"
                     />
                   </button>

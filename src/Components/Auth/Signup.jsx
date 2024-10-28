@@ -31,28 +31,7 @@ const Signup = ({ isOpenness, onClose }) => {
     agreeRules: false,
   };
 
-  const validation = Yup.object().shape({
-    first_name: Yup.string().required("First Name is required"),
-    last_name: Yup.string().required("Last Name is required"),
-    email: Yup.string().email("Invalid email").required("Email is required"),
-    phone: Yup.string()
-      .matches(/^\d{10}$/, "Phone number must be exactly 10 digits")
-      .required("Number is required"),
-    password: Yup.string()
-      .required("Password is required")
-      .min(8, "Password must be at least 8 characters long")
-      .max(16, "Password must be at most 16 characters long")
-      .matches(/[a-z]/, "Password must contain at least one lowercase letter")
-      .matches(/[A-Z]/, "Password must contain at least one uppercase letter")
-      .matches(/[0-9]/, "Password must contain at least one number")
-      .matches(
-        /[@$!%*?&#]/,
-        "Password must contain at least one special character"
-      ),
-    confirm_password: Yup.string()
-      .oneOf([Yup.ref("password"), null], "Passwords must match")
-      .required("Confirm Password is required"),
-  });
+
 
   const toggleNewPasswordVisibility = () => {
     setShowNewPassword((prev) => !prev);
@@ -76,10 +55,19 @@ const Signup = ({ isOpenness, onClose }) => {
     }
   };
 
+   const handleNumericInput = (value) =>
+     value.replace(/[^0-9]/g, "").slice(0, 10);
+
   const handleSignup = async (values) => {
+     const formattedPhone = values.phone.startsWith("+91")
+       ? values.phone
+       : `+91${values.phone}`;
     setIsLoading(true);
     try {
-      const response = await axios.post("sign-up", values);
+      const response = await axios.post("sign-up", {
+        ...values,
+        phone: formattedPhone,
+      });
 
       const tokens = response.data.data.token;
       localStorage.setItem("tokens", tokens);
@@ -205,7 +193,7 @@ const Signup = ({ isOpenness, onClose }) => {
                           // validationSchema={validation}
                           onSubmit={handleSignup}
                         >
-                          {({ isSubmitting, errors }) => (
+                          {({ isSubmitting, errors, setFieldValue }) => (
                             <Form className="formstart">
                               {/* First Name */}
                               <div className="form-control frmctrldiv">
@@ -250,6 +238,12 @@ const Signup = ({ isOpenness, onClose }) => {
                                   type="text"
                                   name="phone"
                                   placeholder="Mobile number"
+                                  onChange={(e) =>
+                                    setFieldValue(
+                                      "phone",
+                                      handleNumericInput(e.target.value)
+                                    )
+                                  }
                                 />
                                 <ErrorMessage
                                   name="phone"
