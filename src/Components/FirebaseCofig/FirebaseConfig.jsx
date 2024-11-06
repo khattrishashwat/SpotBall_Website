@@ -1,8 +1,14 @@
 import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider } from "firebase/auth";
+import {
+  getAuth,
+  GoogleAuthProvider,
+  FacebookAuthProvider,
+  signInWithPopup,
+} from "firebase/auth";
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
 import Swal from "sweetalert2"; // Assuming Swal is already installed
 
+// Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyDWNOtn_zO3ekheuPOBlw7EsieLjYtEguw",
   authDomain: "spotsball-b7d59.firebaseapp.com",
@@ -17,17 +23,19 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
+const facebookProvider = new FacebookAuthProvider();
 
 // Initialize Firebase Messaging
 const messaging = getMessaging(app);
 
+// Register Service Worker and request permission for notifications
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker
     .register("/firebase-messaging-sw.js")
     .then((registration) => {
       console.log("Service Worker registered:", registration);
 
-      // Request permission and get token
+      // Request permission and get token for push notifications
       getToken(messaging, {
         vapidKey:
           "BNkI-Se9LgfgnkAxsoNDTe3uQDR7HBWV6rY-Mhc3A6AioGIl-VnUn49NTAdTZHgBnt6id6KokU02Pku4G0GpYxA",
@@ -35,7 +43,7 @@ if ("serviceWorker" in navigator) {
         .then((currentToken) => {
           if (currentToken) {
             console.log("Current token:", currentToken);
-            // Send the token to your server or subscribe to topics
+            localStorage.setItem("device_token", currentToken);
           } else {
             console.log(
               "No registration token available. Request permission to generate one."
@@ -63,4 +71,75 @@ if ("serviceWorker" in navigator) {
     });
 }
 
-export { auth, provider, messaging, getToken, onMessage };
+// Google sign-in function
+export const signInWithGoogle = async (setFieldValue) => {
+  try {
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+
+    console.log("User info:", user);
+    const userData = {
+      uid: user.uid,
+      displayName: user.displayName,
+      email: user.email,
+      photoURL: user.photoURL,
+    };
+
+    const nameParts = userData.displayName
+      ? userData.displayName.split(" ")
+      : [];
+
+    // Set form values with user data
+    setFieldValue("first_name", nameParts[0] || "");
+    setFieldValue("last_name", nameParts.slice(1).join(" ") || "");
+    setFieldValue("email", userData.email || "");
+    setFieldValue("uid", userData.uid || "");
+
+  
+  } catch (error) {
+    Swal.fire({
+      icon: "error",
+      title: "Sign-in failed",
+      text: error.message,
+    });
+    console.error("Error during Google sign-in:", error);
+    return null; // Return null in case of error
+  }
+};
+
+
+export const signInWithFacebook = async () => {
+  try {
+    const result = await signInWithPopup(auth, facebookProvider);
+    const user = result.user;
+
+    // Handle user data
+    const userData = {
+      uid: user.uid,
+      displayName: user.displayName,
+      email: user.email,
+      photoURL: user.photoURL, // Optional, depending on your API
+    };
+
+    console.log("User info:", userData);
+
+    // Optionally, you can display a success message
+    Swal.fire({
+      icon: "success",
+      title: "Signed in successfully!",
+      text: `Welcome, ${user.displayName}`,
+    });
+
+    // You may want to send userData to your signup popup or handle it as needed
+  } catch (error) {
+    // Handle Errors here.
+    Swal.fire({
+      icon: "error",
+      title: "Sign-in failed",
+      text: error.message,
+    });
+    console.error("Error during Facebook sign-in:", error);
+  }
+};
+
+export { auth, provider, facebookProvider, messaging, getToken, onMessage };

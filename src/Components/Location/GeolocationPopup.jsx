@@ -121,7 +121,11 @@ const GeolocationPopup = ({ contests, onClose }) => {
         <div className="popupdivfor_grolocation">
           <div className="locationwantsdiv">
             <div className="locationicondiv">
-              <img src="images/location_icon.png" alt="Location Icon" />
+              <img
+                src={`${process.env.PUBLIC_URL}/images/location_icon.png`}
+                // src="images/location_icon.png"
+                alt="Location Icon"
+              />
             </div>
             <div className="locationtextwithheading">
               <h2>Enable Location Services</h2>

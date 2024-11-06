@@ -94,7 +94,7 @@ const App = () => {
       <Helmet>
         <title>{loader ? "loader....." : "SpotsBall"}</title>
       </Helmet>
-      <Router basename="/spotsball">
+      <Router basename="/spotsball/web/">
         <Suspense fallback={<Loader />}>
           <Header />
           <Routes>
@@ -115,7 +115,7 @@ const App = () => {
             <Route path="/live_weekly_winner" element={<Weekly />} />
 
             {/* Catch-all for 404 */}
-            {/* <Route path="*" element={<PageNot />} /> */}
+            <Route path="*" element={<PageNot />} />
           </Routes>
           <Footer />
         </Suspense>

@@ -7,7 +7,11 @@ import axios from "axios";
 import Forget from "./Forget";
 import Signup from "./Signup";
 import Loader from "../Loader/Loader";
-import { messaging, getToken, onMessage } from "../FirebaseCofig/FirebaseConfig";
+import {
+  messaging,
+  getToken,
+  onMessage,
+} from "../FirebaseCofig/FirebaseConfig";
 
 import { GoogleLogin } from "@react-oauth/google";
 
@@ -46,13 +50,41 @@ function Login({ isVisible, onClose }) {
     console.log("Attempting to login with values:", values);
 
     setIsLoading(true);
+
     try {
-      const response = await axios.post("login", values);
+      // Retrieve Firebase token for push notifications
+      const device_token = await getToken(messaging, {
+        vapidKey:
+          "BNkI-Se9LgfgnkAxsoNDTe3uQDR7HBWV6rY-Mhc3A6AioGIl-VnUn49NTAdTZHgBnt6id6KokU02Pku4G0GpYxA",
+      });
+
+      if (!device_token) {
+        console.log(
+          "No Firebase token available. Request permission to generate one."
+        );
+        Swal.fire({
+          icon: "error",
+          title: "Notification Permission Required",
+          text: "Please enable notifications to continue.",
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      console.log("Device token:", device_token);
+
+      const response = await axios.post("login", {
+        ...values,
+        device_token,
+        device_type: "website",
+      });
 
       console.log("Login successful! Response:", response.data.data);
 
+      // Store the backend token in local storage
       localStorage.setItem("token", response.data.data.token);
 
+      // Show success message
       Swal.fire({
         icon: "success",
         title: response.data.message,
@@ -61,18 +93,12 @@ function Login({ isVisible, onClose }) {
       });
       window.location.reload();
 
-      // navigate("/sportsball");
       onClose();
     } catch (error) {
       console.error(
         "Login failed:",
         error.response ? error.response.data : error.message
       );
-
-      if (error.response) {
-        console.error("Response status:", error.response.status);
-        console.error("Response headers:", error.response.headers);
-      }
 
       Swal.fire({
         icon: "error",
@@ -84,10 +110,10 @@ function Login({ isVisible, onClose }) {
     }
   };
 
-   const handleSignup = () => {
+  const handleSignup = () => {
     setShowSignup(true);
-    onClose(); 
-    };
+    onClose();
+  };
 
   const handleForgotPassword = () => {
     setShowForgotPassword(true);

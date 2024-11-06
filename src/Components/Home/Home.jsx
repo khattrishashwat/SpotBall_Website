@@ -228,7 +228,7 @@ function Home() {
   return (
     <>
       {loading ? (
-        <Loader /> 
+        <Loader />
       ) : (
         <>
           <section className="bannersection">
@@ -258,7 +258,11 @@ function Home() {
                               {text}
                             </div>
                             <div className="auto_scroll_staricon_cntr">
-                              <img src="images/star.png" alt="star icon" />
+                              <img
+                                src={`${process.env.PUBLIC_URL}/images/star.png`}
+                                // src="images/star.png"
+                                alt="star icon"
+                              />
                             </div>
                           </React.Fragment>
                         ))}
@@ -392,7 +396,8 @@ function Home() {
                               <div className="contesteveryweekdiv">
                                 <div className="contest_newtiming_strip">
                                   <img
-                                    src="images/ball_icon.png"
+                                    src={`${process.env.PUBLIC_URL}/images/ball_icon.png`}
+                                    // src="images/ball_icon.png"
                                     alt="Ball Icon"
                                   />
                                   <h4>Every Week’s Contest Ends</h4>
@@ -406,7 +411,8 @@ function Home() {
                               <div className="contesteveryweekdiv">
                                 <div className="contest_newtiming_strip">
                                   <img
-                                    src="images/ball_icon.png"
+                                    src={`${process.env.PUBLIC_URL}/images/ball_icon.png`}
+                                    // src="images/ball_icon.png"
                                     alt="Ball Icon"
                                   />
                                   <h4>
@@ -425,11 +431,13 @@ function Home() {
                               <div className="watchondiv">
                                 <h4>Watch On</h4>
                                 <img
-                                  src="images/fb_live_icon.png"
+                                  src={`${process.env.PUBLIC_URL}/images/fb_live_icon.png`}
+                                  // src="images/fb_live_icon.png"
                                   alt="Facebook Live"
                                 />
                                 <img
-                                  src="images/yb_live_icon.png"
+                                  src={`${process.env.PUBLIC_URL}/images/yb_live_icon.png`}
+                                  // src="images/yb_live_icon.png"
                                   alt="YouTube Live"
                                 />
                               </div>
@@ -494,7 +502,11 @@ function Home() {
                     id="crossbtn_popuphowtoplay"
                     onClick={close}
                   >
-                    <img src="images/cross_icon.png" alt="Close" />
+                    <img
+                      src={`${process.env.PUBLIC_URL}/images/cross_icon.png`}
+                      // src="images/cross_icon.png"
+                      alt="Close"
+                    />
                   </button>
                   <div className="howtoplay_textdiv">
                     <h2>{movies ? movies.title : "How to Play?"}</h2>
@@ -596,14 +608,22 @@ function Home() {
               </div>
               <div className="contest_quantity_para_div">
                 <div className="addcart_contst_textinfo">
-                  <img src="images/ball_icon.png" alt="Icon" />
+                  <img
+                    src={`${process.env.PUBLIC_URL}/images/ball_icon.png`}
+                    // src="images/ball_icon.png"
+                    alt="Icon"
+                  />
                   <h2>
                     Use Add and subtract buttons to increase or decrease your
                     tickets
                   </h2>
                 </div>
                 <div className="addcart_contst_textinfo">
-                  <img src="images/ball_icon.png" alt="Icon" />
+                  <img
+                    src={`${process.env.PUBLIC_URL}/images/ball_icon.png`}
+                    // src="images/ball_icon.png"
+                    alt="Icon"
+                  />
                   <h2>Max {selectedContest?.maxTickets} tickets per person</h2>
                 </div>
               </div>
@@ -642,7 +662,11 @@ function Home() {
                 className="crossbtn_popupclose"
                 onClick={ClosedCarts}
               >
-                <img src="images/cross_icon.png" alt="Close" />
+                <img
+                  src={`${process.env.PUBLIC_URL}/images/cross_icon.png`}
+                  // src="images/cross_icon.png"
+                  alt="Close"
+                />
               </button>
             </div>
           </div>

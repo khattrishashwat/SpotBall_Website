@@ -9,9 +9,7 @@ function Forget({ onClosed }) {
   const [showOTPS, setShowOTPS] = useState(false);
   const [responseData, setResponseData] = useState(null); // Store the token and email
 
-  const validationSchema = Yup.object().shape({
-    email: Yup.string().email("Invalid email").required("Email is required"),
-  });
+
 
   const PhoneSubmit = async (values) => {
     try {
@@ -22,7 +20,7 @@ function Forget({ onClosed }) {
       });
       setResponseData({
         token: response.data.data.token, // Store token
-        email: values.email, // Store email
+        emailOrPhone: values.email, // Store email
       });
       handleOTP();
     } catch (error) {

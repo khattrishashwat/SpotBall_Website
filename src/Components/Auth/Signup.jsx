@@ -4,14 +4,24 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import Swal from "sweetalert2";
 import axios from "axios";
+import { signInWithPopup } from "firebase/auth";
+// import { useAuth } from './AuthContext'; // Import your Auth context
+
+import {
+  signInWithGoogle,
+  auth,
+  provider,
+} from "../FirebaseCofig/FirebaseConfig";
 
 const Signup = ({ isOpenness, onClose }) => {
+  const [signupData, setSignupData] = useState({});
+
   const [isLoading, setIsLoading] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isModals, setIsModals] = useState("");
   const [otp, setOtp] = useState(["", "", "", ""]);
-  const [isOtpResendEnabled, setIsOtpResendEnabled] = useState(false);
+  const [isSocialSignup, setIsSocialSignup] = useState(false);
 
   const openModals = () => {
     setIsModals(true);
@@ -30,8 +40,6 @@ const Signup = ({ isOpenness, onClose }) => {
     agreeTerms: false,
     agreeRules: false,
   };
-
-
 
   const toggleNewPasswordVisibility = () => {
     setShowNewPassword((prev) => !prev);
@@ -55,13 +63,26 @@ const Signup = ({ isOpenness, onClose }) => {
     }
   };
 
-   const handleNumericInput = (value) =>
-     value.replace(/[^0-9]/g, "").slice(0, 10);
+  const handleNumericInput = (value) =>
+    value.replace(/[^0-9]/g, "").slice(0, 10);
+
+  const handleSubmits = async (values) => {
+    console.log("handlesubmits", values);
+
+    if (values) {
+      console.log("values", values);
+      await handleSocialSignup();
+    }
+
+    // else {
+    //   await handleSocialSignup(values);
+    // }
+  };
 
   const handleSignup = async (values) => {
-     const formattedPhone = values.phone.startsWith("+91")
-       ? values.phone
-       : `+91${values.phone}`;
+    const formattedPhone = values.phone.startsWith("+91")
+      ? values.phone
+      : `+91${values.phone}`;
     setIsLoading(true);
     try {
       const response = await axios.post("sign-up", {
@@ -127,32 +148,39 @@ const Signup = ({ isOpenness, onClose }) => {
     }
   };
 
-  // Function to resend OTP
-  const resendOtp = async (email) => {
-    if (!isOtpResendEnabled) return; // Prevent API call if button is not enabled
-
+  const handleSocialSignup = async (values) => {
+    const formattedPhone = values.phone.startsWith("+91")
+      ? values.phone
+      : `+91${values.phone}`;
     try {
-      const token = localStorage.getItem("token");
-
-      const response = await axios.post(
-        "resend-otp-user-verification",
-        { email },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await axios.post("social-login", {
+        ...values,
+        phone: formattedPhone,
+        device_type: "website",
+        device_token: localStorage.getItem("device_token"),
+      });
 
       Swal.fire({
-        icon: "success",
-        text: "OTP resent successfully!",
+        title: response.data.message,
+        showConfirmButton: false,
+        timer: 1000,
+      }).then(() => {
+        // Handle post signup actions
       });
     } catch (error) {
-      Swal.fire({
-        icon: "error",
-        text: error.response ? error.response.data.message : error.message,
-      });
+      if (error.code === "auth/popup-closed-by-user") {
+        Swal.fire({
+          icon: "info",
+          title: "Signup canceled",
+          text: "It seems like you closed the signup popup before finishing.",
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Signup Failed",
+          text: error.message,
+        });
+      }
     }
   };
 
@@ -190,7 +218,6 @@ const Signup = ({ isOpenness, onClose }) => {
 
                         <Formik
                           initialValues={initialValues}
-                          // validationSchema={validation}
                           onSubmit={handleSignup}
                         >
                           {({ isSubmitting, errors, setFieldValue }) => (
@@ -252,60 +279,65 @@ const Signup = ({ isOpenness, onClose }) => {
                                 />
                               </div>
 
-                              {/* Password */}
-                              <div className="form-control frmctrldiv">
-                                <Field
-                                  type={showNewPassword ? "text" : "password"}
-                                  name="password"
-                                  placeholder="Password"
-                                />
-                                <span
-                                  onClick={toggleNewPasswordVisibility}
-                                  className="eyeiconfor"
-                                >
-                                  <i
-                                    className={
-                                      showNewPassword
-                                        ? "fa fa-eye"
-                                        : "fa fa-eye-slash"
-                                    }
-                                  ></i>
-                                </span>
-                                <ErrorMessage
-                                  name="password"
-                                  component="div"
-                                  className="field_required"
-                                />
-                              </div>
+                              {!isSocialSignup && (
+                                <>
+                                  <div className="form-control frmctrldiv">
+                                    <Field
+                                      type={
+                                        showNewPassword ? "text" : "password"
+                                      }
+                                      name="password"
+                                      placeholder="Password"
+                                    />
+                                    <span
+                                      onClick={toggleNewPasswordVisibility}
+                                      className="eyeiconfor"
+                                    >
+                                      <i
+                                        className={
+                                          showNewPassword
+                                            ? "fa fa-eye"
+                                            : "fa fa-eye-slash"
+                                        }
+                                      ></i>
+                                    </span>
+                                    <ErrorMessage
+                                      name="password"
+                                      component="div"
+                                      className="field_required"
+                                    />
+                                  </div>
 
-                              {/* Confirm Password */}
-                              <div className="form-control frmctrldiv">
-                                <Field
-                                  type={
-                                    showConfirmPassword ? "text" : "password"
-                                  }
-                                  name="confirm_password"
-                                  placeholder="Confirm Password"
-                                />
-                                <span
-                                  onClick={toggleConfirmPasswordVisibility}
-                                  className="eyeiconfor"
-                                >
-                                  <i
-                                    className={
-                                      showConfirmPassword
-                                        ? "fa fa-eye"
-                                        : "fa fa-eye-slash"
-                                    }
-                                  ></i>
-                                </span>
-                                <ErrorMessage
-                                  name="confirm_password"
-                                  component="div"
-                                  className="field_required"
-                                />
-                              </div>
-
+                                  <div className="form-control frmctrldiv">
+                                    <Field
+                                      type={
+                                        showConfirmPassword
+                                          ? "text"
+                                          : "password"
+                                      }
+                                      name="confirm_password"
+                                      placeholder="Confirm Password"
+                                    />
+                                    <span
+                                      onClick={toggleConfirmPasswordVisibility}
+                                      className="eyeiconfor"
+                                    >
+                                      <i
+                                        className={
+                                          showConfirmPassword
+                                            ? "fa fa-eye"
+                                            : "fa fa-eye-slash"
+                                        }
+                                      ></i>
+                                    </span>
+                                    <ErrorMessage
+                                      name="confirm_password"
+                                      component="div"
+                                      className="field_required"
+                                    />
+                                  </div>
+                                </>
+                              )}
                               {/* Terms & Conditions */}
                               <div className="remeberrecoverydiv">
                                 <div className="rememebrmediv">
@@ -319,15 +351,27 @@ const Signup = ({ isOpenness, onClose }) => {
                                     className="labelrememebrme"
                                   >
                                     I have read &amp; agree with{" "}
-                                    <Link to="/legal_terms" onClick={onClose}>
+                                    <Link
+                                      to="/legal_terms"
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                    >
                                       Terms &amp; Conditions
                                     </Link>
                                     ,{" "}
-                                    <Link to="/legal_terms" onClick={onClose}>
+                                    <Link
+                                      to="/legal_terms"
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                    >
                                       Privacy Policy
                                     </Link>{" "}
                                     &amp;{" "}
-                                    <Link to="/legal_terms" onClick={onClose}>
+                                    <Link
+                                      to="/legal_terms"
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                    >
                                       Cookie Policy
                                     </Link>
                                   </label>
@@ -344,7 +388,11 @@ const Signup = ({ isOpenness, onClose }) => {
                                   />
                                   <label className="labelrememebrme">
                                     I have read & agree with{" "}
-                                    <Link to="/legal_terms" onClick={onClose}>
+                                    <Link
+                                      to="/legal_terms"
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                    >
                                       Rules of Play & FAQ's
                                     </Link>
                                   </label>
@@ -366,37 +414,55 @@ const Signup = ({ isOpenness, onClose }) => {
                                 <div className="signupsociallinks">
                                   <ul>
                                     {/* <li>
-                                        <GoogleLogin
-                                          onSuccess={(credentialResponse) => {
-                                            console.log(credentialResponse);
-                                          }}
-                                          onError={() => {
-                                            console.log("Login Failed");
-                                          }}
-                                          render={(renderProps) => (
-                                            <a
-                                              onClick={renderProps.onClick}
-                                              disabled={renderProps.disabled}
-                                            >
-                                              <img
-                                                src="images/google_icon.png"
-                                                alt="Google"
-                                              />
-                                            </a>
-                                          )}
-                                        />
-                                      </li> */}
+                                          <GoogleLogin
+                                            onSuccess={(credentialResponse) => {
+                                              console.log(credentialResponse);
+                                            }}
+                                            onError={() => {
+                                              console.log("Login Failed");
+                                            }}
+                                            render={(renderProps) => (
+                                              <a
+                                                onClick={renderProps.onClick}
+                                                disabled={renderProps.disabled}
+                                              >
+                                                <img
+                                                  src="images/google_icon.png"
+                                                  alt="Google"
+                                                />
+                                              </a>
+                                            )}
+                                          />
+                                        </li> */}
                                     <li>
-                                      <a>
+                                      <a
+                                        onClick={() => {
+                                          setIsSocialSignup(true);
+                                          signInWithGoogle(
+                                            setFieldValue,
+                                            "google"
+                                          );
+                                        }}
+                                        style={{ cursor: "pointer" }}
+                                      >
                                         <img
                                           src={`${process.env.PUBLIC_URL}/images/google_icon.png`}
-                                          // src="images/google_icon.png"
                                           alt="Google"
                                         />
                                       </a>
                                     </li>
                                     <li>
-                                      <a>
+                                      <a
+                                      // onClick={() => {
+                                      //   setIsSocialSignup(true);
+
+                                      //   handleSocialSignup(
+                                      //     setFieldValue,
+                                      //     "facebook"
+                                      //   );
+                                      // }}
+                                      // style={{ cursor: "pointer" }}
+                                      >
                                         <img
                                           src={`${process.env.PUBLIC_URL}/images/facebook_icon.png`}
                                           // src="images/facebook_icon.png"
@@ -509,15 +575,15 @@ const Signup = ({ isOpenness, onClose }) => {
                             </div>
                           </div>
                           {/* <div className="resentdivforotp">
-                            <button
-                              type="button"
-                              className="resentotpbtn"
-                              onClick={resendOtp}
-                              disabled={!isOtpResendEnabled}
-                            >
-                              Resend OTP
-                            </button>
-                          </div> */}
+                              <button
+                                type="button"
+                                className="resentotpbtn"
+                                onClick={resendOtp}
+                                disabled={!isOtpResendEnabled}
+                              >
+                                Resend OTP
+                              </button>
+                            </div> */}
                           <div className="form-control loginformctrl">
                             <button
                               type="button"

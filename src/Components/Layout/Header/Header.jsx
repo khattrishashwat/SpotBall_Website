@@ -2,13 +2,14 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import Login from "../../Auth/Login";
 import axios from "axios";
+import moment from "moment";
 
 function Header() {
   const navigate = useNavigate();
   const location = useLocation();
   const [headerClass, setHeaderClass] = useState("");
   const [lastScrollY, setLastScrollY] = useState(0);
-
+  const [notification, setNotification] = useState("");
   const [profile, setProfile] = useState({});
 
   const [isMenuVisible, setIsMenuVisible] = useState(false);
@@ -82,7 +83,6 @@ function Header() {
       });
 
       setProfile(response.data.data);
-      console.log("profile-----", response.data.data);
     } catch (error) {
       console.error("Error fetching profile:", error);
     }
@@ -93,6 +93,29 @@ function Header() {
       fetchProfile();
     }
   }, [token]);
+  const fetchNotification = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+      const response = await axios.get(
+        "v1/app/notifications/get-notifications",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setNotification(response.data.data);
+      console.log("response Notification", response.data.data);
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotification();
+  }, []);
 
   const getNextSunday = () => {
     const now = new Date();
@@ -152,13 +175,13 @@ function Header() {
               <div className="h3-navbar">
                 <div className="container contmainformob_newshi">
                   <nav className="navbar navbar-expand-lg h3-nav navbar_mainnavdiv_shi">
-                    <a href="" className="navbar-brand navbarlogodiv">
+                    <Link to="/" className="navbar-brand navbarlogodiv">
                       <img
                         src={`${process.env.PUBLIC_URL}/images/logo.png`}
                         // src="images/logo.png"
                         alt="logo"
                       />
-                    </a>
+                    </Link>
                     {token ? (
                       <div className="navbar-collapse newnavbarleft">
                         <ul className="navbar navbar_afterlogin">
@@ -185,29 +208,36 @@ function Header() {
                                   <h2>Notifications</h2>
                                 </div>
                                 <div className="notifi_innerdiv">
-                                  {[1, 2, 3].map((item, index) => (
-                                    <div className="notifystrip" key={index}>
-                                      <a className="notifylinkdiv">
-                                        <div className="notify-icondiv">
-                                          <img
-                                            src={`${process.env.PUBLIC_URL}/images/get_notify_icon_.png`}
-                                            alt="notification"
-                                          />
-                                        </div>
-                                        <div className="notificationtext_heading">
-                                          <h2>New message from Admin!</h2>
-                                          <p>
-                                            Lorem ipsum dolor sit amet
-                                            consectetur. Varius congue in ipsum
-                                            sagittis
-                                          </p>
-                                          <div className="notif_timedate">
-                                            <p>Thu, 8 Aug, 07:12 pm</p>
+                                  {notification.length > 0 ? (
+                                    notification.map((item) => (
+                                      <div
+                                        className="notifystrip"
+                                        key={item._id}
+                                      >
+                                        <a className="notifylinkdiv">
+                                          <div className="notify-icondiv">
+                                            <img
+                                              src={`${process.env.PUBLIC_URL}/images/get_notify_icon_.png`}
+                                              alt="notification"
+                                            />
                                           </div>
-                                        </div>
-                                      </a>
-                                    </div>
-                                  ))}
+                                          <div className="notificationtext_heading">
+                                            <h2>{item.title}</h2>
+                                            <p>{item.body}</p>
+                                            <div className="notif_timedate">
+                                              <p>
+                                                {moment(item.createdAt).format(
+                                                  "ddd, D MMM, h:mm a"
+                                                )}
+                                              </p>
+                                            </div>
+                                          </div>
+                                        </a>
+                                      </div>
+                                    ))
+                                  ) : (
+                                    <p>No notifications available.</p>
+                                  )}
                                 </div>
                                 <div className="crossicondiv">
                                   <button
@@ -217,7 +247,8 @@ function Header() {
                                     onClick={() => setIsNot(false)}
                                   >
                                     <img
-                                      src="images/cross_icon.png"
+                                      src={`${process.env.PUBLIC_URL}/images/cross_icon.png`}
+                                      // src="images/cross_icon.png"
                                       alt="close"
                                     />
                                   </button>

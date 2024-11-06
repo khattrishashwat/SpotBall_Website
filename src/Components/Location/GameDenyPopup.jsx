@@ -23,7 +23,11 @@ const GameDenyPopup = ({ onCancel }) => {
           <div className="popupdivfor_grolocation">
             <div className="locationwantsdiv">
               <div className="locationicondiv">
-                <img src="images/unvailable_icon.png" alt="Unavailable Icon" />
+                <img
+                  src={`${process.env.PUBLIC_URL}/images/unvailable_icon.png`}
+                  // src="images/unvailable_icon.png"
+                  alt="Unavailable Icon"
+                />
               </div>
               <div className="locationtextwithheading">
                 <h2>Location Access Required</h2>

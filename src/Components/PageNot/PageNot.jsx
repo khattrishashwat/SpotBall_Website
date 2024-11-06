@@ -4,40 +4,54 @@ import "./Pages.css";
 
 function PageNot() {
   return (
-    <>
-      <div className="contss">
-        <div className="ent">
-          <p className="p">4</p>
-          <span className="dracula">
-            <div className="con">
-              <div className="hair" />
-              <div className="hair-r" />
-              <div className="head" />
-              <div className="eye" />
-              <div className="eye eye-r" />
-              <div className="mouth" />
-              <div className="blod" />
-              <div className="blod blod2" />
-            </div>
-          </span>
-          <p className="p">4</p>
-          <div className="page-ms">
-            <p className="page-msg">
-              {" "}
-              Oops, the page you're looking for Disappeared{" "}
-            </p>
-            <button className="go-back">Go Back</button>
+    <div>
+      <header className="top-header"></header>
+
+      {/* Dust particles */}
+      <div>
+        <div className="starsec"></div>
+        <div className="starthird"></div>
+        <div className="starfourth"></div>
+        <div className="starfifth"></div>
+      </div>
+      {/* Dust particle end */}
+
+      <div className="lamp__wrap">
+        <div className="lamp">
+          <div className="cable"></div>
+          <div className="cover"></div>
+          <div className="in-cover">
+            <div className="bulb"></div>
           </div>
+          <div className="light"></div>
         </div>
       </div>
-      <iframe
-        style={{ width: 0, height: 0, border: "none" }}
-        scrolling="no"
-        frameBorder="no"
-        allow="autoplay"
-        src="https://instaud.io/_/2Vvu.mp3"
-      />
-    </>
+      {/* END Lamp */}
+
+      <section className="autop">
+        {/* Content */}
+        <div className="autop__content">
+          <div className="autop__message message">
+            <h1 className="message__title">Page Not Found</h1>
+            <p className="message__text">
+              We're sorry, the page you were looking for isn't found here. The
+              link you followed may either be broken or no longer exists. Please
+              try again, or take a look at our.
+            </p>
+          </div>
+          <div className="autop__nav e-nav">
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              className="e-nav__link"
+            >
+              Go to Home
+            </a>
+          </div>
+        </div>
+        {/* END Content */}
+      </section>
+    </div>
   );
 }
 
