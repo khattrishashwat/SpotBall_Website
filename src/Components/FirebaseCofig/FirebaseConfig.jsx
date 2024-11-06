@@ -29,16 +29,57 @@ const facebookProvider = new FacebookAuthProvider();
 const messaging = getMessaging(app);
 
 // Register Service Worker and request permission for notifications
+// if ("serviceWorker" in navigator) {
+//   navigator.serviceWorker
+//     .register("/firebase-messaging-sw.js")
+//     .then((registration) => {
+//       console.log("Service Worker registered:", registration);
+
+//       // Request permission and get token for push notifications
+//       getToken(messaging, {
+//         vapidKey:
+//           "BNkI-Se9LgfgnkAxsoNDTe3uQDR7HBWV6rY-Mhc3A6AioGIl-VnUn49NTAdTZHgBnt6id6KokU02Pku4G0GpYxA",
+//       })
+//         .then((currentToken) => {
+//           if (currentToken) {
+//             console.log("Current token:", currentToken);
+//             localStorage.setItem("device_token", currentToken);
+//           } else {
+//             console.log(
+//               "No registration token available. Request permission to generate one."
+//             );
+//           }
+//         })
+//         .catch((err) => {
+//           console.error("Error getting token:", err);
+//         });
+
+//       // Handle incoming messages
+//       onMessage(messaging, (payload) => {
+//         console.log("Message received:", payload);
+//         // Display a notification using Swal
+//         Swal.fire({
+//           title: "New Message!",
+//           text: payload.notification.body,
+//           icon: "info",
+//           confirmButtonText: "OK",
+//         });
+//       });
+//     })
+//     .catch((error) => {
+//       console.error("Service Worker registration failed:", error);
+//     });
+// }
+
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker
     .register("/firebase-messaging-sw.js")
     .then((registration) => {
       console.log("Service Worker registered:", registration);
 
-      // Request permission and get token for push notifications
       getToken(messaging, {
-        vapidKey:
-          "BNkI-Se9LgfgnkAxsoNDTe3uQDR7HBWV6rY-Mhc3A6AioGIl-VnUn49NTAdTZHgBnt6id6KokU02Pku4G0GpYxA",
+        vapidKey: "BNkI-Se9LgfgnkAxsoNDTe3uQDR7HBWV6rY-Mhc3A6AioGIl-VnUn49NTAdTZHgBnt6id6KokU02Pku4G0GpYxA"
+,
       })
         .then((currentToken) => {
           if (currentToken) {
@@ -54,10 +95,8 @@ if ("serviceWorker" in navigator) {
           console.error("Error getting token:", err);
         });
 
-      // Handle incoming messages
       onMessage(messaging, (payload) => {
         console.log("Message received:", payload);
-        // Display a notification using Swal
         Swal.fire({
           title: "New Message!",
           text: payload.notification.body,
