@@ -1,6 +1,7 @@
 {
   "name": "spotsball",
   "version": "0.1.0",
+  "homepage": "/spotball/web",
   "private": true,
   "dependencies": {
     "@react-oauth/google": "^0.12.1",

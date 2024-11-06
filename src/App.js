@@ -94,7 +94,8 @@ const App = () => {
       <Helmet>
         <title>{loader ? "loader....." : "SpotsBall"}</title>
       </Helmet>
-      <Router basename="/">
+      <Router basename="/spotsball/web/">
+        {" "}
         <Suspense fallback={<Loader />}>
           <Header />
           <Routes>
