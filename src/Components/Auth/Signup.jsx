@@ -67,16 +67,20 @@ const Signup = ({ isOpenness, onClose }) => {
     value.replace(/[^0-9]/g, "").slice(0, 10);
 
   const handleSubmits = async (values) => {
-    console.log("handlesubmits", values);
-
-    if (values) {
-      console.log("values", values);
-      await handleSocialSignup();
+    if (!values) {
+      console.error("No values provided to handleSubmits.");
+      return;
     }
 
-    // else {
-    //   await handleSocialSignup(values);
-    // }
+    console.log("handlesubmits", values);
+
+    if (values.signup_method) {
+      // Social signup
+      await handleSocialSignup(values);
+    } else {
+      // Regular signup
+      await handleSignup(values);
+    }
   };
 
   const handleSignup = async (values) => {
@@ -156,16 +160,18 @@ const Signup = ({ isOpenness, onClose }) => {
       const response = await axios.post("social-login", {
         ...values,
         phone: formattedPhone,
+        signup_method: values.signup_method,
         device_type: "website",
         device_token: localStorage.getItem("device_token"),
       });
-
+      const token = response.data.data.token;
+      localStorage.setItem("token", token);
       Swal.fire({
         title: response.data.message,
         showConfirmButton: false,
         timer: 1000,
       }).then(() => {
-        // Handle post signup actions
+        window.location.reload();
       });
     } catch (error) {
       if (error.code === "auth/popup-closed-by-user") {
@@ -184,6 +190,15 @@ const Signup = ({ isOpenness, onClose }) => {
     }
   };
 
+  const handleGoogleSignup = (setFieldValue) => {
+    setFieldValue("signup_method", "google");
+    signInWithGoogle(setFieldValue);
+  };
+
+  // Example function for Facebook Signup
+  const handleFacebookSignup = (setFieldValue) => {
+    setFieldValue("signup_method", "facebook");
+  };
   return (
     <>
       <div
@@ -218,7 +233,7 @@ const Signup = ({ isOpenness, onClose }) => {
 
                         <Formik
                           initialValues={initialValues}
-                          onSubmit={handleSignup}
+                          onSubmit={(values) => handleSubmits(values)}
                         >
                           {({ isSubmitting, errors, setFieldValue }) => (
                             <Form className="formstart">
@@ -413,32 +428,11 @@ const Signup = ({ isOpenness, onClose }) => {
                               <div className="signupwithsocial_div signup_page_socialdiv">
                                 <div className="signupsociallinks">
                                   <ul>
-                                    {/* <li>
-                                          <GoogleLogin
-                                            onSuccess={(credentialResponse) => {
-                                              console.log(credentialResponse);
-                                            }}
-                                            onError={() => {
-                                              console.log("Login Failed");
-                                            }}
-                                            render={(renderProps) => (
-                                              <a
-                                                onClick={renderProps.onClick}
-                                                disabled={renderProps.disabled}
-                                              >
-                                                <img
-                                                  src="images/google_icon.png"
-                                                  alt="Google"
-                                                />
-                                              </a>
-                                            )}
-                                          />
-                                        </li> */}
                                     <li>
                                       <a
                                         onClick={() => {
                                           setIsSocialSignup(true);
-                                          signInWithGoogle(
+                                          handleGoogleSignup(
                                             setFieldValue,
                                             "google"
                                           );

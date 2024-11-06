@@ -11,6 +11,7 @@ import {
   messaging,
   getToken,
   onMessage,
+  LoginWithGoogle,
 } from "../FirebaseCofig/FirebaseConfig";
 
 import { GoogleLogin } from "@react-oauth/google";
@@ -274,7 +275,13 @@ function Login({ isVisible, onClose }) {
                                         />
                                       </li> */}
                                       <li>
-                                        <a>
+                                        <a
+                                          onClick={() => {
+                                            // setIsSocialSignup(true);
+                                            LoginWithGoogle();
+                                          }}
+                                          style={{ cursor: "pointer" }}
+                                        >
                                           <img
                                             src={`${process.env.PUBLIC_URL}/images/google_icon.png`}
                                             // src="images/google_icon.png"

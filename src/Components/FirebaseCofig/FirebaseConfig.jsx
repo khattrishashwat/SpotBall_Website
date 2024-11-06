@@ -7,7 +7,7 @@ import {
 } from "firebase/auth";
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
 import Swal from "sweetalert2"; // Assuming Swal is already installed
-
+import axios from "axios";
 // Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyDWNOtn_zO3ekheuPOBlw7EsieLjYtEguw",
@@ -94,8 +94,6 @@ export const signInWithGoogle = async (setFieldValue) => {
     setFieldValue("last_name", nameParts.slice(1).join(" ") || "");
     setFieldValue("email", userData.email || "");
     setFieldValue("uid", userData.uid || "");
-
-  
   } catch (error) {
     Swal.fire({
       icon: "error",
@@ -106,7 +104,6 @@ export const signInWithGoogle = async (setFieldValue) => {
     return null; // Return null in case of error
   }
 };
-
 
 export const signInWithFacebook = async () => {
   try {
@@ -139,6 +136,59 @@ export const signInWithFacebook = async () => {
       text: error.message,
     });
     console.error("Error during Facebook sign-in:", error);
+  }
+};
+
+export const LoginWithGoogle = async () => {
+  try {
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+
+    console.log("Google Sign-In successful. User UID:", user.uid);
+
+    const checkUIDResponse = await axios.get(
+      `check-uid-exists/${user.uid}`,
+      {}
+    );
+
+    if (checkUIDResponse.data.message === "Uid found") {
+      const response = await axios.post("social-login", {
+        signup_method: "google",
+        uid: user.uid,
+        device_type: "website",
+        device_token: localStorage.getItem("device_token"), // Assumes device_token is stored in localStorage
+      });
+
+      console.log("Signup response:", response.data);
+
+      const token = response.data.data.token;
+      localStorage.setItem("token", token);
+
+      // Show success message
+      Swal.fire({
+        icon: "success",
+        title: "Login Successful 1",
+        showConfirmButton: false,
+        timer: 2000,
+      });
+
+      // Reload or navigate as needed
+      window.location.reload();
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "UID Not Found 2",
+        text: "User not found. Please sign up.",
+      });
+    }
+  } catch (error) {
+    console.error("Google Sign-In or API request failed:", error);
+
+    Swal.fire({
+      icon: "error",
+      title: "Login Failed 3",
+      text: error.response ? error.response.data.message : error.message,
+    });
   }
 };
 
