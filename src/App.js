@@ -23,7 +23,7 @@ import Profile from "./Components/My Account/Profile";
 import Checkout from "./Components/Pages/Play/Checkout";
 import Screen from "./Components/Pages/Play/Screen";
 import PageNot from "./Components/PageNot/PageNot";
-import Login from "./Components/Auth/Login";
+import PlayVedio from "./Components/Pages/HowToPlay/PalyVedio";
 import Signup from "./Components/Auth/Signup";
 
 // Lazy load components
@@ -106,6 +106,7 @@ const App = () => {
               <Route path="/contact_us" element={<Contact />} />
             </Route>
             <Route path="/" element={<Home />} />
+            <Route path="/playss" element={<PlayVedio />} />
             {/* <Route path="/login" element={<Login />} />
             <Route path="/sign" element={<Signup />} /> */}
             <Route path="/load" element={<Loader />} />

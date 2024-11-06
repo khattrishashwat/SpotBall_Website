@@ -5,6 +5,8 @@ import Login from "../Auth/Login";
 import Swal from "sweetalert2";
 import Loader from "../Loader/Loader";
 import GeolocationPopup from "../Location/GeolocationPopup";
+import PalyVedio from "../Pages/HowToPlay/PalyVedio";
+
 
 function Home() {
   const navigate = useNavigate();
@@ -504,7 +506,6 @@ function Home() {
                   >
                     <img
                       src={`${process.env.PUBLIC_URL}/images/cross_icon.png`}
-                      // src="images/cross_icon.png"
                       alt="Close"
                     />
                   </button>
@@ -521,7 +522,6 @@ function Home() {
                             preload="metadata"
                             poster={videoData.thumbnail_url} // Set the thumbnail
                             style={{ width: "100%", height: "auto" }} // Optional: responsive styles
-                            // onPlay={() => console.log(videoData.video_url)} // Log URL when video plays
                           >
                             <source
                               src={videoData.video_url} // Use the video URL from the fetched data
@@ -539,13 +539,7 @@ function Home() {
                               }}
                               style={{ cursor: "pointer" }} // Add cursor pointer for better UX
                             >
-                              {/* <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 80 80"
-                              >
-                                <path d="M40 0a40 40 0 1040 40A40 40 0 0040 0zM26 61.56V18.44L64 40z" />
-                              </svg> */}
-                            </div>
+                                            </div>
                           </div>
                         </>
                       ) : (
