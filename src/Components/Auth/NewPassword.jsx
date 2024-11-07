@@ -4,7 +4,7 @@ import * as Yup from "yup"; // for validation
 import axios from "axios";
 import Swal from "sweetalert2";
 
-function NewPassword({ onCloseds, email }) {
+function NewPassword({ onCloseds, emailOrPhone }) {
   const [showPassword, setShowPassword] = useState(false);
   const [seePassword, setSeePassword] = useState(false);
 
@@ -18,7 +18,7 @@ function NewPassword({ onCloseds, email }) {
 
   // Initial form values
   const initialValues = {
-    email: email || "", // email passed from props
+    emailOrPhone: emailOrPhone || "",
     new_password: "",
     confirm_password: "",
   };
@@ -35,14 +35,23 @@ function NewPassword({ onCloseds, email }) {
 
   // Function to handle form submission
   const handleSubmit = async (values) => {
+    const token = localStorage.getItem("tokens");
+
     try {
-      const response = await axios.post("reset-password", values);
+      const response = await axios.post("reset-password", values, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
       Swal.fire({
         icon: "success",
         text: response.data.message,
       });
-      onCloseds(); 
-    window.location.reload();
+
+      onCloseds();
+      localStorage.removeItem("tokens");
+      window.location.reload();
     } catch (error) {
       Swal.fire({
         icon: "error",

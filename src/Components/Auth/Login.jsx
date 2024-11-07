@@ -12,6 +12,8 @@ import {
   getToken,
   onMessage,
   LoginWithGoogle,
+  LoginWithTwitter,
+  LoginWithFacebook,
 } from "../FirebaseCofig/FirebaseConfig";
 
 import { GoogleLogin } from "@react-oauth/google";
@@ -290,7 +292,13 @@ function Login({ isVisible, onClose }) {
                                         </a>
                                       </li>
                                       <li>
-                                        <a>
+                                        <a
+                                          onClick={() => {
+                                            // setIsSocialSignup(true);
+                                            LoginWithFacebook();
+                                          }}
+                                          style={{ cursor: "pointer" }}
+                                        >
                                           <img
                                             src={`${process.env.PUBLIC_URL}/images/facebook_icon.png`}
                                             // src="images/facebook_icon.png"
@@ -299,7 +307,13 @@ function Login({ isVisible, onClose }) {
                                         </a>
                                       </li>
                                       <li>
-                                        <a href="#">
+                                        <a
+                                          onClick={() => {
+                                            // setIsSocialSignup(true);
+                                            LoginWithTwitter();
+                                          }}
+                                          style={{ cursor: "pointer" }}
+                                        >
                                           <img
                                             src={`${process.env.PUBLIC_URL}/images/twiiter_x_icon.png`}
                                             // src="images/twiiter_x_icon.png"

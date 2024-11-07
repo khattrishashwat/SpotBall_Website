@@ -3,7 +3,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import NewPassword from "./NewPassword";
 
-function OTPverify({ onClosedss, token, email }) {
+function OTPverify({ onClosedss, token, emailOrPhone }) {
   const [otp, setOtp] = useState(["", "", "", ""]);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const inputRefs = useRef([]);
@@ -35,6 +35,7 @@ function OTPverify({ onClosedss, token, email }) {
           },
         }
       );
+      localStorage.setItem("tokens", response.data.data.token);
 
       if (response.data.success) {
         Swal.fire({
@@ -64,7 +65,7 @@ function OTPverify({ onClosedss, token, email }) {
     try {
       const response = await axios.post(
         "resend-otp-user-verification",
-        { email },
+        { emailOrPhone },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -170,7 +171,7 @@ function OTPverify({ onClosedss, token, email }) {
       {showNewPassword && (
         <NewPassword
           onCloseds={() => setShowNewPassword(false)}
-          email={email}
+          emailOrPhone={emailOrPhone}
         />
       )}
     </>

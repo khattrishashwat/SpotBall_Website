@@ -20,7 +20,7 @@ function Forget({ onClosed }) {
       });
       setResponseData({
         token: response.data.data.token, // Store token
-        emailOrPhone: values.email, // Store email
+        emailOrPhone: values.emailOrPhone, 
       });
       handleOTP();
     } catch (error) {
@@ -67,7 +67,7 @@ function Forget({ onClosed }) {
                         Please Enter the registered Email / Mobile Number
                       </p>
                       <Formik
-                        initialValues={{ email: "" }}
+                        initialValues={{ emailOrPhone: "" }}
                         onSubmit={PhoneSubmit}
                       >
                         {({ handleSubmit }) => (
@@ -75,13 +75,13 @@ function Forget({ onClosed }) {
                             <div className="formstart forgotpass_inputmaindiv">
                               <div className="form-control frmctrldiv">
                                 <Field
-                                  name="email"
+                                  name="emailOrPhone"
                                   type="text"
                                   className="error"
                                   placeholder="E-Mail / Mobile Number"
                                 />
                                 <ErrorMessage
-                                  name="email"
+                                  name="emailOrPhone"
                                   component="span"
                                   className="field_required"
                                 />
@@ -110,7 +110,7 @@ function Forget({ onClosed }) {
         <OTPverify
           onClosedss={() => setShowOTPS(false)}
           token={responseData?.token} // Pass token to OTPverify
-          email={responseData?.email} // Pass email to OTPverify
+          emailOrPhone={responseData?.emailOrPhone} // Pass email to OTPverify
         />
       )}
     </div>

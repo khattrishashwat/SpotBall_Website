@@ -7,7 +7,6 @@ import Loader from "../Loader/Loader";
 import GeolocationPopup from "../Location/GeolocationPopup";
 import PalyVedio from "../Pages/HowToPlay/PalyVedio";
 
-
 function Home() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -17,6 +16,7 @@ function Home() {
   const [selectedContest, setSelectedContest] = useState("");
   const [isModals, setIsModals] = useState("");
   const [onCarts, setOnCarts] = useState("");
+  const [links, setLinks] = useState("");
   const videoRef = useRef(null);
   const [isLoginPopup, setLoginPopup] = useState(false);
   const [banner, setBanner] = useState(false);
@@ -55,7 +55,7 @@ function Home() {
     const videoElement = document.getElementById("video_howtoplay");
     if (videoElement) {
       videoElement.pause();
-      videoElement.currentTime = 0; 
+      videoElement.currentTime = 0;
     }
   };
 
@@ -79,7 +79,7 @@ function Home() {
       if (response) {
         setMovies(response.data.data);
       }
-      } catch (error) {
+    } catch (error) {
       console.error("Error fetching video data:", error);
     }
   };
@@ -107,14 +107,14 @@ function Home() {
   const getNextSunday = () => {
     const now = new Date();
     const dayOfWeek = now.getDay();
-    const daysUntilNextSunday = (7 - dayOfWeek) % 7; 
+    const daysUntilNextSunday = (7 - dayOfWeek) % 7;
     const nextSunday = new Date(
       now.getFullYear(),
       now.getMonth(),
       now.getDate() + daysUntilNextSunday
     );
-    nextSunday.setHours(23, 59, 59, 999); 
-        return nextSunday.getTime();
+    nextSunday.setHours(23, 59, 59, 999);
+    return nextSunday.getTime();
   };
 
   useEffect(() => {
@@ -125,7 +125,6 @@ function Home() {
       const distance = countDownDate - now;
 
       if (distance < 0) {
-
         countDownDate = getNextSunday();
       }
 
@@ -138,7 +137,6 @@ function Home() {
 
       setTimeLeft({ days, hours, minutes, seconds });
     };
-
 
     const interval = setInterval(updateCountdown, 1000);
 
@@ -180,7 +178,7 @@ function Home() {
     if (quantity < selectedContest?.maxTickets) {
       setQuantity((prev) => prev + 1);
     } else {
-       Swal.fire({
+      Swal.fire({
         icon: "warning",
         title: "Max Ticket Limit Reached",
         text: `You can only purchase a maximum of ${selectedContest?.maxTickets} tickets per person.`,
@@ -211,22 +209,38 @@ function Home() {
   useEffect(() => {
     const location = JSON.parse(localStorage.getItem("location"));
 
-     if (token && location && Object.keys(location).length > 0) {
-       setGeolocationPopupVisible(false);
+    if (token && location && Object.keys(location).length > 0) {
+      setGeolocationPopupVisible(false);
     } else if (token) {
-       setGeolocationPopupVisible(true);
+      setGeolocationPopupVisible(true);
     } else if (location && Object.keys(location).length > 0) {
-       setGeolocationPopupVisible(false);
+      setGeolocationPopupVisible(false);
     } else {
       setGeolocationPopupVisible(true);
     }
   }, [token]);
 
   const handleCloseGeolocationPopup = () => {
-    setGeolocationPopupVisible(false); 
-    };
+    setGeolocationPopupVisible(false);
+  };
 
-
+  const Links = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await axios.get("/get-all-static-content/live_links", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setLinks(response.data.data);
+      console.log("links", response.data.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+  useEffect(() => {
+    Links();
+  }, []);
   return (
     <>
       {loading ? (
@@ -538,8 +552,7 @@ function Home() {
                                 playVideo();
                               }}
                               style={{ cursor: "pointer" }} // Add cursor pointer for better UX
-                            >
-                                            </div>
+                            ></div>
                           </div>
                         </>
                       ) : (

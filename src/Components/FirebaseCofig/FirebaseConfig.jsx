@@ -3,6 +3,7 @@ import {
   getAuth,
   GoogleAuthProvider,
   FacebookAuthProvider,
+  TwitterAuthProvider,
   signInWithPopup,
 } from "firebase/auth";
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
@@ -24,6 +25,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 const facebookProvider = new FacebookAuthProvider();
+const twitterprovider = new TwitterAuthProvider();
 
 // Initialize Firebase Messaging
 const messaging = getMessaging(app);
@@ -78,8 +80,8 @@ if ("serviceWorker" in navigator) {
       console.log("Service Worker registered:", registration);
 
       getToken(messaging, {
-        vapidKey: "BNkI-Se9LgfgnkAxsoNDTe3uQDR7HBWV6rY-Mhc3A6AioGIl-VnUn49NTAdTZHgBnt6id6KokU02Pku4G0GpYxA"
-,
+        vapidKey:
+          "BNkI-Se9LgfgnkAxsoNDTe3uQDR7HBWV6rY-Mhc3A6AioGIl-VnUn49NTAdTZHgBnt6id6KokU02Pku4G0GpYxA",
       })
         .then((currentToken) => {
           if (currentToken) {
@@ -144,31 +146,30 @@ export const signInWithGoogle = async (setFieldValue) => {
   }
 };
 
-export const signInWithFacebook = async () => {
+export const signInWithFacebook = async (setFieldValue) => {
   try {
-    const result = await signInWithPopup(auth, facebookProvider);
+       const result = await signInWithPopup(auth, facebookProvider);
     const user = result.user;
 
-    // Handle user data
     const userData = {
       uid: user.uid,
       displayName: user.displayName,
       email: user.email,
-      photoURL: user.photoURL, // Optional, depending on your API
+      photoURL: user.photoURL,
     };
 
     console.log("User info:", userData);
+        const nameParts = userData.displayName
+          ? userData.displayName.split(" ")
+          : [];
 
-    // Optionally, you can display a success message
-    Swal.fire({
-      icon: "success",
-      title: "Signed in successfully!",
-      text: `Welcome, ${user.displayName}`,
-    });
+        // Set form values with user data
+        setFieldValue("first_name", nameParts[0] || "");
+        setFieldValue("last_name", nameParts.slice(1).join(" ") || "");
+        setFieldValue("email", userData.email || "");
+        setFieldValue("uid", userData.uid || "");
 
-    // You may want to send userData to your signup popup or handle it as needed
   } catch (error) {
-    // Handle Errors here.
     Swal.fire({
       icon: "error",
       title: "Sign-in failed",
@@ -177,6 +178,48 @@ export const signInWithFacebook = async () => {
     console.error("Error during Facebook sign-in:", error);
   }
 };
+
+export const signWithTwitter = async (setFieldValue) => {
+  try {
+    const result = await signInWithPopup(auth, twitterprovider);
+
+    // Extract and log user info
+    const user = result.user;
+    const userData = {
+      uid: user.uid,
+      name: user.displayName,
+      email: user.email || "", // Twitter sometimes doesn't return email
+    };
+
+    console.log("Useds:", user);
+    console.log("Uss:", userData);
+    // const nameParts = userData.displayName
+    //   ? userData.displayName.split(" ")
+    //   : [];
+
+    // Set form values with user data
+    setFieldValue("first_name", userData.name || "");
+    // setFieldValue("last_name", nameParts.slice(1).join(" ") || "");
+    setFieldValue("email", userData.email || "");
+    setFieldValue("uid", userData.uid || "");
+  } catch (error) {
+    console.error("Error logging in with Twitter:", error.message);
+
+    // Handle specific error cases
+    if (error.code === "auth/invalid-credential") {
+      console.error(
+        "Invalid credentials. Please ensure your Twitter API keys are correct."
+      );
+    }
+  }
+};
+
+
+
+
+
+//------Login-----
+
 
 export const LoginWithGoogle = async () => {
   try {
@@ -216,7 +259,7 @@ export const LoginWithGoogle = async () => {
     } else {
       Swal.fire({
         icon: "error",
-        title: "UID Not Found 2",
+        title: "UID Not Found ",
         text: "User not found. Please sign up.",
       });
     }
@@ -225,10 +268,139 @@ export const LoginWithGoogle = async () => {
 
     Swal.fire({
       icon: "error",
-      title: "Login Failed 3",
+      title: "Login Failed",
       text: error.response ? error.response.data.message : error.message,
     });
   }
 };
 
-export { auth, provider, facebookProvider, messaging, getToken, onMessage };
+
+export const LoginWithTwitter = async () => {
+  try {
+    // Sign in with Twitter
+    const result = await signInWithPopup(auth, twitterprovider);
+    const user = result.user;
+
+    console.log("Twitter Sign-In successful. User UID:", user.uid);
+
+    // Check if UID exists in your database
+    const checkUIDResponse = await axios.get(
+      `check-uid-exists/${user.uid}`,
+      {}
+    );
+
+    if (checkUIDResponse.data.message === "Uid found") {
+      // If UID is found, proceed with social login
+      const response = await axios.post("social-login", {
+        signup_method: "twitter",
+        uid: user.uid,
+        device_type: "website",
+        device_token: localStorage.getItem("device_token"), // Assumes device_token is stored in localStorage
+      });
+
+      console.log("Twitter response:", response.data);
+
+      // Store token in localStorage
+      const token = response.data.data.token;
+      localStorage.setItem("token", token);
+
+      // Show success message
+      Swal.fire({
+        icon: "success",
+        title: "Login Successful",
+        showConfirmButton: false,
+        timer: 2000,
+      });
+
+      // Reload or navigate as needed
+      window.location.reload();
+    } else {
+      // UID not found, show error message
+      Swal.fire({
+        icon: "error",
+        title: "UID Not Found",
+        text: "User not found. Please sign up.",
+      });
+    }
+  } catch (error) {
+    console.error("Twitter Sign-In or API request failed:", error);
+
+    // Show error message
+    Swal.fire({
+      icon: "error",
+      title: "Login Failed",
+      text: error.response ? error.response.data.message : error.message,
+    });
+  }
+};
+
+
+export const LoginWithFacebook = async () => {
+  try {
+    // Sign in with Facebook
+    const result = await signInWithPopup(auth, facebookProvider);
+    const user = result.user;
+
+    console.log("Facebook Sign-In successful. User UID:", user.uid);
+
+    // Check if UID exists in your database
+    const checkUIDResponse = await axios.get(
+      `check-uid-exists/${user.uid}`,
+      {}
+    );
+
+    if (checkUIDResponse.data.message === "Uid found") {
+      // If UID is found, proceed with social login
+      const response = await axios.post("social-login", {
+        signup_method: "facebook",
+        uid: user.uid,
+        device_type: "website",
+        device_token: localStorage.getItem("device_token"), // Assumes device_token is stored in localStorage
+      });
+
+      console.log("FaceBook response:", response.data);
+
+      // Store token in localStorage
+      const token = response.data.data.token;
+      localStorage.setItem("token", token);
+
+      // Show success message
+      Swal.fire({
+        icon: "success",
+        title: "Login Successful",
+        showConfirmButton: false,
+        timer: 2000,
+      });
+
+      // Reload or navigate as needed
+      window.location.reload();
+    } else {
+      // UID not found, show error message
+      Swal.fire({
+        icon: "error",
+        title: "UID Not Found",
+        text: "User not found. Please sign up.",
+      });
+    }
+  } catch (error) {
+    console.error("Facebook Sign-In or API request failed:", error);
+
+    // Show error message
+    Swal.fire({
+      icon: "error",
+      title: "Login Failed",
+      text: error.response ? error.response.data.message : error.message,
+    });
+  }
+};
+
+
+export {
+  auth,
+  provider,
+  facebookProvider,
+  twitterprovider,
+  messaging,
+  getToken,
+  onMessage,
+};

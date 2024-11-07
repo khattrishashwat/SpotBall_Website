@@ -9,7 +9,8 @@ import { signInWithPopup } from "firebase/auth";
 
 import {
   signInWithGoogle,
-  auth,
+  signWithTwitter,
+  signInWithFacebook,
   provider,
 } from "../FirebaseCofig/FirebaseConfig";
 
@@ -156,6 +157,8 @@ const Signup = ({ isOpenness, onClose }) => {
     const formattedPhone = values.phone.startsWith("+91")
       ? values.phone
       : `+91${values.phone}`;
+      console.log("values",values);
+      
     try {
       const response = await axios.post("social-login", {
         ...values,
@@ -198,7 +201,13 @@ const Signup = ({ isOpenness, onClose }) => {
   // Example function for Facebook Signup
   const handleFacebookSignup = (setFieldValue) => {
     setFieldValue("signup_method", "facebook");
+    signInWithFacebook(setFieldValue);
   };
+  const handleTwitterSignup = (setFieldValue) => {
+    setFieldValue("signup_method", "twitter");
+    signWithTwitter(setFieldValue);
+  };
+
   return (
     <>
       <div
@@ -432,6 +441,7 @@ const Signup = ({ isOpenness, onClose }) => {
                                       <a
                                         onClick={() => {
                                           setIsSocialSignup(true);
+
                                           handleGoogleSignup(
                                             setFieldValue,
                                             "google"
@@ -447,15 +457,15 @@ const Signup = ({ isOpenness, onClose }) => {
                                     </li>
                                     <li>
                                       <a
-                                      // onClick={() => {
-                                      //   setIsSocialSignup(true);
-
-                                      //   handleSocialSignup(
-                                      //     setFieldValue,
-                                      //     "facebook"
-                                      //   );
-                                      // }}
-                                      // style={{ cursor: "pointer" }}
+                                      onClick={() => {
+                                        setIsSocialSignup(true);
+// signInWithFacebook();
+                                        handleFacebookSignup(
+                                          setFieldValue,
+                                          "facebook"
+                                        );
+                                      }}
+                                      style={{ cursor: "pointer" }}
                                       >
                                         <img
                                           src={`${process.env.PUBLIC_URL}/images/facebook_icon.png`}
@@ -465,7 +475,18 @@ const Signup = ({ isOpenness, onClose }) => {
                                       </a>
                                     </li>
                                     <li>
-                                      <a href="#">
+                                      <a
+                                        onClick={() => {
+                                          setIsSocialSignup(true);
+                                          // signWithTwitter();
+                                          handleTwitterSignup(
+                                            setFieldValue,
+                                            "twitter"
+                                          );
+                                         
+                                        }}
+                                        style={{ cursor: "pointer" }}
+                                      >
                                         <img
                                           src={`${process.env.PUBLIC_URL}/images/twiiter_x_icon.png`}
                                           // src="images/twiiter_x_icon.png"
@@ -474,7 +495,7 @@ const Signup = ({ isOpenness, onClose }) => {
                                       </a>
                                     </li>
                                     <li>
-                                      <a href="#">
+                                      <a>
                                         <img
                                           src={`${process.env.PUBLIC_URL}/images/apple_icon.png`}
                                           // src="images/apple_icon.png"
