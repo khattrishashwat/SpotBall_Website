@@ -75,7 +75,9 @@ const messaging = getMessaging(app);
 
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker
-    .register("/firebase-messaging-sw.js")
+    .register("/firebase-messaging-sw.js", {
+      scope: "/spotsball/web/",
+    })
     .then((registration) => {
       console.log("Service Worker registered:", registration);
 
@@ -148,7 +150,7 @@ export const signInWithGoogle = async (setFieldValue) => {
 
 export const signInWithFacebook = async (setFieldValue) => {
   try {
-       const result = await signInWithPopup(auth, facebookProvider);
+    const result = await signInWithPopup(auth, facebookProvider);
     const user = result.user;
 
     const userData = {
@@ -159,16 +161,15 @@ export const signInWithFacebook = async (setFieldValue) => {
     };
 
     console.log("User info:", userData);
-        const nameParts = userData.displayName
-          ? userData.displayName.split(" ")
-          : [];
+    const nameParts = userData.displayName
+      ? userData.displayName.split(" ")
+      : [];
 
-        // Set form values with user data
-        setFieldValue("first_name", nameParts[0] || "");
-        setFieldValue("last_name", nameParts.slice(1).join(" ") || "");
-        setFieldValue("email", userData.email || "");
-        setFieldValue("uid", userData.uid || "");
-
+    // Set form values with user data
+    setFieldValue("first_name", nameParts[0] || "");
+    setFieldValue("last_name", nameParts.slice(1).join(" ") || "");
+    setFieldValue("email", userData.email || "");
+    setFieldValue("uid", userData.uid || "");
   } catch (error) {
     Swal.fire({
       icon: "error",
@@ -214,12 +215,7 @@ export const signWithTwitter = async (setFieldValue) => {
   }
 };
 
-
-
-
-
 //------Login-----
-
 
 export const LoginWithGoogle = async () => {
   try {
@@ -256,12 +252,14 @@ export const LoginWithGoogle = async () => {
 
       // Reload or navigate as needed
       window.location.reload();
-    } else {
+    } else if (checkUIDResponse.data.message === "Uid Not Found") {
       Swal.fire({
         icon: "error",
-        title: "UID Not Found ",
-        text: "User not found. Please sign up.",
+        text: "Go to SignUp, then try social login",
       });
+
+      // Reload the page after error
+      window.location.reload();
     }
   } catch (error) {
     console.error("Google Sign-In or API request failed:", error);
@@ -273,7 +271,6 @@ export const LoginWithGoogle = async () => {
     });
   }
 };
-
 
 export const LoginWithTwitter = async () => {
   try {
@@ -314,13 +311,14 @@ export const LoginWithTwitter = async () => {
 
       // Reload or navigate as needed
       window.location.reload();
-    } else {
-      // UID not found, show error message
+    } else if (checkUIDResponse.data.message === "Uid Not Found") {
       Swal.fire({
         icon: "error",
-        title: "UID Not Found",
-        text: "User not found. Please sign up.",
+        text: "Go to SignUp, then try social login",
       });
+
+      // Reload the page after error
+      window.location.reload();
     }
   } catch (error) {
     console.error("Twitter Sign-In or API request failed:", error);
@@ -333,7 +331,6 @@ export const LoginWithTwitter = async () => {
     });
   }
 };
-
 
 export const LoginWithFacebook = async () => {
   try {
@@ -374,13 +371,14 @@ export const LoginWithFacebook = async () => {
 
       // Reload or navigate as needed
       window.location.reload();
-    } else {
-      // UID not found, show error message
+    } else if (checkUIDResponse.data.message === "Uid Not Found") {
       Swal.fire({
         icon: "error",
-        title: "UID Not Found",
-        text: "User not found. Please sign up.",
+        text: "Go to SignUp, then try social login",
       });
+
+      // Reload the page after error
+      window.location.reload();
     }
   } catch (error) {
     console.error("Facebook Sign-In or API request failed:", error);
@@ -393,7 +391,6 @@ export const LoginWithFacebook = async () => {
     });
   }
 };
-
 
 export {
   auth,
