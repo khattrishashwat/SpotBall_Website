@@ -123,18 +123,7 @@ function Login({ isVisible, onClose }) {
     onClose();
   };
 
-  const handleGoogleLogin = () => {
-    return (
-      <GoogleLogin
-        onSuccess={(credentialResponse) => {
-          console.log(credentialResponse);
-        }}
-        onError={() => {
-          console.log("Login Failed");
-        }}
-      />
-    );
-  };
+
   return (
     <>
       <div
@@ -362,7 +351,7 @@ function Login({ isVisible, onClose }) {
       )}
 
       {/* Sign Up Modal */}
-      {showSignup && <Signup onClose={() => setShowSignup(false)} />}
+      {showSignup && <Signup onClosed={() => setShowSignup(false)} />}
     </>
   );
 }

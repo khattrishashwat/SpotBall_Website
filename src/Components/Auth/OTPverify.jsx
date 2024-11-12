@@ -8,23 +8,36 @@ function OTPverify({ onClosedss, token, emailOrPhone }) {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const inputRefs = useRef([]);
 
-  // Function to handle OTP input change
   const handleInputChange = (index, value) => {
     const newOtp = [...otp];
-    newOtp[index] = value.slice(-1); // Only take the last digit
+    newOtp[index] = value.slice(-1); 
     setOtp(newOtp);
 
-    // Move to the next input
     if (value && index < otp.length - 1) {
       inputRefs.current[index + 1]?.focus();
     } else if (!value && index > 0) {
-      // Handle backspace, move to the previous input if empty
       inputRefs.current[index - 1]?.focus();
     }
   };
 
-  // Function to verify the OTP
   const verifyOtp = async () => {
+
+    if (otp.includes("")) {
+      Swal.fire({
+        icon: "error",
+        text: "Please enter OTP",
+      });
+      return;
+    }
+
+    if (otp.join("").length < 4) {
+      Swal.fire({
+        icon: "error",
+        text: "Please enter valid OTP",
+      });
+      return;
+    }
+
     try {
       const response = await axios.post(
         "submit-otp",
@@ -43,22 +56,22 @@ function OTPverify({ onClosedss, token, emailOrPhone }) {
           text: "OTP verified successfully!",
         });
         setShowNewPassword(true);
-        // onClosedss(); // Close OTP popup when NewPassword is opened
       } else {
         Swal.fire({
           icon: "error",
           text: response.data.message || "OTP verification failed!",
         });
-        setOtp(["", "", "", ""]); // Clear OTP input
+        setOtp(["", "", "", ""]);
       }
     } catch (error) {
       Swal.fire({
         icon: "error",
         text: error.response ? error.response.data.message : error.message,
       });
-      setOtp(["", "", "", ""]); // Clear OTP input on error
+      setOtp(["", "", "", ""]); 
     }
   };
+
 
   // Function to resend OTP
   const resendOtp = async () => {
@@ -151,7 +164,7 @@ function OTPverify({ onClosedss, token, emailOrPhone }) {
                               type="button"
                               className="loginbtn otpverify_sbmtbtn"
                               onClick={verifyOtp}
-                              disabled={otp.includes("")} // Disable if any field is empty
+                              disabled={otp.includes("")} 
                             >
                               Submit
                             </button>

@@ -166,46 +166,42 @@ function Checkout() {
 
   const totalPayments = finalTotalPayment.toFixed(2);
 
-  const handleCrossClick = async (cart) => {
-    const { contest_id, tickets_count, user_coordinates } = cart;
-    const token = localStorage.getItem("token");
+ const handleCrossClick = async (cart) => {
+   const { contest_id, tickets_count, user_coordinates } = cart;
+   const token = localStorage.getItem("token");
 
-    try {
-      const response = await axios.get(
-        `remove-cart-item/${cart._id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`, // Send the token with the request
-          },
-        },
-        {
-          contest_id: contest_id._id, // Send contest ID
-          tickets_count,
-          user_coordinates: {
-            x: user_coordinates.x, // Send x coordinate
-            y: user_coordinates.y, // Send y coordinate
-          },
-        }
-      );
+   try {
+     const response = await axios.get(`remove-cart-item/${cart._id}`, {
+       headers: {
+         Authorization: `Bearer ${token}`,
+       },
+       params: {
+         contest_id: contest_id._id,
+         tickets_count,
+         user_coordinates: {
+           x: user_coordinates.x,
+           y: user_coordinates.y,
+         },
+       },
+     });
 
-      // Handle successful response
-      Swal.fire({
-        title: "Success!",
-        text: "Data sent successfully!",
-        icon: "success",
-      });
+     // Handle successful response
+     Swal.fire({
+       title: "Success!",
+       text: response.data.message,
+     });
 
-      // Optionally, remove the cart from the state
-      setCarts(carts.filter((c) => c._id !== cart._id));
-    } catch (error) {
-      console.error(error);
-      Swal.fire({
-        title: "Error!",
-        text: "There was an error sending the data.",
-        icon: "error",
-      });
-    }
-  };
+     // Optionally, remove the cart from the state
+     setCarts((prevCarts) => prevCarts.filter((c) => c._id !== cart._id));
+   } catch (error) {
+     console.error(error);
+     Swal.fire({
+       title: "Error!",
+       text: error.response?.data?.message ,
+     });
+   }
+ };
+
   console.log("cart", carts);
   console.log(
     "carts[0]?.contest_id?.user_coordinates",

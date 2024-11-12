@@ -1,49 +1,23 @@
-import React,{useState,useEffect} from 'react'
-import { Link } from 'react-router-dom'
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import axios from "axios";
+import PalyVedio from "../../Pages/HowToPlay/PalyVedio";
 
 function Footer() {
-  const [footer, setFooter] = useState({});
-  const [movies, setMovies] = useState("");
-  const [isModals, setIsModals] = useState("");
+  const [footer, setFooter] = useState(""); // Footer content
+  const [plays, setPlays] = useState(false); // Video state
+  const [activeTab, setActiveTab] = useState(
+    localStorage.getItem("activeTab") || "terms_conditions"
+  ); // Active tab state
 
- const open = async () => {
-   setIsModals(true);
- };
-
-  const close = () => {
-    setIsModals(false);
-  };
-
-  const fetchVideoData = async () => {
-    const token = localStorage.getItem("token");
-    try {
-      const response = await axios.get("get-how-to-play", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (response.data.data) {
-        setMovies(response.data.data);
-      } 
-    } catch (error) {
-      console.error("Error fetching video data:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchVideoData();
-  }, []);
   const fetchFooter = async () => {
     try {
       const response = await axios.get("/get-all-static-content/footer");
-
       if (response) {
-        setFooter(response.data.data[0]?.description||{});
-      } 
+        setFooter(response.data.data[0]?.description || "");
+      }
     } catch (error) {
-      console.error("Error fetching video data:", error);
+      console.error("Error fetching footer data:", error);
     }
   };
 
@@ -51,14 +25,23 @@ function Footer() {
     fetchFooter();
   }, []);
 
-  const playVideo = () => {
-    const videoElement = document.getElementById("video_howtoplay");
-    if (videoElement) {
-      videoElement.play();
-    }
+  const handleTabClick = (tabId) => {
+    // Save the selected tab to localStorage
+    localStorage.setItem("activeTab", tabId);
+    setActiveTab(tabId);
   };
 
-  const videoData = movies.length > 0 ? movies[0] : null;
+
+  const openVideo = () => setPlays(true);
+
+  const closeVideo = () => {
+    setPlays(false);
+    const videoElement = document.getElementById("video_howtoplay");
+    if (videoElement) {
+      videoElement.pause();
+      videoElement.currentTime = 0;
+    }
+  };
 
   return (
     <>
@@ -76,125 +59,88 @@ function Footer() {
               <div className="col-md-8 col8rightfooterlinks">
                 <div className="footerlinksmain_right">
                   <div className="footerlinksmaindiv_inner">
-                    <div className="maindivforfooterlinks">
-                      <h2 className="linksheading">Winners</h2>
-                      <ul className="links_list_footer">
-                        <li>
-                          {" "}
-                          <Link
-                            to="/the_winners_circle"
-                            className="linksanchor"
-                          >
-                            The Winners Circle
-                          </Link>{" "}
-                        </li>
-                        <li>
-                          {" "}
-                          <Link
-                            to="/live_weekly_winner"
-                            className="linksanchor"
-                          >
-                            Live Weekly Winner
-                          </Link>{" "}
-                        </li>
-                        <li>
-                          {" "}
-                          <Link to="/in_the_press" className="linksanchor">
-                            In The Press
-                          </Link>{" "}
-                        </li>
-                      </ul>
-                    </div>
-                    <div className="maindivforfooterlinks">
-                      <h2 className="linksheading">About Us</h2>
-                      <ul className="links_list_footer">
-                        <li>
-                          {" "}
-                          <Link to="/who_we_are" className="linksanchor">
-                            Who We Are?
-                          </Link>{" "}
-                        </li>
-                        <li>
-                          {" "}
-                          <a
-                            className="linksanchor footer_howtoplayfaqlink"
-                            onClick={open}
-                          >
-                            How to Play{" "}
-                          </a>{" "}
-                        </li>
-                        <li>
-                          {" "}
-                          <Link to="/contact_us" className="linksanchor">
-                            Contact Us
-                          </Link>{" "}
-                        </li>
-                      </ul>
-                    </div>
-                    <div className="maindivforfooterlinks">
-                      <h2 className="linksheading">Legal</h2>
-                      <ul className="links_list_footer">
-                        <li>
-                          {" "}
-                          <Link to="/legal_terms" className="linksanchor">
-                            Terms &amp; Conditions
-                          </Link>{" "}
-                        </li>
-                        <li>
-                          {" "}
-                          <Link to="/legal_terms" className="linksanchor">
-                            Privacy Policy
-                          </Link>{" "}
-                        </li>
-                        <li>
-                          {" "}
-                          <Link to="/legal_terms" className="linksanchor">
-                            Rules of Play &amp; FAQ's
-                          </Link>{" "}
-                        </li>
-                        <li>
-                          {" "}
-                          <Link to="/legal_terms" className="linksanchor">
-                            Cookie Policy
-                          </Link>{" "}
-                        </li>
-                      </ul>
-                    </div>
-                    <div className="maindivforfooterlinks">
-                      <h2 className="linksheading">Others</h2>
-                      <ul className="links_list_footer">
-                        <li>
-                          {" "}
-                          <a className="linksanchor">Loyalty Club</a>{" "}
-                        </li>
-                        <li>
-                          {" "}
-                          <a className="linksanchor">iOS App</a>{" "}
-                        </li>
-                        <li>
-                          {" "}
-                          <a className="linksanchor">Android App</a>{" "}
-                        </li>
-                      </ul>
-                    </div>
+                    {/* Link Sections */}
+                    {[
+                      {
+                        title: "Winners",
+                        links: [
+                          "The Winners Circle",
+                          "Live Weekly Winner",
+                          "In The Press",
+                        ],
+                        paths: [
+                          "/the_winners_circle",
+                          "/live_weekly_winner",
+                          "/in_the_press",
+                        ],
+                      },
+                      {
+                        title: "About Us",
+                        links: [
+                          "Who We Are?",
+                          "How to Play/ FAQ’s",
+                          "Contact Us",
+                        ],
+                        paths: ["/who_we_are", null, "/contact_us"],
+                        onClick: [null, openVideo, null],
+                      },
+                        {
+                          title: "Legal",
+                          links: [
+                            "Terms & Conditions",
+                            "Privacy Policy",
+                            "Rules of Play & FAQ's",
+                            "Cookie Policy",
+                          ],
+                          paths: [
+                            "/legal_terms",
+                            "/legal_terms",
+                            "/legal_terms",
+                            "/legal_terms",
+                          ],
+                          onClick: [
+                            () => handleTabClick("terms_conditions"),
+                            () => handleTabClick("privacy_policy"),
+                            () => handleTabClick("rules_play"),
+                            () => handleTabClick("cookiepolicy"),
+                          ],
+                        },
+                      {
+                        title: "Others",
+                        links: ["Loyalty Club", "iOS App", "Android App"],
+                        paths: [null, null, null],
+                      },
+                    ].map((section, index) => (
+                      <div key={index} className="maindivforfooterlinks">
+                        <h2 className="linksheading">{section.title}</h2>
+                        <ul className="links_list_footer">
+                          {section.links.map((link, i) => (
+                            <li key={i}>
+                              <Link
+                                to={section.paths[i] || "#"}
+                                className="linksanchor"
+                                onClick={section.onClick?.[i]}
+                                style={{
+                                  cursor: section.onClick?.[i]
+                                    ? "pointer"
+                                    : "auto",
+                                }}
+                              >
+                                {link}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
             </div>
             <div className="row rowmainfooter secondfootermaindiv">
-              {/* <div class="col-md-4 col4footerightside">
-					<div class="footertextinfodiv">
-						
-						<div class="nextbigwinnerdiv_footer">
-							<h2>Be the next big winner!</h2>
-							<a  class="bigwinner_signupbtn" id="footerregisbtn">Register</a>
-						</div>
-						
-					</div>
-
-				</div> */}
               <div className="col-md-8 col8rightfooterlinks">
                 <div className="footerlinksmain_right footersocialwith_downloadicons">
+                  {/* App Store and Social Media Icons */}
                   <div className="footer_downloadapp_icons">
                     <div className="download_app_icondiv">
                       <div className="appstoreicondiv">
@@ -215,51 +161,22 @@ function Footer() {
                   </div>
                   <div className="footer_socialicons">
                     <ul>
-                      <li>
-                        {" "}
-                        <a title="Facebook">
-                          {" "}
-                          <img
-                            src={`${process.env.PUBLIC_URL}/images/facebook_icon.png`}
-                          />{" "}
-                        </a>{" "}
-                      </li>
-                      <li>
-                        {" "}
-                        <a title="Instagram">
-                          {" "}
-                          <img
-                            src={`${process.env.PUBLIC_URL}/images/insta_icon.png`}
-                          />{" "}
-                        </a>{" "}
-                      </li>
-                      <li>
-                        {" "}
-                        <a title="Youtube">
-                          {" "}
-                          <img
-                            src={`${process.env.PUBLIC_URL}/images/twiiter_x_icon.png`}
-                          />{" "}
-                        </a>{" "}
-                      </li>
-                      <li>
-                        {" "}
-                        <a title="Youtube">
-                          {" "}
-                          <img
-                            src={`${process.env.PUBLIC_URL}/images/threads_icon.png`}
-                          />{" "}
-                        </a>{" "}
-                      </li>
-                      <li>
-                        {" "}
-                        <a title="Youtube">
-                          {" "}
-                          <img
-                            src={`${process.env.PUBLIC_URL}/images/youtube_icon.png`}
-                          />{" "}
-                        </a>{" "}
-                      </li>
+                      {[
+                        "facebook_icon.png",
+                        "insta_icon.png",
+                        "twiiter_x_icon.png",
+                        "threads_icon.png",
+                        "youtube_icon.png",
+                      ].map((icon, i) => (
+                        <li key={i}>
+                          <a title={icon.split("_")[0]}>
+                            <img
+                              src={`${process.env.PUBLIC_URL}/images/${icon}`}
+                              alt={icon.split("_")[0]}
+                            />
+                          </a>
+                        </li>
+                      ))}
                     </ul>
                   </div>
                 </div>
@@ -268,6 +185,8 @@ function Footer() {
           </div>
         </div>
       </footer>
+
+      {/* Copyright Footer */}
       <footer className="copyrightfooter">
         <div className="container contsecondfooter">
           <div className="col-md-12 col12secondfootermain">
@@ -275,17 +194,17 @@ function Footer() {
               <div className="copyrightwithinrdropdown">
                 <div className="divforcopyright">
                   <p>
-                    © <Link to="/">SpotsBall</Link> 2024. All Rights Reserved
-                    Designed by <a>Webmobril</a>{" "}
-                  </p>{" "}
-                  <span className="seprator">|</span>
+                    © <Link to="/">SpotsBall</Link> 2024. All Rights Reserved.
+                    Designed by <a href="#">Webmobril</a>
+                  </p>
+                  <span className="separator">|</span>
                   <div className="currencyselectdiv">
                     <p>
                       Currency <i className="fa fa-inr" aria-hidden="true" />
                       <select>
                         <option>INR</option>
-                        <option>INR</option>
-                        <option>INR</option>
+                        <option>USD</option>
+                        <option>EUR</option>
                       </select>
                     </p>
                   </div>
@@ -295,80 +214,13 @@ function Footer() {
           </div>
         </div>
       </footer>
-      <div
-        className={`howtoplay_popup_new ${isModals ? "show" : ""}`}
-        id="howtoplaypopup_new"
-        style={{ display: isModals ? "block" : "none" }}
-      >
-        <div className="howtoplay_innerdiv">
-          <div className="conthowtoplay_videocont">
-            <div className="rowhowtoplay">
-              <div className="colhowtoplaydiv">
-                <div className="howtoplaydiv_video">
-                  <button
-                    type="button"
-                    className="howtoplay_crossicon"
-                    id="crossbtn_popuphowtoplay"
-                    onClick={close}
-                  >
-                    <img
-                      src={`${process.env.PUBLIC_URL}/images/cross_icon.png`}
-                      alt="Close"
-                    />
-                  </button>
-                  <div className="howtoplay_textdiv">
-                    <h2>{movies ? movies.title : "How to Play?"}</h2>
-                  </div>
-                  <div className="video-wrapper">
-                    <div className="video-container" id="video-container">
-                      {videoData ? (
-                        <>
-                          <video
-                            controls
-                            id="video_howtoplay"
-                            preload="metadata"
-                            poster={videoData.thumbnail_url} // Set the thumbnail
-                            style={{ width: "100%", height: "auto" }} // Optional: responsive styles
-                            // onPlay={() => console.log(videoData.video_url)} // Log URL when video plays
-                          >
-                            <source
-                              src={videoData.video_url} // Use the video URL from the fetched data
-                              type="video/mp4"
-                            />
-                            Your browser does not support the video tag.
-                          </video>
-                          <div className="play-button-wrapper">
-                            <div
-                              title="Play video"
-                              className="play-gif"
-                              id="circle-play-b"
-                              onClick={() => {
-                                playVideo();
-                              }}
-                              style={{ cursor: "pointer" }} // Add cursor pointer for better UX
-                            >
-                              {/* <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 80 80"
-                              >
-                                <path d="M40 0a40 40 0 1040 40A40 40 0 0040 0zM26 61.56V18.44L64 40z" />
-                              </svg> */}
-                            </div>
-                          </div>
-                        </>
-                      ) : (
-                        <p>Loading video...</p> // Display loading message if no video data is available
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+
+      {/* Video Component */}
+      {plays && <PalyVedio isON={plays} isOFF={closeVideo} />}
+
+     
     </>
   );
 }
 
-export default Footer
+export default Footer;

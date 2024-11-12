@@ -273,10 +273,14 @@ function Header() {
                             >
                               <div className="userimgdiv">
                                 <img
-                                  src={profile?.profile_url || ""} // Fallback to default image if profile URL is unavailable
+                                  src={
+                                    profile?.profile_url ||
+                                    `${process.env.PUBLIC_URL}/images/user_image.png`
+                                  }
                                   alt="user"
                                 />
                               </div>
+
                               {profile?.is_verified_user && ( // Conditionally render verify image
                                 <div className="userverifyimg">
                                   <img

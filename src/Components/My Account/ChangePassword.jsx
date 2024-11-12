@@ -1,15 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 import Swal from "sweetalert2";
 
-function ChangePassword() {
-    const [isLoading, setIsLoading] = useState(false);
-
+function ChangePassword({ activeTab }) {
+  const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const formikRef = useRef();
 
   const togglePasswordVisibility = () => {
     setShowPassword((prevState) => !prevState);
@@ -17,7 +17,6 @@ function ChangePassword() {
   const toggleNewPasswordVisibility = () => {
     setShowNewPassword((prevState) => !prevState);
   };
-
   const toggleConfirmPasswordVisibility = () => {
     setShowConfirmPassword((prevState) => !prevState);
   };
@@ -52,9 +51,7 @@ function ChangePassword() {
 
   const ChangeSubmit = async (values) => {
     try {
-
       const token = localStorage.getItem("token");
-
       const response = await axios.post("change-password", values, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -76,114 +73,117 @@ function ChangePassword() {
     }
   };
 
+  useEffect(() => {
+    if (activeTab !== "change_password" && formikRef.current) {
+      formikRef.current.resetForm();
+    }
+  }, [activeTab]);
+
   return (
-    <>
-      <div className="chnagepas_div_myacc">
-        <div className="changepass_heading">
-          <h2>Change Password</h2>
-        </div>
-        <Formik
-          initialValues={ChangeValues}
-          validationSchema={validationChange}
-          onSubmit={ChangeSubmit}
-        >
-          <Form>
-            <div className="changepassforminputs">
-              <div className="passinputdiv">
-                <div className="frmctrldiv">
-                  <Field
-                    className="changepassinput"
-                    type={showPassword ? "text" : "password"}
-                    name="old_password"
-                    autocomplete="off"
-                    id="createpass_inp"
-                    placeholder="Old Password"
-                  />
-                  <span
-                    onClick={togglePasswordVisibility}
-                    className="eyeiconforpass"
-                  >
-                    <i
-                      className={
-                        showPassword ? "fa fa-eye iei" : "fa fa-eye-slash iei"
-                      }
-                    ></i>
-                  </span>
+    <div className="chnagepas_div_myacc">
+      <div className="changepass_heading">
+        <h2>Change Password</h2>
+      </div>
+      <Formik
+        initialValues={ChangeValues}
+        validationSchema={validationChange}
+        onSubmit={ChangeSubmit}
+        innerRef={formikRef}
+      >
+        <Form>
+          <div className="changepassforminputs">
+            <div className="passinputdiv">
+              <div className="frmctrldiv">
+                <Field
+                  className="changepassinput"
+                  type={showPassword ? "text" : "password"}
+                  name="old_password"
+                  autoComplete="off"
+                  id="createpass_inp"
+                  placeholder="Old Password"
+                />
+                <span
+                  onClick={togglePasswordVisibility}
+                  className="eyeiconforpass"
+                >
+                  <i
+                    className={
+                      showPassword ? "fa fa-eye iei" : "fa fa-eye-slash iei"
+                    }
+                  ></i>
+                </span>
                 <ErrorMessage
                   name="old_password"
                   component="div"
                   className="error"
                 />
-                </div>
               </div>
-              <div className="passinputdiv">
-                <div className="frmctrldiv">
-                  <Field
-                    type={showNewPassword ? "text" : "password"}
-                    name="new_password"
-                    className="changepassinput"
-                    autocomplete="off"
-                    id="createpass_inp1"
-                    placeholder="New Password"
-                  />
-                  <span
-                    onClick={toggleNewPasswordVisibility}
-                    className="eyeiconforpass"
-                  >
-                    <i
-                      className={
-                        showNewPassword
-                          ? "fa fa-eye iei"
-                          : "fa fa-eye-slash iei"
-                      }
-                    ></i>
-                  </span>
+            </div>
+            <div className="passinputdiv">
+              <div className="frmctrldiv">
+                <Field
+                  type={showNewPassword ? "text" : "password"}
+                  name="new_password"
+                  className="changepassinput"
+                  autoComplete="off"
+                  id="createpass_inp1"
+                  placeholder="New Password"
+                />
+                <span
+                  onClick={toggleNewPasswordVisibility}
+                  className="eyeiconforpass"
+                >
+                  <i
+                    className={
+                      showNewPassword ? "fa fa-eye iei" : "fa fa-eye-slash iei"
+                    }
+                  ></i>
+                </span>
                 <ErrorMessage
                   name="new_password"
                   component="div"
                   className="error"
                 />
-                </div>
               </div>
-              <div className="passinputdiv">
-                <div className="frmctrldiv">
-                  <Field
-                    type={showConfirmPassword ? "text" : "password"}
-                    name="confirm_password"
-                    className="changepassinput"
-                    autocomplete="off"
-                    id="createpass_inp2"
-                    placeholder="Confirm Password"
-                  />
-                  <span
-                    onClick={toggleConfirmPasswordVisibility}
-                    className="eyeiconforpass"
-                  >
-                    <i
-                      className={
-                        showConfirmPassword
-                          ? "fa fa-eye iei"
-                          : "fa fa-eye-slash iei"
-                      }
-                    ></i>
-                  </span>
+            </div>
+            <div className="passinputdiv">
+              <div className="frmctrldiv">
+                <Field
+                  type={showConfirmPassword ? "text" : "password"}
+                  name="confirm_password"
+                  className="changepassinput"
+                  autoComplete="off"
+                  id="createpass_inp2"
+                  placeholder="Confirm Password"
+                />
+                <span
+                  onClick={toggleConfirmPasswordVisibility}
+                  className="eyeiconforpass"
+                >
+                  <i
+                    className={
+                      showConfirmPassword
+                        ? "fa fa-eye iei"
+                        : "fa fa-eye-slash iei"
+                    }
+                  ></i>
+                </span>
                 <ErrorMessage
                   name="confirm_password"
                   component="div"
                   className="error"
                 />
-                </div>
-              </div>
-              <div className="savepass_btndiv">
-                <button type="submit" className="savepass_change_myacc">
-                  Save Password
-                </button>
               </div>
             </div>
-          </Form>
-        </Formik>
-      </div>
-    </>
+            <div className="savepass_btndiv">
+              <button type="submit" className="savepass_change_myacc">
+                Save Password
+              </button>
+            </div>
+          </div>
+        </Form>
+      </Formik>
+    </div>
   );
 }
 

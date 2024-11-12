@@ -148,14 +148,13 @@ function Home() {
       const token = localStorage.getItem("token");
 
       if (token) {
-        // Hit the 'get-all-contests' API if the token is present
         const response = await axios.get("get-all-contests", {
           headers: {
-            Authorization: `Bearer ${token}`, // Send the token with the request
+            Authorization: `Bearer ${token}`,
           },
         });
-        const { banner_details, contests } = response.data.data;
-
+        const { banner_details, contests, livelinks } = response.data.data;
+        setLinks(livelinks);
         setBanner(banner_details[0]);
         setContests(contests);
         setCorousal(banner_details[0]?.corousal);
@@ -224,23 +223,6 @@ function Home() {
     setGeolocationPopupVisible(false);
   };
 
-  const Links = async () => {
-    const token = localStorage.getItem("token");
-    try {
-      const response = await axios.get("/get-all-static-content/live_links", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setLinks(response.data.data);
-      console.log("links", response.data.data);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
-  useEffect(() => {
-    Links();
-  }, []);
   return (
     <>
       {loading ? (
@@ -289,9 +271,17 @@ function Home() {
                 <div className="banner_fixedtext_div_top">
                   <div className="everyweekfixedtext">
                     <h4>
-                      {/* Every week a <span>₹50,000</span> jackpot!{" "} */}
-                      {banner.sub_title}
+                      {(banner.sub_title || "")
+                        .split(/(₹\d{1,3}(?:,\d{3})*)/)
+                        .map((part, index) =>
+                          part.match(/₹\d{1,3}(?:,\d{3})*/) ? (
+                            <span key={index}>{part}</span>
+                          ) : (
+                            part
+                          )
+                        )}
                     </h4>
+
                     <h4>
                       {/* Can you pinpoint the hidden cricket ball? */}
                       {banner.title}
@@ -446,16 +436,30 @@ function Home() {
                             <div className="everyweek_livewatchdiv">
                               <div className="watchondiv">
                                 <h4>Watch On</h4>
-                                <img
-                                  src={`${process.env.PUBLIC_URL}/images/fb_live_icon.png`}
-                                  // src="images/fb_live_icon.png"
-                                  alt="Facebook Live"
-                                />
-                                <img
-                                  src={`${process.env.PUBLIC_URL}/images/yb_live_icon.png`}
-                                  // src="images/yb_live_icon.png"
-                                  alt="YouTube Live"
-                                />
+                                {links?.facebookUrl && (
+                                  <a
+                                    href={links.facebookUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                  >
+                                    <img
+                                      src={`${process.env.PUBLIC_URL}/images/fb_live_icon.png`}
+                                      alt="Facebook Live"
+                                    />
+                                  </a>
+                                )}
+                                {links?.youtubeUrl && (
+                                  <a
+                                    href={links.youtubeUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                  >
+                                    <img
+                                      src={`${process.env.PUBLIC_URL}/images/yb_live_icon.png`}
+                                      alt="YouTube Live"
+                                    />
+                                  </a>
+                                )}
                               </div>
                             </div>
                             <div className="jackpotpricewithpayment">

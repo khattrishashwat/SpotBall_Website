@@ -22,8 +22,18 @@ function Account() {
   });
 
   const validationSchema = Yup.object({
-    first_name: Yup.string().required("First name is required"),
-    last_name: Yup.string().required("Last name is required"),
+    first_name: Yup.string()
+      .matches(
+        /^[A-Za-z]+$/,
+        "First name should only contain alphabetic characters"
+      )
+      .required("First name is required"),
+    last_name: Yup.string()
+      .matches(
+        /^[A-Za-z]+$/,
+        "Last name should only contain alphabetic characters"
+      )
+      .required("Last name is required"),
     email: Yup.string()
       .email("Invalid email format")
       .required("Email is required"),
@@ -208,7 +218,7 @@ function Account() {
                     type="email"
                     className="updateinput"
                     placeholder="Enter Email"
-                    // disabled
+                    disabled
                   />
                   <ErrorMessage
                     name="email"
@@ -223,7 +233,7 @@ function Account() {
                     type="tel"
                     className="updateinput"
                     placeholder="Enter Phone Number"
-                    // disabled
+                    disabled
                   />
                   <ErrorMessage
                     name="phone"

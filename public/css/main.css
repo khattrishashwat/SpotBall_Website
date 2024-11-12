@@ -1468,7 +1468,7 @@ ul.list-inline li a:hover {
 }
 .locationsettingpopup .location_settingdiv {
   background: #fff;
-  padding: 20px;
+  padding: 38px;
   border-radius: 12px;
   width: 400px;
   box-shadow: 0px 2px 6px 0px #00000040;
@@ -1579,11 +1579,11 @@ ul.list-inline li a:hover {
 .faq_content .panel-group .panel .panel-heading h4 a i {
   color: #009e49;
   border: 2px solid #009e49;
-  padding: 1px;
-  font-size: 16px;
+  padding: 2px;
+  font-size: 17px;
   width: 20px;
   height: 20px;
-  line-height: 14px;
+  line-height: 15px;
   text-align: center;
   border-radius: 50%;
 }
@@ -3413,7 +3413,7 @@ ul.list-inline li a:hover {
   height: 100%;
   position: relative;
   overflow: hidden;
-  margin-top: -100px;
+  /* margin-top: -100px; */
 }
 .winnercirlce_timeline_row .timeline-article .content-left-container,
 .winnercirlce_timeline_row .timeline-article .content-right-container {
@@ -5563,6 +5563,10 @@ p strong {
   display: flex;
   justify-content: space-between;
 }
-/* .input:disabled{
-  background-color: white!important;
-} */
+.input:disabled {
+  background-color: white !important;
+}
+
+input.updateinput {
+  background-color: white;
+}
