@@ -31,7 +31,6 @@ function Footer() {
     setActiveTab(tabId);
   };
 
-
   const openVideo = () => setPlays(true);
 
   const closeVideo = () => {
@@ -84,27 +83,27 @@ function Footer() {
                         paths: ["/who_we_are", null, "/contact_us"],
                         onClick: [null, openVideo, null],
                       },
-                        {
-                          title: "Legal",
-                          links: [
-                            "Terms & Conditions",
-                            "Privacy Policy",
-                            "Rules of Play & FAQ's",
-                            "Cookie Policy",
-                          ],
-                          paths: [
-                            "/legal_terms",
-                            "/legal_terms",
-                            "/legal_terms",
-                            "/legal_terms",
-                          ],
-                          onClick: [
-                            () => handleTabClick("terms_conditions"),
-                            () => handleTabClick("privacy_policy"),
-                            () => handleTabClick("rules_play"),
-                            () => handleTabClick("cookiepolicy"),
-                          ],
-                        },
+                      {
+                        title: "Legal",
+                        links: [
+                          "Terms & Conditions",
+                          "Privacy Policy",
+                          "Rules of Play & FAQ's",
+                          "Cookie Policy",
+                        ],
+                        paths: [
+                          "/legal_terms",
+                          "/legal_terms",
+                          "/legal_terms",
+                          "/legal_terms",
+                        ],
+                        onClick: [
+                          () => handleTabClick("terms_conditions"),
+                          () => handleTabClick("privacy_policy"),
+                          () => handleTabClick("rules_play"),
+                          () => handleTabClick("cookiepolicy"),
+                        ],
+                      },
                       {
                         title: "Others",
                         links: ["Loyalty Club", "iOS App", "Android App"],
@@ -120,11 +119,6 @@ function Footer() {
                                 to={section.paths[i] || "#"}
                                 className="linksanchor"
                                 onClick={section.onClick?.[i]}
-                                style={{
-                                  cursor: section.onClick?.[i]
-                                    ? "pointer"
-                                    : "auto",
-                                }}
                               >
                                 {link}
                               </Link>
@@ -147,6 +141,7 @@ function Footer() {
                         <a>
                           <img
                             src={`${process.env.PUBLIC_URL}/images/google-play-store-badge.png`}
+                            alt="Google Play Store"
                           />
                         </a>
                       </div>
@@ -154,6 +149,7 @@ function Footer() {
                         <a>
                           <img
                             src={`${process.env.PUBLIC_URL}/images/apple-store-badge.png`}
+                            alt="Apple Store"
                           />
                         </a>
                       </div>
@@ -162,11 +158,11 @@ function Footer() {
                   <div className="footer_socialicons">
                     <ul>
                       {[
-                        "facebook_icon.png",
-                        "insta_icon.png",
-                        "twiiter_x_icon.png",
-                        "threads_icon.png",
-                        "youtube_icon.png",
+                        "Facebook_icon.png",
+                        "Instagram_icon.png",
+                        "Twitter_x_icon.png",
+                        "Threads_icon.png",
+                        "Youtube_icon.png",
                       ].map((icon, i) => (
                         <li key={i}>
                           <a title={icon.split("_")[0]}>
@@ -217,8 +213,6 @@ function Footer() {
 
       {/* Video Component */}
       {plays && <PalyVedio isON={plays} isOFF={closeVideo} />}
-
-     
     </>
   );
 }

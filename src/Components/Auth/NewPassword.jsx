@@ -51,7 +51,8 @@ function NewPassword({ onCloseds, emailOrPhone }) {
 
       onCloseds();
       localStorage.removeItem("tokens");
-      window.location.reload();
+      localStorage.clear();
+            window.location.reload();
     } catch (error) {
       Swal.fire({
         icon: "error",

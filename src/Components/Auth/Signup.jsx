@@ -6,7 +6,7 @@ import Swal from "sweetalert2";
 import axios from "axios";
 import { signInWithPopup } from "firebase/auth";
 // import { useAuth } from './AuthContext'; // Import your Auth context
-
+import Login from "./Login";
 import {
   signInWithGoogle,
   signWithTwitter,
@@ -14,8 +14,9 @@ import {
   provider,
 } from "../FirebaseCofig/FirebaseConfig";
 
-const Signup = ({ isOpenness, onClose }) => {
+const Signup = ({ isOpenness, onClosed }) => {
   const [signupData, setSignupData] = useState({});
+  const [isLoginPopup, setLoginPopup] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -23,7 +24,7 @@ const Signup = ({ isOpenness, onClose }) => {
   const [isModals, setIsModals] = useState("");
   const [otp, setOtp] = useState(["", "", "", ""]);
   const [isSocialSignup, setIsSocialSignup] = useState(false);
-
+  const [activeTab, setActiveTab] = useState(localStorage.getItem("activeTab"));
   const openModals = () => {
     setIsModals(true);
   };
@@ -31,6 +32,15 @@ const Signup = ({ isOpenness, onClose }) => {
     setIsModals(false);
   };
 
+  const handleLogin = () => {
+    setLoginPopup(true);
+    // onClosed();
+  };
+
+  const ClosePopup = () => {
+    setLoginPopup(false);
+    onClosed();
+  };
   const initialValues = {
     first_name: "",
     last_name: "",
@@ -104,6 +114,8 @@ const Signup = ({ isOpenness, onClose }) => {
         timer: 1000,
       }).then(() => {
         openModals();
+        // Call resendOtp directly, passing the email from values
+        resendOtp(values.email);
         // onClose();
       });
     } catch (error) {
@@ -114,6 +126,37 @@ const Signup = ({ isOpenness, onClose }) => {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const resendOtp = async (email) => {
+    let token = localStorage.getItem("tokens");
+
+    try {
+      const response = await axios.post(
+        "resend-otp-user-verification",
+        { emailOrPhone: email }, // Directly use email passed as argument
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      console.log("resend", response.data.data.tokens);
+
+      // Save the new token
+      localStorage.setItem("tokens", response.data.data.token );
+
+      Swal.fire({
+        icon: "success",
+        text: response.data.message,
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        text: error.response ? error.response.data.message : error.message,
+      });
     }
   };
 
@@ -157,8 +200,8 @@ const Signup = ({ isOpenness, onClose }) => {
     const formattedPhone = values.phone.startsWith("+91")
       ? values.phone
       : `+91${values.phone}`;
-      console.log("values",values);
-      
+    console.log("values", values);
+
     try {
       const response = await axios.post("social-login", {
         ...values,
@@ -208,15 +251,35 @@ const Signup = ({ isOpenness, onClose }) => {
     signWithTwitter(setFieldValue);
   };
 
+  const handleTabClick = (tabId) => {
+    localStorage.setItem("activeTab", tabId);
+    setActiveTab(tabId);
+  };
+  const legalLinks = {
+    title: "Legal",
+    links: ["Terms & Conditions", "Privacy Policy", "Cookie Policy"],
+    paths: ["./legal_terms"],
+    onClick: [
+      () => handleTabClick("terms_conditions"),
+      () => handleTabClick("privacy_policy"),
+      () => handleTabClick("cookiepolicy"),
+    ],
+  };
+  const legalLinkText =
+    legalLinks.links
+      .slice(0, 2) // Only the first three links
+      .join(", ") +
+    " & " +
+    legalLinks.links[legalLinks.links.length - 1];
   return (
     <>
       <div
         // className={`signinpopup_main ${isOpenness ? "show" : ""}`}
         className="signinpopup_main"
         id="signup_popup"
-        style={{ display: "block" }}
+        // style={{ display: "block" }}
 
-        // style={{ display: isOpenness ? "block" : "none" }}
+        style={{ display: isOpenness ? "block" : "none" }}
       >
         <div className="popup_mianSingindiv mainpopupfrsignupdiv_new">
           <div className="adminloginsection">
@@ -230,7 +293,7 @@ const Signup = ({ isOpenness, onClose }) => {
                           <button
                             type="button"
                             className="crossbtn_signinpopupclose singupcrossbtn"
-                            onClick={onClose}
+                            onClick={onClosed}
                           >
                             <img
                               src={`${process.env.PUBLIC_URL}/images/cross_icon.png`}
@@ -242,9 +305,28 @@ const Signup = ({ isOpenness, onClose }) => {
 
                         <Formik
                           initialValues={initialValues}
+                          validate={(values) => {
+                            const errors = {};
+                            if (
+                              values.phone &&
+                              (values.phone.length < 10 ||
+                                values.phone.length > 15)
+                            ) {
+                              errors.phone =
+                                "Phone number must be between 10 and 15 digits";
+                            }
+                            return errors;
+                          }}
+                          validateOnChange={true}
+                          validateOnBlur={true}
                           onSubmit={(values) => handleSubmits(values)}
                         >
-                          {({ isSubmitting, errors, setFieldValue }) => (
+                          {({
+                            isSubmitting,
+                            errors,
+                            touched,
+                            setFieldValue,
+                          }) => (
                             <Form className="formstart">
                               {/* First Name */}
                               <div className="form-control frmctrldiv">
@@ -279,7 +361,7 @@ const Signup = ({ isOpenness, onClose }) => {
                                 <Field
                                   type="email"
                                   name="email"
-                                  placeholder="Email (Optional)"
+                                  placeholder="Email"
                                 />
                               </div>
 
@@ -296,6 +378,11 @@ const Signup = ({ isOpenness, onClose }) => {
                                     )
                                   }
                                 />
+                                {touched.phone && errors.phone && (
+                                  <div className="field_required">
+                                    {errors.phone}
+                                  </div>
+                                )}
                                 <ErrorMessage
                                   name="phone"
                                   component="div"
@@ -362,8 +449,9 @@ const Signup = ({ isOpenness, onClose }) => {
                                   </div>
                                 </>
                               )}
+
                               {/* Terms & Conditions */}
-                              <div className="remeberrecoverydiv">
+                              {/* <div className="remeberrecoverydiv">
                                 <div className="rememebrmediv">
                                   <Field
                                     type="checkbox"
@@ -400,6 +488,73 @@ const Signup = ({ isOpenness, onClose }) => {
                                     </Link>
                                   </label>
                                 </div>
+                              </div> */}
+                              {/* Terms & Conditions and Legal Links */}
+                              {/* {legalLinks.links.map((link, index) => (
+                                <div className="remeberrecoverydiv" key={index}>
+                                  <div className="rememebrmediv">
+                                    <Field
+                                      type="checkbox"
+                                      name={`agree${link.replace(
+                                        /[^a-zA-Z]/g,
+                                        ""
+                                      )}`}
+                                      className="checkboxemeber"
+                                    />
+                                    <label
+                                      htmlFor={`rememebrbtn-${index}`}
+                                      className="labelrememebrme"
+                                    >
+                                      I have read &amp; agree with{" "}
+                                      <Link
+                                        to={legalLinks.paths[index]}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        onClick={legalLinks.onClick[index]}
+                                      >
+                                        {link}
+                                      </Link>
+                                    </label>
+                                  </div>
+                                </div>
+                              ))} */}
+                              <div className="remeberrecoverydiv">
+                                <div className="rememebrmediv">
+                                  <Field
+                                    type="checkbox"
+                                    name={`agreeAllLegal`}
+                                    className="checkboxemeber"
+                                  />
+                                  <label
+                                    htmlFor="rememebrbtn-legal"
+                                    className="labelrememebrme"
+                                  >
+                                    I have read &amp; agree with{" "}
+                                    <span>
+                                      {legalLinks.links.map((link, index) => (
+                                        <span key={index}>
+                                          <Link
+                                            to={legalLinks.paths[0]} // Use the single path
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            onClick={() => {
+                                              legalLinks.onClick[index](); // Trigger the corresponding tab change
+                                              window.open(
+                                                legalLinks.paths[0],
+                                                "_blank"
+                                              ); // Open the path in a new tab
+                                            }}
+                                          >
+                                            {link}
+                                          </Link>
+                                          {index < legalLinks.links.length - 1
+                                            ? ", "
+                                            : ""}
+                                        </span>
+                                      ))}
+                                    </span>
+                                  </label>
+                                </div>
                               </div>
 
                               {/* Rules of Play & FAQ */}
@@ -416,6 +571,9 @@ const Signup = ({ isOpenness, onClose }) => {
                                       to="/legal_terms"
                                       target="_blank"
                                       rel="noopener noreferrer"
+                                      onClick={() => {
+                                        handleTabClick("rules_play"); // Trigger the tab change to 'rules_play'
+                                      }}
                                     >
                                       Rules of Play & FAQ's
                                     </Link>
@@ -441,7 +599,6 @@ const Signup = ({ isOpenness, onClose }) => {
                                       <a
                                         onClick={() => {
                                           setIsSocialSignup(true);
-
                                           handleGoogleSignup(
                                             setFieldValue,
                                             "google"
@@ -450,26 +607,24 @@ const Signup = ({ isOpenness, onClose }) => {
                                         style={{ cursor: "pointer" }}
                                       >
                                         <img
-                                          src={`${process.env.PUBLIC_URL}/images/google_icon.png`}
+                                          src={`${process.env.PUBLIC_URL}/images/Google_icon.png`}
                                           alt="Google"
                                         />
                                       </a>
                                     </li>
                                     <li>
                                       <a
-                                      onClick={() => {
-                                        setIsSocialSignup(true);
-// signInWithFacebook();
-                                        handleFacebookSignup(
-                                          setFieldValue,
-                                          "facebook"
-                                        );
-                                      }}
-                                      style={{ cursor: "pointer" }}
+                                        onClick={() => {
+                                          setIsSocialSignup(true);
+                                          handleFacebookSignup(
+                                            setFieldValue,
+                                            "facebook"
+                                          );
+                                        }}
+                                        style={{ cursor: "pointer" }}
                                       >
                                         <img
-                                          src={`${process.env.PUBLIC_URL}/images/facebook_icon.png`}
-                                          // src="images/facebook_icon.png"
+                                          src={`${process.env.PUBLIC_URL}/images/Facebook_icon.png`}
                                           alt="Facebook"
                                         />
                                       </a>
@@ -478,18 +633,15 @@ const Signup = ({ isOpenness, onClose }) => {
                                       <a
                                         onClick={() => {
                                           setIsSocialSignup(true);
-                                          // signWithTwitter();
                                           handleTwitterSignup(
                                             setFieldValue,
                                             "twitter"
                                           );
-                                         
                                         }}
                                         style={{ cursor: "pointer" }}
                                       >
                                         <img
-                                          src={`${process.env.PUBLIC_URL}/images/twiiter_x_icon.png`}
-                                          // src="images/twiiter_x_icon.png"
+                                          src={`${process.env.PUBLIC_URL}/images/Twitter_x_icon.png`}
                                           alt="Twitter"
                                         />
                                       </a>
@@ -497,8 +649,7 @@ const Signup = ({ isOpenness, onClose }) => {
                                     <li>
                                       <a>
                                         <img
-                                          src={`${process.env.PUBLIC_URL}/images/apple_icon.png`}
-                                          // src="images/apple_icon.png"
+                                          src={`${process.env.PUBLIC_URL}/images/Apple_icon.png`}
                                           alt="Apple"
                                         />
                                       </a>
@@ -506,8 +657,7 @@ const Signup = ({ isOpenness, onClose }) => {
                                     <li>
                                       <a href="#">
                                         <img
-                                          src={`${process.env.PUBLIC_URL}/images/insta_icon.png`}
-                                          // src="images/insta_icon.png"
+                                          src={`${process.env.PUBLIC_URL}/images/Instagram_icon.png`}
                                           alt="Instagram"
                                         />
                                       </a>
@@ -517,17 +667,21 @@ const Signup = ({ isOpenness, onClose }) => {
                               </div>
 
                               {/* Already have an account */}
-                              <div className="registerdiv">
+                              {/* <div className="registerdiv">
                                 <p>
                                   Already have an account?{" "}
                                   <a
-                                    // onClick={onClose}
                                     className="showsigninbtn_div"
+                                    // onClick={handleLogin}
+                                    onClick={() => {
+                                      setLoginPopup(!isLoginPopup); // Toggle login popup
+                                      // onClosed(); // Close the signup popup
+                                    }}
                                   >
                                     Sign In
                                   </a>
                                 </p>
-                              </div>
+                              </div> */}
                             </Form>
                           )}
                         </Formik>
@@ -540,6 +694,7 @@ const Signup = ({ isOpenness, onClose }) => {
           </div>
         </div>
       </div>
+      <Login isVisible={isLoginPopup} onClose={ClosePopup} />
 
       <div
         className={`signinpopup_main ${isModals ? "show" : ""}`}
@@ -589,16 +744,15 @@ const Signup = ({ isOpenness, onClose }) => {
                               ))}
                             </div>
                           </div>
-                          {/* <div className="resentdivforotp">
-                              <button
-                                type="button"
-                                className="resentotpbtn"
-                                onClick={resendOtp}
-                                disabled={!isOtpResendEnabled}
-                              >
-                                Resend OTP
-                              </button>
-                            </div> */}
+                          <div className="resentdivforotp">
+                            <button
+                              type="button"
+                              className="resentotpbtn"
+                              onClick={resendOtp}
+                            >
+                              Resend OTP
+                            </button>
+                          </div>
                           <div className="form-control loginformctrl">
                             <button
                               type="button"

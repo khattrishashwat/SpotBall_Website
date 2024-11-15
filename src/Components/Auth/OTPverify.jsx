@@ -3,14 +3,14 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import NewPassword from "./NewPassword";
 
-function OTPverify({ onClosedss, token, emailOrPhone }) {
+function OTPverify({ onClosedss, emailOrPhone }) {
   const [otp, setOtp] = useState(["", "", "", ""]);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const inputRefs = useRef([]);
 
   const handleInputChange = (index, value) => {
     const newOtp = [...otp];
-    newOtp[index] = value.slice(-1); 
+    newOtp[index] = value.slice(-1);
     setOtp(newOtp);
 
     if (value && index < otp.length - 1) {
@@ -21,6 +21,7 @@ function OTPverify({ onClosedss, token, emailOrPhone }) {
   };
 
   const verifyOtp = async () => {
+    let token = localStorage.getItem("tokens");
 
     if (otp.includes("")) {
       Swal.fire({
@@ -48,6 +49,10 @@ function OTPverify({ onClosedss, token, emailOrPhone }) {
           },
         }
       );
+
+      console.log("verify", response.data.data.token);
+
+      // Save the new token
       localStorage.setItem("tokens", response.data.data.token);
 
       if (response.data.success) {
@@ -68,16 +73,17 @@ function OTPverify({ onClosedss, token, emailOrPhone }) {
         icon: "error",
         text: error.response ? error.response.data.message : error.message,
       });
-      setOtp(["", "", "", ""]); 
+      setOtp(["", "", "", ""]);
     }
   };
 
-
   // Function to resend OTP
   const resendOtp = async () => {
+    let token = localStorage.getItem("tokens");
+
     try {
       const response = await axios.post(
-        "resend-otp-user-verification",
+        "send-otp",
         { emailOrPhone },
         {
           headers: {
@@ -86,9 +92,15 @@ function OTPverify({ onClosedss, token, emailOrPhone }) {
         }
       );
 
+      console.log("resend", response.data.data.token);
+
+      // Remove the old token and save the new token
+      localStorage.removeItem("tokens");
+      localStorage.setItem("tokens", response.data.data.token);
+
       Swal.fire({
         icon: "success",
-        text: "OTP resent successfully!",
+        text: response.data.message,
       });
     } catch (error) {
       Swal.fire({
@@ -164,7 +176,7 @@ function OTPverify({ onClosedss, token, emailOrPhone }) {
                               type="button"
                               className="loginbtn otpverify_sbmtbtn"
                               onClick={verifyOtp}
-                              disabled={otp.includes("")} 
+                              disabled={otp.includes("")}
                             >
                               Submit
                             </button>

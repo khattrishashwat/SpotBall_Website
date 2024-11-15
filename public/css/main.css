@@ -5570,3 +5570,7 @@ p strong {
 input.updateinput {
   background-color: white;
 }
+.footermaindiv_section a,
+.footermaindiv_section .linksanchor {
+  cursor: pointer;
+}

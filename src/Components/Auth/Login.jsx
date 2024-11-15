@@ -92,10 +92,10 @@ function Login({ isVisible, onClose }) {
         icon: "success",
         title: response.data.message,
         showConfirmButton: false,
-        timer: 2000,
+        timer: 1000,
       });
       window.location.reload();
-
+      navigate("/");
       onClose();
     } catch (error) {
       console.error(
@@ -122,7 +122,6 @@ function Login({ isVisible, onClose }) {
     setShowForgotPassword(true);
     onClose();
   };
-
 
   return (
     <>
@@ -155,7 +154,6 @@ function Login({ isVisible, onClose }) {
 
                         <Formik
                           initialValues={LoginValues}
-                          // validationSchema={validation}
                           onSubmit={Login}
                           validateOnChange={true}
                           validateOnBlur={true}
@@ -244,27 +242,6 @@ function Login({ isVisible, onClose }) {
                                   <p>or Sign Up using</p>
                                   <div className="signupsociallinks">
                                     <ul>
-                                      {/* <li>
-                                        <GoogleLogin
-                                          onSuccess={(credentialResponse) => {
-                                            console.log(credentialResponse);
-                                          }}
-                                          onError={() => {
-                                            console.log("Login Failed");
-                                          }}
-                                          render={(renderProps) => (
-                                            <a
-                                              onClick={renderProps.onClick}
-                                              disabled={renderProps.disabled}
-                                            >
-                                              <img
-                                                src="images/google_icon.png"
-                                                alt="Google"
-                                              />
-                                            </a>
-                                          )}
-                                        />
-                                      </li> */}
                                       <li>
                                         <a
                                           onClick={() => {
@@ -274,7 +251,7 @@ function Login({ isVisible, onClose }) {
                                           style={{ cursor: "pointer" }}
                                         >
                                           <img
-                                            src={`${process.env.PUBLIC_URL}/images/google_icon.png`}
+                                            src={`${process.env.PUBLIC_URL}/images/Google_icon.png`}
                                             // src="images/google_icon.png"
                                             alt="Google"
                                           />
@@ -289,7 +266,7 @@ function Login({ isVisible, onClose }) {
                                           style={{ cursor: "pointer" }}
                                         >
                                           <img
-                                            src={`${process.env.PUBLIC_URL}/images/facebook_icon.png`}
+                                            src={`${process.env.PUBLIC_URL}/images/Facebook_icon.png`}
                                             // src="images/facebook_icon.png"
                                             alt="Facebook"
                                           />
@@ -304,7 +281,7 @@ function Login({ isVisible, onClose }) {
                                           style={{ cursor: "pointer" }}
                                         >
                                           <img
-                                            src={`${process.env.PUBLIC_URL}/images/twiiter_x_icon.png`}
+                                            src={`${process.env.PUBLIC_URL}/images/Twitter_x_icon.png`}
                                             // src="images/twiiter_x_icon.png"
                                             alt="Twitter"
                                           />
@@ -313,7 +290,7 @@ function Login({ isVisible, onClose }) {
                                       <li>
                                         <a href="#">
                                           <img
-                                            src={`${process.env.PUBLIC_URL}/images/apple_icon.png`}
+                                            src={`${process.env.PUBLIC_URL}/images/Apple_icon.png`}
                                             // src="images/apple_icon.png"
                                             alt="Apple"
                                           />
@@ -322,7 +299,7 @@ function Login({ isVisible, onClose }) {
                                       <li>
                                         <a href="#">
                                           <img
-                                            src={`${process.env.PUBLIC_URL}/images/insta_icon.png`}
+                                            src={`${process.env.PUBLIC_URL}/images/Instagram_icon.png`}
                                             // src="images/insta_icon.png"
                                             alt="Instagram"
                                           />
@@ -351,7 +328,12 @@ function Login({ isVisible, onClose }) {
       )}
 
       {/* Sign Up Modal */}
-      {showSignup && <Signup onClosed={() => setShowSignup(false)} />}
+      {showSignup && (
+        <Signup
+          isOpenness={() => setShowSignup(false)}
+          onClosed={() => setShowSignup(false)}
+        />
+      )}
     </>
   );
 }

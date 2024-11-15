@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Loader from "../Loader/Loader";
 import Account from "./Account";
@@ -16,9 +16,24 @@ function Profile() {
   const [isLogout, setIsLogout] = useState("");
   const [isLoading, setIsLoading] = useState("");
 
+  const changePasswordRef = useRef(null);
+
+  // Reset the form whenever the tab changes
+  const resetForm = (tab) => {
+    if (tab === "change_password" && changePasswordRef.current) {
+      changePasswordRef.current();
+    }
+  };
+
   const handleTabClick = (tabId) => {
     setActiveTab(tabId);
+    resetForm(tabId); // Reset form when tab is changed
   };
+
+  useEffect(() => {
+    resetForm(activeTab); // Reset on initial load or tab change
+  }, [activeTab]);
+
   const DecopenModal = () => {
     setIsDeactivate(true);
   };
@@ -86,7 +101,7 @@ function Profile() {
         Swal.fire({
           title: response.data.message,
         }).then(() => {
-      window.location.reload();
+          window.location.reload();
         });
       } else {
         Swal.fire({
@@ -104,13 +119,13 @@ function Profile() {
 
   const Logout = async () => {
     localStorage.clear();
-      window.location.reload();
+    window.location.reload();
   };
 
   return (
     <>
       {isLoading ? (
-        <Loader /> 
+        <Loader />
       ) : (
         <>
           <section className="maincont_section myacocunt_sectionforbgimg">
@@ -239,7 +254,9 @@ function Profile() {
                             activeTab === "update_profile" ? "active show" : ""
                           }`}
                         >
-                          <Account />
+                          <Account
+                            resetForm={() => resetForm("update_profile")}
+                          />
                         </div>
                         <div
                           id="change_password"
@@ -247,7 +264,9 @@ function Profile() {
                             activeTab === "change_password" ? "active show" : ""
                           }`}
                         >
-                          <ChangePassword />
+                          {activeTab === "change_password" && (
+                            <ChangePassword resetForm={resetForm} />
+                          )}
                         </div>
                         <div
                           id="paymentmethod"
@@ -255,7 +274,9 @@ function Profile() {
                             activeTab === "paymentmethod" ? "active show" : ""
                           }`}
                         >
-                          <PastPayment />
+                          <PastPayment
+                            resetForm={() => resetForm("paymentmethod")}
+                          />
                         </div>
                       </div>
                     </div>

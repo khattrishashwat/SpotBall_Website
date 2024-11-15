@@ -4,7 +4,7 @@ import * as Yup from "yup";
 import axios from "axios";
 import Swal from "sweetalert2";
 
-function ChangePassword({ activeTab }) {
+function ChangePassword({ resetForm }) {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -39,8 +39,7 @@ function ChangePassword({ activeTab }) {
       .matches(
         /[@$!%*?&#]/,
         "Password must contain at least one special character"
-      )
-      .required(" New Password is required"),
+      ),
     confirm_password: Yup.string()
       .oneOf(
         [Yup.ref("new_password"), null],
@@ -73,11 +72,12 @@ function ChangePassword({ activeTab }) {
     }
   };
 
+  // Reset the form when the component mounts or when resetForm is called
   useEffect(() => {
-    if (activeTab !== "change_password" && formikRef.current) {
-      formikRef.current.resetForm();
+    if (resetForm) {
+      resetForm();
     }
-  }, [activeTab]);
+  }, [resetForm]);
 
   return (
     <div className="chnagepas_div_myacc">
@@ -90,98 +90,99 @@ function ChangePassword({ activeTab }) {
         onSubmit={ChangeSubmit}
         innerRef={formikRef}
       >
-        <Form>
-          <div className="changepassforminputs">
-            <div className="passinputdiv">
-              <div className="frmctrldiv">
-                <Field
-                  className="changepassinput"
-                  type={showPassword ? "text" : "password"}
-                  name="old_password"
-                  autoComplete="off"
-                  id="createpass_inp"
-                  placeholder="Old Password"
-                />
-                <span
-                  onClick={togglePasswordVisibility}
-                  className="eyeiconforpass"
-                >
-                  <i
-                    className={
-                      showPassword ? "fa fa-eye iei" : "fa fa-eye-slash iei"
-                    }
-                  ></i>
-                </span>
-                <ErrorMessage
-                  name="old_password"
-                  component="div"
-                  className="error"
-                />
+        {({ touched, errors }) => (
+          <Form>
+            <div className="changepassforminputs">
+              <div className="passinputdiv">
+                <div className="frmctrldiv">
+                  <Field
+                    className="changepassinput"
+                    type={showPassword ? "text" : "password"}
+                    name="old_password"
+                    autoComplete="off"
+                    id="createpass_inp"
+                    placeholder="Old Password"
+                  />
+                  <span
+                    onClick={togglePasswordVisibility}
+                    className="eyeiconforpass"
+                  >
+                    <i
+                      className={
+                        showPassword ? "fa fa-eye iei" : "fa fa-eye-slash iei"
+                      }
+                    ></i>
+                  </span>
+                  {touched.old_password && errors.old_password && (
+                    <div className="error">{errors.old_password}</div>
+                  )}
+                </div>
+              </div>
+
+              <div className="passinputdiv">
+                <div className="frmctrldiv">
+                  <Field
+                    type={showNewPassword ? "text" : "password"}
+                    name="new_password"
+                    className="changepassinput"
+                    autoComplete="off"
+                    id="createpass_inp1"
+                    placeholder="New Password"
+                  />
+                  <span
+                    onClick={toggleNewPasswordVisibility}
+                    className="eyeiconforpass"
+                  >
+                    <i
+                      className={
+                        showNewPassword
+                          ? "fa fa-eye iei"
+                          : "fa fa-eye-slash iei"
+                      }
+                    ></i>
+                  </span>
+                  {touched.new_password && errors.new_password && (
+                    <div className="error">{errors.new_password}</div>
+                  )}
+                </div>
+              </div>
+
+              <div className="passinputdiv">
+                <div className="frmctrldiv">
+                  <Field
+                    type={showConfirmPassword ? "text" : "password"}
+                    name="confirm_password"
+                    className="changepassinput"
+                    autoComplete="off"
+                    id="createpass_inp2"
+                    placeholder="Confirm Password"
+                  />
+                  <span
+                    onClick={toggleConfirmPasswordVisibility}
+                    className="eyeiconforpass"
+                  >
+                    <i
+                      className={
+                        showConfirmPassword
+                          ? "fa fa-eye iei"
+                          : "fa fa-eye-slash iei"
+                      }
+                    ></i>
+                  </span>
+                  {touched.confirm_password && errors.confirm_password && (
+                    <div className="error">{errors.confirm_password}</div>
+                  )}
+                </div>
+              </div>
+
+              <div className="savepass_btndiv">
+                <button type="submit" className="savepass_change_myacc">
+                  Save Password
+                </button>
               </div>
             </div>
-            <div className="passinputdiv">
-              <div className="frmctrldiv">
-                <Field
-                  type={showNewPassword ? "text" : "password"}
-                  name="new_password"
-                  className="changepassinput"
-                  autoComplete="off"
-                  id="createpass_inp1"
-                  placeholder="New Password"
-                />
-                <span
-                  onClick={toggleNewPasswordVisibility}
-                  className="eyeiconforpass"
-                >
-                  <i
-                    className={
-                      showNewPassword ? "fa fa-eye iei" : "fa fa-eye-slash iei"
-                    }
-                  ></i>
-                </span>
-                <ErrorMessage
-                  name="new_password"
-                  component="div"
-                  className="error"
-                />
-              </div>
-            </div>
-            <div className="passinputdiv">
-              <div className="frmctrldiv">
-                <Field
-                  type={showConfirmPassword ? "text" : "password"}
-                  name="confirm_password"
-                  className="changepassinput"
-                  autoComplete="off"
-                  id="createpass_inp2"
-                  placeholder="Confirm Password"
-                />
-                <span
-                  onClick={toggleConfirmPasswordVisibility}
-                  className="eyeiconforpass"
-                >
-                  <i
-                    className={
-                      showConfirmPassword
-                        ? "fa fa-eye iei"
-                        : "fa fa-eye-slash iei"
-                    }
-                  ></i>
-                </span>
-                <ErrorMessage
-                  name="confirm_password"
-                  component="div"
-                  className="error"
-                />
-              </div>
-            </div>
-            <div className="savepass_btndiv">
-              <button type="submit" className="savepass_change_myacc">
-                Save Password
-              </button>
-            </div>
-          </div>
-        </Form>
+          </Form>
+        )}
       </Formik>
     </div>
   );

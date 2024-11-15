@@ -5,10 +5,13 @@ import {
   FacebookAuthProvider,
   TwitterAuthProvider,
   signInWithPopup,
+  OAuthProvider,
 } from "firebase/auth";
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
 import Swal from "sweetalert2"; // Assuming Swal is already installed
 import axios from "axios";
+// import appleSignin from "apple-signin-auth";
+
 // Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyDWNOtn_zO3ekheuPOBlw7EsieLjYtEguw",
@@ -26,6 +29,7 @@ const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 const facebookProvider = new FacebookAuthProvider();
 const twitterprovider = new TwitterAuthProvider();
+const appleProvider = new OAuthProvider("apple.com");
 
 // Initialize Firebase Messaging
 const messaging = getMessaging(app);
@@ -215,6 +219,46 @@ export const signWithTwitter = async (setFieldValue) => {
   }
 };
 
+// export const signInWithApple = async (setFieldValue) => {
+//   try {
+//     const appleResponse = await appleSignin.signIn();
+//     const appleCredential = appleResponse;
+
+//     // Send Apple token to Firebase for authentication
+//     const credential = OAuthProvider.credential(
+//       appleCredential.id_token,
+//       appleCredential.access_token
+//     );
+
+//     const result = await signInWithPopup(auth, credential);
+//     const user = result.user;
+
+//     console.log("User info from Apple:", user);
+//     const userData = {
+//       uid: user.uid,
+//       displayName: user.displayName,
+//       email: user.email,
+//       photoURL: user.photoURL,
+//     };
+
+//     const nameParts = userData.displayName
+//       ? userData.displayName.split(" ")
+//       : [];
+
+//     setFieldValue("first_name", nameParts[0] || "");
+//     setFieldValue("last_name", nameParts.slice(1).join(" ") || "");
+//     setFieldValue("email", userData.email || "");
+//     setFieldValue("uid", userData.uid || "");
+//   } catch (error) {
+//     Swal.fire({
+//       icon: "error",
+//       title: "Sign-in failed",
+//       text: error.message,
+//     });
+//     console.error("Error during Apple sign-in:", error);
+//   }
+// };
+
 //------Login-----
 
 export const LoginWithGoogle = async () => {
@@ -245,7 +289,7 @@ export const LoginWithGoogle = async () => {
       // Show success message
       Swal.fire({
         icon: "success",
-        title: "Login Successful 1",
+        title: "Social Login Successful ",
         showConfirmButton: false,
         timer: 2000,
       });
@@ -392,12 +436,74 @@ export const LoginWithFacebook = async () => {
   }
 };
 
+
+export const LoginWithApple = async () => {
+  try {
+    // Sign in with Apple
+    const result = await signInWithPopup(auth, appleProvider);
+    const user = result.user;
+
+    console.log("Apple Sign-In successful. User UID:", user.uid);
+
+    // Check if UID exists in your database
+    const checkUIDResponse = await axios.get(
+      `check-uid-exists/${user.uid}`,
+      {}
+    );
+
+    if (checkUIDResponse.data.message === "Uid found") {
+      // If UID is found, proceed with social login
+      const response = await axios.post("social-login", {
+        signup_method: "apple",
+        uid: user.uid,
+        device_type: "website",
+        device_token: localStorage.getItem("device_token"), // Assumes device_token is stored in localStorage
+      });
+
+      console.log("Apple response:", response.data);
+
+      // Store token in localStorage
+      const token = response.data.data.token;
+      localStorage.setItem("token", token);
+
+      // Show success message
+      Swal.fire({
+        icon: "success",
+        title: "Login Successful",
+        showConfirmButton: false,
+        timer: 2000,
+      });
+
+      // Reload or navigate as needed
+      window.location.reload();
+    } else if (checkUIDResponse.data.message === "Uid Not Found") {
+      Swal.fire({
+        icon: "error",
+        text: "Go to SignUp, then try social login",
+      });
+
+      // Reload the page after error
+      window.location.reload();
+    }
+  } catch (error) {
+    console.error("Apple Sign-In or API request failed:", error);
+
+    // Show error message
+    Swal.fire({
+      icon: "error",
+      title: "Login Failed",
+      text: error.response ? error.response.data.message : error.message,
+    });
+  }
+};
+
 export {
   auth,
   provider,
   facebookProvider,
   twitterprovider,
   messaging,
+  appleProvider,
   getToken,
   onMessage,
 };

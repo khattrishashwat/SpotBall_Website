@@ -18,8 +18,10 @@ function Forget({ onClosed }) {
         icon: "success",
         text: response.data.message,
       });
+            localStorage.setItem("tokens", response.data.data.token);
+
       setResponseData({
-        token: response.data.data.token, // Store token
+       
         emailOrPhone: values.emailOrPhone, 
       });
       handleOTP();
@@ -109,8 +111,7 @@ function Forget({ onClosed }) {
       {showOTPS && (
         <OTPverify
           onClosedss={() => setShowOTPS(false)}
-          token={responseData?.token} // Pass token to OTPverify
-          emailOrPhone={responseData?.emailOrPhone} // Pass email to OTPverify
+                 emailOrPhone={responseData?.emailOrPhone} // Pass email to OTPverify
         />
       )}
     </div>

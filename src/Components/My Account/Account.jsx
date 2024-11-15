@@ -10,7 +10,7 @@ function Account() {
   const [isVerified, setIsVerified] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [profileImagePreview, setProfileImagePreview] = useState(
-    "images/user_icon.jpg"
+    "images/user_image.png"
   );
 
   const [initialValues, setInitialValues] = useState({
@@ -25,14 +25,17 @@ function Account() {
     first_name: Yup.string()
       .matches(
         /^[A-Za-z]+$/,
-        "First name should only contain alphabetic characters"
+        "First name should only contain alphabetic characters (no spaces or numbers)"
       )
+      .max(25, "First name cannot be longer than 25 characters")
       .required("First name is required"),
+
     last_name: Yup.string()
       .matches(
         /^[A-Za-z]+$/,
-        "Last name should only contain alphabetic characters"
+        "Last name should only contain alphabetic characters (no spaces or numbers)"
       )
+      .max(25, "Last name cannot be longer than 25 characters")
       .required("Last name is required"),
     email: Yup.string()
       .email("Invalid email format")

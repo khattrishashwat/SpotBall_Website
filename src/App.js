@@ -109,6 +109,7 @@ const App = () => {
               <Route path="/play_screen" element={<Screen />} />
               <Route path="/cart" element={<Checkout />} />
               <Route path="/contact_us" element={<Contact />} />
+            <Route path="/the_winners_circle" element={<Circle />} />
             </Route>
             <Route path="/" element={<Home />} />
             <Route path="/playss" element={<PlayVedio />} />
@@ -117,7 +118,6 @@ const App = () => {
             <Route path="/load" element={<Loader />} />
             <Route path="/legal_terms" element={<Legal />} />
             <Route path="/who_we_are" element={<Are />} />
-            <Route path="/the_winners_circle" element={<Circle />} />
             <Route path="/live_weekly_winner" element={<Weekly />} />
 
             {/* Catch-all for 404 */}

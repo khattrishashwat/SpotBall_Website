@@ -304,7 +304,8 @@ function Home() {
                         <button
                           type="button"
                           className="bannerfixedbtn regis showsigninpopup_onclick"
-                          onClick={OpenSignIn}
+                          // onClick={OpenSignIn}
+                          onClick={()=>setLoginPopup(!isLoginPopup)}
                         >
                           Sign Up/Sign In
                         </button>

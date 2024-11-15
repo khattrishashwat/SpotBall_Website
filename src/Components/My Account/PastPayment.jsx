@@ -55,12 +55,14 @@ const toggleDropdown = () => {
 console.log("pdf",response.data.data[0].pdf);
 
       const pdfUrl = response.data.data[0].pdf;
-      const link = document.createElement("a");
-      link.href = pdfUrl;
-      link.download = `invoice_${paymentId}.pdf`; // Dynamic filename
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+
+      window.open(pdfUrl, "_blank");
+      // const link = document.createElement("a");
+      // link.href = pdfUrl;
+      // link.download = `invoice_${paymentId}.pdf`; // Dynamic filename
+      // document.body.appendChild(link);
+      // link.click();
+      // document.body.removeChild(link);
     } catch (error) {
       console.error("Error downloading the invoice:", error);
       Swal.fire({
@@ -103,7 +105,7 @@ console.log("jackpot_price", payments);
                     <div className="pastpay_invoicediv">
                       <a
                         className="downloadinvoice_hreftag"
-                        onClick={(e) => handleDownload(e, payment._id)} // Pass paymentId
+                        onClick={(e) => handleDownload(e, payment._id)} 
                       >
                         <img
                           src={`${process.env.PUBLIC_URL}/images/download_invoice.png`}
