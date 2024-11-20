@@ -14,7 +14,7 @@ import {
   provider,
 } from "../FirebaseCofig/FirebaseConfig";
 
-const Signup = ({ isOpenness, onClosed }) => {
+const Signup = ({ isOpenness, onClosed, back }) => {
   const [signupData, setSignupData] = useState({});
   const [isLoginPopup, setLoginPopup] = useState(false);
 
@@ -32,9 +32,12 @@ const Signup = ({ isOpenness, onClosed }) => {
     setIsModals(false);
   };
 
+  // const handleLogin = () => {
+  //   setLoginPopup(true);
+  //   // onClosed();
+  // };
   const handleLogin = () => {
-    setLoginPopup(true);
-    // onClosed();
+    back();
   };
 
   const ClosePopup = () => {
@@ -146,7 +149,7 @@ const Signup = ({ isOpenness, onClosed }) => {
       console.log("resend", response.data.data.tokens);
 
       // Save the new token
-      localStorage.setItem("tokens", response.data.data.token );
+      localStorage.setItem("tokens", response.data.data.token);
 
       Swal.fire({
         icon: "success",
@@ -334,6 +337,14 @@ const Signup = ({ isOpenness, onClosed }) => {
                                   type="text"
                                   name="first_name"
                                   placeholder="First Name"
+                                  onKeyDown={(e) => {
+                                    if (
+                                      !/[a-zA-Z\s]/.test(e.key) &&
+                                      e.key !== "Backspace"
+                                    ) {
+                                      e.preventDefault();
+                                    }
+                                  }}
                                 />
                                 <ErrorMessage
                                   name="first_name"
@@ -348,6 +359,14 @@ const Signup = ({ isOpenness, onClosed }) => {
                                   type="text"
                                   name="last_name"
                                   placeholder="Last Name"
+                                  onKeyDown={(e) => {
+                                    if (
+                                      !/[a-zA-Z\s]/.test(e.key) &&
+                                      e.key !== "Backspace"
+                                    ) {
+                                      e.preventDefault();
+                                    }
+                                  }}
                                 />
                                 <ErrorMessage
                                   name="last_name"
@@ -672,11 +691,11 @@ const Signup = ({ isOpenness, onClosed }) => {
                                   Already have an account?{" "}
                                   <a
                                     className="showsigninbtn_div"
-                                    // onClick={handleLogin}
-                                    onClick={() => {
-                                      setLoginPopup(!isLoginPopup); // Toggle login popup
-                                      // onClosed(); // Close the signup popup
-                                    }}
+                                    onClick={handleLogin}
+                                    // onClick={() => {
+                                    //   setLoginPopup(!isLoginPopup); // Toggle login popup
+                                    //   onClosed(); // Close the signup popup
+                                    // }}
                                   >
                                     Sign In
                                   </a>

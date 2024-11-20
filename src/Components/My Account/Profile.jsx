@@ -118,7 +118,8 @@ function Profile() {
   };
 
   const Logout = async () => {
-    localStorage.clear();
+    // localStorage.clear();
+    localStorage.removeItem("token");
     window.location.reload();
   };
 

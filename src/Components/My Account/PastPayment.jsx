@@ -3,13 +3,16 @@ import axios from "axios";
 import Swal from "sweetalert2";
 
 function PastPayment() {
-    const [isOpen, setIsOpen] = useState(false);
-
   const [payments, setPayments] = useState([]);
-  const [download, setDownload] = useState([]);
-const toggleDropdown = () => {
-  setIsOpen(!isOpen);
-};
+  const [dropdownStates, setDropdownStates] = useState({});
+
+  const toggleDropdown = (id) => {
+    setDropdownStates((prevState) => ({
+      ...prevState,
+      [id]: !prevState[id],
+    }));
+  };
+
   useEffect(() => {
     const fetchPayments = async () => {
       const token = localStorage.getItem("token");
@@ -18,23 +21,17 @@ const toggleDropdown = () => {
         const response = await axios.get(
           "v1/app/contest/get-contest-payments",
           {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+            headers: { Authorization: `Bearer ${token}` },
           }
         );
 
-        console.log("newww", response.data);
-
-        setPayments(response.data.data||{});
-        
+        setPayments(response.data.data || []);
       } catch (error) {
         console.error("Error fetching payments:", error);
         Swal.fire({
           icon: "error",
           title: "Error",
-          text: "There was an error fetching payments. Please try again later.",
-          confirmButtonText: "OK",
+          text: "Unable to fetch payments. Please try again later.",
         });
       }
     };
@@ -48,93 +45,84 @@ const toggleDropdown = () => {
 
     try {
       const response = await axios.get(`v1/app/contest/get-bill/${paymentId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
-console.log("pdf",response.data.data[0].pdf);
 
-      const pdfUrl = response.data.data[0].pdf;
-
-      window.open(pdfUrl, "_blank");
-      // const link = document.createElement("a");
-      // link.href = pdfUrl;
-      // link.download = `invoice_${paymentId}.pdf`; // Dynamic filename
-      // document.body.appendChild(link);
-      // link.click();
-      // document.body.removeChild(link);
+      const pdfUrl = response.data.data[0]?.pdf;
+      if (pdfUrl) {
+        window.open(pdfUrl, "_blank");
+      } else {
+        throw new Error("PDF URL not found.");
+      }
     } catch (error) {
       console.error("Error downloading the invoice:", error);
       Swal.fire({
         icon: "error",
         title: "Download Failed",
-        text: "There was an error downloading your invoice. Please try again later.",
+        text: "Unable to download invoice. Please try again later.",
       });
     }
   };
-console.log("jackpot_price", payments);
 
   return (
-    <>
-      <div className="payment_methoddiv pastpay_detailmaindiv_new">
-        <div className="cartwithcordinatetables">
-          {payments.length > 0 ? (
-            payments.map((payment) => (
-              <div
-                key={payment._id}
-                className="cartstripe pastpaydetail_maindiv"
-              >
-                <div className="checkout_cartdiv">
-                  <div className="cart_jackpotdetails">
-                    <div className="cart_windiv">
-                      Win{" "}
-                      <span className="winprice_cart">
-                        ₹{payment?.contestId?.jackpot_price}
-                      </span>
-                    </div>
-                    <div className="jackpot_ticket_cart pastpayment_detailleft">
-                      <h3>₹{payment?.contestId?.jackpot_price} Jackpot</h3>
-                      <span>
-                        {new Date(payment.createdAt).toLocaleString()}
-                      </span>
-                      <h4>{payment.tickets} Tickets</h4>
-                      {/* <p>Payment Mode: UPI</p> */}
-                    </div>
+    <div className="payment_methoddiv pastpay_detailmaindiv_new">
+      <div className="cartwithcordinatetables">
+        {payments.length > 0 ? (
+          payments.map((payment) => (
+            <div key={payment._id} className="cartstripe pastpaydetail_maindiv">
+              <div className="checkout_cartdiv">
+                <div className="cart_jackpotdetails">
+                  <div className="cart_windiv">
+                    Win{" "}
+                    <span className="winprice_cart">
+                      ₹{payment?.contestId?.jackpot_price}
+                    </span>
                   </div>
-                  <div className="cart_gametotalprice pastpay_right">
-                    <div className="pastpay_invoicediv">
-                      <a
-                        className="downloadinvoice_hreftag"
-                        onClick={(e) => handleDownload(e, payment._id)} 
-                      >
-                        <img
-                          src={`${process.env.PUBLIC_URL}/images/download_invoice.png`}
-                          style={{ cursor: "pointer" }}
-                        />
-                        <p>Download Invoice</p>
-                      </a>
-                    </div>
-                    <p>Txn. Id.: {payment.paymentId}</p>
-                    <h3>₹{payment.amount}</h3>
-                    <div className="pastpay_dropdownicon">
-                      <button
-                        type="button"
-                        className="dropbtn_pastpy"
-                        onClick={toggleDropdown}
-                      >
-                        <img
-                          src={`${process.env.PUBLIC_URL}/images/arrow_icon_payment.png`}
-                          className={isOpen ? "" : "rotate_pastpayicon"}
-                        />
-                      </button>
-                    </div>
+                  <div className="jackpot_ticket_cart pastpayment_detailleft">
+                    <h3>₹{payment?.contestId?.jackpot_price} Jackpot</h3>
+                    <span>
+                      {new Date(payment?.createdAt).toLocaleDateString()}
+                    </span>
+                    <h4>{payment?.tickets} Tickets</h4>
                   </div>
                 </div>
-                <div
-                  className={`cordinates_table_cart pastgamecordinate_payment ${
-                    isOpen ? "" : "hide"
-                  }`}
-                >
+                <div className="cart_gametotalprice pastpay_right">
+                  <div className="pastpay_invoicediv">
+                    <a
+                      className="downloadinvoice_hreftag"
+                      onClick={(e) => handleDownload(e, payment._id)}
+                    >
+                      <img
+                        src={`${process.env.PUBLIC_URL}/images/download_invoice.png`}
+                        alt="Download Invoice"
+                        style={{ cursor: "pointer" }}
+                      />
+                      <p>Download Invoice</p>
+                    </a>
+                  </div>
+                  <p>Txn. Id.: {payment?.paymentId}</p>
+                  <h3>₹{payment?.amount}</h3>
+                  <div className="pastpay_dropdownicon">
+                    <button
+                      type="button"
+                      className="dropbtn_pastpy"
+                      onClick={() => toggleDropdown(payment._id)}
+                    >
+                      <img
+                        src={`${process.env.PUBLIC_URL}/images/arrow_icon_payment.png`}
+                        className={
+                          dropdownStates[payment._id]
+                            ? ""
+                            : "rotate_pastpayicon"
+                        }
+                        alt="Toggle"
+                      />
+                    </button>
+                  </div>
+                </div>
+              </div>
+              {dropdownStates[payment._id] && (
+                <div className="cordinates_table_cart pastgamecordinate_payment">
                   <table className="table table-bordered cordtable_new">
                     <thead>
                       <tr>
@@ -144,7 +132,7 @@ console.log("jackpot_price", payments);
                       </tr>
                     </thead>
                     <tbody>
-                      {payment.coordinates.map((coordinate, index) => (
+                      {payment.coordinates?.map((coordinate, index) => (
                         <tr key={coordinate._id}>
                           <td>{index + 1}</td>
                           <td>{coordinate.x}</td>
@@ -154,14 +142,14 @@ console.log("jackpot_price", payments);
                     </tbody>
                   </table>
                 </div>
-              </div>
-            ))
-          ) : (
-            <h2 style={{"color":"white"}}>No Payment History Found!</h2>
-          )}
-        </div>
+              )}
+            </div>
+          ))
+        ) : (
+          <h2 style={{ color: "white" }}>No Payment History Found!</h2>
+        )}
       </div>
-    </>
+    </div>
   );
 }
 

@@ -1,6 +1,9 @@
-import React from 'react'
+import React, { useState, useEffect } from "react";
 
 function Weekly() {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <>
       <section className="maincont_section">
@@ -97,4 +100,4 @@ function Weekly() {
   );
 }
 
-export default Weekly
+export default Weekly;

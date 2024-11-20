@@ -118,7 +118,7 @@ function Screen() {
     // Check if usedTickets is less than maxTickets
     if (usedTickets < responseData.maxTickets) {
       const newTicket = {
-        id: usedTickets + 1,
+        id: tickets.length + 1, // Increment ID based on the current length of tickets
         xCord: "____",
         yCord: "____",
       };
@@ -128,7 +128,7 @@ function Screen() {
 
       // Increment usedTickets and totalTickets
       setUsedTickets((prev) => prev + 1); // Increment usedTickets
-      setTotalTickets((prev) => prev + 1); // Increment totalTickets
+      setTotalTickets((prev) => prev + 1); // Update totalTickets
     } else {
       // Show a message if the maximum limit is reached
       Swal.fire({
@@ -151,36 +151,37 @@ function Screen() {
     setClickedPoints([]);
     setClickCount(0);
   };
-const handleDeleteTicket = (id) => {
-  const updatedTickets = tickets.filter((ticket) => ticket.id !== id);
+  const handleDeleteTicket = (id) => {
+    const updatedTickets = tickets.filter((ticket) => ticket.id !== id);
 
-  const reindexedTickets = updatedTickets.map((ticket, index) => ({
-    ...ticket,
-    id: index + 1,
-  }));
+    const reindexedTickets = updatedTickets.map((ticket, index) => ({
+      ...ticket,
+      id: index + 1,
+    }));
 
-  setTickets(reindexedTickets);
+    setTickets(reindexedTickets);
 
-  const ticketToDelete = tickets.find((ticket) => ticket.id === id);
+    const ticketToDelete = tickets.find((ticket) => ticket.id === id);
 
-  if (ticketToDelete) {
-    // Check if the xCord and yCord are not empty or undefined
-    if (ticketToDelete.xCord && ticketToDelete.yCord) {
-      setClickedPoints((prev) =>
-        prev.filter(
-          (point) =>
-            point.x !== ticketToDelete.xCord && point.y !== ticketToDelete.yCord
-        )
-      );
+    if (ticketToDelete) {
+      // Check if the xCord and yCord are not empty or undefined
+      if (ticketToDelete.xCord && ticketToDelete.yCord) {
+        setClickedPoints((prev) =>
+          prev.filter(
+            (point) =>
+              point.x !== ticketToDelete.xCord &&
+              point.y !== ticketToDelete.yCord
+          )
+        );
 
-      setClickCount((prev) => prev - 1); // Decrement click count if valid ticket
-      setUsedTickets((prev) => prev - 1); // Decrement used tickets if valid
+        setClickCount((prev) => prev - 1); // Decrement click count if valid ticket
+        setUsedTickets((prev) => prev - 1); // Decrement used tickets if valid
+      }
+
+      // Decrement total tickets if a ticket is deleted, regardless of x and y coordinates
+      setTotalTickets((prev) => prev - 1);
     }
-
-    // Decrement total tickets if a ticket is deleted, regardless of x and y coordinates
-    setTotalTickets((prev) => prev - 1);
-  }
-};
+  };
 
   const handleReply = (id) => {
     const updatedTickets = tickets.map((ticket) =>

@@ -4,25 +4,54 @@ import * as Yup from "yup";
 import axios from "axios";
 import Swal from "sweetalert2";
 import OTPverify from "./OTPverify";
+// import * as Yup from "yup";
 
 function Forget({ onClosed }) {
   const [showOTPS, setShowOTPS] = useState(false);
   const [responseData, setResponseData] = useState(null); // Store the token and email
 
-
+  const validationSchema = Yup.object({
+    emailOrPhone: Yup.string()
+      .required("This field is required")
+      .test(
+        "is-email-or-phone",
+        "Please enter a valid email or phone number",
+        (value) => {
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          const phoneRegex = /^[6-9]\d{9}$/; // Validates Indian mobile numbers without country code
+          return emailRegex.test(value) || phoneRegex.test(value);
+        }
+      )
+      .test(
+        "add-country-code",
+        "Please add +91 before your phone number",
+        (value) => {
+          const phoneRegex = /^[6-9]\d{9}$/; // Validates Indian mobile numbers without country code
+          if (phoneRegex.test(value)) {
+            return false; // Fail if a phone number without +91
+          }
+          return true; // Pass for email or phone with +91
+        }
+      ),
+  });
 
   const PhoneSubmit = async (values) => {
     try {
+      // Prepend +91 to the number if it's a valid Indian number without country code
+      const isPhoneNumber = /^[6-9]\d{9}$/.test(values.emailOrPhone);
+      if (isPhoneNumber) {
+        values.emailOrPhone = `+91${values.emailOrPhone}`;
+      }
+
       const response = await axios.post("send-otp", values);
       Swal.fire({
         icon: "success",
         text: response.data.message,
       });
-            localStorage.setItem("tokens", response.data.data.token);
+      localStorage.setItem("tokens", response.data.data.token);
 
       setResponseData({
-       
-        emailOrPhone: values.emailOrPhone, 
+        emailOrPhone: values.emailOrPhone,
       });
       handleOTP();
     } catch (error) {
@@ -70,6 +99,7 @@ function Forget({ onClosed }) {
                       </p>
                       <Formik
                         initialValues={{ emailOrPhone: "" }}
+                        // validationSchema={validationSchema}
                         onSubmit={PhoneSubmit}
                       >
                         {({ handleSubmit }) => (
@@ -111,7 +141,7 @@ function Forget({ onClosed }) {
       {showOTPS && (
         <OTPverify
           onClosedss={() => setShowOTPS(false)}
-                 emailOrPhone={responseData?.emailOrPhone} // Pass email to OTPverify
+          emailOrPhone={responseData?.emailOrPhone} // Pass email to OTPverify
         />
       )}
     </div>

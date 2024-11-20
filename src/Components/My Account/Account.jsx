@@ -185,6 +185,12 @@ function Account() {
                     type="text"
                     className="updateinput"
                     placeholder="Enter First Name"
+                    maxLength={25}
+                    onKeyDown={(e) => {
+                      if (!/[a-zA-Z\s]/.test(e.key) && e.key !== "Backspace") {
+                        e.preventDefault();
+                      }
+                    }}
                   />
                   <img
                     src={`${process.env.PUBLIC_URL}/images/edit_pro.png`}
@@ -203,6 +209,12 @@ function Account() {
                     type="text"
                     className="updateinput"
                     placeholder="Enter Last Name"
+                    maxLength={15}
+                    onKeyDown={(e) => {
+                      if (!/[a-zA-Z\s]/.test(e.key) && e.key !== "Backspace") {
+                        e.preventDefault();
+                      }
+                    }}
                   />
                   <img
                     src={`${process.env.PUBLIC_URL}/images/edit_pro.png`}

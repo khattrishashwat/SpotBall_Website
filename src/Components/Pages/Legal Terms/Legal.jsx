@@ -10,7 +10,9 @@ function Legal() {
   const [isLoading, setIsLoading] = useState(false);
   const [activeIndex, setActiveIndex] = useState(null);
   const [activeTab, setActiveTab] = useState("terms_conditions");
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   // Handle tab click
   const handleTabClick = (tabId) => {
     localStorage.setItem("activeTab", tabId); // Store tabId in localStorage

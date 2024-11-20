@@ -69,7 +69,8 @@ function Header() {
   const handleLogout = () => {
     setIsLogout(false);
 
-    localStorage.clear();
+    // localStorage.clear();
+    localStorage.removeItem("token");
     navigate("/");
   };
   const fetchProfile = async () => {

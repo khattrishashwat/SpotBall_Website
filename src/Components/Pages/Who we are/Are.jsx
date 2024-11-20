@@ -30,6 +30,9 @@ function Are() {
   useEffect(() => {
     fetchWho();
   }, []);
+   useEffect(() => {
+     window.scrollTo(0, 0);
+   }, []);
 
   return (
     <>

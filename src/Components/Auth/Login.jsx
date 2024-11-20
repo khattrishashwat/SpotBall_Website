@@ -117,6 +117,10 @@ function Login({ isVisible, onClose }) {
     setShowSignup(true);
     onClose();
   };
+  const handlebackSignup = () => {
+    setShowSignup(false);
+    isVisible();
+  };
 
   const handleForgotPassword = () => {
     setShowForgotPassword(true);
@@ -168,6 +172,10 @@ function Login({ isVisible, onClose }) {
                                     className="error"
                                     placeholder="Email / Mobile Number"
                                     aria-label="Email or Phone Number"
+                                    onInput={(e) => {
+                                      e.target.value =
+                                        e.target.value.toLowerCase();
+                                    }}
                                   />
                                   <ErrorMessage
                                     name="emailOrPhone"
@@ -252,7 +260,6 @@ function Login({ isVisible, onClose }) {
                                         >
                                           <img
                                             src={`${process.env.PUBLIC_URL}/images/google_icon.png`}
-                                           
                                             alt="Google"
                                           />
                                         </a>
@@ -267,7 +274,6 @@ function Login({ isVisible, onClose }) {
                                         >
                                           <img
                                             src={`${process.env.PUBLIC_URL}/images/facebook_icon.png`}
-                                            
                                             alt="Facebook"
                                           />
                                         </a>
@@ -282,7 +288,6 @@ function Login({ isVisible, onClose }) {
                                         >
                                           <img
                                             src={`${process.env.PUBLIC_URL}/images/Twitter_x_icon.png`}
-                                            
                                             alt="Twitter"
                                           />
                                         </a>
@@ -291,7 +296,6 @@ function Login({ isVisible, onClose }) {
                                         <a href="#">
                                           <img
                                             src={`${process.env.PUBLIC_URL}/images/apple_icon.png`}
-                                          
                                             alt="Apple"
                                           />
                                         </a>
@@ -330,6 +334,7 @@ function Login({ isVisible, onClose }) {
       {/* Sign Up Modal */}
       {showSignup && (
         <Signup
+          back={handlebackSignup}
           isOpenness={() => setShowSignup(false)}
           onClosed={() => setShowSignup(false)}
         />

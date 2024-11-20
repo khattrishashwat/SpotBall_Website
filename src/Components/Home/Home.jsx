@@ -31,7 +31,31 @@ function Home() {
   //   setSelectedContest(contest);
   //   setOnCarts(true);
   // };
+  // const handleBuyTicketClick = (contest) => {
+  //   if (!contest.allowance) {
+  //     Swal.fire({
+  //       icon: "warning",
+  //       title: "Participation Alert",
+  //       text: "You have already participated in this contest!",
+  //     });
+  //   } else {
+  //     setSelectedContest(contest);
+  //     setOnCarts(true);
+  //   }
+  // };
+
   const handleBuyTicketClick = (contest) => {
+    const token = localStorage.getItem("token"); // Replace with your token retrieval method
+
+    if (!token) {
+      Swal.fire({
+        icon: "info",
+        title: "Login Required",
+        text: "Please login to participate in this contest!",
+      });
+      return;
+    }
+
     if (!contest.allowance) {
       Swal.fire({
         icon: "warning",
@@ -160,8 +184,10 @@ function Home() {
         setCorousal(banner_details[0]?.corousal);
       } else {
         const response = await axios.get("get-banner");
+        const { bannerDetails, contests } = response.data.data;
 
-        setBanner(response.data.data[0]);
+        setBanner(bannerDetails[0]);
+        setContests(contests);
         setCorousal(response.data.data[0]?.corousal || []);
       }
     } catch (error) {
@@ -233,10 +259,7 @@ function Home() {
             <div className="container-fluid contfld_mainvideobanner">
               <div className="mainbannervideodiv">
                 <div className="banner_video">
-                  <img
-                    src={banner.banner_url}
-
-                  />
+                  <img src={banner.banner_url} />
                 </div>
                 <div className="autoscroll_section">
                   <div className="marquee">
@@ -303,7 +326,7 @@ function Home() {
                           type="button"
                           className="bannerfixedbtn regis showsigninpopup_onclick"
                           // onClick={OpenSignIn}
-                          onClick={()=>setLoginPopup(!isLoginPopup)}
+                          onClick={() => setLoginPopup(!isLoginPopup)}
                         >
                           Sign Up/Sign In
                         </button>
@@ -365,7 +388,7 @@ function Home() {
               </div>
             </div>
           </section>
-          {token && contests && (
+          {contests && (
             <section className="compitionsection" id="compitions_div">
               <div className="container contcompitions">
                 <div className="col-md-12 col12maincompitions">

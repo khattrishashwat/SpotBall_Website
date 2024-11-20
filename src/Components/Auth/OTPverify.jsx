@@ -188,7 +188,7 @@ function OTPverify({ onClosedss, emailOrPhone }) {
                               type="button"
                               className="loginbtn otpverify_sbmtbtn"
                               onClick={verifyOtp}
-                              disabled={otp.includes("")}
+                              // disabled={otp.includes("")}
                             >
                               Submit
                             </button>
