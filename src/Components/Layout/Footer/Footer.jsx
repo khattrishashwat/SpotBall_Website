@@ -158,7 +158,7 @@ function Footer() {
                   <div className="footer_socialicons">
                     <ul>
                       {[
-                        "Facebook_icon.png",
+                        "facebook_icon.png",
                         "Instagram_icon.png",
                         "Twitter_x_icon.png",
                         "Threads_icon.png",

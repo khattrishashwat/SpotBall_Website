@@ -607,7 +607,7 @@ const Signup = ({ isOpenness, onClosed }) => {
                                         style={{ cursor: "pointer" }}
                                       >
                                         <img
-                                          src={`${process.env.PUBLIC_URL}/images/Google_icon.png`}
+                                          src={`${process.env.PUBLIC_URL}/images/google_icon.png`}
                                           alt="Google"
                                         />
                                       </a>
@@ -624,7 +624,7 @@ const Signup = ({ isOpenness, onClosed }) => {
                                         style={{ cursor: "pointer" }}
                                       >
                                         <img
-                                          src={`${process.env.PUBLIC_URL}/images/Facebook_icon.png`}
+                                          src={`${process.env.PUBLIC_URL}/images/facebook_icon.png`}
                                           alt="Facebook"
                                         />
                                       </a>
@@ -649,7 +649,7 @@ const Signup = ({ isOpenness, onClosed }) => {
                                     <li>
                                       <a>
                                         <img
-                                          src={`${process.env.PUBLIC_URL}/images/Apple_icon.png`}
+                                          src={`${process.env.PUBLIC_URL}/images/apple_icon.png`}
                                           alt="Apple"
                                         />
                                       </a>

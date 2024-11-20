@@ -234,10 +234,8 @@ function Home() {
               <div className="mainbannervideodiv">
                 <div className="banner_video">
                   <img
-                    // src={`${process.env.PUBLIC_URL}/images/cricket_contest.jpg`}
                     src={banner.banner_url}
 
-                    // alt="Banner"
                   />
                 </div>
                 <div className="autoscroll_section">

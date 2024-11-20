@@ -251,8 +251,8 @@ function Login({ isVisible, onClose }) {
                                           style={{ cursor: "pointer" }}
                                         >
                                           <img
-                                            src={`${process.env.PUBLIC_URL}/images/Google_icon.png`}
-                                            // src="images/google_icon.png"
+                                            src={`${process.env.PUBLIC_URL}/images/google_icon.png`}
+                                           
                                             alt="Google"
                                           />
                                         </a>
@@ -266,8 +266,8 @@ function Login({ isVisible, onClose }) {
                                           style={{ cursor: "pointer" }}
                                         >
                                           <img
-                                            src={`${process.env.PUBLIC_URL}/images/Facebook_icon.png`}
-                                            // src="images/facebook_icon.png"
+                                            src={`${process.env.PUBLIC_URL}/images/facebook_icon.png`}
+                                            
                                             alt="Facebook"
                                           />
                                         </a>
@@ -282,7 +282,7 @@ function Login({ isVisible, onClose }) {
                                         >
                                           <img
                                             src={`${process.env.PUBLIC_URL}/images/Twitter_x_icon.png`}
-                                            // src="images/twiiter_x_icon.png"
+                                            
                                             alt="Twitter"
                                           />
                                         </a>
@@ -290,8 +290,8 @@ function Login({ isVisible, onClose }) {
                                       <li>
                                         <a href="#">
                                           <img
-                                            src={`${process.env.PUBLIC_URL}/images/Apple_icon.png`}
-                                            // src="images/apple_icon.png"
+                                            src={`${process.env.PUBLIC_URL}/images/apple_icon.png`}
+                                          
                                             alt="Apple"
                                           />
                                         </a>

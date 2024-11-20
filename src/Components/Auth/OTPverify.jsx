@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import NewPassword from "./NewPassword";
@@ -6,7 +6,18 @@ import NewPassword from "./NewPassword";
 function OTPverify({ onClosedss, emailOrPhone }) {
   const [otp, setOtp] = useState(["", "", "", ""]);
   const [showNewPassword, setShowNewPassword] = useState(false);
+  const [timer, setTimer] = useState(0); // Timer state for resend OTP
   const inputRefs = useRef([]);
+
+  useEffect(() => {
+    let countdown;
+    if (timer > 0) {
+      countdown = setInterval(() => {
+        setTimer((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(countdown);
+  }, [timer]);
 
   const handleInputChange = (index, value) => {
     const newOtp = [...otp];
@@ -50,9 +61,6 @@ function OTPverify({ onClosedss, emailOrPhone }) {
         }
       );
 
-      console.log("verify", response.data.data.token);
-
-      // Save the new token
       localStorage.setItem("tokens", response.data.data.token);
 
       if (response.data.success) {
@@ -77,8 +85,9 @@ function OTPverify({ onClosedss, emailOrPhone }) {
     }
   };
 
-  // Function to resend OTP
   const resendOtp = async () => {
+    if (timer > 0) return; // Prevent resending if timer is active
+
     let token = localStorage.getItem("tokens");
 
     try {
@@ -92,9 +101,6 @@ function OTPverify({ onClosedss, emailOrPhone }) {
         }
       );
 
-      console.log("resend", response.data.data.token);
-
-      // Remove the old token and save the new token
       localStorage.removeItem("tokens");
       localStorage.setItem("tokens", response.data.data.token);
 
@@ -102,6 +108,9 @@ function OTPverify({ onClosedss, emailOrPhone }) {
         icon: "success",
         text: response.data.message,
       });
+
+      // Start the timer
+      setTimer(60);
     } catch (error) {
       Swal.fire({
         icon: "error",
@@ -157,7 +166,7 @@ function OTPverify({ onClosedss, emailOrPhone }) {
                                     handleInputChange(index, e.target.value)
                                   }
                                   maxLength={1}
-                                  ref={(el) => (inputRefs.current[index] = el)} // Use refs for inputs
+                                  ref={(el) => (inputRefs.current[index] = el)}
                                 />
                               ))}
                             </div>
@@ -167,8 +176,11 @@ function OTPverify({ onClosedss, emailOrPhone }) {
                               type="button"
                               className="resentotpbtn"
                               onClick={resendOtp}
+                              disabled={timer > 0} // Disable button if timer is active
                             >
-                              Resend OTP
+                              {timer > 0
+                                ? `Resend OTP in ${timer}s`
+                                : "Resend OTP"}
                             </button>
                           </div>
                           <div className="form-control loginformctrl">
