@@ -4591,11 +4591,11 @@ ul.list-inline li a:hover {
     margin-top: 15px;
   }
   .allticketmaindiv_contest .contestticketdiv_main {
-    display: flex;
+    display: grid;
     gap: 10px;
   }
   .contestticketdiv_main .contest_cordinates_div {
-    margin-bottom: 0;
+    margin-bottom: 10px;
   }
   .rowmain_playgame {
     margin-bottom: 15px;
@@ -5581,4 +5581,11 @@ input.updateinput {
 
 .showsigninbtn_div:hover {
   text-decoration: underline; /* Underline on hover */
+}
+.innerlegal_heaidngwithpara {
+  padding: 0px 20px;
+}
+.play-img {
+  object-fit: cover;
+  height: 306px !important;
 }

@@ -220,7 +220,7 @@ function Circle() {
                   value={month}
                   onChange={(e) => setMonth(e.target.value)}
                 >
-                  <option value="" disabled>
+                  <option value="">
                     Select Month
                   </option>
                   <option value="1">January</option>

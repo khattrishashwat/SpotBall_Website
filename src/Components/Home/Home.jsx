@@ -88,6 +88,7 @@ function Home() {
 
   const OpenSignIn = () => {
     setLoginPopup(true);
+    
   };
 
   const ClosePopup = () => {
@@ -424,14 +425,13 @@ function Home() {
                           <div className="compititonmgdivnew">
                             <img
                               src={contests[0].contest_banner?.file_url}
-                              alt="Contest Banner"
-                              width="750" // Intrinsic width
-                              height="500" // Intrinsic height
-                              style={{
-                                width: "459px",
-                                height: "306px",
-                                // objectFit: "cover",
-                              }}
+                              alt="Contest Banner" className="play-img"
+                              // width="750" // Intrinsic width
+                              // height="500" // Intrinsic height
+                              // style={{
+                              //   width: "459px",
+                              //   height: "306px",
+                              // }} 
                             />
                             {/* <img
                               src={`${process.env.PUBLIC_URL}/images/cricket_contest.jpg`}
