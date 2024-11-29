@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import Loader from "../../Loader/Loader";
 
-function Privacy() {
-    const [isCookies, setIsCookies] = useState("");
+function Tearms() {
+  const [terms, setTerms] = useState("");
   const [isLoading, setIsLoading] = useState("");
 
   const fetchCondition = async () => {
@@ -13,14 +13,14 @@ function Privacy() {
       setIsLoading(true);
 
       const response = await axios.get(
-        "/get-all-static-content/cookie_policy",
+        "/get-all-static-content/terms_and_condition",
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-      setIsCookies(response.data.data[0]?.description);
+      setTerms(response.data.data[0]?.description);
       // console.log("ye",response.data.data);
     } catch (error) {
       console.error("Error data:", error);
@@ -51,7 +51,11 @@ function Privacy() {
               <div className="navtabdiv">
                 <ul className="nav nav-tabs">
                   <li className="nav-item">
-                    <Link to="/tearms" className="nav-link" data-toggle="tab">
+                    <Link
+                      to="/tearms"
+                      className="nav-link active"
+                      data-toggle="tab"
+                    >
                       {" "}
                       <div className="tabbingiconbgdiv">
                         {" "}
@@ -90,11 +94,7 @@ function Privacy() {
                     </Link>
                   </li>
                   <li className="nav-item">
-                    <Link
-                      to="/cookies"
-                      className="nav-link active"
-                      data-toggle="tab"
-                    >
+                    <Link to="/cookies" className="nav-link" data-toggle="tab">
                       <div className="tabbingiconbgdiv">
                         {" "}
                         <img
@@ -111,18 +111,14 @@ function Privacy() {
             <div className="col-md-8 coltabdata_righttext">
               <div className="tabingrighttextdiv">
                 <div className="tab-content">
-                  <div id="cookiepolicy" className="tab-pane active">
+                  <div id="terms_conditions" className="tab-pane active">
                     <div className="legaltermsdata_div">
                       <div className="innerlegal_heaidngwithpara">
-                        <div className="innerlegal_heaidngwithpara">
-                          {isLoading ? (
-                            <Loader /> // Correctly render the Loader component
-                          ) : (
-                            <div
-                              dangerouslySetInnerHTML={{ __html: isCookies }}
-                            />
-                          )}
-                        </div>
+                        {isLoading ? (
+                          <Loader /> // Correctly render the Loader component
+                        ) : (
+                          <div dangerouslySetInnerHTML={{ __html: terms }} />
+                        )}
                       </div>
                     </div>
                   </div>
@@ -131,9 +127,10 @@ function Privacy() {
             </div>
           </div>
         </div>
+        
       </section>
     </div>
   );
 }
 
-export default Privacy;
+export default Tearms;

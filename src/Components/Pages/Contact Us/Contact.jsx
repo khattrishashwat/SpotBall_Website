@@ -11,7 +11,7 @@ function Contact() {
   const [contacts, setContacts] = useState("");
 
   const fetchContact = async () => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("Web-token");
     try {
       setIsLoading(true);
       const response = await axios.get("/get-all-static-content/contact_us", {
@@ -63,7 +63,7 @@ function Contact() {
   });
 
   const Contact_Us = async (values, { resetForm }) => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("Web-token");
     const formattedPhone = values.phone.startsWith("+91")
       ? values.phone
       : `+91${values.phone}`;
@@ -145,7 +145,12 @@ function Contact() {
                       <div className="social_inner">
                         <ul>
                           <li>
-                            <a href="#!" className="bggreen">
+                            <a
+                              href="https://www.facebook.com/officialspotsball"
+                              className="bggreen"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
                               <img
                                 src={`${process.env.PUBLIC_URL}/images/facebook_contact.png`}
                                 alt="Facebook"
@@ -153,7 +158,11 @@ function Contact() {
                             </a>
                           </li>
                           <li>
-                            <a href="#!">
+                            <a
+                              href="https://www.instagram.com/spotsballofficial/"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
                               <img
                                 src={`${process.env.PUBLIC_URL}/images/instagram_contact.png`}
                                 alt="Instagram"
@@ -161,7 +170,12 @@ function Contact() {
                             </a>
                           </li>
                           <li>
-                            <a href="#!" className="bggreen">
+                            <a
+                              href="https://x.com/Spotsball_"
+                              className="bggreen"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
                               <img
                                 src={`${process.env.PUBLIC_URL}/images/twitter_contact.png`}
                                 alt="Twitter"
@@ -299,7 +313,7 @@ function Contact() {
                                     />
                                     <label htmlFor="gnrl2">Support</label>
                                   </div>
-                                  <div className="form-group">
+                                  {/* <div className="form-group">
                                     <Field
                                       type="radio"
                                       id="gnrl3"
@@ -307,7 +321,7 @@ function Contact() {
                                       value="technical"
                                     />
                                     <label htmlFor="gnrl3">Technical</label>
-                                  </div>
+                                  </div> */}
                                   <div className="form-group">
                                     <Field
                                       type="radio"

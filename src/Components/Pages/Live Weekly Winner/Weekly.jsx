@@ -67,10 +67,14 @@ function Weekly() {
                   <div className="watchlivediv">
                     <h2>Watch Live</h2>
                     <div className="liveicons">
-                      <a href="#!">
+                      <a
+                        href="https://www.facebook.com/share/v/armiAWigm94t5BZf/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
                         <img
                           src={`${process.env.PUBLIC_URL}/images/fb_live_icon.png`}
-                          // src="images/fb_live_icon.png"
+                          alt="FaceBook Live Icon"
                         />
                       </a>
                       <a
@@ -85,11 +89,11 @@ function Weekly() {
                       </a>
                     </div>
                   </div>
-                  <div className="savebtn">
+                  {/* <div className="savebtn">
                     <button type="button" className="savebtn_livewinner">
                       Save
                     </button>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>

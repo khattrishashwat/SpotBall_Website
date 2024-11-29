@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import Login from "../../Auth/Login";
 import axios from "axios";
 import moment from "moment";
+import Swal from "sweetalert2";
 
 function Header() {
   const navigate = useNavigate();
@@ -16,8 +17,9 @@ function Header() {
   const [isLogout, setIsLogout] = useState("");
   const [loginPopup, setLoginPopup] = useState(false);
   const [isNot, setIsNot] = useState(false);
+  const [notice, setNotice] = useState(false);
 
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("Web-token");
 
   const NotificationOpen = () => {
     setIsNot(true);
@@ -69,13 +71,20 @@ function Header() {
   const handleLogout = () => {
     setIsLogout(false);
 
-    // localStorage.clear();
-    localStorage.removeItem("token");
+    localStorage.removeItem("Web-token");
+    Swal.fire({
+      icon: "success",
+      title: "Logout Successful",
+      text: "You have been logged out successfully.",
+      timer: 2000,
+      showConfirmButton: false,
+    });
     navigate("/");
   };
+
   const fetchProfile = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("Web-token");
       if (!token) return;
       const response = await axios.get("get-profile", {
         headers: {
@@ -96,7 +105,7 @@ function Header() {
   }, [token]);
   const fetchNotification = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("Web-token");
       if (!token) return;
       const response = await axios.get(
         "v1/app/notifications/get-notifications",
@@ -108,6 +117,7 @@ function Header() {
       );
 
       setNotification(response.data.data);
+      // setNotice(response.data.data.length);
       console.log("response Notification", response.data.data);
     } catch (error) {
       console.error("Error fetching profile:", error);
@@ -193,6 +203,7 @@ function Header() {
                                 alt="bell"
                                 onClick={NotificationOpen}
                               />
+                              {/* <span class="cartcount">3</span> */}
                             </a>
                             <div
                               className={`notificationdiv_popup ${
@@ -499,7 +510,7 @@ function Header() {
 
                         <li className="mainmenulist">
                           <Link
-                            to="/legal_terms"
+                            to="/tearms"
                             onClick={() => setIsMenuVisible(false)}
                           >
                             <div className="menubar_divmain">

@@ -38,7 +38,6 @@ function Screen() {
       setImageDimensions({ width, height });
     }
   };
-  console.log("sizes", imageDimensions);
 
   const open = async () => {
     setIsModals(true);
@@ -53,7 +52,7 @@ function Screen() {
   };
 
   const fetchVideoData = async () => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("Web-token");
     try {
       const response = await axios.get("get-how-to-play", {
         headers: {
@@ -113,6 +112,10 @@ function Screen() {
       });
     }
   };
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const handleAddTicket = () => {
     // Check if usedTickets is less than maxTickets
@@ -326,7 +329,7 @@ function Screen() {
     console.log("ceckied--", values);
 
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("Web-token");
       const response = await axios.post("add-to-cart", values, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -408,7 +411,6 @@ function Screen() {
                       style={{
                         color: "black",
                         fontSize: "20px",
-                        position: "absolute",
                       }}
                     />
                   </div>
@@ -420,17 +422,16 @@ function Screen() {
                       position: "absolute",
                       left: `${
                         (coordinates.x / imgRef.current.naturalWidth) *
-                          imgRef.current.clientWidth +
-                        1
+                        imgRef.current.clientWidth
                       }px`,
                       top: `${
                         (coordinates.y / imgRef.current.naturalHeight) *
-                          imgRef.current.clientHeight +
-                        1
+                        imgRef.current.clientHeight
                       }px`,
                       backgroundColor: "rgba(0, 0, 0, 0.7)",
                       color: "#fff",
                       pointerEvents: "none",
+                      transform: "translate(-50%, -100%)", // Slightly above the cursor
                     }}
                   >
                     <p>

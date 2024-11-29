@@ -6,7 +6,7 @@ function PalyVedio({ isON, isOFF }) {
   const [movies, setMovies] = useState("");
 
   const fetchVideoData = async () => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("Web-token");
     try {
       const response = await axios.get("get-how-to-play", {
         headers: {

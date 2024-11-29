@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import Swal from "sweetalert2";
@@ -14,7 +14,7 @@ import {
   provider,
 } from "../FirebaseCofig/FirebaseConfig";
 
-const Signup = ({ isOpenness, onClosed, back }) => {
+const Signup = ({ isOpenness, Closed, back }) => {
   const [signupData, setSignupData] = useState({});
   const [isLoginPopup, setLoginPopup] = useState(false);
 
@@ -24,7 +24,14 @@ const Signup = ({ isOpenness, onClosed, back }) => {
   const [isModals, setIsModals] = useState("");
   const [otp, setOtp] = useState(["", "", "", ""]);
   const [isSocialSignup, setIsSocialSignup] = useState(false);
-  const [activeTab, setActiveTab] = useState(localStorage.getItem("activeTab"));
+  const location = useLocation();
+
+  useEffect(() => {
+    // Keep the popup open if navigating to linked pages like terms or rules
+    if (location.state?.popupOpen) {
+      isOpenness(true);
+    }
+  }, [location.state]);
   const openModals = () => {
     setIsModals(true);
   };
@@ -32,27 +39,38 @@ const Signup = ({ isOpenness, onClosed, back }) => {
     setIsModals(false);
   };
 
-  // const handleLogin = () => {
-  //   setLoginPopup(true);
-  //   // onClosed();
-  // };
   const handleLogin = () => {
-    back();
+    setLoginPopup(true);
+    // onClosed();
   };
+  // const handleLogin = () => {
+  //   back();
+  // };
 
   const ClosePopup = () => {
     setLoginPopup(false);
-    onClosed();
+    Closed();
   };
-  const initialValues = {
+
+  const localStorageKey = "signupFormData";
+  const initialValues = JSON.parse(localStorage.getItem(localStorageKey)) || {
     first_name: "",
     last_name: "",
     email: "",
     phone: "",
     password: "",
     confirm_password: "",
-    agreeTerms: false,
+    agreeAllLegal: false,
     agreeRules: false,
+  };
+
+  // Save data to localStorage on every change
+  const handleFieldChange = (field, value, setFieldValue) => {
+    setFieldValue(field, value);
+    const updatedValues =
+      JSON.parse(localStorage.getItem(localStorageKey)) || initialValues;
+    updatedValues[field] = value;
+    localStorage.setItem(localStorageKey, JSON.stringify(updatedValues));
   };
 
   const toggleNewPasswordVisibility = () => {
@@ -98,9 +116,12 @@ const Signup = ({ isOpenness, onClosed, back }) => {
   };
 
   const handleSignup = async (values) => {
-    const formattedPhone = values.phone.startsWith("+91")
-      ? values.phone
-      : `+91${values.phone}`;
+    let formattedPhone = values.phone;
+
+    // Only add +91 if phone is not empty and doesn't already start with +91
+    if (formattedPhone && !formattedPhone.startsWith("+91")) {
+      formattedPhone = `+91${formattedPhone}`;
+    }
     setIsLoading(true);
     try {
       const response = await axios.post("sign-up", {
@@ -110,6 +131,7 @@ const Signup = ({ isOpenness, onClosed, back }) => {
 
       const tokens = response.data.data.token;
       localStorage.setItem("tokens", tokens);
+      localStorage.removeItem(localStorageKey);
 
       Swal.fire({
         title: response.data.message,
@@ -254,19 +276,10 @@ const Signup = ({ isOpenness, onClosed, back }) => {
     signWithTwitter(setFieldValue);
   };
 
-  const handleTabClick = (tabId) => {
-    localStorage.setItem("activeTab", tabId);
-    setActiveTab(tabId);
-  };
   const legalLinks = {
     title: "Legal",
     links: ["Terms & Conditions", "Privacy Policy", "Cookie Policy"],
-    paths: ["./legal_terms"],
-    onClick: [
-      () => handleTabClick("terms_conditions"),
-      () => handleTabClick("privacy_policy"),
-      () => handleTabClick("cookiepolicy"),
-    ],
+    paths: ["/tearms", "/privacy", "/cookies"],
   };
   const legalLinkText =
     legalLinks.links
@@ -277,8 +290,8 @@ const Signup = ({ isOpenness, onClosed, back }) => {
   return (
     <>
       <div
-        // className={`signinpopup_main ${isOpenness ? "show" : ""}`}
-        className="signinpopup_main"
+        className={`signinpopup_main ${isOpenness ? "show" : ""}`}
+        // className="signinpopup_main"
         id="signup_popup"
         // style={{ display: "block" }}
 
@@ -296,7 +309,7 @@ const Signup = ({ isOpenness, onClosed, back }) => {
                           <button
                             type="button"
                             className="crossbtn_signinpopupclose singupcrossbtn"
-                            onClick={onClosed}
+                            onClick={Closed}
                           >
                             <img
                               src={`${process.env.PUBLIC_URL}/images/cross_icon.png`}
@@ -308,18 +321,6 @@ const Signup = ({ isOpenness, onClosed, back }) => {
 
                         <Formik
                           initialValues={initialValues}
-                          validate={(values) => {
-                            const errors = {};
-                            if (
-                              values.phone &&
-                              (values.phone.length < 10 ||
-                                values.phone.length > 15)
-                            ) {
-                              errors.phone =
-                                "Phone number must be between 10 and 15 digits";
-                            }
-                            return errors;
-                          }}
                           validateOnChange={true}
                           validateOnBlur={true}
                           onSubmit={(values) => handleSubmits(values)}
@@ -337,15 +338,26 @@ const Signup = ({ isOpenness, onClosed, back }) => {
                                   type="text"
                                   name="first_name"
                                   placeholder="First Name"
+                                  onChange={(e) =>
+                                    handleFieldChange(
+                                      "first_name",
+                                      e.target.value,
+                                      setFieldValue
+                                    )
+                                  }
                                   onKeyDown={(e) => {
+                                    const inputValue = e.target.value;
                                     if (
-                                      !/[a-zA-Z\s]/.test(e.key) &&
+                                      (!/[a-zA-Z\s]/.test(e.key) ||
+                                        (e.key === " " &&
+                                          inputValue.length === 0)) &&
                                       e.key !== "Backspace"
                                     ) {
                                       e.preventDefault();
                                     }
                                   }}
                                 />
+
                                 <ErrorMessage
                                   name="first_name"
                                   component="div"
@@ -359,9 +371,19 @@ const Signup = ({ isOpenness, onClosed, back }) => {
                                   type="text"
                                   name="last_name"
                                   placeholder="Last Name"
+                                  onChange={(e) =>
+                                    handleFieldChange(
+                                      "last_name",
+                                      e.target.value,
+                                      setFieldValue
+                                    )
+                                  }
                                   onKeyDown={(e) => {
+                                    const inputValue = e.target.value;
                                     if (
-                                      !/[a-zA-Z\s]/.test(e.key) &&
+                                      (!/[a-zA-Z\s]/.test(e.key) ||
+                                        (e.key === " " &&
+                                          inputValue.length === 0)) &&
                                       e.key !== "Backspace"
                                     ) {
                                       e.preventDefault();
@@ -381,6 +403,13 @@ const Signup = ({ isOpenness, onClosed, back }) => {
                                   type="email"
                                   name="email"
                                   placeholder="Email"
+                                  onChange={(e) =>
+                                    handleFieldChange(
+                                      "email",
+                                      e.target.value,
+                                      setFieldValue
+                                    )
+                                  }
                                 />
                               </div>
 
@@ -390,18 +419,19 @@ const Signup = ({ isOpenness, onClosed, back }) => {
                                   type="text"
                                   name="phone"
                                   placeholder="Mobile number"
-                                  onChange={(e) =>
-                                    setFieldValue(
+                                  onChange={(e) => {
+                                    const numericValue = handleNumericInput(
+                                      e.target.value
+                                    );
+                                    handleFieldChange(
                                       "phone",
-                                      handleNumericInput(e.target.value)
-                                    )
-                                  }
+                                      numericValue,
+                                      setFieldValue
+                                    );
+                                    setFieldValue("phone", numericValue);
+                                  }}
                                 />
-                                {touched.phone && errors.phone && (
-                                  <div className="field_required">
-                                    {errors.phone}
-                                  </div>
-                                )}
+
                                 <ErrorMessage
                                   name="phone"
                                   component="div"
@@ -418,6 +448,13 @@ const Signup = ({ isOpenness, onClosed, back }) => {
                                       }
                                       name="password"
                                       placeholder="Password"
+                                      onChange={(e) =>
+                                        handleFieldChange(
+                                          "password",
+                                          e.target.value,
+                                          setFieldValue
+                                        )
+                                      }
                                     />
                                     <span
                                       onClick={toggleNewPasswordVisibility}
@@ -447,6 +484,13 @@ const Signup = ({ isOpenness, onClosed, back }) => {
                                       }
                                       name="confirm_password"
                                       placeholder="Confirm Password"
+                                      onChange={(e) =>
+                                        handleFieldChange(
+                                          "confirm_password",
+                                          e.target.value,
+                                          setFieldValue
+                                        )
+                                      }
                                     />
                                     <span
                                       onClick={toggleConfirmPasswordVisibility}
@@ -470,73 +514,7 @@ const Signup = ({ isOpenness, onClosed, back }) => {
                               )}
 
                               {/* Terms & Conditions */}
-                              {/* <div className="remeberrecoverydiv">
-                                <div className="rememebrmediv">
-                                  <Field
-                                    type="checkbox"
-                                    name="agreeTerms"
-                                    className="checkboxemeber"
-                                  />
-                                  <label
-                                    htmlFor="rememebrbtn"
-                                    className="labelrememebrme"
-                                  >
-                                    I have read &amp; agree with{" "}
-                                    <Link
-                                      to="/legal_terms"
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                    >
-                                      Terms &amp; Conditions
-                                    </Link>
-                                    ,{" "}
-                                    <Link
-                                      to="/legal_terms"
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                    >
-                                      Privacy Policy
-                                    </Link>{" "}
-                                    &amp;{" "}
-                                    <Link
-                                      to="/legal_terms"
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                    >
-                                      Cookie Policy
-                                    </Link>
-                                  </label>
-                                </div>
-                              </div> */}
-                              {/* Terms & Conditions and Legal Links */}
-                              {/* {legalLinks.links.map((link, index) => (
-                                <div className="remeberrecoverydiv" key={index}>
-                                  <div className="rememebrmediv">
-                                    <Field
-                                      type="checkbox"
-                                      name={`agree${link.replace(
-                                        /[^a-zA-Z]/g,
-                                        ""
-                                      )}`}
-                                      className="checkboxemeber"
-                                    />
-                                    <label
-                                      htmlFor={`rememebrbtn-${index}`}
-                                      className="labelrememebrme"
-                                    >
-                                      I have read &amp; agree with{" "}
-                                      <Link
-                                        to={legalLinks.paths[index]}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        onClick={legalLinks.onClick[index]}
-                                      >
-                                        {link}
-                                      </Link>
-                                    </label>
-                                  </div>
-                                </div>
-                              ))} */}
+
                               <div className="remeberrecoverydiv">
                                 <div className="rememebrmediv">
                                   <Field
@@ -553,16 +531,10 @@ const Signup = ({ isOpenness, onClosed, back }) => {
                                       {legalLinks.links.map((link, index) => (
                                         <span key={index}>
                                           <Link
-                                            to={legalLinks.paths[0]} // Use the single path
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            onClick={() => {
-                                              legalLinks.onClick[index](); // Trigger the corresponding tab change
-                                              window.open(
-                                                legalLinks.paths[0],
-                                                "_blank"
-                                              ); // Open the path in a new tab
-                                            }}
+                                            to={legalLinks.paths[index]}
+                                            state={{ popupOpen: true }}
+                                            // target="_blank"
+                                            // rel="noopener noreferrer"
                                           >
                                             {link}
                                           </Link>
@@ -587,12 +559,10 @@ const Signup = ({ isOpenness, onClosed, back }) => {
                                   <label className="labelrememebrme">
                                     I have read & agree with{" "}
                                     <Link
-                                      to="/legal_terms"
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      onClick={() => {
-                                        handleTabClick("rules_play"); // Trigger the tab change to 'rules_play'
-                                      }}
+                                      to="/rules"
+                                      state={{ popupOpen: true }}
+                                      // target="_blank"
+                                      // rel="noopener noreferrer"
                                     >
                                       Rules of Play & FAQ's
                                     </Link>
@@ -665,7 +635,7 @@ const Signup = ({ isOpenness, onClosed, back }) => {
                                         />
                                       </a>
                                     </li>
-                                    <li>
+                                    {/* <li>
                                       <a>
                                         <img
                                           src={`${process.env.PUBLIC_URL}/images/apple_icon.png`}
@@ -680,27 +650,29 @@ const Signup = ({ isOpenness, onClosed, back }) => {
                                           alt="Instagram"
                                         />
                                       </a>
-                                    </li>
+                                    </li> */}
                                   </ul>
                                 </div>
                               </div>
 
                               {/* Already have an account */}
-                              {/* <div className="registerdiv">
+                              <div className="registerdiv">
                                 <p>
                                   Already have an account?{" "}
                                   <a
                                     className="showsigninbtn_div"
-                                    onClick={handleLogin}
-                                    // onClick={() => {
-                                    //   setLoginPopup(!isLoginPopup); // Toggle login popup
-                                    //   onClosed(); // Close the signup popup
-                                    // }}
+                                    // onClick={handleLogin}
+                                    onClick={() => {
+                                      setLoginPopup(!isLoginPopup);
+                                      localStorage.removeItem("showSignup");
+
+                                      // Closed();
+                                    }}
                                   >
                                     Sign In
                                   </a>
                                 </p>
-                              </div> */}
+                              </div>
                             </Form>
                           )}
                         </Formik>
@@ -713,7 +685,7 @@ const Signup = ({ isOpenness, onClosed, back }) => {
           </div>
         </div>
       </div>
-      <Login isVisible={isLoginPopup} onClose={ClosePopup} />
+      {isLoginPopup && <Login isVisible={isLoginPopup} onClose={ClosePopup} />}
 
       <div
         className={`signinpopup_main ${isModals ? "show" : ""}`}

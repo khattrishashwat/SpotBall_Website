@@ -6,15 +6,16 @@ import PalyVedio from "../../Pages/HowToPlay/PalyVedio";
 function Footer() {
   const [footer, setFooter] = useState(""); // Footer content
   const [plays, setPlays] = useState(false); // Video state
-  const [activeTab, setActiveTab] = useState(
-    localStorage.getItem("activeTab") || "terms_conditions"
-  ); // Active tab state
-
+  const [links, setLinks] = useState(false); // Video state
+ 
   const fetchFooter = async () => {
     try {
       const response = await axios.get("/get-all-static-content/footer");
+      console.log("response.data.data[0]", response.data.data);
+      
       if (response) {
-        setFooter(response.data.data[0]?.description || "");
+        setLinks(response.data.data?.liveLinks)
+        setFooter(response.data.data?.footer?.description || "");
       }
     } catch (error) {
       console.error("Error fetching footer data:", error);
@@ -25,11 +26,6 @@ function Footer() {
     fetchFooter();
   }, []);
 
-  const handleTabClick = (tabId) => {
-    // Save the selected tab to localStorage
-    localStorage.setItem("activeTab", tabId);
-    setActiveTab(tabId);
-  };
 
   const openVideo = () => setPlays(true);
 
@@ -91,18 +87,7 @@ function Footer() {
                           "Rules of Play & FAQ's",
                           "Cookie Policy",
                         ],
-                        paths: [
-                          "/legal_terms",
-                          "/legal_terms",
-                          "/legal_terms",
-                          "/legal_terms",
-                        ],
-                        onClick: [
-                          () => handleTabClick("terms_conditions"),
-                          () => handleTabClick("privacy_policy"),
-                          () => handleTabClick("rules_play"),
-                          () => handleTabClick("cookiepolicy"),
-                        ],
+                        paths: ["/tearms", "/privacy", "/rules", "/cookies"],
                       },
                       {
                         title: "Others",
@@ -138,7 +123,11 @@ function Footer() {
                   <div className="footer_downloadapp_icons">
                     <div className="download_app_icondiv">
                       <div className="appstoreicondiv">
-                        <a>
+                        <a
+                          href={links?.Play_Store}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
                           <img
                             src={`${process.env.PUBLIC_URL}/images/google-play-store-badge.png`}
                             alt="Google Play Store"
@@ -146,7 +135,11 @@ function Footer() {
                         </a>
                       </div>
                       <div className="appstoreicondiv">
-                        <a>
+                        <a
+                          href={links?.Apple_Store}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
                           <img
                             src={`${process.env.PUBLIC_URL}/images/apple-store-badge.png`}
                             alt="Apple Store"
@@ -155,24 +148,57 @@ function Footer() {
                       </div>
                     </div>
                   </div>
+
                   <div className="footer_socialicons">
                     <ul>
                       {[
-                        "facebook_icon.png",
-                        "Instagram_icon.png",
-                        "Twitter_x_icon.png",
-                        "Threads_icon.png",
-                        "Youtube_icon.png",
-                      ].map((icon, i) => (
-                        <li key={i}>
-                          <a title={icon.split("_")[0]}>
-                            <img
-                              src={`${process.env.PUBLIC_URL}/images/${icon}`}
-                              alt={icon.split("_")[0]}
-                            />
-                          </a>
-                        </li>
-                      ))}
+                        {
+                          icon: "facebook_icon.png",
+                          name: "Facebook_Social_Link",
+                        },
+                        {
+                          icon: "Instagram_icon.png",
+                          name: "Instagram_Social_Link",
+                        },
+                        { icon: "Twitter_x_icon.png", name: "X_Social_Link" },
+                        {
+                          icon: "threads_icon.png",
+                          name: "Threads_Social_Link",
+                        },
+                        {
+                          icon: "youtube_icon.png",
+                          name: "Youtube_Social_Link",
+                        },
+                      ].map((item, i) => {
+                        const { icon, name } = item;
+                        const capitalizedName =
+                          name.split("_")[0].charAt(0).toUpperCase() +
+                          name.split("_")[0].slice(1); // Capitalize only the first letter
+                        const link = links ? links[name] : ""; // Dynamically fetch the link based on the name from liveLinks
+
+                        return (
+                          <li key={i}>
+                            {link ? (
+                              <a
+                                href={link}
+                                title={capitalizedName}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                <img
+                                  src={`${process.env.PUBLIC_URL}/images/${icon}`}
+                                  alt={capitalizedName}
+                                  onError={(e) => {
+                                    e.target.src = `${process.env.PUBLIC_URL}/images/${icon}`; // Fallback image
+                                  }}
+                                />
+                              </a>
+                            ) : (
+                              <span>{capitalizedName} link not available</span>
+                            )}
+                          </li>
+                        );
+                      })}
                     </ul>
                   </div>
                 </div>

@@ -6,7 +6,7 @@ import GameDenyPopup from "./GameDenyPopup";
 import GameUnavailablePopup from "./GameUnavailablePopup";
 import LocationSettingPopup from "./LocationSettingPopup";
 
-const GeolocationPopup = ({ contests, onClose }) => {
+const GeolocationPopup = ({ Area, onClose }) => {
   const [isPopupVisible, setPopupVisible] = useState(false);
   const [isUnavailablePopupVisible, setUnavailablePopupVisible] =
     useState(false);
@@ -30,7 +30,7 @@ const GeolocationPopup = ({ contests, onClose }) => {
 
           try {
             const response = await axios.get(
-              `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=AIzaSyAZayBd_1QMbIZpRgTc9-QDvtrmuA-w-xI`
+              `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=AIzaSyA8pM5yXTJ3LM8zBF-EkZHEyxlPXSttsl0`
             );
 
             // Check if the results array exists and has at least one item
@@ -40,7 +40,7 @@ const GeolocationPopup = ({ contests, onClose }) => {
               let stateName = "";
               let countryName = "";
 
-              // Check that addressComponents is defined and an array
+              // Extract state and country names
               if (Array.isArray(addressComponents)) {
                 addressComponents.forEach((component) => {
                   if (component.types.includes("administrative_area_level_1")) {
@@ -59,26 +59,50 @@ const GeolocationPopup = ({ contests, onClose }) => {
                 countryName
               );
 
-              const { restrictedStates } = contests || { restrictedStates: [] };
+              // Safely access restrictedStates
+              const restrictedStates = Area;
 
+              // Log the restrictedStates to debug
+              console.log("Restricted States:", Area);
+
+              // Validate restrictedStates array
               if (
                 Array.isArray(restrictedStates) &&
-                (restrictedStates.some(
-                  (restrictedState) => restrictedState === stateName
-                ) ||
-                  restrictedStates.some(
-                    (restrictedState) => restrictedState === countryName
-                  ))
+                restrictedStates.length > 0
               ) {
-                setUnavailablePopupVisible(true);
-                localStorage.removeItem("token");
-              } else {
-                localStorage.setItem(
-                  "location",
-                  JSON.stringify({ stateName, countryName })
+                const isRestricted = restrictedStates.some(
+                  (restrictedState) =>
+                    restrictedState.toLowerCase() === stateName.toLowerCase() ||
+                    restrictedState.toLowerCase() === countryName.toLowerCase()
                 );
-                console.log("location", stateName, countryName);
-                onClose();
+
+                if (isRestricted) {
+                  // Show the SweetAlert popup if restricted
+                  Swal.fire({
+                    title: "Area Restricted",
+                    text: `This area is restricted for this game. State: ${stateName} in Country: ${countryName}`,
+                    icon: "error",
+                    confirmButtonText: "OK",
+                  });
+
+                  // Remove the token if restricted
+                  localStorage.removeItem("Web-token");
+                } else {
+                  // Save the location in localStorage and close the popup
+                  localStorage.setItem(
+                    "location",
+                    JSON.stringify({ stateName, countryName })
+                  );
+                  console.log("Location saved:", { stateName, countryName });
+                  onClose();
+                }
+              } else {
+                Swal.fire({
+                  title: "Error",
+                  text: "Restricted Area, You are not able to Play Game.",
+                  icon: "error",
+                  confirmButtonText: "OK",
+                });
               }
             } else {
               console.error("No results found in geocode response.");

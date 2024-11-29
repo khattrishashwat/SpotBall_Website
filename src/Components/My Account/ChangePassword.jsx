@@ -31,15 +31,9 @@ function ChangePassword({ resetForm }) {
     old_password: Yup.string().required("Old Password is required"),
     new_password: Yup.string()
       .required("Password is required")
-      .min(8, "Password should be between 8-16 characters long")
-      .max(16, "Password should be between 8-16 characters long")
-      .matches(/[a-z]/, "Password must contain at least one lowercase letter")
-      .matches(/[A-Z]/, "Password must contain at least one uppercase letter")
-      .matches(/[0-9]/, "Password must contain at least one number")
-      .matches(
-        /[@$!%*?&#]/,
-        "Password must contain at least one special character"
-      ),
+      .min(6, "Password should be between 6-16 characters long")
+      .max(16, "Password should be between 6-16 characters long"),
+      
     confirm_password: Yup.string()
       .oneOf(
         [Yup.ref("new_password"), null],
@@ -50,7 +44,7 @@ function ChangePassword({ resetForm }) {
 
   const ChangeSubmit = async (values) => {
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("Web-token");
       const response = await axios.post("change-password", values, {
         headers: {
           Authorization: `Bearer ${token}`,

@@ -34,49 +34,6 @@ const appleProvider = new OAuthProvider("apple.com");
 // Initialize Firebase Messaging
 const messaging = getMessaging(app);
 
-// Register Service Worker and request permission for notifications
-// if ("serviceWorker" in navigator) {
-//   navigator.serviceWorker
-//     .register("/firebase-messaging-sw.js")
-//     .then((registration) => {
-//       console.log("Service Worker registered:", registration);
-
-//       // Request permission and get token for push notifications
-//       getToken(messaging, {
-//         vapidKey:
-//           "BNkI-Se9LgfgnkAxsoNDTe3uQDR7HBWV6rY-Mhc3A6AioGIl-VnUn49NTAdTZHgBnt6id6KokU02Pku4G0GpYxA",
-//       })
-//         .then((currentToken) => {
-//           if (currentToken) {
-//             console.log("Current token:", currentToken);
-//             localStorage.setItem("device_token", currentToken);
-//           } else {
-//             console.log(
-//               "No registration token available. Request permission to generate one."
-//             );
-//           }
-//         })
-//         .catch((err) => {
-//           console.error("Error getting token:", err);
-//         });
-
-//       // Handle incoming messages
-//       onMessage(messaging, (payload) => {
-//         console.log("Message received:", payload);
-//         // Display a notification using Swal
-//         Swal.fire({
-//           title: "New Message!",
-//           text: payload.notification.body,
-//           icon: "info",
-//           confirmButtonText: "OK",
-//         });
-//       });
-//     })
-//     .catch((error) => {
-//       console.error("Service Worker registration failed:", error);
-//     });
-// }
-
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker
     .register("/firebase-messaging-sw.js", {
@@ -219,47 +176,38 @@ export const signWithTwitter = async (setFieldValue) => {
   }
 };
 
-// export const signInWithApple = async (setFieldValue) => {
-//   try {
-//     const appleResponse = await appleSignin.signIn();
-//     const appleCredential = appleResponse;
+export const signInWithApple = async (setFieldValue) => {
+  try {
+    const result = await signInWithPopup(auth, appleProvider);
+    const user = result.user;
 
-//     // Send Apple token to Firebase for authentication
-//     const credential = OAuthProvider.credential(
-//       appleCredential.id_token,
-//       appleCredential.access_token
-//     );
+    console.log("User info from Apple:", user);
+    const userData = {
+      uid: user.uid,
+      displayName: user.displayName,
+      email: user.email,
+      photoURL: user.photoURL,
+    };
 
-//     const result = await signInWithPopup(auth, credential);
-//     const user = result.user;
+    const nameParts = userData.displayName
+      ? userData.displayName.split(" ")
+      : [];
 
-//     console.log("User info from Apple:", user);
-//     const userData = {
-//       uid: user.uid,
-//       displayName: user.displayName,
-//       email: user.email,
-//       photoURL: user.photoURL,
-//     };
+    setFieldValue("first_name", nameParts[0] || "");
+    setFieldValue("last_name", nameParts.slice(1).join(" ") || "");
+    setFieldValue("email", userData.email || "");
+    setFieldValue("uid", userData.uid || "");
+  } catch (error) {
+    Swal.fire({
+      icon: "error",
+      title: "Sign-in failed",
+      text: error.message,
+    });
+    console.error("Error during Apple sign-in:", error);
+  }
+};
 
-//     const nameParts = userData.displayName
-//       ? userData.displayName.split(" ")
-//       : [];
-
-//     setFieldValue("first_name", nameParts[0] || "");
-//     setFieldValue("last_name", nameParts.slice(1).join(" ") || "");
-//     setFieldValue("email", userData.email || "");
-//     setFieldValue("uid", userData.uid || "");
-//   } catch (error) {
-//     Swal.fire({
-//       icon: "error",
-//       title: "Sign-in failed",
-//       text: error.message,
-//     });
-//     console.error("Error during Apple sign-in:", error);
-//   }
-// };
-
-//------Login-----
+// ------Login-----
 
 export const LoginWithGoogle = async () => {
   try {
@@ -435,7 +383,6 @@ export const LoginWithFacebook = async () => {
     });
   }
 };
-
 
 export const LoginWithApple = async () => {
   try {

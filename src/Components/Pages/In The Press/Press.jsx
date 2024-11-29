@@ -6,7 +6,7 @@ function Press() {
   const [press,setPress]=useState('');
 
     const fetchPress = async () => {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("Web-token");
       try {
         setIsLoading(true);
         const response = await axios.get("get-press", {

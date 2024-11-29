@@ -1579,7 +1579,7 @@ ul.list-inline li a:hover {
 .faq_content .panel-group .panel .panel-heading h4 a i {
   color: #009e49;
   border: 2px solid #009e49;
-  padding: 2px;
+  padding: 1px;
   font-size: 17px;
   width: 20px;
   height: 20px;
@@ -5573,4 +5573,12 @@ input.updateinput {
 .footermaindiv_section a,
 .footermaindiv_section .linksanchor {
   cursor: pointer;
+}
+.showsigninbtn_div {
+  cursor: pointer; /* Ensures pointer cursor */
+  text-decoration: none; /* No underline by default */
+}
+
+.showsigninbtn_div:hover {
+  text-decoration: underline; /* Underline on hover */
 }

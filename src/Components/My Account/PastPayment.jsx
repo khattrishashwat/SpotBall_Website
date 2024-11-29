@@ -15,7 +15,7 @@ function PastPayment() {
 
   useEffect(() => {
     const fetchPayments = async () => {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("Web-token");
 
       try {
         const response = await axios.get(
@@ -41,14 +41,14 @@ function PastPayment() {
 
   const handleDownload = async (e, paymentId) => {
     e.preventDefault();
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("Web-token");
 
     try {
       const response = await axios.get(`v1/app/contest/get-bill/${paymentId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
-      const pdfUrl = response.data.data[0]?.pdf;
+console.log("pdf",response.data.data.pdf);
+      const pdfUrl = response.data.data.pdf;
       if (pdfUrl) {
         window.open(pdfUrl, "_blank");
       } else {

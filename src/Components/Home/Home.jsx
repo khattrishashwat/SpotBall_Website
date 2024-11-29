@@ -17,6 +17,8 @@ function Home() {
   const [isModals, setIsModals] = useState("");
   const [onCarts, setOnCarts] = useState("");
   const [links, setLinks] = useState("");
+  const [countss, setCountss] = useState("");
+  const [restrictedStates, setRestrictedStates] = useState("");
   const videoRef = useRef(null);
   const [isLoginPopup, setLoginPopup] = useState(false);
   const [banner, setBanner] = useState(false);
@@ -29,6 +31,7 @@ function Home() {
   };
   // const handleBuyTicketClick = (contest) => {
   //   setSelectedContest(contest);
+
   //   setOnCarts(true);
   // };
   // const handleBuyTicketClick = (contest) => {
@@ -45,7 +48,7 @@ function Home() {
   // };
 
   const handleBuyTicketClick = (contest) => {
-    const token = localStorage.getItem("token"); // Replace with your token retrieval method
+    const token = localStorage.getItem("Web-token"); // Replace with your token retrieval method
 
     if (!token) {
       Swal.fire({
@@ -72,7 +75,7 @@ function Home() {
     setOnCarts(false);
   };
 
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("Web-token");
 
   const close = () => {
     setIsModals(false);
@@ -92,7 +95,7 @@ function Home() {
   };
 
   const fetchVideoData = async () => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("Web-token");
     try {
       const response = await axios.get("get-how-to-play", {
         headers: {
@@ -110,6 +113,9 @@ function Home() {
 
   useEffect(() => {
     fetchVideoData();
+  }, []);
+  useEffect(() => {
+    window.scrollTo(0,0);
   }, []);
 
   const playVideo = () => {
@@ -169,7 +175,7 @@ function Home() {
 
   const fetchData = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("Web-token");
 
       if (token) {
         const response = await axios.get("get-all-contests", {
@@ -177,18 +183,28 @@ function Home() {
             Authorization: `Bearer ${token}`,
           },
         });
-        const { banner_details, contests, livelinks } = response.data.data;
+
+        const {
+          banner_details,
+          unreadCount,
+          contests,
+          restrictedStates,
+          livelinks,
+        } = response.data.data;
         setLinks(livelinks);
         setBanner(banner_details[0]);
         setContests(contests);
         setCorousal(banner_details[0]?.corousal);
+        setCountss(unreadCount);
+        setRestrictedStates(restrictedStates);
       } else {
         const response = await axios.get("get-banner");
-        const { bannerDetails, contests } = response.data.data;
-
+        const { bannerDetails, contests, restrictedStates } =
+          response.data.data;
+        setRestrictedStates(restrictedStates);
         setBanner(bannerDetails[0]);
         setContests(contests);
-        setCorousal(response.data.data[0]?.corousal || []);
+        setCorousal(bannerDetails[0].corousal || []);
       }
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -198,6 +214,8 @@ function Home() {
   useEffect(() => {
     fetchData();
   }, [token]);
+
+  // console.log("corousal", corousal);
 
   const handleIncrease = () => {
     if (quantity < selectedContest?.maxTickets) {
@@ -249,6 +267,8 @@ function Home() {
     setGeolocationPopupVisible(false);
   };
 
+  console.log("live",links);
+  
   return (
     <>
       {loading ? (
@@ -458,9 +478,9 @@ function Home() {
                             <div className="everyweek_livewatchdiv">
                               <div className="watchondiv">
                                 <h4>Watch On</h4>
-                                {links?.facebookUrl && (
+                                {links?.Facebook_Streaming && (
                                   <a
-                                    href={links.facebookUrl}
+                                    href={links.Facebook_Streaming}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                   >
@@ -470,9 +490,9 @@ function Home() {
                                     />
                                   </a>
                                 )}
-                                {links?.youtubeUrl && (
+                                {links?.Youtube_Streaming && (
                                   <a
-                                    href={links.youtubeUrl}
+                                    href={links.Youtube_Streaming}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                   >
@@ -524,7 +544,7 @@ function Home() {
       {isGeolocationPopupVisible && (
         <GeolocationPopup
           onClose={handleCloseGeolocationPopup}
-          contests={selectedContest}
+          Area={restrictedStates}
         />
       )}
 

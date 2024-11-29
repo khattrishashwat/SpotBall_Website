@@ -55,7 +55,7 @@ function Profile() {
   };
 
   const fetchDeactive = async () => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("Web-token");
     try {
       setIsLoading(true);
       const response = await axios.get(`active-inactive`, {
@@ -66,7 +66,7 @@ function Profile() {
 
       if (response.status === 200) {
         // Clear token and navigate to homepage
-        localStorage.removeItem("token");
+        localStorage.removeItem("Web-token");
         Swal.fire({
           title: response.data.message,
         }).then(() => {
@@ -86,7 +86,7 @@ function Profile() {
     }
   };
   const fetchDelete = async () => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("Web-token");
     try {
       setIsLoading(true);
       const response = await axios.get(`delete-account`, {
@@ -97,7 +97,7 @@ function Profile() {
 
       if (response.status === 200) {
         // Clear token and navigate to homepage
-        localStorage.removeItem("token");
+        localStorage.removeItem("Web-token");
         Swal.fire({
           title: response.data.message,
         }).then(() => {
@@ -118,9 +118,15 @@ function Profile() {
   };
 
   const Logout = async () => {
-    // localStorage.clear();
-    localStorage.removeItem("token");
-    window.location.reload();
+    localStorage.removeItem("Web-token");
+    Swal.fire({
+      icon: "success",
+      title: "Logout Successful",
+      text: "You have been logged out successfully.",
+      timer: 2000,
+      showConfirmButton: false,
+    });
+    navigate("/");
   };
 
   return (

@@ -18,7 +18,11 @@ import Press from "./Components/Pages/In The Press/Press";
 import Are from "./Components/Pages/Who we are/Are";
 import Circle from "./Components/Pages/The Winners Circle/Circle";
 import Weekly from "./Components/Pages/Live Weekly Winner/Weekly";
-import Legal from "./Components/Pages/Legal Terms/Legal";
+// import Legal from "./Components/Pages/Legal Terms/Legal";
+import Cookies from "./Components/Pages/Legal Terms/Cookies";
+import Privacy from "./Components/Pages/Legal Terms/Privacy";
+import Rules from "./Components/Pages/Legal Terms/Rules";
+import Tearms from "./Components/Pages/Legal Terms/Tearms";
 import Profile from "./Components/My Account/Profile";
 import Checkout from "./Components/Pages/Play/Checkout";
 import Screen from "./Components/Pages/Play/Screen";
@@ -45,7 +49,7 @@ const ProtectedRoute = () => {
   // }
   // return <Outlet />;
 
-  const isAuthenticated = localStorage.getItem("token");
+  const isAuthenticated = localStorage.getItem("Web-token");
 
   if (!isAuthenticated) {
     // Show Swal alert
@@ -64,17 +68,21 @@ const ProtectedRoute = () => {
   return <Outlet />;
 };
 
-// Axios interceptor with redirect on 403 error
-// axios.interceptors.response.use(
-//   (response) => response,
-//   (error) => {
-//     if (error.response && error.response.status === 403) {
-//       localStorage.removeItem("token");
-//       window.location.href = "/"; // Redirect using window.location.href
-//     }
-//     return Promise.reject(error);
-//   }
-// );
+axios.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem("Web-token");
+      Swal.fire({
+        icon: "error",
+        title: "Something went wrong!",
+        text: "You are not authorized. Please log in again.",
+      });
+      window.location.reload(); // Redirect using window.location.href
+    }
+    return Promise.reject(error);
+  }
+);
 
 const App = () => {
   const [loader, setLoading] = useState(false);
@@ -108,17 +116,21 @@ const App = () => {
               <Route path="/in_the_press" element={<Press />} />
               <Route path="/play_screen" element={<Screen />} />
               <Route path="/cart" element={<Checkout />} />
-              <Route path="/contact_us" element={<Contact />} />
-            <Route path="/the_winners_circle" element={<Circle />} />
+              <Route path="/the_winners_circle" element={<Circle />} />
             </Route>
             <Route path="/" element={<Home />} />
+            <Route path="/contact_us" element={<Contact />} />
             <Route path="/playss" element={<PlayVedio />} />
             {/* <Route path="/login" element={<Login />} />
             <Route path="/sign" element={<Signup />} /> */}
             <Route path="/load" element={<Loader />} />
-            <Route path="/legal_terms" element={<Legal />} />
+            {/* <Route path="/legal_terms" element={<Legal />} /> */}
             <Route path="/who_we_are" element={<Are />} />
             <Route path="/live_weekly_winner" element={<Weekly />} />
+            <Route path="/tearms" element={<Tearms />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/rules" element={<Rules />} />
+            <Route path="/cookies" element={<Cookies />} />
 
             {/* Catch-all for 404 */}
             <Route path="*" element={<PageNot />} />

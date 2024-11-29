@@ -11,6 +11,7 @@ import {
   messaging,
   getToken,
   onMessage,
+  LoginWithApple,
   LoginWithGoogle,
   LoginWithTwitter,
   LoginWithFacebook,
@@ -21,7 +22,12 @@ import { GoogleLogin } from "@react-oauth/google";
 function Login({ isVisible, onClose }) {
   const [showPassword, setShowPassword] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
-  const [showSignup, setShowSignup] = useState(false);
+  const stateFromLocalStorage = localStorage.getItem("showSignup");
+  let state = false;
+  if (stateFromLocalStorage) {
+    state = true;
+  }
+  const [showSignup, setShowSignup] = useState(state);
   const [isLoading, setIsLoading] = useState("");
   const navigate = useNavigate();
 
@@ -51,6 +57,12 @@ function Login({ isVisible, onClose }) {
 
   const Login = async (values) => {
     console.log("Attempting to login with values:", values);
+
+    // Check if the input is a phone number and prepend country code if needed
+    const isPhoneNumber = /^[6-9]\d{9}$/.test(values.emailOrPhone);
+    if (isPhoneNumber) {
+      values.emailOrPhone = `+91${values.emailOrPhone}`;
+    }
 
     setIsLoading(true);
 
@@ -85,7 +97,7 @@ function Login({ isVisible, onClose }) {
       console.log("Login successful! Response:", response.data.data);
 
       // Store the backend token in local storage
-      localStorage.setItem("token", response.data.data.token);
+      localStorage.setItem("Web-token", response.data.data.token);
 
       // Show success message
       Swal.fire({
@@ -94,7 +106,7 @@ function Login({ isVisible, onClose }) {
         showConfirmButton: false,
         timer: 1000,
       });
-      window.location.reload();
+      // window.location.reload();
       navigate("/");
       onClose();
     } catch (error) {
@@ -113,9 +125,11 @@ function Login({ isVisible, onClose }) {
     }
   };
 
+
   const handleSignup = () => {
     setShowSignup(true);
     onClose();
+    localStorage.setItem("showSignup", "true");
   };
   const handlebackSignup = () => {
     setShowSignup(false);
@@ -240,6 +254,9 @@ function Login({ isVisible, onClose }) {
                                     <a
                                       className="showsignupbtn_main"
                                       onClick={handleSignup}
+                                      style={{
+                                        cursor: "pointer",
+                                      }}
                                     >
                                       Sign Up
                                     </a>
@@ -292,8 +309,13 @@ function Login({ isVisible, onClose }) {
                                           />
                                         </a>
                                       </li>
-                                      <li>
-                                        <a href="#">
+                                      {/* <li>
+                                        <a
+                                          onClick={() => {
+                                            LoginWithApple();
+                                          }}
+                                          style={{ cursor: "pointer" }}
+                                        >
                                           <img
                                             src={`${process.env.PUBLIC_URL}/images/apple_icon.png`}
                                             alt="Apple"
@@ -304,11 +326,10 @@ function Login({ isVisible, onClose }) {
                                         <a href="#">
                                           <img
                                             src={`${process.env.PUBLIC_URL}/images/Instagram_icon.png`}
-                                            // src="images/insta_icon.png"
                                             alt="Instagram"
                                           />
                                         </a>
-                                      </li>
+                                      </li> */}
                                     </ul>
                                   </div>
                                 </div>
@@ -335,8 +356,11 @@ function Login({ isVisible, onClose }) {
       {showSignup && (
         <Signup
           back={handlebackSignup}
-          isOpenness={() => setShowSignup(false)}
-          onClosed={() => setShowSignup(false)}
+          isOpenness={handleSignup}
+          Closed={() => {
+            localStorage.removeItem("showSignup");
+            setShowSignup(false);
+          }}
         />
       )}
     </>
