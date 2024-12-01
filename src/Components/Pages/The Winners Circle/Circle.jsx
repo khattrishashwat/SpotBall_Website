@@ -220,9 +220,7 @@ function Circle() {
                   value={month}
                   onChange={(e) => setMonth(e.target.value)}
                 >
-                  <option value="">
-                    Select Month
-                  </option>
+                  <option value="">Select Month</option>
                   <option value="1">January</option>
                   <option value="2">February</option>
                   <option value="3">March</option>
@@ -240,8 +238,75 @@ function Circle() {
             </div>
           </div>
         </div>
-
         <div className="row winnercirlce_timeline_row">
+          <div id="winner_circle-timeline">
+            <div className="winner_circle-center-line"></div>
+            <div className="winner_circle-timeline-content">
+              {Object.keys(groupedLinks).length > 0 ? (
+                Object.entries(groupedLinks).map(
+                  ([monthYear, items], index) => (
+                    <div
+                      className={`timeline-article ${
+                        index === 0 ? "onlyforfisrtchild" : ""
+                      }`}
+                      key={monthYear}
+                    >
+                      <div
+                        className={
+                          index % 2 === 0
+                            ? "content-left-container"
+                            : "content-right-container"
+                        }
+                      >
+                        <div className="row rowforwinner_boxes">
+                          {items.map((item, i) => {
+                            const winnerName =
+                              `${item.userId.first_name} ${item.userId.last_name}`.toUpperCase();
+                            const formattedDate = formatDate(item.createdAt);
+                            const formattedPrize =
+                              item.prize.toLocaleString("en-IN");
+
+                            return (
+                              <div
+                                className={`col-md-${
+                                  items.length === 1 ? "12" : "6"
+                                } colmainwinnerbox`}
+                                key={item._id}
+                              >
+                                <div className="jackpotwinner_div">
+                                  <div className="winnercrclimg">
+                                    <img
+                                      src={
+                                        item.userId.profile_url ||
+                                        `${process.env.PUBLIC_URL}/images/winner_img.png`
+                                      }
+                                      alt={`${winnerName}'s profile`}
+                                    />
+                                  </div>
+                                  <div className="winnerabouttext">
+                                    <h3>{winnerName}</h3>
+                                    <p>Jackpot {formattedDate}</p>
+                                    <h4>₹{formattedPrize}</h4>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                        <div className="monthwithyear_text">{monthYear}</div>
+                      </div>
+                      <div className="meta-date"></div>
+                    </div>
+                  )
+                )
+              ) : (
+                <p>No data available for the selected filters.</p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* <div className="row winnercirlce_timeline_row">
           <div id="winner_circle-timeline">
             <div className="winner_circle-center-line" />
             <div className="winner_circle-timeline-content">
@@ -298,7 +363,7 @@ function Circle() {
               )}
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </section>
   );

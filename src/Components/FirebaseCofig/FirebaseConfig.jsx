@@ -10,6 +10,8 @@ import {
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
 import Swal from "sweetalert2"; // Assuming Swal is already installed
 import axios from "axios";
+import Login from "../Auth/Login";
+import Signup from "../Auth/Signup";
 // import appleSignin from "apple-signin-auth";
 
 // Firebase configuration
@@ -208,13 +210,28 @@ export const signInWithApple = async (setFieldValue) => {
 };
 
 // ------Login-----
-
+let UserDetails;
 export const LoginWithGoogle = async () => {
   try {
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
     console.log("user Data", user);
 
+    const userData = {
+      uid: user.uid,
+      displayName: user.displayName,
+      email: user.email,
+      photoURL: user.photoURL,
+      signup_method: "google",
+    };
+    const nameParts = userData.displayName
+      ? userData.displayName.split(" ")
+      : [];
+    const first_name = nameParts[0] || "";
+    const last_name = nameParts.length > 1 ? nameParts.slice(1).join(" ") : "";
+
+    // Store data in UserDetails
+    UserDetails = { ...userData, first_name, last_name };
     console.log("Google Sign-In successful. User UID:", user.uid);
 
     const checkUIDResponse = await axios.get(
@@ -244,10 +261,10 @@ export const LoginWithGoogle = async () => {
       });
 
       // Reload or navigate as needed
-      
+
       window.location.reload();
-    } 
-    
+    }
+
     // else if (checkUIDResponse.data.message === "Uid Not Found") {
     //   Swal.fire({
     //     icon: "error",
@@ -260,11 +277,14 @@ export const LoginWithGoogle = async () => {
   } catch (error) {
     console.error("Google Sign-In or API request failed:", error);
 
-    Swal.fire({
-      icon: "error",
-      title: "Login Failed",
-      text: error.response ? error.response.data.message : error.message,
-    });
+    // Swal.fire({
+    //   icon: "error",
+    //   title: "Login Failed",
+    //   text: error.response ? error.response.data.message : error.message,
+    // });
+    console.log("UserDetails", UserDetails);
+    localStorage.setItem("UIDNotFound", JSON.stringify(UserDetails));
+    window.location.reload();
   }
 };
 
@@ -274,8 +294,21 @@ export const LoginWithTwitter = async () => {
     const result = await signInWithPopup(auth, twitterprovider);
     const user = result.user;
 
-    console.log("Twitter Sign-In successful. User UID:", user.uid);
+    const userData = {
+      uid: user.uid,
+      displayName: user.displayName,
+      email: user.email,
+      photoURL: user.photoURL,
+      signup_method: "twitter",
+    };
+    const nameParts = userData.displayName
+      ? userData.displayName.split(" ")
+      : [];
+    const first_name = nameParts[0] || "";
+    const last_name = nameParts.length > 1 ? nameParts.slice(1).join(" ") : "";
 
+    // Store data in UserDetails
+    UserDetails = { ...userData, first_name, last_name };
     // Check if UID exists in your database
     const checkUIDResponse = await axios.get(
       `check-uid-exists/${user.uid}`,
@@ -318,13 +351,8 @@ export const LoginWithTwitter = async () => {
     }
   } catch (error) {
     console.error("Twitter Sign-In or API request failed:", error);
-
-    // Show error message
-    Swal.fire({
-      icon: "error",
-      title: "Login Failed",
-      text: error.response ? error.response.data.message : error.message,
-    });
+    localStorage.setItem("UIDNotFound", JSON.stringify(UserDetails));
+    window.location.reload();
   }
 };
 
@@ -334,6 +362,21 @@ export const LoginWithFacebook = async () => {
     const result = await signInWithPopup(auth, facebookProvider);
     const user = result.user;
 
+    const userData = {
+      uid: user.uid,
+      displayName: user.displayName,
+      email: user.email,
+      photoURL: user.photoURL,
+      signup_method: "facebook",
+    };
+    const nameParts = userData.displayName
+      ? userData.displayName.split(" ")
+      : [];
+    const first_name = nameParts[0] || "";
+    const last_name = nameParts.length > 1 ? nameParts.slice(1).join(" ") : "";
+
+    // Store data in UserDetails
+    UserDetails = { ...userData, first_name, last_name };
     console.log("Facebook Sign-In successful. User UID:", user.uid);
 
     // Check if UID exists in your database
@@ -379,12 +422,8 @@ export const LoginWithFacebook = async () => {
   } catch (error) {
     console.error("Facebook Sign-In or API request failed:", error);
 
-    // Show error message
-    Swal.fire({
-      icon: "error",
-      title: "Login Failed",
-      text: error.response ? error.response.data.message : error.message,
-    });
+    localStorage.setItem("UIDNotFound", JSON.stringify(UserDetails));
+    window.location.reload();
   }
 };
 

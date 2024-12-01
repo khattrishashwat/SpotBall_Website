@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
@@ -6,6 +6,7 @@ import * as Yup from "yup";
 import axios from "axios";
 import Forget from "./Forget";
 import Signup from "./Signup";
+import SocialSignUP from "./SocialSignUp";
 import Loader from "../Loader/Loader";
 import {
   messaging,
@@ -20,6 +21,8 @@ import {
 import { GoogleLogin } from "@react-oauth/google";
 
 function Login({ isVisible, onClose }) {
+  // console.log("logincomponent");
+
   const [showPassword, setShowPassword] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const stateFromLocalStorage = localStorage.getItem("showSignup");
@@ -27,6 +30,7 @@ function Login({ isVisible, onClose }) {
   if (stateFromLocalStorage) {
     state = true;
   }
+
   const [showSignup, setShowSignup] = useState(state);
   const [isLoading, setIsLoading] = useState("");
   const navigate = useNavigate();
@@ -35,25 +39,24 @@ function Login({ isVisible, onClose }) {
     setShowPassword(!showPassword);
   };
 
+  const [isSocialSignup, setIsSocialSignup] = useState(false);
+
+  useEffect(() => {
+    const socialsLocalStorage = localStorage.getItem("isSocialSignup");
+     if (socialsLocalStorage) {
+       setIsSocialSignup(true);
+     }
+
+    const userDetails = localStorage.getItem("UIDNotFound");
+    if (userDetails) {
+      handleSocialSignup();
+    }
+  }, []);
+
   const LoginValues = {
     emailOrPhone: "",
     password: "",
   };
-
-  const validation = Yup.object().shape({
-    emailOrPhone: Yup.string().required("Phone number or email is required"),
-    password: Yup.string()
-      .required("Password is required")
-      .min(8, "Password should be between 8-16 characters long")
-      .max(16, "Password should be between 8-16 characters long")
-      .matches(/[a-z]/, "Password must contain at least one lowercase letter")
-      .matches(/[A-Z]/, "Password must contain at least one uppercase letter")
-      .matches(/[0-9]/, "Password must contain at least one number")
-      .matches(
-        /[@$!%*?&#]/,
-        "Password must contain at least one special character"
-      ),
-  });
 
   const Login = async (values) => {
     console.log("Attempting to login with values:", values);
@@ -125,7 +128,16 @@ function Login({ isVisible, onClose }) {
     }
   };
 
+  const handleSocialSignup = () => {
+    setIsSocialSignup(true);
+    onClose(); // Ensure onClose is defined
+    // localStorage.setItem("isSocialSignup", "true");
+  };
 
+  const closeSocialSignup = () => {
+    localStorage.removeItem("isSocialSignup");
+    setIsSocialSignup(false);
+  };
   const handleSignup = () => {
     setShowSignup(true);
     onClose();
@@ -350,6 +362,13 @@ function Login({ isVisible, onClose }) {
       {/* Forgot Password Modal */}
       {showForgotPassword && (
         <Forget onClosed={() => setShowForgotPassword(false)} />
+      )}
+      {isSocialSignup && (
+        <SocialSignUP
+          userDetails={JSON.parse(localStorage.getItem("UIDNotFound"))} // Ensure this data is parsed correctly
+          onSocial={handleSocialSignup}
+          closeSocial={closeSocialSignup}
+        />
       )}
 
       {/* Sign Up Modal */}

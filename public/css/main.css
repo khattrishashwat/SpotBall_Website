@@ -2921,8 +2921,9 @@ ul.list-inline li a:hover {
   }
   /* .hideonmob_icon{display: none;} */
   .userprofilediv_new .userimgdiv img {
-    width: 35px !important;
-    top: 2px;
+           width: 36px !important;
+        top: -2px;
+        right: 6px;
   }
   .userprofilediv_new .userverifyimg img {
     top: 11px;
