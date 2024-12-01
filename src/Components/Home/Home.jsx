@@ -29,11 +29,11 @@ function Home() {
   const open = async () => {
     setIsModals(true);
   };
-  // const handleBuyTicketClick = (contest) => {
-  //   setSelectedContest(contest);
+  const handleBuyTicketClick = (contest) => {
+    setSelectedContest(contest);
 
-  //   setOnCarts(true);
-  // };
+    setOnCarts(true);
+  };
   // const handleBuyTicketClick = (contest) => {
   //   if (!contest.allowance) {
   //     Swal.fire({
@@ -47,29 +47,29 @@ function Home() {
   //   }
   // };
 
-  const handleBuyTicketClick = (contest) => {
-    const token = localStorage.getItem("Web-token"); // Replace with your token retrieval method
+  // const handleBuyTicketClick = (contest) => {
+  //   const token = localStorage.getItem("Web-token"); // Replace with your token retrieval method
 
-    if (!token) {
-      Swal.fire({
-        icon: "info",
-        title: "Login Required",
-        text: "Please login to participate in this contest!",
-      });
-      return;
-    }
+  //   if (!token) {
+  //     Swal.fire({
+  //       icon: "info",
+  //       title: "Login Required",
+  //       text: "Please login to participate in this contest!",
+  //     });
+  //     return;
+  //   }
 
-    if (!contest.allowance) {
-      Swal.fire({
-        icon: "warning",
-        title: "Participation Alert",
-        text: "You have already participated in this contest!",
-      });
-    } else {
-      setSelectedContest(contest);
-      setOnCarts(true);
-    }
-  };
+  //   if (!contest.allowance) {
+  //     Swal.fire({
+  //       icon: "warning",
+  //       title: "Participation Alert",
+  //       text: "You have already participated in this contest!",
+  //     });
+  //   } else {
+  //     setSelectedContest(contest);
+  //     setOnCarts(true);
+  //   }
+  // };
 
   const ClosedCarts = async () => {
     setOnCarts(false);
@@ -268,7 +268,7 @@ function Home() {
     setGeolocationPopupVisible(false);
   };
 
-  console.log("live",links);
+  // console.log("live",links);
   
   return (
     <>

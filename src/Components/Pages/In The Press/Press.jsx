@@ -41,42 +41,32 @@ function Press() {
             </div>
           </div>
         </div>
-        {/* ============= when press page is empty (start) ============== */}
-        {/* <div className="container pressempty_cont" style={{ display: "none" }}>
-          <div className="col-md-12 col12pressemptyscreen">
-            <div className="row rowpressemptymain">
-              <div className="presspageemptydiv">
-                <div className="emptypresstext">
-                  <h2>
-                    Check back here for Stories and Press Coverage about
-                    SpotsBall India
-                  </h2>
-                  <a href="#!" className="seefullartcle_btn">
-                    See Full Article
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div> */}
-        {/* ============= when press page is empty (end)  ============== */}
+
         <div className="container cont_inthepress">
           {isLoading ? (
-            <Loader/>
+            <Loader />
+          ) : press && press.length > 0 ? (
+            <div className="row inthepress_mainrow">
+              {press.map((pressItem, index) => (
+                <div className="col-md-4 col4pressdi" key={index}>
+                  <div className="inthepressdivmain">
+                    <img src={pressItem.press_banner} alt="In the Press" />
+                    <p>{pressItem.description}</p>
+                    <a
+                      href={pressItem.link}
+                      className="seefullarticle_btn"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      See Full Article
+                    </a>
+                  </div>
+                </div>
+              ))}
+            </div>
           ) : (
             <div className="row inthepress_mainrow">
-              {press &&
-                press.map((pressItem, index) => (
-                  <div className="col-md-4 col4pressdi" key={index}>
-                    <div className="inthepressdivmain">
-                      <img src={pressItem.press_banner} alt="In the Press" />{" "}
-                      <p>{pressItem.description}</p>{" "}
-                      <a href={pressItem.link} className="seefullarticle_btn">
-                        See Full Article
-                      </a>
-                    </div>
-                  </div>
-                ))}
+              <div className="no-data-message">No Press Found</div>
             </div>
           )}
         </div>

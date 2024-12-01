@@ -68,21 +68,21 @@ const ProtectedRoute = () => {
   return <Outlet />;
 };
 
-axios.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response && error.response.status === 401) {
-      localStorage.removeItem("Web-token");
-      Swal.fire({
-        icon: "error",
-        title: "Something went wrong!",
-        text: "You are not authorized. Please log in again.",
-      });
-      window.location.reload(); // Redirect using window.location.href
-    }
-    return Promise.reject(error);
-  }
-);
+// axios.interceptors.response.use(
+//   (response) => response,
+//   (error) => {
+//     if (error.response && error.response.status === 401) {
+//       localStorage.removeItem("Web-token");
+//       Swal.fire({
+//         icon: "error",
+//         title: "Something went wrong!",
+//         text: "You are not authorized. Please log in again.",
+//       });
+//       window.location.reload(); // Redirect using window.location.href
+//     }
+//     return Promise.reject(error);
+//   }
+// );
 
 const App = () => {
   const [loader, setLoading] = useState(false);
@@ -113,19 +113,19 @@ const App = () => {
           <Routes>
             <Route element={<ProtectedRoute />}>
               <Route path="/my_account" element={<Profile />} />
-              <Route path="/in_the_press" element={<Press />} />
               <Route path="/play_screen" element={<Screen />} />
               <Route path="/cart" element={<Checkout />} />
-              <Route path="/the_winners_circle" element={<Circle />} />
             </Route>
             <Route path="/" element={<Home />} />
             <Route path="/contact_us" element={<Contact />} />
             <Route path="/playss" element={<PlayVedio />} />
+              <Route path="/in_the_press" element={<Press />} />
             {/* <Route path="/login" element={<Login />} />
             <Route path="/sign" element={<Signup />} /> */}
             <Route path="/load" element={<Loader />} />
             {/* <Route path="/legal_terms" element={<Legal />} /> */}
             <Route path="/who_we_are" element={<Are />} />
+            <Route path="/the_winners_circle" element={<Circle />} />
             <Route path="/live_weekly_winner" element={<Weekly />} />
             <Route path="/tearms" element={<Tearms />} />
             <Route path="/privacy" element={<Privacy />} />

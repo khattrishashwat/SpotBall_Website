@@ -461,6 +461,7 @@ function Profile() {
                   type="button"
                   className="delete_btn_delete actionbtnmain"
                   onClick={Logout}
+                  
                 >
                   Logout
                 </button>

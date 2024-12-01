@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import Login from "../../Auth/Login";
 import axios from "axios";
@@ -6,6 +6,8 @@ import moment from "moment";
 import Swal from "sweetalert2";
 
 function Header() {
+  const menuRef = useRef(null);
+
   const navigate = useNavigate();
   const location = useLocation();
   const [headerClass, setHeaderClass] = useState("");
@@ -46,6 +48,17 @@ function Header() {
     setIsLogout(false);
   };
 
+  const handleClickOutside = (event) => {
+    if (menuRef.current && !menuRef.current.contains(event.target)) {
+      setIsMenuVisible(false);
+    }
+  };
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
   const isHomePage = location.pathname === "/";
   const handleScroll = () => {
     const currentScrollY = window.scrollY;
@@ -128,39 +141,52 @@ function Header() {
     fetchNotification();
   }, []);
 
+  const [timeLeft, setTimeLeft] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  });
+
   const getNextSunday = () => {
     const now = new Date();
-    const nextSunday = new Date(now);
-    nextSunday.setDate(now.getDate() + (7 - now.getDay()));
+    const dayOfWeek = now.getDay();
+    const daysUntilNextSunday = (7 - dayOfWeek) % 7;
+    const nextSunday = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate() + daysUntilNextSunday
+    );
     nextSunday.setHours(23, 59, 59, 999);
-    return nextSunday;
+    return nextSunday.getTime();
   };
-
-  const [timeLeft, setTimeLeft] = useState(getNextSunday() - new Date());
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft(getNextSunday() - new Date());
-    }, 1000);
+    let countDownDate = getNextSunday();
 
-    return () => clearInterval(timer);
+    const updateCountdown = () => {
+      const now = new Date().getTime();
+      const distance = countDownDate - now;
+
+      if (distance < 0) {
+        countDownDate = getNextSunday();
+      }
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor(
+        (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+      );
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      setTimeLeft({ days, hours, minutes, seconds });
+    };
+
+    const interval = setInterval(updateCountdown, 1000);
+
+    return () => clearInterval(interval);
   }, []);
 
-  const formatTime = (milliseconds) => {
-    const totalSeconds = Math.max(0, Math.floor(milliseconds / 1000));
-    const days = String(Math.floor(totalSeconds / 86400)).padStart(2, "0"); // 86400 seconds in a day
-    const hours = String(Math.floor((totalSeconds % 86400) / 3600)).padStart(
-      2,
-      "0"
-    );
-    const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(
-      2,
-      "0"
-    );
-    const seconds = String(totalSeconds % 60).padStart(2, "0");
-
-    return `${days} days:${hours} hours:${minutes} mintues:${seconds} seconds`;
-  };
   return (
     <>
       <header className={headerClass}>
@@ -174,8 +200,12 @@ function Header() {
                   src={`${process.env.PUBLIC_URL}/images/instant-win.svg`}
                 />{" "}
               </div>
-              <div className="endscompititions">
+              {/* <div className="endscompititions">
                 Competition Ends: {formatTime(timeLeft)}
+              </div> */}
+              <div className="endscompititions">
+                Competition Ends:{" "}
+                {`${timeLeft.days} days: ${timeLeft.hours} hours: ${timeLeft.minutes} minutes: ${timeLeft.seconds} seconds`}
               </div>
             </a>
           </div>
@@ -341,6 +371,7 @@ function Header() {
                       </div>
                     )}
                     <div
+                      ref={menuRef}
                       className="menulist_divmanin"
                       style={{ display: isMenuVisible ? "block" : "none" }}
                     >

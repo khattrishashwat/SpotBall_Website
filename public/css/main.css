@@ -5589,3 +5589,18 @@ input.updateinput {
   object-fit: cover;
   height: 306px !important;
 }
+
+.itmelink_menus {
+  cursor: pointer;
+}
+.cncle_btn_delete.actionbtnmain,
+.delete_btn_delete.actionbtnmain {
+  cursor: pointer;
+}
+
+.showsigninpopup_onclick {
+  cursor: pointer;
+}
+.forgotpas_btn_signin {
+  cursor: pointer;
+}

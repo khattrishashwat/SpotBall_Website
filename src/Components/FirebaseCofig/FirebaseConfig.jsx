@@ -213,6 +213,7 @@ export const LoginWithGoogle = async () => {
   try {
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
+    console.log("user Data", user);
 
     console.log("Google Sign-In successful. User UID:", user.uid);
 
@@ -243,16 +244,19 @@ export const LoginWithGoogle = async () => {
       });
 
       // Reload or navigate as needed
+      
       window.location.reload();
-    } else if (checkUIDResponse.data.message === "Uid Not Found") {
-      Swal.fire({
-        icon: "error",
-        text: "Go to SignUp, then try social login",
-      });
+    } 
+    
+    // else if (checkUIDResponse.data.message === "Uid Not Found") {
+    //   Swal.fire({
+    //     icon: "error",
+    //     text: "Go to SignUp, then try social login",
+    //   });
 
-      // Reload the page after error
-      window.location.reload();
-    }
+    //   // Reload the page after error
+    //   window.location.reload();
+    // }
   } catch (error) {
     console.error("Google Sign-In or API request failed:", error);
 
