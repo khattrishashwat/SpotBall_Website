@@ -52,8 +52,9 @@ const SocialSignUP = ({ onSocial, closeSocial }) => {
         device_type: "website",
         device_token: localStorage.getItem("device_token"),
       });
+      console.log("social token",response.data)
       const token = response.data.data.token;
-      localStorage.setItem("token", token);
+      localStorage.setItem("Web-token", token);
       Swal.fire({
         title: response.data.message,
         showConfirmButton: false,
@@ -86,7 +87,7 @@ const SocialSignUP = ({ onSocial, closeSocial }) => {
   const legalLinks = {
     title: "Legal",
     links: ["Terms & Conditions", "Privacy Policy", "Cookie Policy"],
-    paths: ["/terms", "/privacy", "/cookies"],
+    paths: ["/tearms", "/privacy", "/cookies"],
   };
 
   return (

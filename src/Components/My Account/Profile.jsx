@@ -304,6 +304,7 @@ function Profile() {
         style={{
           paddingRight: isDeactivate ? 17 : "",
           display: isDeactivate ? "block" : "none",
+          backgroundColor: isDeactivate ? "#303030a3" : "",
         }}
         aria-modal={isDeactivate ? "true" : "false"}
       >
@@ -362,6 +363,7 @@ function Profile() {
         style={{
           paddingRight: isDel ? 17 : "",
           display: isDel ? "block" : "none",
+          backgroundColor: isDel ? "#303030a3" : "",
         }}
         aria-modal={isDel ? "true" : "false"}
       >
@@ -425,6 +427,7 @@ function Profile() {
         style={{
           paddingRight: isLogout ? 17 : "",
           display: isLogout ? "block" : "none",
+          backgroundColor: isLogout ? "#303030a3" : "",
         }}
         aria-modal="true"
       >
@@ -461,7 +464,6 @@ function Profile() {
                   type="button"
                   className="delete_btn_delete actionbtnmain"
                   onClick={Logout}
-                  
                 >
                   Logout
                 </button>

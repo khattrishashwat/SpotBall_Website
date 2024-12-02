@@ -68,21 +68,21 @@ const ProtectedRoute = () => {
   return <Outlet />;
 };
 
-// axios.interceptors.response.use(
-//   (response) => response,
-//   (error) => {
-//     if (error.response && error.response.status === 401) {
-//       localStorage.removeItem("Web-token");
-//       Swal.fire({
-//         icon: "error",
-//         title: "Something went wrong!",
-//         text: "You are not authorized. Please log in again.",
-//       });
-//       window.location.reload(); // Redirect using window.location.href
-//     }
-//     return Promise.reject(error);
-//   }
-// );
+axios.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem("Web-token");
+      Swal.fire({
+        icon: "error",
+        title: "Something went wrong!",
+        text: error.response ? error.response.data.message : error.message,
+      });
+      }
+    return Promise.reject(error);
+  }
+);
+
 
 const App = () => {
   const [loader, setLoading] = useState(false);

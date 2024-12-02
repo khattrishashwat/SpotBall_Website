@@ -6,7 +6,7 @@ import moment from "moment";
 import Swal from "sweetalert2";
 
 function Header() {
-  const menuRef = useRef(null);
+  
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -24,7 +24,7 @@ function Header() {
   const token = localStorage.getItem("Web-token");
 
   const NotificationOpen = () => {
-    setIsNot(true);
+    setIsNot((prevState) => !prevState);
   };
 
   const NotificationClose = () => {
@@ -39,7 +39,7 @@ function Header() {
     setLoginPopup(false);
   };
   const toggleMenu = () => {
-    setIsMenuVisible(!isMenuVisible);
+    setIsMenuVisible((prevState) => !prevState); // Toggle the state
   };
   const OpenLogout = () => {
     setIsLogout(true);
@@ -48,17 +48,39 @@ function Header() {
     setIsLogout(false);
   };
 
-  const handleClickOutside = (event) => {
-    if (menuRef.current && !menuRef.current.contains(event.target)) {
-      setIsMenuVisible(false);
-    }
-  };
-  useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+  // const handleClickOutside = (event) => {
+  //   if (menuRef.current && !menuRef.current.contains(event.target)) {
+  //     setIsMenuVisible(false);
+  //   }
+  // };
+  // useEffect(() => {
+  //   document.addEventListener("mousedown", handleClickOutside);
+  //   return () => {
+  //     document.removeEventListener("mousedown", handleClickOutside);
+  //   };
+  // }, []);
+
+   const handleClickOutside = (event) => {
+     // Check if the click happened outside the menu button and the menu itself
+     const menuButton = document.querySelector(".menubaricons");
+     const menuList = document.querySelector(".menulist_divmanin");
+
+     if (
+       menuButton &&
+       menuList &&
+       !menuButton.contains(event.target) &&
+       !menuList.contains(event.target)
+     ) {
+       setIsMenuVisible(false); // Hide the menu if clicked outside
+     }
+   };
+
+    useEffect(() => {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
+    }, []);
   const isHomePage = location.pathname === "/";
   const handleScroll = () => {
     const currentScrollY = window.scrollY;
@@ -338,8 +360,14 @@ function Header() {
                         <ul className="navbar moremenubar">
                           <li className="nav-item humbergermenulist">
                             <button
+                              // type="button"
+                              // className="menubaricons showmenus_clickbtn"
+                              // // onClick={toggleMenu}
+                              // onClick={() => setIsMenuVisible(!isMenuVisible)}
                               type="button"
                               className="menubaricons showmenus_clickbtn"
+                              
+                              aria-controls="menu-list"
                               onClick={toggleMenu}
                             >
                               <span className="moretextmenu">More</span>
@@ -358,6 +386,7 @@ function Header() {
                             <button
                               type="button"
                               className="menubaricons showmenus_clickbtn"
+                              aria-controls="menu-list"
                               onClick={toggleMenu}
                             >
                               <span className="moretextmenu">More</span>
@@ -371,7 +400,8 @@ function Header() {
                       </div>
                     )}
                     <div
-                      ref={menuRef}
+                      id="menu-list"
+                      // ref={menuRef}
                       className="menulist_divmanin"
                       style={{ display: isMenuVisible ? "block" : "none" }}
                     >

@@ -31,7 +31,7 @@ function PastPayment() {
         Swal.fire({
           icon: "error",
           title: "Error",
-          text: "Unable to fetch payments. Please try again later.",
+          text: error.response?.data?.message,
         });
       }
     };
@@ -47,7 +47,7 @@ function PastPayment() {
       const response = await axios.get(`v1/app/contest/get-bill/${paymentId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-console.log("pdf",response.data.data.pdf);
+      console.log("pdf", response.data.data.pdf);
       const pdfUrl = response.data.data.pdf;
       if (pdfUrl) {
         window.open(pdfUrl, "_blank");
@@ -56,11 +56,7 @@ console.log("pdf",response.data.data.pdf);
       }
     } catch (error) {
       console.error("Error downloading the invoice:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Download Failed",
-        text: "Unable to download invoice. Please try again later.",
-      });
+      
     }
   };
 

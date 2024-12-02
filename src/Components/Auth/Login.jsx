@@ -43,9 +43,9 @@ function Login({ isVisible, onClose }) {
 
   useEffect(() => {
     const socialsLocalStorage = localStorage.getItem("isSocialSignup");
-     if (socialsLocalStorage) {
-       setIsSocialSignup(true);
-     }
+    if (socialsLocalStorage) {
+      setIsSocialSignup(true);
+    }
 
     const userDetails = localStorage.getItem("UIDNotFound");
     if (userDetails) {
@@ -365,7 +365,7 @@ function Login({ isVisible, onClose }) {
       )}
       {isSocialSignup && (
         <SocialSignUP
-          userDetails={JSON.parse(localStorage.getItem("UIDNotFound"))} // Ensure this data is parsed correctly
+          // userDetails={JSON.parse(localStorage.getItem("UIDNotFound"))} // Ensure this data is parsed correctly
           onSocial={handleSocialSignup}
           closeSocial={closeSocialSignup}
         />

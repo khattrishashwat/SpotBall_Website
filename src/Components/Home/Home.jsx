@@ -268,7 +268,7 @@ function Home() {
     setGeolocationPopupVisible(false);
   };
 
-  console.log("live",links);
+  // console.log("live",links);
   
   return (
     <>

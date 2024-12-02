@@ -236,7 +236,7 @@ const Signup = ({ isOpenness, Closed, back }) => {
         device_token: localStorage.getItem("device_token"),
       });
       const token = response.data.data.token;
-      localStorage.setItem("token", token);
+      localStorage.setItem("Web-token", token);
       Swal.fire({
         title: response.data.message,
         showConfirmButton: false,
@@ -272,6 +272,7 @@ const Signup = ({ isOpenness, Closed, back }) => {
     signInWithFacebook(setFieldValue);
   };
   const handleTwitterSignup = (setFieldValue) => {
+    
     setFieldValue("signup_method", "twitter");
     signWithTwitter(setFieldValue);
   };

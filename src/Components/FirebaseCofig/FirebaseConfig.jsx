@@ -10,8 +10,7 @@ import {
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
 import Swal from "sweetalert2"; // Assuming Swal is already installed
 import axios from "axios";
-import Login from "../Auth/Login";
-import Signup from "../Auth/Signup";
+
 // import appleSignin from "apple-signin-auth";
 
 // Firebase configuration
@@ -145,35 +144,35 @@ export const signInWithFacebook = async (setFieldValue) => {
 
 export const signWithTwitter = async (setFieldValue) => {
   try {
+    // Sign in with Twitter
     const result = await signInWithPopup(auth, twitterprovider);
 
-    // Extract and log user info
+    // Extract user info from the result
     const user = result.user;
     const userData = {
-      uid: user.uid,
-      name: user.displayName,
-      email: user.email || "", // Twitter sometimes doesn't return email
+      uid: user?.uid || "",
+      name: user?.displayName || "",
+      email: user?.email || "", // Twitter might not return email
     };
 
-    console.log("Useds:", user);
-    console.log("Uss:", userData);
-    // const nameParts = userData.displayName
-    //   ? userData.displayName.split(" ")
-    //   : [];
+    // Log user info for debugging
+    console.log("User Details:", user);
+    console.log("Processed User Data:", userData);
 
-    // Set form values with user data
-    setFieldValue("first_name", userData.name || "");
-    // setFieldValue("last_name", nameParts.slice(1).join(" ") || "");
-    setFieldValue("email", userData.email || "");
-    setFieldValue("uid", userData.uid || "");
+    // Set Formik field values
+    setFieldValue("first_name", userData.name);
+    setFieldValue("email", userData.email);
+    setFieldValue("uid", userData.uid);
   } catch (error) {
     console.error("Error logging in with Twitter:", error.message);
 
-    // Handle specific error cases
+    // Handle specific errors
     if (error.code === "auth/invalid-credential") {
       console.error(
-        "Invalid credentials. Please ensure your Twitter API keys are correct."
+        "Invalid credentials. Please check your Twitter API configuration."
       );
+    } else {
+      console.error("An unexpected error occurred:", error);
     }
   }
 };
@@ -250,7 +249,7 @@ export const LoginWithGoogle = async () => {
       console.log("Signup response:", response.data);
 
       const token = response.data.data.token;
-      localStorage.setItem("token", token);
+      localStorage.setItem("Web-token", token);
 
       // Show success message
       Swal.fire({
@@ -309,6 +308,7 @@ export const LoginWithTwitter = async () => {
 
     // Store data in UserDetails
     UserDetails = { ...userData, first_name, last_name };
+    console.log("ksugfdsiu", UserDetails);
     // Check if UID exists in your database
     const checkUIDResponse = await axios.get(
       `check-uid-exists/${user.uid}`,
@@ -328,7 +328,7 @@ export const LoginWithTwitter = async () => {
 
       // Store token in localStorage
       const token = response.data.data.token;
-      localStorage.setItem("token", token);
+      localStorage.setItem("Web-token", token);
 
       // Show success message
       Swal.fire({
@@ -398,7 +398,7 @@ export const LoginWithFacebook = async () => {
 
       // Store token in localStorage
       const token = response.data.data.token;
-      localStorage.setItem("token", token);
+      localStorage.setItem("Web-token", token);
 
       // Show success message
       Swal.fire({
@@ -479,11 +479,11 @@ export const LoginWithApple = async () => {
     console.error("Apple Sign-In or API request failed:", error);
 
     // Show error message
-    Swal.fire({
-      icon: "error",
-      title: "Login Failed",
-      text: error.response ? error.response.data.message : error.message,
-    });
+    // Swal.fire({
+    //   icon: "error",
+    //   title: "Login Failed",
+    //   text: error.response ? error.response.data.message : error.message,
+    // });
   }
 };
 
