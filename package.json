@@ -1,7 +1,6 @@
 {
   "name": "spotsball",
   "version": "0.1.0",
- "homepage":"/spotsball/web",
   "private": true,
   "dependencies": {
     "@react-oauth/google": "^0.12.1",
@@ -19,7 +18,9 @@
     "react-phone-input-2": "^2.15.1",
     "react-router-dom": "^6.26.2",
     "react-scripts": "5.0.1",
+    "react-slick": "^0.30.2",
     "react-type-animation": "^3.2.0",
+    "slick-carousel": "^1.8.1",
     "sweetalert2": "^11.14.3",
     "web-vitals": "^2.1.4",
     "yup": "^1.4.0"

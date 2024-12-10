@@ -26,147 +26,313 @@ function Checkout() {
   const [cvv, setCvv] = useState("");
   const [promoApplied, setPromoApplied] = useState(false); // Tracks if the promo is successfully applied
   const [promoMessage, setPromoMessage] = useState("");
+  const [selectedPromoCode, setSelectedPromoCode] = useState(null);
+  const [promoCodes, setPromoCodes] = useState([]);
+
   // const fetchData = async () => {
-  //   const token = localStorage.getItem("token");
+  //   const token = localStorage.getItem("Web-token");
   //   try {
-  //     // setIsLoading(true);
   //     const response = await axios.get(`get-all-cart-items`, {
-  //       headers: {
-  //         Authorization: `Bearer ${token}`,
-  //       },
+  //       headers: { Authorization: `Bearer ${token}` },
   //     });
 
-  //     //  if (response.data.data.length === 0 && location.pathname === "/cart") {
-  //     if (response.data.data.cartItems.length === 0) {
+  //     const { cartItems, discounts } = response.data.data;
+  //     if (cartItems.length === 0) {
   //       Swal.fire({
   //         icon: "info",
   //         title: "No Cart Items",
   //         text: "Your cart is currently empty.",
   //         confirmButtonText: "OK",
   //       }).then((result) => {
-  //         if (result.isConfirmed) {
-  //           navigate("/");
-  //         }
+  //         if (result.isConfirmed) navigate("/");
   //       });
-  //     } else {
-  //       console.log("sad-->", response.data.data.cartItems[0].contest_id);
-  //       setCarts(response.data.data.cartItems || {});
-
-  //       const contest = response.data.data.cartItems[0]; // Assuming you want the first contest
-  //       setContestDetails(contest);
-  //       setContestId(contest.contest_id._id); // Set contest ID
-  //       setTickets(contest.tickets_count); // Set the number of tickets
-  //       setCoordinates(contest.user_coordinates); // Set user coordinates
-  //       setPromoCodeApplied(contest.contest_id.promocodes);
+  //       return;
   //     }
+
+  //     setCarts(cartItems);
+
+  //     const calculated = cartItems.map((cart) => {
+  //       const ticketPrice = cart.contest_id.ticket_price;
+  //       const ticketsCount = cart.tickets_count;
+  //       const gstRate = cart.contest_id.gstRate;
+  //       const platformFeeRate = cart.contest_id.platformFeeRate;
+  //       const gstOnPlatformFeeRate = cart.contest_id.gstOnPlatformFeeRate;
+
+  //       const totalTicketPrice = ticketPrice * ticketsCount;
+  //       const gstAmount = totalTicketPrice * (gstRate / 100);
+  //       const subtotal = totalTicketPrice + gstAmount;
+  //       const platformFee = subtotal * (platformFeeRate / 100);
+  //       const gstOnPlatformFee = platformFee * (gstOnPlatformFeeRate / 100);
+  //       const totalRazorpayFee = platformFee + gstOnPlatformFee;
+  //       const totalPayment = subtotal + totalRazorpayFee;
+
+  //       return {
+  //         ...cart,
+  //         totalTicketPrice: totalTicketPrice.toFixed(2),
+  //         gstAmount: gstAmount.toFixed(2),
+  //         subtotal: subtotal.toFixed(2),
+  //         platformFee: platformFee.toFixed(2),
+  //         gstOnPlatformFee: gstOnPlatformFee.toFixed(2),
+  //         totalRazorpayFee: totalRazorpayFee.toFixed(2),
+  //         totalPayment: totalPayment.toFixed(2),
+  //       };
+  //     });
+
+  //     setCalculatedCarts(calculated);
+  //     setDiscounts(discounts || []);
   //   } catch (error) {
-  //     console.error("Error data:", error);
+  //     console.error(
+  //       "Error fetching cart data:",
+  //       error.response?.data?.message || error.message
+  //     );
   //   }
-  //   // finally {
-  //   //   setIsLoading(false);
-  //   // }
+  // };
+
+  // useEffect(() => {
+  //   fetchData();
+  // }, []);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  console.log("carts -->", carts);
+
+  const toggleCardInput = () => {
+    setIsCardActive(!isCardActive);
+  };
+  const handleImageClick = () => {
+    setIsEntrysActive(!isEntrysActive);
+    setIsImageRotated(!isImageRotated);
+  };
+
+  // const totalBeforeDiscount = calculatedCarts.reduce((total, cart) => {
+  //   if (promoApplied) {
+  //     const discountedTotalTicketPrice = Math.max(
+  //       parseFloat(cart.totalTicketPrice) - discountAmount,
+  //       0
+  //     );
+
+  //     const discountedGstAmount =
+  //       discountedTotalTicketPrice * ((cart.contest_id?.gstRate || 0) / 100);
+  //     const discountedSubtotal =
+  //       discountedTotalTicketPrice + discountedGstAmount;
+  //     const discountedPlatformFee =
+  //       discountedSubtotal * ((cart.contest_id?.platformFeeRate || 0) / 100);
+  //     const discountedGstOnPlatformFee =
+  //       discountedPlatformFee *
+  //       ((cart.contest_id?.gstOnPlatformFeeRate || 0) / 100);
+  //     const discountedGrandTotal =
+  //       discountedSubtotal + discountedPlatformFee + discountedGstOnPlatformFee;
+
+  //     return total + discountedGrandTotal;
+  //   } else {
+  //     return total + parseFloat(cart.totalPayment);
+  //   }
+  // }, 0);
+
+  // const handleApplyPromoCode = () => {
+  //   if (!Array.isArray(discounts)) {
+  //     setPromoApplied(false);
+  //     setPromoMessage("No promo codes available.");
+  //     return;
+  //   }
+
+  //   const promo = discounts.find(
+  //     (p) =>
+  //       p.name === promoCode &&
+  //       calculatedCarts.length > 0 &&
+  //       calculatedCarts.every(
+  //         (cart) =>
+  //           p.minTickets <= cart.tickets_count &&
+  //           cart.tickets_count <= p.maxTickets
+  //       )
+  //   );
+
+  //   if (promo) {
+  //     const discount = calculatedCarts.reduce((acc, cart) => {
+  //       const totalTicketPrice = parseFloat(cart.totalTicketPrice);
+  //       return acc + (totalTicketPrice * promo.discountPercentage) / 100;
+  //     }, 0);
+
+  //     // Update discount amount and promo details in each cart
+  //     const updatedCarts = calculatedCarts.map((cart) => ({
+  //       ...cart,
+  //       discount: {
+  //         name: promo.name,
+  //         discountPercentage: promo.discountPercentage,
+  //         amount:
+  //           (parseFloat(cart.totalTicketPrice) * promo.discountPercentage) /
+  //           100,
+  //       },
+  //     }));
+
+  //     setCalculatedCarts(updatedCarts); // Update carts state
+  //     setDiscountAmount(discount.toFixed(2));
+  //     setPromoApplied(true);
+  //     setPromoMessage(
+  //       `Promo code applied successfully. Discount ₹${discount.toFixed(2)}`
+  //     );
+  //   } else {
+  //     setPromoApplied(false);
+  //     setPromoMessage("Invalid or ineligible promo code.");
+  //   }
   // };
 
   // const fetchData = async () => {
-  //   const token = localStorage.getItem("token");
+  //   const token = localStorage.getItem("Web-token");
   //   try {
-  //     const response = await axios.get(`get-all-cart-items`, {
-  //       headers: {
-  //         Authorization: `Bearer ${token}`,
-  //       },
+  //     const response = await axios.get("get-all-cart-items", {
+  //       headers: { Authorization: `Bearer ${token}` },
   //     });
 
-  //     if (response.data.data.cartItems.length === 0) {
+  //     const { cartItems, discounts } = response.data.data;
+  //     if (cartItems.length === 0) {
   //       Swal.fire({
   //         icon: "info",
   //         title: "No Cart Items",
   //         text: "Your cart is currently empty.",
   //         confirmButtonText: "OK",
   //       }).then((result) => {
-  //         if (result.isConfirmed) {
-  //           navigate("/");
-  //         }
+  //         if (result.isConfirmed) navigate("/");
   //       });
-  //     } else {
-  //       const contest = response.data.data.cartItems;
-  //       setCarts(response.data.data.cartItems || []);
-  //       setContestDetails(contest);
-  //       setContestId(contest.contest_id._id);
-  //       setTickets(contest.tickets_count);
-  //       setCoordinates(contest.user_coordinates);
-  //       setPromoCodeApplied(contest.contest_id.promocodes);
+  //       return;
   //     }
-  //   } catch (error) {
-  //     console.error("Error fetching cart data:", error);
-  //   }
-  // };
 
-  // const fetchData = async () => {
-  //   const token = localStorage.getItem("token");
-  //   try {
-  //     const response = await axios.get(`get-all-cart-items`, {
-  //       headers: {
-  //         Authorization: `Bearer ${token}`,
-  //       },
+  //     setCarts(cartItems);
+
+  //     const calculated = cartItems.map((cart) => {
+  //       const ticketPrice = cart.contest_id.ticket_price;
+  //       const ticketsCount = cart.tickets_count;
+  //       const gstRate = cart.contest_id.gstRate;
+  //       const platformFeeRate = cart.contest_id.platformFeeRate;
+  //       const gstOnPlatformFeeRate = cart.contest_id.gstOnPlatformFeeRate;
+
+  //       const totalTicketPrice = ticketPrice * ticketsCount;
+  //       const gstAmount = totalTicketPrice * (gstRate / 100);
+  //       const subtotal = totalTicketPrice + gstAmount;
+  //       const platformFee = subtotal * (platformFeeRate / 100);
+  //       const gstOnPlatformFee = platformFee * (gstOnPlatformFeeRate / 100);
+  //       const totalRazorpayFee = platformFee + gstOnPlatformFee;
+  //       const totalPayment = subtotal + totalRazorpayFee;
+
+  //       return {
+  //         ...cart,
+  //         totalTicketPrice: totalTicketPrice.toFixed(2),
+  //         gstAmount: gstAmount.toFixed(2),
+  //         subtotal: subtotal.toFixed(2),
+  //         platformFee: platformFee.toFixed(2),
+  //         gstOnPlatformFee: gstOnPlatformFee.toFixed(2),
+  //         totalRazorpayFee: totalRazorpayFee.toFixed(2),
+  //         totalPayment: totalPayment.toFixed(2),
+  //       };
   //     });
 
-  //     if (response.data.data.cartItems.length === 0) {
-  //       Swal.fire({
-  //         icon: "info",
-  //         title: "No Cart Items",
-  //         text: "Your cart is currently empty.",
-  //         confirmButtonText: "OK",
-  //       }).then((result) => {
-  //         if (result.isConfirmed) {
-  //           navigate("/");
-  //         }
-  //       });
-  //     } else {
-  //       const cartItems = response.data.data.cartItems;
-  //       setCarts(cartItems);
-
-  //       // Apply discount logic if necessary
-  //       const discounts = response.data.data.discounts || [];
-  //       const calculated = cartItems.map((cart) => {
-  //         const totalTicketPrice =
-  //           cart.contest_id.ticket_price * cart.tickets_count;
-  //         const gstAmount = totalTicketPrice * (cart.contest_id.gstRate / 100);
-  //         const subtotal = totalTicketPrice + gstAmount;
-
-  //         const platformFee =
-  //           subtotal * (cart.contest_id.platformFeeRate / 100);
-  //         const gstOnPlatformFee =
-  //           platformFee * (cart.contest_id.gstOnPlatformFeeRate / 100);
-  //         const totalRazorpayFee = platformFee + gstOnPlatformFee;
-  //         const totalPayment = subtotal + totalRazorpayFee;
-
-  //         return {
-  //           ...cart,
-  //           totalTicketPrice,
-  //           gstAmount:gstAmount.toFixed(2),
-  //           subtotal,
-  //           platformFee,
-  //           gstOnPlatformFee,
-  //           totalRazorpayFee,
-  //           totalPayment,
-  //         };
-  //       });
-
-  //       setCalculatedCarts(calculated);
-  //     }
+  //     setCalculatedCarts(calculated);
+  //     setDiscounts(discounts || []);
   //   } catch (error) {
-  //     console.error("Error fetching cart data:", error);
+  //     console.error(
+  //       "Error fetching cart data:",
+  //       error.response?.data?.message || error.message
+  //     );
   //   }
   // };
+
+  // useEffect(() => {
+  //   fetchData();
+  // }, []);
+
+  // const totalBeforeDiscount = calculatedCarts.reduce((total, cart) => {
+  //   if (promoApplied) {
+  //     const discountedTotalTicketPrice = Math.max(
+  //       parseFloat(cart.totalTicketPrice) - discountAmount,
+  //       0
+  //     );
+
+  //     const discountedGstAmount =
+  //       discountedTotalTicketPrice * ((cart.contest_id?.gstRate || 0) / 100);
+  //     const discountedSubtotal =
+  //       discountedTotalTicketPrice + discountedGstAmount;
+  //     const discountedPlatformFee =
+  //       discountedSubtotal * ((cart.contest_id?.platformFeeRate || 0) / 100);
+  //     const discountedGstOnPlatformFee =
+  //       discountedPlatformFee *
+  //       ((cart.contest_id?.gstOnPlatformFeeRate || 0) / 100);
+  //     const discountedGrandTotal =
+  //       discountedSubtotal + discountedPlatformFee + discountedGstOnPlatformFee;
+
+  //     return total + discountedGrandTotal;
+  //   } else {
+  //     return total + parseFloat(cart.totalPayment);
+  //   }
+  // }, 0);
+
+  // const handleApplyPromoCode = () => {
+  //   if (!Array.isArray(discounts) || discounts.length === 0) {
+  //     setPromoApplied(false);
+  //     setPromoMessage("No promo codes available.");
+  //     return;
+  //   }
+
+  //   // Sort discounts by `minTickets` in descending order to find the highest applicable discount
+  //   const applicableDiscount = discounts.find((promo) =>
+  //     calculatedCarts.every(
+  //       (cart) =>
+  //         cart.tickets_count >= promo.minTickets &&
+  //         cart.tickets_count <= promo.maxTickets
+  //     )
+  //   );
+
+  //   if (applicableDiscount) {
+  //     const discountAmount = calculatedCarts.reduce((acc, cart) => {
+  //       const totalTicketPrice = parseFloat(cart.totalTicketPrice);
+  //       return (
+  //         acc + (totalTicketPrice * applicableDiscount.discountPercentage) / 100
+  //       );
+  //     }, 0);
+
+  //     // Update discount amount and promo details in each cart
+  //     const updatedCarts = calculatedCarts.map((cart) => ({
+  //       ...cart,
+  //       discount: {
+  //         name: applicableDiscount.name,
+  //         discountPercentage: applicableDiscount.discountPercentage,
+  //         amount:
+  //           (parseFloat(cart.totalTicketPrice) *
+  //             applicableDiscount.discountPercentage) /
+  //           100,
+  //       },
+  //     }));
+
+  //     setCalculatedCarts(updatedCarts); // Update carts state
+  //     setDiscountAmount(discountAmount.toFixed(2));
+  //     setPromoApplied(true);
+  //     setPromoMessage(
+  //       `Promo code applied successfully. Discount ₹${discountAmount.toFixed(
+  //         2
+  //       )}`
+  //     );
+  //   } else {
+  //     setPromoApplied(false);
+  //     setPromoMessage(
+  //       "No applicable promo code based on the number of tickets in the cart."
+  //     );
+  //   }
+  // };
+
+  // // Apply default discount on component load
+  // useEffect(() => {
+  //   handleApplyPromoCode();
+  // }, []);
 
   const fetchData = async () => {
     const token = localStorage.getItem("Web-token");
     try {
-      const response = await axios.get(`get-all-cart-items`, {
+      const response = await axios.get("get-all-cart-items", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      const { cartItems, discounts } = response.data.data;
+      const { cartItems, discounts, promocodes } = response.data.data;
       if (cartItems.length === 0) {
         Swal.fire({
           icon: "info",
@@ -210,6 +376,47 @@ function Checkout() {
 
       setCalculatedCarts(calculated);
       setDiscounts(discounts || []);
+      setPromoCodes(promocodes || []);
+
+      // Apply discount automatically based on ticket count
+      const ticketCounts = cartItems.map((cart) => cart.tickets_count);
+      const maxTickets = Math.max(...ticketCounts);
+
+      let applicableDiscount = null;
+
+      for (const discount of discounts) {
+        if (
+          maxTickets >= discount.minTickets &&
+          maxTickets <= discount.maxTickets
+        ) {
+          applicableDiscount = discount;
+          break;
+        }
+      }
+
+      if (applicableDiscount) {
+        const discountAmount = calculated.reduce((acc, cart) => {
+          const totalTicketPrice = parseFloat(cart.totalTicketPrice);
+          return (
+            acc +
+            (totalTicketPrice * applicableDiscount.discountPercentage) / 100
+          );
+        }, 0);
+
+        const updatedCarts = calculated.map((cart) => ({
+          ...cart,
+          discount: {
+            name: applicableDiscount.name,
+            discountPercentage: applicableDiscount.discountPercentage,
+            amount:
+              (parseFloat(cart.totalTicketPrice) *
+                applicableDiscount.discountPercentage) /
+              100,
+          },
+        }));
+
+        setCalculatedCarts(updatedCarts); // Update carts state
+      }
     } catch (error) {
       console.error(
         "Error fetching cart data:",
@@ -221,289 +428,13 @@ function Checkout() {
   useEffect(() => {
     fetchData();
   }, []);
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
-  console.log("carts -->", carts);
-
-  const toggleCardInput = () => {
-    setIsCardActive(!isCardActive);
-  };
-  const handleImageClick = () => {
-    setIsEntrysActive(!isEntrysActive);
-    setIsImageRotated(!isImageRotated);
-  };
-
-  // Constants for discount application
-  // const DEFAULT_DISCOUNT = 0;
-
-  // // Calculation of cart values
-  // const calculatedCarts = useMemo(() => {
-  //   // Ensure carts is always an array
-  //   return (
-  //     (Array.isArray(carts) &&
-  //       carts.map((cart) => {
-  //         const { contest_id } = cart || {}; // Ensure cart is defined
-
-  //         // Ensure values are safe and default to 0 if undefined
-  //         const ticketPrice = contest_id?.ticket_price || 0;
-  //         const ticketsCount = cart?.tickets_count || 0;
-  //         const gstRate = (contest_id?.gstRate || 0) / 100; // Convert percentage
-  //         const platformFeeRate = (contest_id?.platformFeeRate || 0) / 100; // Convert percentage
-  //         const gstOnPlatformFeeRate =
-  //           (contest_id?.gstOnPlatformFeeRate || 0) / 100; // Convert percentage
-
-  //         // Step 1: Calculate total ticket price
-  //         const totalTicketPrice = ticketPrice * ticketsCount;
-
-  //         // Step 2: Calculate GST on ticket price
-  //         const gstAmount = totalTicketPrice * gstRate;
-
-  //         // Step 3: Subtotal
-  //         const subtotal = totalTicketPrice + gstAmount;
-
-  //         // Step 4: Platform fee
-  //         const platformFee = subtotal * platformFeeRate;
-
-  //         // Step 5: GST on platform fee
-  //         const gstOnPlatformFee = platformFee * gstOnPlatformFeeRate;
-
-  //         // Step 6: Total Razorpay fee
-  //         const totalRazorpayFee = platformFee + gstOnPlatformFee;
-
-  //         // Step 7: Total payment by user
-  //         const totalPayment = subtotal + totalRazorpayFee;
-
-  //         return {
-  //           ...cart,
-  //           ticketPrice,
-  //           totalTicketPrice: totalTicketPrice.toFixed(2),
-  //           gstAmount: gstAmount.toFixed(2),
-  //           subtotal: subtotal.toFixed(2),
-  //           platformFee: platformFee.toFixed(2),
-  //           gstOnPlatformFee: gstOnPlatformFee.toFixed(2),
-  //           totalRazorpayFee: totalRazorpayFee.toFixed(2),
-  //           totalPayment: totalPayment.toFixed(2),
-  //         };
-  //       })) ||
-  //     []
-  //   ); // Ensure it returns an empty array if carts is not an array
-  // }, [carts]);
-
-  // console.log("calculatedCarts", calculatedCarts);
-
-  // // Total calculations
-  // const totalBeforeDiscount = calculatedCarts.reduce((total, cart) => {
-  //   return total + parseFloat(cart.totalPayment);
-  // }, 0);
-
-  // const totalAfterDiscount = totalBeforeDiscount - discountAmount;
-
-  // const handleApplyPromoCode = () => {
-  //   const promo = promoCodeApplied.find((p) => p.promocode === promoCode);
-
-  //   if (promo) {
-  //     const totalBeforeDiscount = calculatedCarts.reduce((total, cart) => {
-  //       return total + parseFloat(cart.totalPayment);
-  //     }, 0);
-
-  //     const discount = promo.amount || DEFAULT_DISCOUNT; // Default to 0 if undefined
-  //     setDiscountAmount(discount);
-  //     setPromoApplied(true);
-  //     setPromoMessage(
-  //       `Promo code applied successfully. Discount ₹${discount}.`
-  //     );
-  //   } else {
-  //     setPromoApplied(false);
-  //     setPromoMessage("Invalid promo code");
-  //   }
-  // };
-
-  // const finalTotalPayment =
-  //   discountAmount > 0 ? totalAfterDiscount : totalBeforeDiscount;
-
-  // const totalPayments = finalTotalPayment.toFixed(2);
-
-  // const DEFAULT_DISCOUNT = 0;
-
-  // // Calculation of cart values
-  // const calculatedCarts = useMemo(() => {
-  //   return (
-  //     (Array.isArray(carts) &&
-  //       carts.contest_id.map((cart) => {
-  //         const { contest_id } = cart || {}; // Ensure cart is defined
-
-  //         // Ensure values are safe and default to 0 if undefined
-  //         const ticketPrice = contest_id?.ticket_price || 0;
-  //         const ticketsCount = cart?.tickets_count || 0;
-  //         const gstRate = (contest_id?.gstRate || 0) / 100; // Convert percentage
-  //         const platformFeeRate = (contest_id?.platformFeeRate || 0) / 100; // Convert percentage
-  //         const gstOnPlatformFeeRate =
-  //           (contest_id?.gstOnPlatformFeeRate || 0) / 100; // Convert percentage
-
-  //         // Step 1: Calculate total ticket price
-  //         const totalTicketPrice = ticketPrice * ticketsCount;
-
-  //         // Step 2: Calculate GST on ticket price
-  //         const gstAmount = totalTicketPrice * gstRate;
-
-  //         // Step 3: Subtotal
-  //         const subtotal = totalTicketPrice + gstAmount;
-
-  //         // Step 4: Platform fee
-  //         const platformFee = subtotal * platformFeeRate;
-
-  //         // Step 5: GST on platform fee
-  //         const gstOnPlatformFee = platformFee * gstOnPlatformFeeRate;
-
-  //         // Step 6: Total Razorpay fee
-  //         const totalRazorpayFee = platformFee + gstOnPlatformFee;
-
-  //         // Step 7: Total payment by user
-  //         const totalPayment = subtotal + totalRazorpayFee;
-
-  //         // Return the updated cart object with calculations
-  //         return {
-  //           ...cart,
-  //           ticketPrice: ticketPrice.toFixed(2),
-  //           totalTicketPrice: totalTicketPrice.toFixed(2),
-  //           gstAmount: gstAmount.toFixed(2),
-  //           subtotal: subtotal.toFixed(2),
-  //           platformFee: platformFee.toFixed(2),
-  //           gstOnPlatformFee: gstOnPlatformFee.toFixed(2),
-  //           totalRazorpayFee: totalRazorpayFee.toFixed(2),
-  //           totalPayment: totalPayment.toFixed(2),
-  //         };
-  //       })) ||
-  //     []
-  //   ); // Ensure it returns an empty array if carts is not an array
-  // }, [carts]);
-
-  // console.log("calculatedCarts", calculatedCarts);
-
-  // // Total calculations
-  // const totalBeforeDiscount = calculatedCarts.reduce((total, cart) => {
-  //   if (promoApplied) {
-  //     const discountedTotalTicketPrice = Math.max(
-  //       parseFloat(cart.totalTicketPrice) - discountAmount,
-  //       0
-  //     ); // Ensure price doesn't go below 0
-
-  //     const discountedGstAmount =
-  //       discountedTotalTicketPrice * ((cart.contest_id?.gstRate || 0) / 100);
-  //     const discountedSubtotal =
-  //       discountedTotalTicketPrice + discountedGstAmount;
-  //     const discountedPlatformFee =
-  //       discountedSubtotal * ((cart.contest_id?.platformFeeRate || 0) / 100);
-  //     const discountedGstOnPlatformFee =
-  //       discountedPlatformFee *
-  //       ((cart.contest_id?.gstOnPlatformFeeRate || 0) / 100);
-  //     const discountedTotalRazorpayFee =
-  //       discountedPlatformFee + discountedGstOnPlatformFee;
-  //     const discountedGrandTotal =
-  //       discountedSubtotal + discountedTotalRazorpayFee;
-
-  //     console.log("discountedPlatformFee:", discountedPlatformFee);
-  //     console.log("discountedGstOnPlatformFee:", discountedGstOnPlatformFee);
-  //     console.log("discountedTotalRazorpayFee:", discountedTotalRazorpayFee);
-  //     console.log("discountedGrandTotal:", discountedGrandTotal);
-  //     return total + discountedGrandTotal;
-  //   } else {
-  //     return total + parseFloat(cart.totalPayment);
-  //   }
-  // }, 0);
-
-  // console.log("totalBeforeDiscount", totalBeforeDiscount);
-
-  // const handleApplyPromoCode = () => {
-  //   if (!Array.isArray(promoCodeApplied)) {
-  //     setPromoApplied(false);
-  //     setPromoMessage("No promo codes available.");
-  //     return;
-  //   }
-  //   console.log("promoCodeApplied", promoCodeApplied);
-
-  //   const promo = promoCodeApplied.find((p) => p.promocode === promoCode);
-
-  //   if (promo) {
-  //     const discount = promo.amount || DEFAULT_DISCOUNT; // Default to 0 if undefined
-
-  //     // Apply discount to each cart's totalTicketPrice
-  //     const discountedCarts = calculatedCarts.map((cart) => {
-  //       const discountedTicketPrice = Math.max(
-  //         parseFloat(cart.totalTicketPrice) - discount,
-  //         0
-  //       ); // Ensure price doesn't go below 0
-  //       const gstAmount = discountedTicketPrice * ((cart.gstRate || 0) / 100);
-  //       const subtotal = discountedTicketPrice + gstAmount;
-  //       const platformFee = subtotal * ((cart.platformFeeRate || 0) / 100);
-  //       const gstOnPlatformFee =
-  //         platformFee * ((cart.gstOnPlatformFeeRate || 0) / 100);
-  //       const totalRazorpayFee = platformFee + gstOnPlatformFee;
-  //       const totalPayment = subtotal + totalRazorpayFee;
-
-  //       return {
-  //         ...cart,
-  //         discountedTicketPrice: discountedTicketPrice.toFixed(2),
-  //         gstAmount: gstAmount.toFixed(2),
-  //         subtotal: subtotal.toFixed(2),
-  //         platformFee: platformFee.toFixed(2),
-  //         gstOnPlatformFee: gstOnPlatformFee.toFixed(2),
-  //         totalRazorpayFee: totalRazorpayFee.toFixed(2),
-  //         totalPayment: totalPayment.toFixed(2),
-  //       };
-  //     });
-
-  //     setDiscountAmount(discount);
-  //     setPromoApplied(true);
-  //     setPromoMessage(
-  //       `Promo code applied successfully. Discount ₹${discount} on total ticket price.`
-  //     );
-  //     console.log("Discounted Carts", discountedCarts);
-  //   } else {
-  //     setPromoApplied(false);
-  //     setPromoMessage("Invalid promo code");
-  //   }
-  // };
-
-  // const calculatedCarts = useMemo(() => {
-  //   return carts.map((cart) => {
-  //     const { contest_id } = cart || {};
-
-  //     const ticketPrice = contest_id?.ticket_price || 0;
-  //     const ticketsCount = cart?.tickets_count || 0;
-  //     const gstRate = (contest_id?.gstRate || 0) / 100;
-  //     const platformFeeRate = (contest_id?.platformFeeRate || 0) / 100;
-  //     const gstOnPlatformFeeRate =
-  //       (contest_id?.gstOnPlatformFeeRate || 0) / 100;
-
-  //     const totalTicketPrice = ticketPrice * ticketsCount;
-  //     const gstAmount = totalTicketPrice * gstRate;
-  //     const subtotal = totalTicketPrice + gstAmount;
-  //     const platformFee = subtotal * platformFeeRate;
-  //     const gstOnPlatformFee = platformFee * gstOnPlatformFeeRate;
-  //     const totalRazorpayFee = platformFee + gstOnPlatformFee;
-  //     const totalPayment = subtotal + totalRazorpayFee;
-
-  //     return {
-  //       ...cart,
-  //       ticketPrice: ticketPrice.toFixed(2),
-  //       totalTicketPrice: totalTicketPrice.toFixed(2),
-  //       gstAmount: gstAmount.toFixed(2),
-  //       subtotal: subtotal.toFixed(2),
-  //       platformFee: platformFee.toFixed(2),
-  //       gstOnPlatformFee: gstOnPlatformFee.toFixed(2),
-  //       totalRazorpayFee: totalRazorpayFee.toFixed(2),
-  //       totalPayment: totalPayment.toFixed(2),
-  //     };
-  //   });
-  // }, [carts]);
 
   const totalBeforeDiscount = calculatedCarts.reduce((total, cart) => {
-    if (promoApplied) {
+    if (cart.promoCode) {
+      return total + parseFloat(cart.totalPayment);
+    } else if (cart.discount) {
       const discountedTotalTicketPrice = Math.max(
-        parseFloat(cart.totalTicketPrice) - discountAmount,
+        parseFloat(cart.totalTicketPrice) - cart.discount.amount,
         0
       );
 
@@ -525,72 +456,46 @@ function Checkout() {
     }
   }, 0);
 
-  // const handleApplyPromoCode = () => {
-  //   if (!Array.isArray(discounts)) {
-  //     setPromoApplied(false);
-  //     setPromoMessage("No promo codes available.");
-  //     return;
-  //   }
-
-  //   const promo = discounts.find((p) => p.promocode === promoCode);
-
-  //   if (promo) {
-  //     const discount = promo.amount || 0;
-
-  //     setDiscountAmount(discount);
-  //     setPromoApplied(true);
-  //     setPromoMessage(`Promo code applied successfully. Discount ₹${discount}`);
-  //   } else {
-  //     setPromoApplied(false);
-  //     setPromoMessage("Invalid promo code");
-  //   }
-  // };
-
   const handleApplyPromoCode = () => {
-    if (!Array.isArray(discounts)) {
-      setPromoApplied(false);
-      setPromoMessage("No promo codes available.");
-      return;
-    }
-
-    const promo = discounts.find(
-      (p) =>
-        p.name === promoCode &&
-        calculatedCarts.length > 0 &&
-        calculatedCarts.every(
-          (cart) =>
-            p.minTickets <= cart.tickets_count &&
-            cart.tickets_count <= p.maxTickets
-        )
-    );
+    const promo = promoCodes.find((code) => code.name === promoCode);
 
     if (promo) {
-      const discount = calculatedCarts.reduce((acc, cart) => {
-        const totalTicketPrice = parseFloat(cart.totalTicketPrice);
-        return acc + (totalTicketPrice * promo.discountPercentage) / 100;
-      }, 0);
+      const updatedCarts = calculatedCarts.map((cart) => {
+        // Recalculate total payment with promo code applied
+        const promoDiscountAmount = Math.min(
+          promo.amount,
+          parseFloat(cart.totalPayment)
+        );
+        const discountedTotalPayment = Math.max(
+          parseFloat(cart.totalPayment) - promoDiscountAmount,
+          0
+        );
 
-      // Update discount amount and promo details in each cart
-      const updatedCarts = calculatedCarts.map((cart) => ({
-        ...cart,
-        discount: {
-          name: promo.name,
-          discountPercentage: promo.discountPercentage,
-          amount:
-            (parseFloat(cart.totalTicketPrice) * promo.discountPercentage) /
-            100,
-        },
-      }));
+        return {
+          ...cart,
+          discount: null, // Remove default discount
+          promoCode: {
+            name: promo.name,
+            amount: promoDiscountAmount,
+          },
+          totalPayment: discountedTotalPayment.toFixed(2),
+        };
+      });
 
-      setCalculatedCarts(updatedCarts); // Update carts state
-      setDiscountAmount(discount.toFixed(2));
-      setPromoApplied(true);
-      setPromoMessage(
-        `Promo code applied successfully. Discount ₹${discount.toFixed(2)}`
-      );
+      setCalculatedCarts(updatedCarts);
+      setSelectedPromoCode(promo);
+
+      Swal.fire({
+        icon: "success",
+        title: "Promo Code Applied!",
+        text: `Promo code "${promo.name}" applied. Discount: ₹${promo.amount}`,
+      });
     } else {
-      setPromoApplied(false);
-      setPromoMessage("Invalid or ineligible promo code.");
+      Swal.fire({
+        icon: "error",
+        title: "Invalid Promo Code",
+        text: "The promo code you entered is not valid.",
+      });
     }
   };
 
@@ -617,8 +522,10 @@ function Checkout() {
       Swal.fire({
         title: "Success!",
         text: response.data.message,
+        confirmButtonText: "OK",
+        showConfirmButton: true,
       });
-
+      navigate("/");
       // Optionally, remove the cart from the state
       setCarts((prevCarts) => prevCarts.filter((c) => c._id !== cart._id));
     } catch (error) {
@@ -697,16 +604,138 @@ function Checkout() {
       description: "Buy ticket to play",
       handler: (response) => {
         const paymentData = {
-          contestId: carts[0]?.contest_id?._id,
-          paymentId: response.razorpay_payment_id,
-          coordinates: carts[0]?.user_coordinates,
-          tickets: carts[0]?.tickets_count,
-          amount: totalBeforeDiscount,
+          contestId: carts[0]?.contest_id?._id || "defaultContestId", // Use appropriate fallback or validation
+          paymentId: response.razorpay_payment_id || "defaultPaymentId",
+          coordinates: carts[0]?.user_coordinates || [],
+          tickets: carts.reduce(
+            (total, cart) => total + (cart.tickets_count || 0),
+            0
+          ),
           discountApplied: {
-            name: calculatedCarts[0]?.discount?.name,
+            name: calculatedCarts[0]?.discount?.name || "",
             discountPercentage:
-              calculatedCarts[0]?.discount?.discountPercentage,
+              calculatedCarts[0]?.discount?.discountPercentage || 0,
           },
+          ticketAmount: calculatedCarts.reduce(
+            (total, cart) => total + (cart.totalTicketPrice || 0),
+            0
+          ),
+          discountAmount: calculatedCarts.reduce(
+            (total, cart) =>
+              total +
+              ((cart.totalTicketPrice || 0) *
+                (calculatedCarts[0]?.discount?.discountPercentage || 0)) /
+                100,
+            0
+          ),
+          afterDiscountAmount: calculatedCarts.reduce(
+            (total, cart) =>
+              total +
+              (cart.totalTicketPrice || 0) -
+              ((cart.totalTicketPrice || 0) *
+                (calculatedCarts[0]?.discount?.discountPercentage || 0)) /
+                100,
+            0
+          ),
+          gstPercentage: carts[0]?.contest_id?.gstRate || 28, // Default GST rate as 28%
+          gstAmount: calculatedCarts.reduce(
+            (total, cart) =>
+              total +
+              (((cart.totalTicketPrice || 0) -
+                ((cart.totalTicketPrice || 0) *
+                  (calculatedCarts[0]?.discount?.discountPercentage || 0)) /
+                  100) *
+                (carts[0]?.contest_id?.gstRate || 28)) /
+                100,
+            0
+          ),
+          subTotalAmount: calculatedCarts.reduce(
+            (total, cart) =>
+              total +
+              (cart.totalTicketPrice || 0) -
+              ((cart.totalTicketPrice || 0) *
+                (calculatedCarts[0]?.discount?.discountPercentage || 0)) /
+                100 +
+              (((cart.totalTicketPrice || 0) -
+                ((cart.totalTicketPrice || 0) *
+                  (calculatedCarts[0]?.discount?.discountPercentage || 0)) /
+                  100) *
+                (carts[0]?.contest_id?.gstRate || 28)) /
+                100,
+            0
+          ),
+          platformFeePercentage: carts[0]?.contest_id?.platformFeeRate || 2, // Default platform fee rate as 2%
+          platformFeeAmount: calculatedCarts.reduce(
+            (total, cart) =>
+              total +
+              (((cart.totalTicketPrice || 0) -
+                ((cart.totalTicketPrice || 0) *
+                  (calculatedCarts[0]?.discount?.discountPercentage || 0)) /
+                  100) *
+                (carts[0]?.contest_id?.platformFeeRate || 2)) /
+                100,
+            0
+          ),
+          gstOnPlatformFeePercentage:
+            carts[0]?.contest_id?.gstOnPlatformFeeRate || 2, // Default GST on platform fee rate as 2%
+          gstOnPlatformFeeAmount: calculatedCarts.reduce(
+            (total, cart) =>
+              total +
+              (((cart.totalTicketPrice || 0) -
+                ((cart.totalTicketPrice || 0) *
+                  (calculatedCarts[0]?.discount?.discountPercentage || 0)) /
+                  100) *
+                (carts[0]?.contest_id?.platformFeeRate || 2) *
+                (carts[0]?.contest_id?.gstOnPlatformFeeRate || 2)) /
+                10000,
+            0
+          ),
+          totalRazorPayFeeAmount: calculatedCarts.reduce(
+            (total, cart) =>
+              total +
+              (((cart.totalTicketPrice || 0) -
+                ((cart.totalTicketPrice || 0) *
+                  (calculatedCarts[0]?.discount?.discountPercentage || 0)) /
+                  100) *
+                (carts[0]?.contest_id?.platformFeeRate || 2)) /
+                100 +
+              (((cart.totalTicketPrice || 0) -
+                ((cart.totalTicketPrice || 0) *
+                  (calculatedCarts[0]?.discount?.discountPercentage || 0)) /
+                  100) *
+                (carts[0]?.contest_id?.platformFeeRate || 2) *
+                (carts[0]?.contest_id?.gstOnPlatformFeeRate || 2)) /
+                10000,
+            0
+          ),
+          amount: calculatedCarts.reduce(
+            (total, cart) =>
+              total +
+              (cart.totalTicketPrice || 0) -
+              ((cart.totalTicketPrice || 0) *
+                (calculatedCarts[0]?.discount?.discountPercentage || 0)) /
+                100 +
+              (((cart.totalTicketPrice || 0) -
+                ((cart.totalTicketPrice || 0) *
+                  (calculatedCarts[0]?.discount?.discountPercentage || 0)) /
+                  100) *
+                (carts[0]?.contest_id?.gstRate || 28)) /
+                100 +
+              (((cart.totalTicketPrice || 0) -
+                ((cart.totalTicketPrice || 0) *
+                  (calculatedCarts[0]?.discount?.discountPercentage || 0)) /
+                  100) *
+                (carts[0]?.contest_id?.platformFeeRate || 2)) /
+                100 +
+              (((cart.totalTicketPrice || 0) -
+                ((cart.totalTicketPrice || 0) *
+                  (calculatedCarts[0]?.discount?.discountPercentage || 0)) /
+                  100) *
+                (carts[0]?.contest_id?.platformFeeRate || 2) *
+                (carts[0]?.contest_id?.gstOnPlatformFeeRate || 2)) /
+                10000,
+            0
+          ),
         };
 
         Pay(paymentData);
@@ -820,7 +849,7 @@ function Checkout() {
                             </button>
                           </div>
 
-                          <div className="entry">
+                          {/* <div className="entry">
                             <div className="detailes">
                               <div className="arrowicondiv">
                                 <img
@@ -971,6 +1000,166 @@ function Checkout() {
                                 })}
                               </div>
                             </div>
+                          </div> */}
+                          <div className="entry">
+                            <div className="detailes">
+                              <div className="arrowicondiv">
+                                <img
+                                  src={`${process.env.PUBLIC_URL}/images/arrow_icon_payment.png`}
+                                  className={`showclick_icon ${
+                                    isImageRotated ? "rotate" : ""
+                                  }`}
+                                  alt="Arrow Icon"
+                                  onClick={handleImageClick}
+                                />
+                              </div>
+                              <div className="cardbills">
+                                <div className="creditbils_div">
+                                  <h4>Bill Details</h4>
+                                </div>
+                              </div>
+                              <div
+                                className={`details_inputs details_div ${
+                                  isEntrysActive ? "active" : ""
+                                }`}
+                                style={{
+                                  display: isEntrysActive ? "block" : "none",
+                                }}
+                              >
+                                {calculatedCarts.map((cart, index) => {
+                                  // Calculate the promo discount amount
+                                  const promoDiscountAmount = cart.promoCode
+                                    ? cart.promoCode.amount
+                                    : 0;
+
+                                  // Calculate discount amount per cart
+                                  const discountPerCart = cart.discount
+                                    ? cart.discount.amount
+                                    : "0.00";
+
+                                  // Recalculate total ticket price after applying discount or promo
+                                  const discountedTotalTicketPrice = Math.max(
+                                    cart.totalTicketPrice -
+                                      discountPerCart -
+                                      promoDiscountAmount,
+                                    0
+                                  ).toFixed(2);
+
+                                  // Calculate GST on the discounted ticket price
+                                  const discountedGstAmount = (
+                                    discountedTotalTicketPrice *
+                                    (cart.contest_id.gstRate / 100)
+                                  ).toFixed(2);
+
+                                  // Calculate subtotal after GST
+                                  const discountedSubtotal = (
+                                    parseFloat(discountedTotalTicketPrice) +
+                                    parseFloat(discountedGstAmount)
+                                  ).toFixed(2);
+
+                                  // Calculate platform fee based on the new subtotal
+                                  const discountedPlatformFee = (
+                                    discountedSubtotal *
+                                    (cart.contest_id.platformFeeRate / 100)
+                                  ).toFixed(2);
+
+                                  // Calculate GST on platform fee
+                                  const discountedGstOnPlatformFee = (
+                                    discountedPlatformFee *
+                                    (cart.contest_id.gstOnPlatformFeeRate / 100)
+                                  ).toFixed(2);
+
+                                  // Calculate total Razorpay fee
+                                  const discountedTotalRazorpayFee = (
+                                    parseFloat(discountedPlatformFee) +
+                                    parseFloat(discountedGstOnPlatformFee)
+                                  ).toFixed(2);
+
+                                  // Calculate grand total
+                                  const discountedGrandTotal = (
+                                    parseFloat(discountedSubtotal) +
+                                    parseFloat(discountedTotalRazorpayFee)
+                                  ).toFixed(2);
+
+                                  return (
+                                    <div
+                                      key={index}
+                                      className="cart-itemss table-blockk"
+                                    >
+                                      <p>
+                                        <strong>Items Total: </strong>₹
+                                        {cart.totalTicketPrice}
+                                      </p>
+                                      {cart.promoCode && (
+                                        <>
+                                          <p>
+                                            <strong>Promo Applied:</strong>
+                                            -₹{promoDiscountAmount}
+                                          </p>
+                                          <p>
+                                            <strong>After: </strong>₹
+                                            {discountedTotalTicketPrice}
+                                          </p>
+                                        </>
+                                      )}
+                                      {cart.discount && (
+                                        <>
+                                          <p>
+                                            <strong>Discount: </strong>-₹
+                                            {discountPerCart}
+                                          </p>
+                                          <p>
+                                            <strong>After Discount: </strong>₹
+                                            {discountedTotalTicketPrice}
+                                          </p>
+                                        </>
+                                      )}
+                                      <p>
+                                        <strong>
+                                          +GST (@{cart.contest_id.gstRate}%):{" "}
+                                        </strong>
+                                        ₹{discountedGstAmount}
+                                      </p>
+                                      <p>
+                                        <strong>
+                                          Subtotal (Base Amount + GST):{" "}
+                                        </strong>
+                                        ₹{discountedSubtotal}
+                                      </p>
+                                      <hr />
+                                      <p>
+                                        <strong>
+                                          Platform Fee (@
+                                          {
+                                            cart.contest_id.platformFeeRate
+                                          }%):{" "}
+                                        </strong>
+                                        ₹{discountedPlatformFee}
+                                      </p>
+                                      <p>
+                                        <strong>
+                                          GST on Platform Fee (@
+                                          {cart.contest_id.gstOnPlatformFeeRate}
+                                          %):{" "}
+                                        </strong>
+                                        ₹{discountedGstOnPlatformFee}
+                                      </p>
+                                      <p>
+                                        <strong>Total Razorpay Fee: </strong>₹
+                                        {discountedTotalRazorpayFee}
+                                      </p>
+                                      <hr />
+                                      <p>
+                                        <strong>
+                                          Grand Total (Subtotal + Razorpay):{" "}
+                                        </strong>
+                                        ₹{discountedGrandTotal}
+                                      </p>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
                           </div>
                         </div>
                       ))}
@@ -1042,187 +1231,6 @@ function Checkout() {
                           </div>
                         </div>
                       </div>
-                      {/* <div className="methodsdivnew">
-                        <div className="paymentmethodsheaidng">
-                          <h4>CARDS</h4>
-                        </div>
-
-                        <div className="cardmethod_design">
-                          <div
-                            className="creditdebit_carddiv"
-                            onClick={toggleCardInput}
-                          >
-                            <div className="cardnamewithicon">
-                              <img
-                                src={`${process.env.PUBLIC_URL}/images/card.png`}
-                                alt="Card Icon"
-                              />
-                              <p>Pay Via Credit / Debit Cards</p>
-                            </div>
-                            <div className="arrowicondiv">
-                              <img
-                                src={`${process.env.PUBLIC_URL}/images/arrow_icon_payment.png`}
-                                className="showcardinputonclick_icon"
-                                alt="Arrow Icon"
-                              />
-                            </div>
-                          </div>
-
-                          <div
-                            className={`cardpay_inputs showhideonclick_arrowicon_carddiv ${
-                              isCardActive ? "active" : ""
-                            }`}
-                            style={{ display: isCardActive ? "block" : "none" }}
-                          >
-                            <div className="cardnumberinput">
-                              <input
-                                type="text"
-                                className="input_cardsnew"
-                                placeholder="Card Number"
-                                aria-label="Card Number"
-                                value={cardNumber}
-                                onChange={(e) => setCardNumber(e.target.value)}
-                              />
-                            </div>
-                            <div className="validupto_cvv">
-                              <div className="cardnumberinput">
-                                <input
-                                  type="text"
-                                  className="input_cardsnew"
-                                  placeholder="Valid Upto (MM/YY)"
-                                  aria-label="Valid Until"
-                                  value={validUpto}
-                                  onChange={(e) => setValidUpto(e.target.value)}
-                                />
-                              </div>
-                              <div className="cardnumberinput">
-                                <input
-                                  type="text"
-                                  className="input_cardsnew"
-                                  placeholder="CVV"
-                                  aria-label="CVV"
-                                  value={cvv}
-                                  onChange={(e) => setCvv(e.target.value)}
-                                />
-                              </div>
-                            </div>
-                            <div className="paybtn_card">
-                              <button
-                                onClick={handlePaymentClick}
-                                className="btn btn-primary"
-                              >
-                                Pay ₹{totalPayments}
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="methodsdivnew">
-                        <div className="paymentmethodsheaidng">
-                          <h4>NETBANKING</h4>
-                        </div>
-                        <div className="card_netbankingdivmain">
-                          <a href="#!">
-                            <div className="cardmethod_design forbrdrbtm">
-                              <div className="creditdebit_carddiv">
-                                <div className="cardnamewithicon">
-                                  <img
-                                    src={`${process.env.PUBLIC_URL}/images/icici_icon.png`}
-                                    // src="images/icici_icon.png"
-                                  />
-                                  <p>ICICI</p>
-                                </div>
-                                <div className="arrowicondiv rotate270forotherpayment">
-                                  <img
-                                    src={`${process.env.PUBLIC_URL}/images/arrow_icon_payment.png`}
-                                  />
-                                </div>
-                              </div>
-                            </div>
-                          </a>
-                          <a>
-                            <div className="cardmethod_design">
-                              <div className="creditdebit_carddiv">
-                                <div className="cardnamewithicon">
-                                  <img
-                                    src={`${process.env.PUBLIC_URL}/images/axis_icon.png`}
-                                    // src="images/axis_icon.png"
-                                  />
-                                  <p>Axis Bank</p>
-                                </div>
-                                <div className="arrowicondiv rotate270forotherpayment">
-                                  <img
-                                    src={`${process.env.PUBLIC_URL}/images/arrow_icon_payment.png`}
-                                    // src="images/arrow_icon_payment.png"
-                                  />
-                                </div>
-                              </div>
-                            </div>
-                          </a>
-                        </div>
-                      </div>
-                      <div className="methodsdivnew">
-                        <div className="paymentmethodsheaidng">
-                          <h4>UPI</h4>
-                        </div>
-                        <a href="#!">
-                          <div className="cardmethod_design mrgnbtmforupistripe">
-                            <div className="creditdebit_carddiv">
-                              <div className="cardnamewithicon">
-                                <img
-                                  src={`${process.env.PUBLIC_URL}/images/gpay_icon.png`}
-                                  // src="images/gpay_icon.png"
-                                />
-                                <p>GPay</p>
-                              </div>
-                              <div className="arrowicondiv rotate270forotherpayment">
-                                <img
-                                  src={`${process.env.PUBLIC_URL}/images/arrow_icon_payment.png`}
-                                  // src="images/arrow_icon_payment.png"
-                                />
-                              </div>
-                            </div>
-                          </div>
-                        </a>
-                        <a href="#!">
-                          <div className="cardmethod_design mrgnbtmforupistripe">
-                            <div className="creditdebit_carddiv">
-                              <div className="cardnamewithicon">
-                                <img
-                                  src={`${process.env.PUBLIC_URL}/images/paytm_icon.png`}
-                                  // src="images/paytm_icon.png"
-                                />
-                                <p>Paytm</p>
-                              </div>
-                              <div className="arrowicondiv rotate270forotherpayment">
-                                <img
-                                  src={`${process.env.PUBLIC_URL}/images/arrow_icon_payment.png`}
-                                  // src="images/arrow_icon_payment.png"
-                                />
-                              </div>
-                            </div>
-                          </div>
-                        </a>
-                        <a href="#!">
-                          <div className="cardmethod_design mrgnbtmforupistripe">
-                            <div className="creditdebit_carddiv">
-                              <div className="cardnamewithicon">
-                                <img
-                                  src={`${process.env.PUBLIC_URL}/images/phonepay_icon.png`}
-                                  // src="images/phonepay_icon.png"
-                                />
-                                <p>PhonePe</p>
-                              </div>
-                              <div className="arrowicondiv rotate270forotherpayment">
-                                <img
-                                  src={`${process.env.PUBLIC_URL}/images/arrow_icon_payment.png`}
-                                  // src="images/arrow_icon_payment.png"
-                                />
-                              </div>
-                            </div>
-                          </div>
-                        </a>
-                      </div> */}
                     </div>
                   </div>
                 </div>

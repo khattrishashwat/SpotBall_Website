@@ -454,18 +454,21 @@ function Screen() {
                     <img
                       src={`${process.env.PUBLIC_URL}/images/user_guide_icon.png`}
                     />
+                    <p>Video</p>
                   </div>
                   <div className="threeicons_action" onClick={handleTicket}>
                     <img
                       src={`${process.env.PUBLIC_URL}/images/ticket_icon.png`}
                       alt="Add Ticket"
                     />
+                    <p>Ticket</p>
                   </div>
                   <div className="threeicons_action" onClick={handleRefreshAll}>
                     <img
                       src={`${process.env.PUBLIC_URL}/images/refresh_icon.png`}
                       alt="Refresh"
                     />
+                    <p>RefreshAll</p>
                   </div>
                 </div>
                 <div className="ticketcount_div">

@@ -38,7 +38,7 @@ const messaging = getMessaging(app);
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker
     .register("/firebase-messaging-sw.js", {
-      scope: "/spotsball/web/",
+      scope: "/",
     })
     .then((registration) => {
       console.log("Service Worker registered:", registration);

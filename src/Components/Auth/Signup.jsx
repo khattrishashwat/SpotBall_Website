@@ -570,6 +570,19 @@ const Signup = ({ isOpenness, Closed, back }) => {
                                   </label>
                                 </div>
                               </div>
+                              <div className="remeberrecoverydiv">
+                                <div className="rememebrmediv">
+                                  <Field
+                                    type="checkbox"
+                                    name="agreeRules"
+                                    className="checkboxemeber"
+                                  />
+                                  <label className="labelrememebrme">
+                                    Age Must be +18{" "}
+                                   
+                                  </label>
+                                </div>
+                              </div>
 
                               {/* Submit Button */}
                               <div className="form-control loginformctrl">

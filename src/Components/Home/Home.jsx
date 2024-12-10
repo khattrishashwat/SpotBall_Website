@@ -5,7 +5,9 @@ import Login from "../Auth/Login";
 import Swal from "sweetalert2";
 import Loader from "../Loader/Loader";
 import GeolocationPopup from "../Location/GeolocationPopup";
-import PalyVedio from "../Pages/HowToPlay/PalyVedio";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+import Slider from "react-slick";
 
 function Home() {
   const navigate = useNavigate();
@@ -13,7 +15,9 @@ function Home() {
   const [corousal, setCorousal] = useState([]);
   const [movies, setMovies] = useState("");
   const [contests, setContests] = useState("");
+  const [discounts, setDiscounts] = useState("");
   const [selectedContest, setSelectedContest] = useState("");
+  const [selectedDiscount, setSelectedDiscount] = useState("");
   const [isModals, setIsModals] = useState("");
   const [onCarts, setOnCarts] = useState("");
   const [links, setLinks] = useState("");
@@ -25,13 +29,15 @@ function Home() {
   const [quantity, setQuantity] = useState(3);
   const [isGeolocationPopupVisible, setGeolocationPopupVisible] =
     useState(false);
+  console.log("selectedContest--.", selectedContest);
+  console.log("Contests--.", contests);
 
   const open = async () => {
     setIsModals(true);
   };
-  // const handleBuyTicketClick = (contest) => {
+  // const handleBuyTicketClick = (contest, discount) => {
   //   setSelectedContest(contest);
-
+  //   setSelectedDiscount(discount);
   //   setOnCarts(true);
   // };
   // const handleBuyTicketClick = (contest) => {
@@ -47,7 +53,7 @@ function Home() {
   //   }
   // };
 
-  const handleBuyTicketClick = (contest) => {
+  const handleBuyTicketClick = (contest, discount) => {
     const token = localStorage.getItem("Web-token"); // Replace with your token retrieval method
 
     if (!token) {
@@ -68,9 +74,19 @@ function Home() {
     } else {
       setSelectedContest(contest);
       setOnCarts(true);
+        setSelectedDiscount(discount);
     }
   };
 
+  const settings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 2,
+    slidesToScroll: 1,
+    autoplay: true,
+    CenterPadding: 10,
+  };
   const ClosedCarts = async () => {
     setOnCarts(false);
   };
@@ -88,7 +104,6 @@ function Home() {
 
   const OpenSignIn = () => {
     setLoginPopup(true);
-    
   };
 
   const ClosePopup = () => {
@@ -116,7 +131,7 @@ function Home() {
     fetchVideoData();
   }, []);
   useEffect(() => {
-    window.scrollTo(0,0);
+    window.scrollTo(0, 0);
   }, []);
 
   const playVideo = () => {
@@ -189,12 +204,14 @@ function Home() {
           banner_details,
           unreadCount,
           contests,
+          discounts,
           restrictedStates,
           livelinks,
         } = response.data.data;
         setLinks(livelinks);
         setBanner(banner_details[0]);
         setContests(contests);
+        setDiscounts(discounts);
         setCorousal(banner_details[0]?.corousal);
         setCountss(unreadCount);
         setRestrictedStates(restrictedStates);
@@ -264,12 +281,37 @@ function Home() {
     }
   }, [token]);
 
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      localStorage.removeItem("location");
+      console.log("Location removed from localStorage");
+      setGeolocationPopupVisible(true);
+    }, 15 * 60 * 1000);
+
+    // Cleanup interval on component unmount
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, []);
+
   const handleCloseGeolocationPopup = () => {
     setGeolocationPopupVisible(false);
   };
 
   // console.log("live",links);
-  
+
+  useEffect(() => {
+    if (isModals) {
+      document.body.style.overflow = "hidden"; // Disable background scrolling
+    } else {
+      document.body.style.overflow = "auto"; // Enable background scrolling
+    }
+
+    // Cleanup on component unmount or modal close
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [isModals]);
   return (
     <>
       {loading ? (
@@ -425,13 +467,14 @@ function Home() {
                           <div className="compititonmgdivnew">
                             <img
                               src={contests[0].contest_banner?.file_url}
-                              alt="Contest Banner" className="play-img"
+                              alt="Contest Banner"
+                              className="play-img"
                               // width="750" // Intrinsic width
                               // height="500" // Intrinsic height
                               // style={{
                               //   width: "459px",
                               //   height: "306px",
-                              // }} 
+                              // }}
                             />
                             {/* <img
                               src={`${process.env.PUBLIC_URL}/images/cricket_contest.jpg`}
@@ -522,7 +565,7 @@ function Home() {
                                   type="button"
                                   className="buyticketbtn onclickcarticon_showcartpopup"
                                   onClick={() =>
-                                    handleBuyTicketClick(contests[0])
+                                    handleBuyTicketClick(contests[0], discounts)
                                   }
                                 >
                                   Buy Tickets to Play
@@ -679,6 +722,24 @@ function Home() {
                   />
                   <h2>Max {selectedContest?.maxTickets} tickets per person</h2>
                 </div>
+              </div>
+              <div className="discount_cousal">
+                <h5>Discount</h5>
+                <Slider {...settings}>
+                  {Array.isArray(selectedDiscount) &&
+                    selectedDiscount.map((discount) => (
+                      <div key={discount._id} className="discount_card">
+                        <img
+                          src={`${process.env.PUBLIC_URL}/images/discount_img.png`}
+                        />
+                        <h6>{discount.name}</h6>
+                        <p>
+                          Tickets: {discount.minTickets} - {discount.maxTickets}
+                        </p>
+                        <p>Discount: {discount.discountPercentage}%</p>
+                      </div>
+                    ))}
+                </Slider>
               </div>
               <div className="bulkticketdiv">
                 <div className="buybulkticket_heaidng">

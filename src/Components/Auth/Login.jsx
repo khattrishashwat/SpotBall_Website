@@ -153,6 +153,19 @@ function Login({ isVisible, onClose }) {
     onClose();
   };
 
+    useEffect(() => {
+      if (isVisible) {
+        document.body.style.overflow = "hidden"; // Disable background scrolling
+      } else {
+        document.body.style.overflow = "auto"; // Enable background scrolling
+      }
+
+      // Cleanup on component unmount or modal close
+      return () => {
+        document.body.style.overflow = "auto";
+      };
+    }, [isVisible]);
+
   return (
     <>
       <div

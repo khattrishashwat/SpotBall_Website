@@ -129,6 +129,19 @@ function Profile() {
     navigate("/");
   };
 
+  useEffect(() => {
+    if (isDel || isLogout || isDeactivate) {
+      document.body.style.overflow = "hidden"; // Disable background scrolling
+    } else {
+      document.body.style.overflow = "auto"; // Enable background scrolling
+    }
+
+    // Cleanup on component unmount or modal close
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [isDel, isLogout, isDeactivate]);
+
   return (
     <>
       {isLoading ? (
