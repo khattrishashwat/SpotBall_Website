@@ -72,8 +72,8 @@ function Footer() {
                       {
                         title: "About Us",
                         links: [
-                          "Who We Are?",
-                          "How to Play/ FAQ’s",
+                          "Who We Are",
+                          "How to Play",
                           "Contact Us",
                         ],
                         paths: ["/who_we_are", null, "/contact_us"],
@@ -91,8 +91,8 @@ function Footer() {
                       },
                       {
                         title: "Others",
-                        links: ["Loyalty Club", "iOS App", "Android App"],
-                        paths: [null, null, null],
+                        links: ["IOS App", "Android App"],
+                        paths: [null, null],
                       },
                     ].map((section, index) => (
                       <div key={index} className="maindivforfooterlinks">

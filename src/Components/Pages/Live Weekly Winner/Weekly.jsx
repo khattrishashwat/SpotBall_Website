@@ -73,7 +73,8 @@ function Weekly() {
                         rel="noopener noreferrer"
                       >
                         <img
-                          src={`${process.env.PUBLIC_URL}/images/fb_live_icon.png`}
+                          // src={`${process.env.PUBLIC_URL}/images/fb_live_icon.png`}
+                          src={`${process.env.PUBLIC_URL}/images/face.png`}
                           alt="FaceBook Live Icon"
                         />
                       </a>

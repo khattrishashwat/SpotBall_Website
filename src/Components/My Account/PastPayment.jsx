@@ -56,7 +56,6 @@ function PastPayment() {
       }
     } catch (error) {
       console.error("Error downloading the invoice:", error);
-      
     }
   };
 
@@ -71,11 +70,20 @@ function PastPayment() {
                   <div className="cart_windiv">
                     Win{" "}
                     <span className="winprice_cart">
-                      ₹{payment?.contestId?.jackpot_price}
+                      ₹
+                      {Number(
+                        payment?.contestId?.jackpot_price
+                      ).toLocaleString()}{" "}
                     </span>
                   </div>
                   <div className="jackpot_ticket_cart pastpayment_detailleft">
-                    <h3>₹{payment?.contestId?.jackpot_price} Jackpot</h3>
+                    <h3>
+                      ₹
+                      {Number(
+                        payment?.contestId?.jackpot_price
+                      ).toLocaleString()}{" "}
+                      Jackpot
+                    </h3>
                     <span>
                       {new Date(payment?.createdAt).toLocaleDateString()}
                     </span>
@@ -97,7 +105,8 @@ function PastPayment() {
                     </a>
                   </div>
                   <p>Txn. Id.: {payment?.paymentId}</p>
-                  <h3>₹{payment?.amount}</h3>
+                  <h3>₹{payment?.amount?.toFixed(2)}</h3>
+
                   <div className="pastpay_dropdownicon">
                     <button
                       type="button"

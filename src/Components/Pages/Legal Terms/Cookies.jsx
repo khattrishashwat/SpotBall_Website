@@ -60,7 +60,7 @@ function Privacy() {
                           alt="Terms"
                         />{" "}
                       </div>{" "}
-                      <span className="navlinkname">Terms and conditions</span>{" "}
+                      <span className="navlinkname">Terms and Conditions</span>{" "}
                     </Link>
                   </li>
                   <li className="nav-item">
@@ -72,7 +72,7 @@ function Privacy() {
                           alt="Privacy"
                         />{" "}
                       </div>
-                      <span className="navlinkname">Privacy policies</span>
+                      <span className="navlinkname">Privacy Policies</span>
                     </Link>
                   </li>
                   <li className="nav-item">
@@ -85,7 +85,7 @@ function Privacy() {
                         />{" "}
                       </div>
                       <span className="navlinkname">
-                        Rules of play &amp; FAQ’s
+                        Rules of Play &amp; FAQ’s
                       </span>
                     </Link>
                   </li>
@@ -115,13 +115,16 @@ function Privacy() {
                     <div className="legaltermsdata_div">
                       <div className="innerlegal_heaidngwithpara">
                         <div className="innerlegal_heaidngwithpara">
-                          {isLoading ? (
+                          <div
+                            dangerouslySetInnerHTML={{ __html: isCookies }}
+                          />
+                          {/* {isLoading ? (
                             <Loader /> // Correctly render the Loader component
                           ) : (
                             <div
                               dangerouslySetInnerHTML={{ __html: isCookies }}
                             />
-                          )}
+                          )} */}
                         </div>
                       </div>
                     </div>

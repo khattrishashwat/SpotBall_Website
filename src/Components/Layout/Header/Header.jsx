@@ -6,8 +6,6 @@ import moment from "moment";
 import Swal from "sweetalert2";
 
 function Header() {
-  
-
   const navigate = useNavigate();
   const location = useLocation();
   const [headerClass, setHeaderClass] = useState("");
@@ -21,6 +19,11 @@ function Header() {
   const [isNot, setIsNot] = useState(false);
   const [notice, setNotice] = useState(false);
 
+  useEffect(() => {
+    if (location.pathname === "/") {
+      window.scrollTo(0, 0);
+    }
+  }, [location.pathname]);
   const token = localStorage.getItem("Web-token");
 
   const NotificationOpen = () => {
@@ -60,27 +63,44 @@ function Header() {
   //   };
   // }, []);
 
-   const handleClickOutside = (event) => {
-     // Check if the click happened outside the menu button and the menu itself
-     const menuButton = document.querySelector(".menubaricons");
-     const menuList = document.querySelector(".menulist_divmanin");
+  const handleClickOutside = (event) => {
+    // Menu elements
+    const menuButton = document.querySelector(".menubaricons");
+    const menuList = document.querySelector(".menulist_divmanin");
 
-     if (
-       menuButton &&
-       menuList &&
-       !menuButton.contains(event.target) &&
-       !menuList.contains(event.target)
-     ) {
-       setIsMenuVisible(false); // Hide the menu if clicked outside
-     }
-   };
+    // Notification elements
+    const notificationButton = document.querySelector(
+      ".notificationclick .itmelink_menus"
+    );
+    const notificationList = document.querySelector(".notificationdiv_popup");
 
-    useEffect(() => {
-      document.addEventListener("mousedown", handleClickOutside);
-      return () => {
-        document.removeEventListener("mousedown", handleClickOutside);
-      };
-    }, []);
+    // Close menu if clicked outside
+    if (
+      menuButton &&
+      menuList &&
+      !menuButton.contains(event.target) &&
+      !menuList.contains(event.target)
+    ) {
+      setIsMenuVisible(false); // Hide the menu
+    }
+
+    // Close notification dropdown if clicked outside
+    if (
+      notificationButton &&
+      notificationList &&
+      !notificationButton.contains(event.target) &&
+      !notificationList.contains(event.target)
+    ) {
+      setIsNot(false); // Hide the notifications
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
   const isHomePage = location.pathname === "/";
   const handleScroll = () => {
     const currentScrollY = window.scrollY;
@@ -94,6 +114,9 @@ function Header() {
     }
 
     setLastScrollY(currentScrollY);
+
+    setIsNot(false);
+    setIsMenuVisible(false);
   };
 
   useEffect(() => {
@@ -238,13 +261,20 @@ function Header() {
               <div className="h3-navbar">
                 <div className="container contmainformob_newshi">
                   <nav className="navbar navbar-expand-lg h3-nav navbar_mainnavdiv_shi">
-                    <Link to="/" className="navbar-brand navbarlogodiv">
+                    <Link
+                      to="/"
+                      className="navbar-brand navbarlogodiv"
+                      // onClick={() => {
+                      //   window.scrollTo(0, 0);
+                      //   window.location.reload();
+                      // }}
+                    >
                       <img
                         src={`${process.env.PUBLIC_URL}/images/logo.png`}
-                        // src="images/logo.png"
                         alt="logo"
                       />
                     </Link>
+
                     {token ? (
                       <div className="navbar-collapse newnavbarleft">
                         <ul className="navbar navbar_afterlogin">
@@ -366,7 +396,6 @@ function Header() {
                               // onClick={() => setIsMenuVisible(!isMenuVisible)}
                               type="button"
                               className="menubaricons showmenus_clickbtn"
-                              
                               aria-controls="menu-list"
                               onClick={toggleMenu}
                             >

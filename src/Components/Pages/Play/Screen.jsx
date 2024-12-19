@@ -7,7 +7,12 @@ import Swal from "sweetalert2";
 function Screen() {
   const navigate = useNavigate();
   const imgRef = useRef(null);
+  const colors = ["black", "red", "blue", "green", "orange"]; // List of colors
+  const [colorIndex, setColorIndex] = useState(0); // Track the current color index
 
+  const changeColor = () => {
+    setColorIndex((prevIndex) => (prevIndex + 1) % colors.length); // Cycle through colors
+  };
   const location = useLocation();
   const { quantity, responseData } = location.state.payload || {};
   const [usedTickets, setUsedTickets] = useState(0);
@@ -119,7 +124,10 @@ function Screen() {
 
   const handleAddTicket = () => {
     // Check if usedTickets is less than maxTickets
-    if (usedTickets < responseData.maxTickets) {
+    if (
+      usedTickets < responseData.maxTickets &&
+      totalTickets < responseData.maxTickets
+    ) {
       const newTicket = {
         id: tickets.length + 1, // Increment ID based on the current length of tickets
         xCord: "____",
@@ -154,58 +162,100 @@ function Screen() {
     setClickedPoints([]);
     setClickCount(0);
   };
+
   const handleDeleteTicket = (id) => {
-    const updatedTickets = tickets.filter((ticket) => ticket.id !== id);
-
-    const reindexedTickets = updatedTickets.map((ticket, index) => ({
-      ...ticket,
-      id: index + 1,
-    }));
-
-    setTickets(reindexedTickets);
-
     const ticketToDelete = tickets.find((ticket) => ticket.id === id);
 
-    if (ticketToDelete) {
-      // Check if the xCord and yCord are not empty or undefined
-      if (ticketToDelete.xCord && ticketToDelete.yCord) {
-        setClickedPoints((prev) =>
-          prev.filter(
-            (point) =>
-              point.x !== ticketToDelete.xCord &&
-              point.y !== ticketToDelete.yCord
-          )
-        );
-
-        setClickCount((prev) => prev - 1); // Decrement click count if valid ticket
-        setUsedTickets((prev) => prev - 1); // Decrement used tickets if valid
-      }
-
-      // Decrement total tickets if a ticket is deleted, regardless of x and y coordinates
-      setTotalTickets((prev) => prev - 1);
+    if (!ticketToDelete) {
+      return; // Exit if the ticket doesn't exist
     }
+
+    Swal.fire({
+      title: "Are you sure?",
+      text: "Do you want to delete this ticket?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it",
+      cancelButtonText: "No, cancel",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Proceed with deletion
+        const updatedTickets = tickets.filter((ticket) => ticket.id !== id);
+
+        const reindexedTickets = updatedTickets.map((ticket, index) => ({
+          ...ticket,
+          id: index + 1,
+        }));
+
+        setTickets(reindexedTickets);
+
+        // Check if xCord and yCord are valid
+        if (ticketToDelete.xCord && ticketToDelete.yCord) {
+          setClickedPoints((prev) =>
+            prev.filter(
+              (point) =>
+                point.x !== ticketToDelete.xCord &&
+                point.y !== ticketToDelete.yCord
+            )
+          );
+
+          setClickCount((prev) => prev - 1); // Decrement click count
+          setUsedTickets((prev) => prev - 1); // Decrement used tickets
+        }
+
+        // Decrement total tickets only if there are any left
+        if (totalTickets > 0) {
+          setTotalTickets((prev) => prev - 1);
+        }
+
+        Swal.fire("Deleted!", "The ticket has been removed.", "success");
+      } else {
+        Swal.fire("Cancelled", "Your ticket is safe.", "error");
+      }
+    });
   };
 
   const handleReply = (id) => {
-    const updatedTickets = tickets.map((ticket) =>
-      ticket.id === id ? { ...ticket, xCord: "____", yCord: "____" } : ticket
-    );
+    Swal.fire({
+      title: "Are you sure?",
+      text: "Do you want to remove this coordinate?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it",
+      cancelButtonText: "No, cancel",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const updatedTickets = tickets.map((ticket) =>
+          ticket.id === id
+            ? { ...ticket, xCord: "____", yCord: "____" }
+            : ticket
+        );
 
-    setTickets(updatedTickets);
+        setTickets(updatedTickets);
 
-    const ticketToUpdate = tickets.find((ticket) => ticket.id === id);
-    if (ticketToUpdate) {
-      setClickedPoints((prev) =>
-        prev.filter(
-          (point) =>
-            point.x !== ticketToUpdate.xCord || point.y !== ticketToUpdate.yCord
-        )
-      );
+        const ticketToUpdate = tickets.find((ticket) => ticket.id === id);
+        if (ticketToUpdate) {
+          setClickedPoints((prev) =>
+            prev.filter(
+              (point) =>
+                point.x !== ticketToUpdate.xCord ||
+                point.y !== ticketToUpdate.yCord
+            )
+          );
 
-      // Decrement clickCount and usedTickets in one go
-      setClickCount((prevClickCount) => prevClickCount - 1);
-      setUsedTickets((prevUsedTickets) => prevUsedTickets - 1);
-    }
+          // Decrement clickCount and usedTickets in one go
+          setClickCount((prevClickCount) => prevClickCount - 1);
+          setUsedTickets((prevUsedTickets) => prevUsedTickets - 1);
+        }
+        Swal.fire("Deleted!", "The Coordinates has been removed.", "success");
+      } else {
+        Swal.fire("Cancelled", "Your Coordinates is safe.", "error");
+      }
+    });
   };
 
   const handleMouseMove = (e) => {
@@ -231,46 +281,10 @@ function Screen() {
     setShowTooltip(false);
   };
 
-  // const handleClick = (e) => {
-  //   // Check if the user has used all their chances
-  //   if (clickCount >= usedTickets) {
-  //     alert("You have used all your chances.");
-  //     return;
-  //   }
-
-  //   const image = e.target;
-  //   const rect = image.getBoundingClientRect();
-  //   const x = (e.clientX - rect.left).toFixed(2);
-  //   const y = (e.clientY - rect.top).toFixed(2);
-
-  //   const updatedTickets = [...tickets];
-  //   // Allow filling empty tickets
-  //   const ticketIndex = updatedTickets.findIndex(
-  //     (ticket) => ticket.xCord === "____"
-  //   );
-
-  //   if (ticketIndex !== -1) {
-  //     // Update the ticket's coordinates
-  //     updatedTickets[ticketIndex] = {
-  //       ...updatedTickets[ticketIndex],
-  //       xCord: x,
-  //       yCord: y,
-  //     };
-
-  //     // Update the state
-  //     setTickets(updatedTickets);
-  //     setClickedPoints((prev) => [...prev, { x, y }]);
-  //     setClickCount((prev) => prev + 1); // Increment clickCount only when filling a new ticket
-  //     setUsedTickets((prev) => prev + 1); // Increment usedTickets here if needed
-  //   } else {
-  //     alert("All tickets are already filled.");
-  //   }
-  // };
-
   const handleClick = (e) => {
     // Check if the user has used all their chances
     if (clickCount >= totalTickets) {
-      alert("You have used all your chances.");
+      alert("You've used all your tickets. Click '+' to add more.");
       return;
     }
 
@@ -409,10 +423,18 @@ function Screen() {
                   >
                     <RxCross2
                       style={{
-                        color: "black",
+                        color: "red",
                         fontSize: "20px",
                       }}
                     />
+                    {/* <RxCross2
+                      style={{
+                        color: colors[colorIndex], // Use the current color
+                        fontSize: "20px",
+                        cursor: "pointer", // Make it clickable
+                      }}
+                      onClick={changeColor} // Change color on click
+                    /> */}
                   </div>
                 ))}
 
@@ -451,23 +473,31 @@ function Screen() {
                     className="threeicons_action footer_howtoplayfaqlink"
                     onClick={open}
                   >
-                    <img
-                      src={`${process.env.PUBLIC_URL}/images/user_guide_icon.png`}
-                    />
+                    <div className="the_icon">
+                      <img
+                        src={`${process.env.PUBLIC_URL}/images/user_guide_icon.png`}
+                      />
+                    </div>
+
                     <p>Video</p>
                   </div>
                   <div className="threeicons_action" onClick={handleTicket}>
-                    <img
-                      src={`${process.env.PUBLIC_URL}/images/ticket_icon.png`}
-                      alt="Add Ticket"
-                    />
+                    <div className="the_icon">
+                      <img
+                        src={`${process.env.PUBLIC_URL}/images/ticket_icon.png`}
+                        alt="Add Ticket"
+                      />
+                    </div>
                     <p>Ticket</p>
                   </div>
                   <div className="threeicons_action" onClick={handleRefreshAll}>
-                    <img
-                      src={`${process.env.PUBLIC_URL}/images/refresh_icon.png`}
-                      alt="Refresh"
-                    />
+                    <div className="the_icon">
+                      <img
+                        src={`${process.env.PUBLIC_URL}/images/refresh_icon.png`}
+                        alt="Refresh"
+                      />
+                    </div>
+
                     <p>RefreshAll</p>
                   </div>
                 </div>
@@ -483,7 +513,13 @@ function Screen() {
                       <div className="contest_cordinates_div">
                         <div className="contestprice_tickets">
                           <div className="pricewithcontest">
-                            <h3>₹{responseData.jackpot_price} Contest</h3>
+                            <h3>
+                              ₹
+                              {Number(
+                                responseData.jackpot_price
+                              ).toLocaleString()}{" "}
+                              Contest
+                            </h3>
                           </div>
                           <div className="usedticket_withcheck">
                             <p className="ticketallforuse">

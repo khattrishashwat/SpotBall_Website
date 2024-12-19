@@ -64,7 +64,7 @@ function Account() {
           phone: data.phone || "",
           profile: data.profile_url || "",
         });
-        setProfileImagePreview(data.profile_url || "images/user_icon.jpg");
+        setProfileImagePreview(data.profile_url || "images/user_image.png");
         setIsVerified(data.is_verified_user || false);
 
         setPro(data);
@@ -130,7 +130,142 @@ function Account() {
   return (
     <div className="profilesection_inner">
       <div className="update_profile_main">
-        {isLoading ? (
+        <Formik
+          initialValues={initialValues}
+          validationSchema={validationSchema}
+          enableReinitialize={true}
+          onSubmit={updateProfile}
+        >
+          {({ setFieldValue }) => (
+            <Form className="updatepro_formdiv">
+              {isVerified && ( // Show this section if the user is verified
+                <div className="userimg_namediv">
+                  <div className="profileimgdiv">
+                    <div className="usermgdiv">
+                      <div className="profile-pic">
+                        <label className="-label" htmlFor="file">
+                          <span>
+                            <i className="fa fa-pencil" aria-hidden="true" />{" "}
+                            Change Image
+                          </span>
+                        </label>
+                        <input
+                          id="file"
+                          name="profile"
+                          type="file"
+                          onChange={(event) =>
+                            handleFileChange(event, setFieldValue)
+                          }
+                        />
+                        <img
+                          src={
+                            profileImagePreview ||
+                            `${process.env.PUBLIC_URL}/images/user_image.png`
+                          }
+                          alt="Profile"
+                        />
+                      </div>
+                    </div>
+                    <img
+                      src={`${process.env.PUBLIC_URL}/images/verify.png`}
+                      className="verifyicon"
+                      alt="Verified"
+                    />
+                  </div>
+                  <div className="profilename_mail">
+                    <h2>
+                      {pro.first_name} {pro.last_name}
+                    </h2>
+                    <a href={`mailto:${pro.email}`}>{pro.email}</a>
+                  </div>
+                </div>
+              )}
+
+              <div className="inputdiv_updatepro">
+                <Field
+                  name="first_name"
+                  type="text"
+                  className="updateinput"
+                  placeholder="Enter First Name"
+                  maxLength={25}
+                  onKeyDown={(e) => {
+                    if (!/[a-zA-Z\s]/.test(e.key) && e.key !== "Backspace") {
+                      e.preventDefault();
+                    }
+                  }}
+                />
+                <img
+                  src={`${process.env.PUBLIC_URL}/images/edit_pro.png`}
+                  class="editicon_input"
+                />
+                <ErrorMessage
+                  name="first_name"
+                  component="div"
+                  className="error-message"
+                />
+              </div>
+
+              <div className="inputdiv_updatepro">
+                <Field
+                  name="last_name"
+                  type="text"
+                  className="updateinput"
+                  placeholder="Enter Last Name"
+                  maxLength={15}
+                  onKeyDown={(e) => {
+                    if (!/[a-zA-Z\s]/.test(e.key) && e.key !== "Backspace") {
+                      e.preventDefault();
+                    }
+                  }}
+                />
+                <img
+                  src={`${process.env.PUBLIC_URL}/images/edit_pro.png`}
+                  class="editicon_input"
+                />
+                <ErrorMessage
+                  name="last_name"
+                  component="div"
+                  className="error-message"
+                />
+              </div>
+
+              <div className="inputdiv_updatepro">
+                <Field
+                  name="email"
+                  type="email"
+                  className="updateinput"
+                  placeholder="Enter Email"
+                  disabled
+                />
+                <ErrorMessage
+                  name="email"
+                  component="div"
+                  className="error-message"
+                />
+              </div>
+
+              <div className="inputdiv_updatepro">
+                <Field
+                  name="phone"
+                  type="tel"
+                  className="updateinput"
+                  placeholder="Enter Phone Number"
+                  disabled
+                />
+                <ErrorMessage
+                  name="phone"
+                  component="div"
+                  className="error-message"
+                />
+              </div>
+
+              <button type="submit" className="btn btn-primary">
+                Update Profile
+              </button>
+            </Form>
+          )}
+        </Formik>
+        {/* {isLoading ? (
           <Loader />
         ) : (
           <Formik
@@ -160,12 +295,17 @@ function Account() {
                               handleFileChange(event, setFieldValue)
                             }
                           />
-                          <img src={profileImagePreview} alt="Profile" />
+                          <img
+                            src={
+                              profileImagePreview ||
+                              `${process.env.PUBLIC_URL}/images/user_image.png`
+                            }
+                            alt="Profile"
+                          />
                         </div>
                       </div>
                       <img
                         src={`${process.env.PUBLIC_URL}/images/verify.png`}
-                        // src="images/verify.png"
                         className="verifyicon"
                         alt="Verified"
                       />
@@ -263,7 +403,7 @@ function Account() {
               </Form>
             )}
           </Formik>
-        )}
+        )} */}
       </div>
     </div>
   );

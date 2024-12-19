@@ -69,7 +69,7 @@ function PalyVedio({ isON, isOFF }) {
                           id="video_howtoplay"
                           preload="metadata"
                           poster={videoData.thumbnail_url} // Set the thumbnail
-                          style={{ width: "100%", height: "auto" }} // Optional: responsive styles
+                          // style={{ width: "100%", height: "auto" }} // Optional: responsive styles
                         >
                           <source
                             src={videoData.video_url} // Use the video URL from the fetched data

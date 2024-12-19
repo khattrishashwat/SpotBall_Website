@@ -282,12 +282,7 @@ const Signup = ({ isOpenness, Closed, back }) => {
     links: ["Terms & Conditions", "Privacy Policy", "Cookie Policy"],
     paths: ["/tearms", "/privacy", "/cookies"],
   };
-  const legalLinkText =
-    legalLinks.links
-      .slice(0, 2) // Only the first three links
-      .join(", ") +
-    " & " +
-    legalLinks.links[legalLinks.links.length - 1];
+
   return (
     <>
       <div
@@ -574,12 +569,11 @@ const Signup = ({ isOpenness, Closed, back }) => {
                                 <div className="rememebrmediv">
                                   <Field
                                     type="checkbox"
-                                    name="agreeRules"
+                                    name="age"
                                     className="checkboxemeber"
                                   />
                                   <label className="labelrememebrme">
-                                    Age Must be +18{" "}
-                                   
+                                    I hereby declare that I am 18+ and ready to proceed responsibly{" "}
                                   </label>
                                 </div>
                               </div>

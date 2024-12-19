@@ -264,23 +264,10 @@ export const LoginWithGoogle = async () => {
       window.location.reload();
     }
 
-    // else if (checkUIDResponse.data.message === "Uid Not Found") {
-    //   Swal.fire({
-    //     icon: "error",
-    //     text: "Go to SignUp, then try social login",
-    //   });
-
-    //   // Reload the page after error
-    //   window.location.reload();
-    // }
+    
   } catch (error) {
     console.error("Google Sign-In or API request failed:", error);
 
-    // Swal.fire({
-    //   icon: "error",
-    //   title: "Login Failed",
-    //   text: error.response ? error.response.data.message : error.message,
-    // });
     console.log("UserDetails", UserDetails);
     localStorage.setItem("UIDNotFound", JSON.stringify(UserDetails));
     window.location.reload();

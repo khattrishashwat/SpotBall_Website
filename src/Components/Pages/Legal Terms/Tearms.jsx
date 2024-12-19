@@ -24,7 +24,8 @@ function Tearms() {
       // console.log("ye",response.data.data);
     } catch (error) {
       console.error("Error data:", error);
-    } finally {
+    } 
+    finally {
       setIsLoading(false);
     }
   };
@@ -64,7 +65,7 @@ function Tearms() {
                           alt="Terms"
                         />{" "}
                       </div>{" "}
-                      <span className="navlinkname">Terms and conditions</span>{" "}
+                      <span className="navlinkname">Terms and Conditions</span>{" "}
                     </Link>
                   </li>
                   <li className="nav-item">
@@ -76,7 +77,7 @@ function Tearms() {
                           alt="Privacy"
                         />{" "}
                       </div>
-                      <span className="navlinkname">Privacy policies</span>
+                      <span className="navlinkname">Privacy Policies</span>
                     </Link>
                   </li>
                   <li className="nav-item">
@@ -89,7 +90,7 @@ function Tearms() {
                         />{" "}
                       </div>
                       <span className="navlinkname">
-                        Rules of play &amp; FAQ’s
+                        Rules of Play &amp; FAQ’s
                       </span>
                     </Link>
                   </li>
@@ -114,11 +115,13 @@ function Tearms() {
                   <div id="terms_conditions" className="tab-pane active">
                     <div className="legaltermsdata_div">
                       <div className="innerlegal_heaidngwithpara">
-                        {isLoading ? (
+                        <div dangerouslySetInnerHTML={{ __html: terms }} />
+
+                        {/* {isLoading ? (
                           <Loader /> // Correctly render the Loader component
                         ) : (
                           <div dangerouslySetInnerHTML={{ __html: terms }} />
-                        )}
+                        )} */}
                       </div>
                     </div>
                   </div>
@@ -127,7 +130,6 @@ function Tearms() {
             </div>
           </div>
         </div>
-        
       </section>
     </div>
   );

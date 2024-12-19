@@ -380,7 +380,12 @@ function Rules() {
                 <div className="tab-content">
                   <div id="rulesplay" className="tab-pane active">
                     <div className="legaltermsdata_div">
-                      {isLoading ? (
+                      <div
+                        dangerouslySetInnerHTML={{
+                          __html: rules,
+                        }}
+                      />
+                      {/* {isLoading ? (
                         <Loader />
                       ) : (
                         <div
@@ -388,7 +393,7 @@ function Rules() {
                             __html: rules,
                           }}
                         />
-                      )}
+                      )} */}
                     </div>
                   </div>
                 </div>
@@ -408,47 +413,6 @@ function Rules() {
                       role="tablist"
                       aria-multiselectable="true"
                     >
-                      {/* {faqs.map((faq, index) => (
-                        <div className="panel panel-default" key={faq._id}>
-                          <div
-                            className="panel-heading"
-                            id={`heading${index}`}
-                            role="tab"
-                          >
-                            <h4 className="panel-title">
-                              <button
-                                className={`faq-toggle ${
-                                  activeIndex === index ? "" : "collapsed"
-                                }`}
-                                onClick={() => toggleFAQ(index)}
-                                aria-expanded={activeIndex === index}
-                                aria-controls={`collapse${index}`}
-                              >
-                                <span>{faq.question}</span>
-                                <i
-                                  className={`pull-right fa ${
-                                    activeIndex === index
-                                      ? "fa-minus"
-                                      : "fa-plus"
-                                  }`}
-                                />
-                              </button>
-                            </h4>
-                          </div>
-                          <div
-                            className={`panel-collapse collapse ${
-                              activeIndex === index ? "show" : ""
-                            }`}
-                            id={`collapse${index}`}
-                            role="tabpanel"
-                            aria-labelledby={`heading${index}`}
-                          >
-                            <div className="panel-body">
-                              <p>{faq.answer}</p>
-                            </div>
-                          </div>
-                        </div>
-                      ))} */}
                       {faqs.map((faq, index) => (
                         <div className="panel panel-default" key={faq._id}>
                           <div

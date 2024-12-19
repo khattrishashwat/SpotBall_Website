@@ -52,7 +52,7 @@ const SocialSignUP = ({ onSocial, closeSocial }) => {
         device_type: "website",
         device_token: localStorage.getItem("device_token"),
       });
-      console.log("social token",response.data)
+      console.log("social token", response.data);
       const token = response.data.data.token;
       localStorage.setItem("Web-token", token);
       Swal.fire({
@@ -270,7 +270,18 @@ const SocialSignUP = ({ onSocial, closeSocial }) => {
                                 </label>
                               </div>
                             </div>
-
+                            <div className="remeberrecoverydiv">
+                              <div className="rememebrmediv">
+                                <Field
+                                  type="checkbox"
+                                  name="all"
+                                  className="checkboxemeber"
+                                />
+                                <label className="labelrememebrme">
+                                  I hereby declare that I am 18+ and ready to proceed responsibly{" "}
+                                </label>
+                              </div>
+                            </div>
                             <div className="form-control loginformctrl">
                               <button
                                 type="submit"

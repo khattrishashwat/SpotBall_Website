@@ -4,11 +4,11 @@ import * as Yup from "yup";
 import axios from "axios";
 import Swal from "sweetalert2";
 import OTPverify from "./OTPverify";
-// import * as Yup from "yup";
 
 function Forget({ onClosed }) {
   const [showOTPS, setShowOTPS] = useState(false);
   const [responseData, setResponseData] = useState(null); // Store the token and email
+  const [isSubmitting, setIsSubmitting] = useState(false); // Prevent multiple submissions
 
   const validationSchema = Yup.object({
     emailOrPhone: Yup.string()
@@ -37,6 +37,7 @@ function Forget({ onClosed }) {
 
   const PhoneSubmit = async (values) => {
     try {
+      setIsSubmitting(true); // Disable button
       // Prepend +91 to the number if it's a valid Indian number without country code
       const isPhoneNumber = /^[6-9]\d{9}$/.test(values.emailOrPhone);
       if (isPhoneNumber) {
@@ -59,12 +60,13 @@ function Forget({ onClosed }) {
         icon: "error",
         text: error.response ? error.response.data.message : error.message,
       });
+    } finally {
+      setIsSubmitting(false); // Re-enable button
     }
   };
 
   const handleOTP = () => {
     setShowOTPS(true);
-    // onClosed();
   };
 
   return (
@@ -99,7 +101,7 @@ function Forget({ onClosed }) {
                       </p>
                       <Formik
                         initialValues={{ emailOrPhone: "" }}
-                        // validationSchema={validationSchema}
+                        validationSchema={validationSchema}
                         onSubmit={PhoneSubmit}
                       >
                         {({ handleSubmit }) => (
@@ -122,8 +124,10 @@ function Forget({ onClosed }) {
                                 <button
                                   type="submit"
                                   className="loginbtn sbmtbtn_showotpscreen"
+                                  // disabled={isSubmitting} // Disable button while submitting
                                 >
                                   Submit
+                                  {/* {isSubmitting ? "Submitting..." : "Submit"} */}
                                 </button>
                               </div>
                             </div>

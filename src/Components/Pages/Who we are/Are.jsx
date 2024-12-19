@@ -44,7 +44,7 @@ function Are() {
             <div className="row rowmainheading_inner">
               <div className="col-md-12 colmainheading_innerpages">
                 <div className="pageheading_main">
-                  <h2>Who We Are?</h2>
+                  <h2>Who We Are</h2>
                 </div>
               </div>
             </div>

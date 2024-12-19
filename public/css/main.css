@@ -3443,9 +3443,9 @@ ul.list-inline li a:hover {
 }
 
 .registerplay_btndiv .play_regis_btn .bannerfixedbtn {
-  font-size: 18px;
-  padding: 10px 5px;
-  width: 160px;
+  font-size: 22px;
+  padding: 22px 10px;
+  width: 190px;
   text-align: center;
   border: none;
   outline: none;
@@ -4039,8 +4039,8 @@ ul.list-inline li a:hover {
 }
 
 .rowforwinner_boxes .colmainwinnerbox {
-  padding-right: 10px;
-  padding-left: 10px;
+  padding-right: 0px;
+  padding-left: 15px;
 }
 
 .colmainwinnerbox .jackpotwinner_div {
@@ -4059,12 +4059,35 @@ ul.list-inline li a:hover {
   object-fit: cover;
 }
 
-.winnercrclimg img {
+/* .winnercrclimg img {
   width: 100%;
   margin: 0 auto;
   display: block;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
+} */
+
+
+.winnercrclimg img {
+  width: 100%;
+  /* Set the width to 100% to ensure the image scales with its container */
+  margin: 0 auto;
+  display: block;
+  height: 190px;
+  /* Default height for .col-md-12 */
+  object-fit: cover;
+  /* Maintain aspect ratio by covering the container */
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+@media (max-width: 768px) {
+
+  /* Media query for screens smaller than 768px */
+  .col-md-6 .winnercrclimg img {
+    height: 180px;
+    /* Smaller height for .col-md-6 */
+  }
 }
 
 .jackpotwinner_div .winnerabouttext {
@@ -4073,7 +4096,7 @@ ul.list-inline li a:hover {
 }
 
 .jackpotwinner_div .winnerabouttext h3 {
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 600;
   margin-bottom: 5px;
 }
@@ -5104,6 +5127,19 @@ ul.list-inline li a:hover {
 }
 
 .actionicon_btn .threeicons_action {
+  line-height: 36px;
+  /* box-shadow: 0px 2px 6px 0px #00000040; */
+  text-align: center;
+  padding: 2px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.the_icon {
   width: 42px;
   height: 42px;
   line-height: 36px;
@@ -5120,7 +5156,7 @@ ul.list-inline li a:hover {
 
 .ticketcount_div {
   margin-bottom: 10px;
-  margin-top: 35px;
+  /* margin-top: 35px; */
 }
 
 .ticketcount_div .countoftotalticket {
@@ -6570,4 +6606,26 @@ input.updateinput {
 
 .slick-dots {
   display: none !important;
+}
+
+.press-banner-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 8px;
+
+}
+
+.see-more-btn {
+  background: none;
+  border: none;
+  color: #2bf757;
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: 14px;
+  margin-left: 5px;
+}
+
+.see-more-btn:hover {
+  color: #0056b3;
 }

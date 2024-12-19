@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import Login from "../Auth/Login";
 import Swal from "sweetalert2";
@@ -29,8 +29,14 @@ function Home() {
   const [quantity, setQuantity] = useState(3);
   const [isGeolocationPopupVisible, setGeolocationPopupVisible] =
     useState(false);
-  console.log("selectedContest--.", selectedContest);
-  console.log("Contests--.", contests);
+
+  // const location = useLocation();
+
+  // useEffect(() => {
+  //   if (location.pathname === "/") {
+  //     window.scrollTo(0, 0);
+  //   }
+  // }, [location.pathname]);
 
   const open = async () => {
     setIsModals(true);
@@ -74,7 +80,7 @@ function Home() {
     } else {
       setSelectedContest(contest);
       setOnCarts(true);
-        setSelectedDiscount(discount);
+      setSelectedDiscount(discount);
     }
   };
 
@@ -89,6 +95,7 @@ function Home() {
   };
   const ClosedCarts = async () => {
     setOnCarts(false);
+    setQuantity(3);
   };
 
   const token = localStorage.getItem("Web-token");
@@ -130,6 +137,7 @@ function Home() {
   useEffect(() => {
     fetchVideoData();
   }, []);
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -217,8 +225,10 @@ function Home() {
         setRestrictedStates(restrictedStates);
       } else {
         const response = await axios.get("get-banner");
-        const { bannerDetails, contests, restrictedStates } =
+        const { bannerDetails, contests, liveLinks, restrictedStates } =
           response.data.data;
+        setLinks(liveLinks);
+
         setRestrictedStates(restrictedStates);
         setBanner(bannerDetails[0]);
         setContests(contests);
@@ -228,6 +238,7 @@ function Home() {
       console.error("Error fetching data:", error);
     }
   };
+  // console.log("juhsdfiuhsdfuj-.", links);
 
   useEffect(() => {
     fetchData();
@@ -301,7 +312,7 @@ function Home() {
   // console.log("live",links);
 
   useEffect(() => {
-    if (isModals) {
+    if (isModals || onCarts) {
       document.body.style.overflow = "hidden"; // Disable background scrolling
     } else {
       document.body.style.overflow = "auto"; // Enable background scrolling
@@ -311,7 +322,7 @@ function Home() {
     return () => {
       document.body.style.overflow = "auto";
     };
-  }, [isModals]);
+  }, [isModals, onCarts]);
   return (
     <>
       {loading ? (
@@ -550,7 +561,8 @@ function Home() {
                             <div className="jackpotpricewithpayment">
                               <div className="gamejackpotdiv">
                                 <h4>
-                                  Game Jackpot: ₹{contests[0].jackpot_price}
+                                  Game Jackpot: ₹
+                                  {contests[0].jackpot_price.toLocaleString()}
                                 </h4>
                               </div>
                               <div className="gamejackpotdiv">
@@ -666,7 +678,11 @@ function Home() {
           <div className="addtocart_content_popup">
             <div className="contest_maindiv_popup_inner">
               <div className="contestheading">
-                <h2>Weekly ₹{selectedContest?.jackpot_price} Jackpot Prize</h2>
+                <h2>
+                  Weekly ₹
+                  {Number(selectedContest?.jackpot_price).toLocaleString()}{" "}
+                  Jackpot Prize
+                </h2>
               </div>
               <div className="contesttickeprice">
                 <p>
@@ -732,7 +748,7 @@ function Home() {
                         <img
                           src={`${process.env.PUBLIC_URL}/images/discount_img.png`}
                         />
-                        <h6>{discount.name}</h6>
+                        {/* <h6>{discount.name}</h6> */}
                         <p>
                           Tickets: {discount.minTickets} - {discount.maxTickets}
                         </p>

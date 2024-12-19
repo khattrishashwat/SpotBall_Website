@@ -339,6 +339,7 @@ function Checkout() {
           title: "No Cart Items",
           text: "Your cart is currently empty.",
           confirmButtonText: "OK",
+          allowOutsideClick: false,
         }).then((result) => {
           if (result.isConfirmed) navigate("/");
         });
@@ -457,6 +458,15 @@ function Checkout() {
   }, 0);
 
   const handleApplyPromoCode = () => {
+    if (!promoCode.trim()) {
+      Swal.fire({
+        icon: "warning",
+        title: "Promo Code Required",
+        text: "Please enter a promo code before applying.",
+      });
+      return;
+    }
+
     const promo = promoCodes.find((code) => code.name === promoCode);
 
     if (promo) {
@@ -503,38 +513,54 @@ function Checkout() {
     const { contest_id, tickets_count, user_coordinates } = cart;
     const token = localStorage.getItem("Web-token");
 
-    try {
-      const response = await axios.get(`remove-cart-item/${cart._id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        params: {
-          contest_id: contest_id._id,
-          tickets_count,
-          user_coordinates: {
-            x: user_coordinates.x,
-            y: user_coordinates.y,
-          },
-        },
-      });
+    Swal.fire({
+      title: "Are you sure?",
+      text: "Do you really want to delete this item?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "No, keep it",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const response = await axios.get(`remove-cart-item/${cart._id}`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            params: {
+              contest_id: contest_id._id,
+              tickets_count,
+              user_coordinates: {
+                x: user_coordinates.x,
+                y: user_coordinates.y,
+              },
+            },
+          });
 
-      // Handle successful response
-      Swal.fire({
-        title: "Success!",
-        text: response.data.message,
-        confirmButtonText: "OK",
-        showConfirmButton: true,
-      });
-      navigate("/");
-      // Optionally, remove the cart from the state
-      setCarts((prevCarts) => prevCarts.filter((c) => c._id !== cart._id));
-    } catch (error) {
-      console.error(error);
-      Swal.fire({
-        title: "Error!",
-        text: error.response?.data?.message,
-      });
-    }
+          // Handle successful response
+          Swal.fire({
+            title: "Success!",
+            text: response.data.message,
+            icon: "success",
+            confirmButtonText: "OK",
+            showConfirmButton: true,
+          });
+          navigate("/");
+
+          // Optionally, remove the cart from the state
+          setCarts((prevCarts) => prevCarts.filter((c) => c._id !== cart._id));
+        } catch (error) {
+          console.error(error);
+          Swal.fire({
+            title: "Error!",
+            text:
+              error.response?.data?.message ||
+              "An error occurred. Please try again.",
+            icon: "error",
+          });
+        }
+      }
+    });
   };
 
   const loadScript = (src) => {
@@ -786,6 +812,8 @@ function Checkout() {
     // }
   };
 
+  console.log("need Update -->", calculatedCarts);
+
   return (
     <>
       <section className="maincont_section myacocunt_sectionforbgimg">
@@ -814,13 +842,21 @@ function Checkout() {
                               <div className="cart_windiv">
                                 Win{" "}
                                 <span className="winprice_cart">
-                                  ₹{cart.contest_id.jackpot_price}
+                                  ₹
+                                  {Number(
+                                    cart.contest_id.jackpot_price
+                                  ).toLocaleString()}
                                 </span>
                               </div>
                               <div className="jackpot_ticket_cart">
                                 <h3>
-                                  ₹{cart.contest_id.jackpot_price} Jackpot
+                                  ₹
+                                  {Number(
+                                    cart.contest_id.jackpot_price
+                                  ).toLocaleString()}{" "}
+                                  Jackpot
                                 </h3>
+
                                 <h4>{cart.tickets_count} Tickets</h4>
                                 <p>Spot &amp; Win</p>
                               </div>
@@ -1032,6 +1068,11 @@ function Checkout() {
                                     ? cart.promoCode.amount
                                     : 0;
 
+                                  // Calculate discount percentage per cart
+                                  const PerDiscount = cart.discount
+                                    ? cart.discount.discountPercentage
+                                    : 0;
+
                                   // Calculate discount amount per cart
                                   const discountPerCart = cart.discount
                                     ? cart.discount.amount
@@ -1093,8 +1134,8 @@ function Checkout() {
                                       {cart.promoCode && (
                                         <>
                                           <p>
-                                            <strong>Promo Applied:</strong>
-                                            -₹{promoDiscountAmount}
+                                            <strong>Promo Applied:</strong> -₹
+                                            {promoDiscountAmount}
                                           </p>
                                           <p>
                                             <strong>After: </strong>₹
@@ -1103,16 +1144,12 @@ function Checkout() {
                                         </>
                                       )}
                                       {cart.discount && (
-                                        <>
-                                          <p>
-                                            <strong>Discount: </strong>-₹
-                                            {discountPerCart}
-                                          </p>
-                                          <p>
-                                            <strong>After Discount: </strong>₹
-                                            {discountedTotalTicketPrice}
-                                          </p>
-                                        </>
+                                        <p className="discount-line">
+                                          <strong>
+                                            Discount ({PerDiscount}%):
+                                          </strong>{" "}
+                                          ₹{discountPerCart}
+                                        </p>
                                       )}
                                       <p>
                                         <strong>
@@ -1145,13 +1182,13 @@ function Checkout() {
                                         ₹{discountedGstOnPlatformFee}
                                       </p>
                                       <p>
-                                        <strong>Total Razorpay Fee: </strong>₹
+                                        <strong>Total PlatForm Fee: </strong>₹
                                         {discountedTotalRazorpayFee}
                                       </p>
                                       <hr />
                                       <p>
                                         <strong>
-                                          Grand Total (Subtotal + Razorpay):{" "}
+                                          Grand Total (Subtotal + Platform):{" "}
                                         </strong>
                                         ₹{discountedGrandTotal}
                                       </p>
@@ -1226,7 +1263,7 @@ function Checkout() {
                               onClick={handlePaymentClick}
                               style={{ cursor: "pointer" }}
                             >
-                              <p>Proceed to Pay</p>
+                              <p>Pay Now</p>
                             </div>
                           </div>
                         </div>
