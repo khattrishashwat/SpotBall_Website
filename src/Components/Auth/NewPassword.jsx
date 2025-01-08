@@ -38,7 +38,7 @@ function NewPassword({ onCloseds, emailOrPhone }) {
     const token = localStorage.getItem("tokens");
 
     try {
-      const response = await axios.post("reset-password", values, {
+      const response = await axios.post("app/auth/reset-password", values, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -47,6 +47,8 @@ function NewPassword({ onCloseds, emailOrPhone }) {
       Swal.fire({
         icon: "success",
         text: response.data.message,
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
       });
 
       onCloseds();
@@ -57,6 +59,8 @@ function NewPassword({ onCloseds, emailOrPhone }) {
       Swal.fire({
         icon: "error",
         text: error.response ? error.response.data.message : error.message,
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
       });
     }
   };

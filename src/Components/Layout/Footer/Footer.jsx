@@ -7,14 +7,15 @@ function Footer() {
   const [footer, setFooter] = useState(""); // Footer content
   const [plays, setPlays] = useState(false); // Video state
   const [links, setLinks] = useState(false); // Video state
- 
+
   const fetchFooter = async () => {
     try {
-      const response = await axios.get("/get-all-static-content/footer");
-      console.log("response.data.data[0]", response.data.data);
-      
+      const response = await axios.get(
+        "app/static-content/get-all-static-content/footer"
+      );
+
       if (response) {
-        setLinks(response.data.data?.liveLinks)
+        setLinks(response.data.data?.liveLinks);
         setFooter(response.data.data?.footer?.description || "");
       }
     } catch (error) {
@@ -25,7 +26,6 @@ function Footer() {
   useEffect(() => {
     fetchFooter();
   }, []);
-
 
   const openVideo = () => setPlays(true);
 
@@ -61,7 +61,7 @@ function Footer() {
                         links: [
                           "The Winners Circle",
                           "Live Weekly Winner",
-                          "In The Press",
+                          "Trending Articles",
                         ],
                         paths: [
                           "/the_winners_circle",
@@ -71,27 +71,23 @@ function Footer() {
                       },
                       {
                         title: "About Us",
-                        links: [
-                          "Who We Are",
-                          "How to Play",
-                          "Contact Us",
-                        ],
+                        links: ["Who We Are", "How to Play", "Contact Us"],
                         paths: ["/who_we_are", null, "/contact_us"],
                         onClick: [null, openVideo, null],
                       },
                       {
-                        title: "Legal",
+                        title: "Legal Terms",
                         links: [
                           "Terms & Conditions",
                           "Privacy Policy",
-                          "Rules of Play & FAQ's",
+                          "Rules of Play & FAQs",
                           "Cookie Policy",
                         ],
-                        paths: ["/tearms", "/privacy", "/rules", "/cookies"],
+                        paths: ["/terms", "/privacy", "/rules", "/cookies"],
                       },
                       {
-                        title: "Others",
-                        links: ["IOS App", "Android App"],
+                        title: "Apps",
+                        links: ["Ios", "Android"],
                         paths: [null, null],
                       },
                     ].map((section, index) => (

@@ -176,6 +176,7 @@ const GeolocationPopup = ({ Area, onClose }) => {
               restrictedState.toLowerCase() === stateName.toLowerCase() ||
               restrictedState.toLowerCase() === countryName.toLowerCase()
           );
+          console.log("isRestricted", isRestricted);
 
           if (isRestricted) {
             Swal.fire({

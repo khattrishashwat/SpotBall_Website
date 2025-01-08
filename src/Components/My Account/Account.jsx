@@ -47,7 +47,7 @@ function Account() {
     const token = localStorage.getItem("Web-token");
     try {
       setIsLoading(true);
-      const response = await axios.get(`get-profile`, {
+      const response = await axios.get(`app/profile/get-profile`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -105,12 +105,16 @@ function Account() {
       formData.append("phone", values.phone);
       formData.append("profile", values.profile);
 
-      const response = await axios.post(`update-profile`, formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      const response = await axios.post(
+        `app/profile/update-profile`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
       // Refresh the page after a successful update
       window.location.reload();

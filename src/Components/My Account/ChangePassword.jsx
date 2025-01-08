@@ -45,19 +45,23 @@ function ChangePassword({ resetForm }) {
   const ChangeSubmit = async (values) => {
     try {
       const token = localStorage.getItem("Web-token");
-      const response = await axios.post("change-password", values, {
+      const response = await axios.post("app/profile/change-password", values, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
       Swal.fire({
         title: response.data.message,
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
       }).then(() => {
         window.location.reload();
       });
     } catch (error) {
       Swal.fire({
         text: error.response ? error.response.data.message : error.message,
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
       });
       console.error(
         "Failed:",

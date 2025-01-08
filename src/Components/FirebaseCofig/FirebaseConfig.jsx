@@ -11,8 +11,6 @@ import { getMessaging, getToken, onMessage } from "firebase/messaging";
 import Swal from "sweetalert2"; // Assuming Swal is already installed
 import axios from "axios";
 
-// import appleSignin from "apple-signin-auth";
-
 // Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyDWNOtn_zO3ekheuPOBlw7EsieLjYtEguw",
@@ -35,47 +33,75 @@ const appleProvider = new OAuthProvider("apple.com");
 // Initialize Firebase Messaging
 const messaging = getMessaging(app);
 
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker
-    .register("/firebase-messaging-sw.js", {
-      scope: "/",
-    })
-    .then((registration) => {
-      console.log("Service Worker registered:", registration);
-
-      getToken(messaging, {
-        vapidKey:
-          "BNkI-Se9LgfgnkAxsoNDTe3uQDR7HBWV6rY-Mhc3A6AioGIl-VnUn49NTAdTZHgBnt6id6KokU02Pku4G0GpYxA",
-      })
-        .then((currentToken) => {
-          if (currentToken) {
-            console.log("Current token:", currentToken);
-            localStorage.setItem("device_token", currentToken);
-          } else {
-            console.log(
-              "No registration token available. Request permission to generate one."
-            );
-          }
-        })
-        .catch((err) => {
-          console.error("Error getting token:", err);
-        });
-
-      onMessage(messaging, (payload) => {
-        console.log("Message received:", payload);
-        Swal.fire({
-          title: "New Message!",
-          text: payload.notification.body,
-          icon: "info",
-          confirmButtonText: "OK",
-        });
-      });
-    })
-    .catch((error) => {
-      console.error("Service Worker registration failed:", error);
-    });
+function detectIncognitoMode() {
+  return new Promise((resolve) => {
+    const fs = window.RequestFileSystem || window.webkitRequestFileSystem;
+    if (!fs) {
+      resolve(false); // Browser does not support this API
+    } else {
+      fs(
+        window.TEMPORARY,
+        100,
+        () => resolve(false),
+        () => resolve(true)
+      );
+    }
+  });
 }
 
+// Main logic
+if ("serviceWorker" in navigator) {
+  detectIncognitoMode().then((isIncognito) => {
+    if (isIncognito) {
+      Swal.fire({
+        title: "Incognito Mode Detected",
+        text: "Push notifications are disabled in incognito mode. Please switch to normal mode for full functionality.",
+        icon: "warning",
+        confirmButtonText: "OK",
+      });
+      return; // Stop execution if incognito mode is detected
+    }
+
+    navigator.serviceWorker
+      .register("/firebase-messaging-sw.js", {
+        scope: "/spotsball/web/",
+      })
+      .then((registration) => {
+        console.log("Service Worker registered:", registration);
+
+        getToken(messaging, {
+          vapidKey:
+            "BNkI-Se9LgfgnkAxsoNDTe3uQDR7HBWV6rY-Mhc3A6AioGIl-VnUn49NTAdTZHgBnt6id6KokU02Pku4G0GpYxA",
+        })
+          .then((currentToken) => {
+            if (currentToken) {
+              console.log("Current token:", currentToken);
+              localStorage.setItem("device_token", currentToken);
+            } else {
+              console.log(
+                "No registration token available. Request permission to generate one."
+              );
+            }
+          })
+          .catch((err) => {
+            console.error("Error getting token:", err);
+          });
+
+        onMessage(messaging, (payload) => {
+          console.log("Message received:", payload);
+          Swal.fire({
+            title: "New Message!",
+            text: payload.notification.body,
+            icon: "info",
+            confirmButtonText: "OK",
+          });
+        });
+      })
+      .catch((error) => {
+        console.error("Service Worker registration failed:", error);
+      });
+  });
+} 
 // Google sign-in function
 export const signInWithGoogle = async (setFieldValue) => {
   try {
@@ -234,12 +260,12 @@ export const LoginWithGoogle = async () => {
     console.log("Google Sign-In successful. User UID:", user.uid);
 
     const checkUIDResponse = await axios.get(
-      `check-uid-exists/${user.uid}`,
+      `app/auth/check-uid-exists/${user.uid}`,
       {}
     );
 
     if (checkUIDResponse.data.message === "Uid found") {
-      const response = await axios.post("social-login", {
+      const response = await axios.post("app/auth/social-login", {
         signup_method: "google",
         uid: user.uid,
         device_type: "website",
@@ -298,13 +324,13 @@ export const LoginWithTwitter = async () => {
     console.log("ksugfdsiu", UserDetails);
     // Check if UID exists in your database
     const checkUIDResponse = await axios.get(
-      `check-uid-exists/${user.uid}`,
+      `app/auth/check-uid-exists/${user.uid}`,
       {}
     );
 
     if (checkUIDResponse.data.message === "Uid found") {
       // If UID is found, proceed with social login
-      const response = await axios.post("social-login", {
+      const response = await axios.post("app/auth/social-login", {
         signup_method: "twitter",
         uid: user.uid,
         device_type: "website",
@@ -368,13 +394,13 @@ export const LoginWithFacebook = async () => {
 
     // Check if UID exists in your database
     const checkUIDResponse = await axios.get(
-      `check-uid-exists/${user.uid}`,
+      `app/auth/check-uid-exists/${user.uid}`,
       {}
     );
 
     if (checkUIDResponse.data.message === "Uid found") {
       // If UID is found, proceed with social login
-      const response = await axios.post("social-login", {
+      const response = await axios.post("app/auth/social-login", {
         signup_method: "facebook",
         uid: user.uid,
         device_type: "website",
@@ -424,13 +450,13 @@ export const LoginWithApple = async () => {
 
     // Check if UID exists in your database
     const checkUIDResponse = await axios.get(
-      `check-uid-exists/${user.uid}`,
+      `app/auth/check-uid-exists/${user.uid}`,
       {}
     );
 
     if (checkUIDResponse.data.message === "Uid found") {
       // If UID is found, proceed with social login
-      const response = await axios.post("social-login", {
+      const response = await axios.post("app/auth/social-login", {
         signup_method: "apple",
         uid: user.uid,
         device_type: "website",

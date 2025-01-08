@@ -10,11 +10,14 @@ function Are() {
     const token = localStorage.getItem("Web-token");
     try {
       setIsLoading(true);
-      const response = await axios.get("/get-all-static-content/who_we_are", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.get(
+        "app/static-content/get-all-static-content/who_we_are",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (response.data.data) {
         console.log("Fetched ", response.data.data);

@@ -58,7 +58,7 @@ function Profile() {
     const token = localStorage.getItem("Web-token");
     try {
       setIsLoading(true);
-      const response = await axios.get(`active-inactive`, {
+      const response = await axios.get(`app/profile/active-inactive`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -69,17 +69,23 @@ function Profile() {
         localStorage.removeItem("Web-token");
         Swal.fire({
           title: response.data.message,
+          confirmButtonText: "OK",
+          allowOutsideClick: false,
         }).then(() => {
           navigate("/");
         });
       } else {
         Swal.fire({
-          title: response.data.message, // Display message from response if needed
+          title: response.data.message,
+          confirmButtonText: "OK",
+          allowOutsideClick: false,
         });
       }
     } catch (error) {
       Swal.fire({
         text: error.response ? error.response.data.message : error.message,
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
       });
     } finally {
       setIsLoading(false);
@@ -89,7 +95,7 @@ function Profile() {
     const token = localStorage.getItem("Web-token");
     try {
       setIsLoading(true);
-      const response = await axios.get(`delete-account`, {
+      const response = await axios.get(`app/profile/delete-account`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -100,17 +106,23 @@ function Profile() {
         localStorage.removeItem("Web-token");
         Swal.fire({
           title: response.data.message,
+          confirmButtonText: "OK",
+          allowOutsideClick: false,
         }).then(() => {
           window.location.reload();
         });
       } else {
         Swal.fire({
-          title: response.data.message, // Display message from response if needed
+          title: response.data.message,
+          confirmButtonText: "OK",
+          allowOutsideClick: false,
         });
       }
     } catch (error) {
       Swal.fire({
         text: error.response ? error.response.data.message : error.message,
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
       });
     } finally {
       setIsLoading(false);

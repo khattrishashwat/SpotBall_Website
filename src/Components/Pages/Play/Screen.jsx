@@ -7,14 +7,12 @@ import Swal from "sweetalert2";
 function Screen() {
   const navigate = useNavigate();
   const imgRef = useRef(null);
-  const colors = ["black", "red", "blue", "green", "orange"]; // List of colors
-  const [colorIndex, setColorIndex] = useState(0); // Track the current color index
 
-  const changeColor = () => {
-    setColorIndex((prevIndex) => (prevIndex + 1) % colors.length); // Cycle through colors
-  };
+  const [colorIndex, setColorIndex] = useState(""); // Track the current color index
+ 
   const location = useLocation();
   const { quantity, responseData } = location.state.payload || {};
+
   const [usedTickets, setUsedTickets] = useState(0);
   const [totalTickets, setTotalTickets] = useState(quantity || "");
   const [tickets, setTickets] = useState(
@@ -59,7 +57,7 @@ function Screen() {
   const fetchVideoData = async () => {
     const token = localStorage.getItem("Web-token");
     try {
-      const response = await axios.get("get-how-to-play", {
+      const response = await axios.get("app/how-to-play/get-how-to-play", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -114,6 +112,7 @@ function Screen() {
         title: "Maximum ticket limit reached",
         text: `You cannot add more than ${responseData.maxTickets} tickets.`,
         confirmButtonText: "OK",
+        allowOutsideClick: false,
       });
     }
   };
@@ -147,6 +146,7 @@ function Screen() {
         title: "Maximum ticket limit reached",
         text: `You cannot add more than ${responseData.maxTickets} tickets.`,
         confirmButtonText: "OK",
+        allowOutsideClick: false,
       });
     }
   };
@@ -174,6 +174,7 @@ function Screen() {
       title: "Are you sure?",
       text: "Do you want to delete this ticket?",
       icon: "warning",
+      allowOutsideClick: false,
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
@@ -222,6 +223,7 @@ function Screen() {
       title: "Are you sure?",
       text: "Do you want to remove this coordinate?",
       icon: "warning",
+      allowOutsideClick: false,
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
@@ -282,6 +284,8 @@ function Screen() {
   };
 
   const handleClick = (e) => {
+
+    setColorIndex(responseData.cursor_color);
     // Check if the user has used all their chances
     if (clickCount >= totalTickets) {
       alert("You've used all your tickets. Click '+' to add more.");
@@ -340,22 +344,21 @@ function Screen() {
       tickets_count: usedTickets,
       user_coordinates: usedTicketCoordinates,
     };
-    console.log("ceckied--", values);
 
     try {
       const token = localStorage.getItem("Web-token");
-      const response = await axios.post("add-to-cart", values, {
+      const response = await axios.post("app/contest/add-to-cart", values, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
-      console.log("Response:", response.data);
 
       Swal.fire({
         icon: "success",
         title: response.data.message,
         showConfirmButton: false,
+        allowOutsideClick: false,
         timer: 2000,
       });
 
@@ -375,6 +378,8 @@ function Screen() {
         icon: "error",
         title: "Failed",
         text: error.response ? error.response.data.message : error.message,
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
       });
     }
   };
@@ -418,23 +423,16 @@ function Screen() {
                         (point.y / imgRef.current.naturalHeight) *
                         imgRef.current.clientHeight
                       }px`,
-                      transform: "translate(-50%, -50%)", // Center the cross
+                      transform: "translate(-50%, -50%)",
                     }}
                   >
                     <RxCross2
                       style={{
-                        color: "red",
-                        fontSize: "20px",
+                        color: colorIndex,
+                        fontSize: "40px",
                       }}
                     />
-                    {/* <RxCross2
-                      style={{
-                        color: colors[colorIndex], // Use the current color
-                        fontSize: "20px",
-                        cursor: "pointer", // Make it clickable
-                      }}
-                      onClick={changeColor} // Change color on click
-                    /> */}
+                    
                   </div>
                 ))}
 
@@ -498,7 +496,7 @@ function Screen() {
                       />
                     </div>
 
-                    <p>RefreshAll</p>
+                    <p>Refresh All</p>
                   </div>
                 </div>
                 <div className="ticketcount_div">

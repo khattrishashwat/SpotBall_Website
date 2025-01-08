@@ -7,7 +7,7 @@ import OTPverify from "./OTPverify";
 
 function Forget({ onClosed }) {
   const [showOTPS, setShowOTPS] = useState(false);
-  const [responseData, setResponseData] = useState(null); // Store the token and email
+  const [responseData, setResponseData] = useState(null); // Store the token and email/phone
   const [isSubmitting, setIsSubmitting] = useState(false); // Prevent multiple submissions
 
   const validationSchema = Yup.object({
@@ -21,44 +21,40 @@ function Forget({ onClosed }) {
           const phoneRegex = /^[6-9]\d{9}$/; // Validates Indian mobile numbers without country code
           return emailRegex.test(value) || phoneRegex.test(value);
         }
-      )
-      .test(
-        "add-country-code",
-        "Please add +91 before your phone number",
-        (value) => {
-          const phoneRegex = /^[6-9]\d{9}$/; // Validates Indian mobile numbers without country code
-          if (phoneRegex.test(value)) {
-            return false; // Fail if a phone number without +91
-          }
-          return true; // Pass for email or phone with +91
-        }
       ),
   });
 
-  const PhoneSubmit = async (values) => {
+  const PhoneSubmit = async (values, { resetForm }) => {
     try {
       setIsSubmitting(true); // Disable button
-      // Prepend +91 to the number if it's a valid Indian number without country code
+
+      // Ensure valid phone numbers are always prefixed with +91
       const isPhoneNumber = /^[6-9]\d{9}$/.test(values.emailOrPhone);
-      if (isPhoneNumber) {
+      if (isPhoneNumber && !values.emailOrPhone.startsWith("+91")) {
         values.emailOrPhone = `+91${values.emailOrPhone}`;
       }
 
-      const response = await axios.post("send-otp", values);
+      const response = await axios.post(`app/auth/send-otp`, values);
+
       Swal.fire({
         icon: "success",
         text: response.data.message,
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
       });
-      localStorage.setItem("tokens", response.data.data.token);
 
-      setResponseData({
-        emailOrPhone: values.emailOrPhone,
-      });
+      // Save token and response data
+      localStorage.setItem("tokens", response.data.data.token);
+      setResponseData({ emailOrPhone: values.emailOrPhone });
+
+      resetForm(); // Reset the form
       handleOTP();
     } catch (error) {
       Swal.fire({
         icon: "error",
-        text: error.response ? error.response.data.message : error.message,
+        text: error.response?.data?.message,
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
       });
     } finally {
       setIsSubmitting(false); // Re-enable button
@@ -104,8 +100,8 @@ function Forget({ onClosed }) {
                         validationSchema={validationSchema}
                         onSubmit={PhoneSubmit}
                       >
-                        {({ handleSubmit }) => (
-                          <Form onSubmit={handleSubmit}>
+                        {() => (
+                          <Form>
                             <div className="formstart forgotpass_inputmaindiv">
                               <div className="form-control frmctrldiv">
                                 <Field
@@ -124,10 +120,9 @@ function Forget({ onClosed }) {
                                 <button
                                   type="submit"
                                   className="loginbtn sbmtbtn_showotpscreen"
-                                  // disabled={isSubmitting} // Disable button while submitting
+                                  disabled={isSubmitting} // Disable button during submission
                                 >
-                                  Submit
-                                  {/* {isSubmitting ? "Submitting..." : "Submit"} */}
+                                  {isSubmitting ? "Submitting..." : "Submit"}
                                 </button>
                               </div>
                             </div>
@@ -145,7 +140,7 @@ function Forget({ onClosed }) {
       {showOTPS && (
         <OTPverify
           onClosedss={() => setShowOTPS(false)}
-          emailOrPhone={responseData?.emailOrPhone} // Pass email to OTPverify
+          emailOrPhone={responseData?.emailOrPhone} // Pass email/phone to OTPverify
         />
       )}
     </div>

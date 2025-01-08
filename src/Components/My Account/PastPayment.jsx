@@ -19,7 +19,7 @@ function PastPayment() {
 
       try {
         const response = await axios.get(
-          "v1/app/contest/get-contest-payments",
+          "app/contest/get-contest-payments",
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -32,6 +32,8 @@ function PastPayment() {
           icon: "error",
           title: "Error",
           text: error.response?.data?.message,
+          confirmButtonText: "OK",
+          allowOutsideClick: false,
         });
       }
     };
@@ -44,7 +46,7 @@ function PastPayment() {
     const token = localStorage.getItem("Web-token");
 
     try {
-      const response = await axios.get(`v1/app/contest/get-bill/${paymentId}`, {
+      const response = await axios.get(`app/contest/get-bill/${paymentId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       console.log("pdf", response.data.data.pdf);

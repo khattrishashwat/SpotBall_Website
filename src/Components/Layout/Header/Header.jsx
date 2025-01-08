@@ -134,6 +134,8 @@ function Header() {
       icon: "success",
       title: "Logout Successful",
       text: "You have been logged out successfully.",
+     
+      allowOutsideClick: false,
       timer: 2000,
       showConfirmButton: false,
     });
@@ -144,7 +146,7 @@ function Header() {
     try {
       const token = localStorage.getItem("Web-token");
       if (!token) return;
-      const response = await axios.get("get-profile", {
+      const response = await axios.get("app/profile/get-profile", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -166,7 +168,7 @@ function Header() {
       const token = localStorage.getItem("Web-token");
       if (!token) return;
       const response = await axios.get(
-        "v1/app/notifications/get-notifications",
+        "app/notifications/get-notifications",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -176,7 +178,6 @@ function Header() {
 
       setNotification(response.data.data);
       // setNotice(response.data.data.length);
-      console.log("response Notification", response.data.data);
     } catch (error) {
       console.error("Error fetching profile:", error);
     }
@@ -224,7 +225,13 @@ function Header() {
       const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-      setTimeLeft({ days, hours, minutes, seconds });
+      // Format all values to always display two digits
+      setTimeLeft({
+        days: String(days).padStart(2, "0"),
+        hours: String(hours).padStart(2, "0"),
+        minutes: String(minutes).padStart(2, "0"),
+        seconds: String(seconds).padStart(2, "0"),
+      });
     };
 
     const interval = setInterval(updateCountdown, 1000);
@@ -481,7 +488,7 @@ function Header() {
                                   />
                                 </div>
                                 <div className="menuname">
-                                  <h4>Who We Are?</h4>
+                                  <h4>Who We Are</h4>
                                 </div>
                               </div>
                               <div className="arrowicondiv">
@@ -533,7 +540,8 @@ function Header() {
                                   />
                                 </div>
                                 <div className="menuname">
-                                  <h4>In The Press</h4>
+                                  {/* <h4>Trending Articles</h4> */}
+                                  <h4>SpotsBall In the News</h4>
                                 </div>
                               </div>
                               <div className="arrowicondiv">
@@ -559,7 +567,8 @@ function Header() {
                                   />
                                 </div>
                                 <div className="menuname">
-                                  <h4>Live Weekly Winner</h4>
+                                  {/* <h4>Live Weekly Winner</h4> */}
+                                  <h4>Monday Live Stream : Who Won</h4>
                                 </div>
                               </div>
                               <div className="arrowicondiv">
@@ -600,7 +609,7 @@ function Header() {
 
                         <li className="mainmenulist">
                           <Link
-                            to="/tearms"
+                            to="/terms"
                             onClick={() => setIsMenuVisible(false)}
                           >
                             <div className="menubar_divmain">

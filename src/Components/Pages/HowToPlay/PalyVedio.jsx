@@ -8,7 +8,7 @@ function PalyVedio({ isON, isOFF }) {
   const fetchVideoData = async () => {
     const token = localStorage.getItem("Web-token");
     try {
-      const response = await axios.get("get-how-to-play", {
+      const response = await axios.get("app/how-to-play/get-how-to-play", {
         headers: {
           Authorization: `Bearer ${token}`,
         },

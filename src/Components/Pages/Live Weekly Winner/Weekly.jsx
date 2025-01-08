@@ -84,7 +84,8 @@ function Weekly() {
                         rel="noopener noreferrer"
                       >
                         <img
-                          src={`${process.env.PUBLIC_URL}/images/yb_live_icon.png`}
+                          // src={`${process.env.PUBLIC_URL}/images/yb_live_icon.png`}
+                          src={`${process.env.PUBLIC_URL}/images/you.png`}
                           alt="YouTube Live Icon"
                         />
                       </a>

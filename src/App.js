@@ -33,6 +33,7 @@ import Signup from "./Components/Auth/Signup";
 // Lazy load components
 const Loader = lazy(() => import("./Components/Loader/Loader"));
 const Home = lazy(() => import("./Components/Home/Home"));
+const Know = lazy(() => import("./Components/Home/Know"));
 const Header = lazy(() => import("./Components/Layout/Header/Header"));
 const Footer = lazy(() => import("./Components/Layout/Footer/Footer"));
 
@@ -41,8 +42,8 @@ const Footer = lazy(() => import("./Components/Layout/Footer/Footer"));
 
 // axios.defaults.baseURL = "http://localhost:10077/api/";
 // axios.defaults.baseURL = "http://44.195.125.80:10077/spotsball/api/";
-// axios.defaults.baseURL = "https://webmobrildemo.com/spotsball/api/";
-axios.defaults.baseURL = "https://www.spotsball.com/spotsball/api/";
+axios.defaults.baseURL = "https://webmobrildemo.com/spotsball/api/v1/";
+// axios.defaults.baseURL = "https://www.spotsball.com/spotsball/api/";
 
 const ProtectedRoute = () => {
   // if (!localStorage.getItem("token")) {
@@ -78,12 +79,16 @@ axios.interceptors.response.use(
         icon: "error",
         title: "Something went wrong!",
         text: error.response ? error.response.data.message : error.message,
+        allowOutsideClick: false,
+        showConfirmButton: true,
+        confirmButtonText: "OK",
+      }).then(() => {
+        window.location.reload();
       });
-      }
+    }
     return Promise.reject(error);
   }
 );
-
 
 const App = () => {
   const [loader, setLoading] = useState(false);
@@ -107,7 +112,7 @@ const App = () => {
       <Helmet>
         <title>{loader ? "loader....." : "SpotsBall"}</title>
       </Helmet>
-      <Router basename="/">
+      <Router basename="/spotsball/web/">
         {" "}
         <Suspense fallback={<Loader />}>
           <Header />
@@ -120,7 +125,7 @@ const App = () => {
             <Route path="/" element={<Home />} />
             <Route path="/contact_us" element={<Contact />} />
             <Route path="/playss" element={<PlayVedio />} />
-              <Route path="/in_the_press" element={<Press />} />
+            <Route path="/in_the_press" element={<Press />} />
             {/* <Route path="/login" element={<Login />} />
             <Route path="/sign" element={<Signup />} /> */}
             <Route path="/load" element={<Loader />} />
@@ -128,10 +133,11 @@ const App = () => {
             <Route path="/who_we_are" element={<Are />} />
             <Route path="/the_winners_circle" element={<Circle />} />
             <Route path="/live_weekly_winner" element={<Weekly />} />
-            <Route path="/tearms" element={<Tearms />} />
+            <Route path="/terms" element={<Tearms />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/rules" element={<Rules />} />
             <Route path="/cookies" element={<Cookies />} />
+            <Route path="/knows" element={<Know />} />
 
             {/* Catch-all for 404 */}
             <Route path="*" element={<PageNot />} />

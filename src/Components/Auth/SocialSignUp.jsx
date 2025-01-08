@@ -27,6 +27,7 @@ const SocialSignUP = ({ onSocial, closeSocial }) => {
     signup_method: "",
     agreeAllLegal: false,
     agreeRules: false,
+    agreeAge: false,
   };
 
   const handleFieldChange = (field, value, setFieldValue) => {
@@ -45,7 +46,7 @@ const SocialSignUP = ({ onSocial, closeSocial }) => {
       ? values.phone
       : `+91${values.phone}`;
     try {
-      const response = await axios.post("social-login", {
+      const response = await axios.post("app/auth/social-login", {
         ...values,
         phone: formattedPhone,
         signup_method: values.signup_method,
@@ -57,6 +58,8 @@ const SocialSignUP = ({ onSocial, closeSocial }) => {
       localStorage.setItem("Web-token", token);
       Swal.fire({
         title: response.data.message,
+       
+        allowOutsideClick: false,
         showConfirmButton: false,
         timer: 1000,
       }).then(() => {
@@ -87,7 +90,7 @@ const SocialSignUP = ({ onSocial, closeSocial }) => {
   const legalLinks = {
     title: "Legal",
     links: ["Terms & Conditions", "Privacy Policy", "Cookie Policy"],
-    paths: ["/tearms", "/privacy", "/cookies"],
+    paths: ["/terms", "/privacy", "/cookies"],
   };
 
   return (
@@ -261,7 +264,7 @@ const SocialSignUP = ({ onSocial, closeSocial }) => {
                                   I have read & agree with{" "}
                                   <Link
                                     to="/rules"
-                                    state={{ popupOpen: true }}
+                                    state={{ popupOpen: false }}
                                     // target="_blank"
                                     // rel="noopener noreferrer"
                                   >
@@ -274,11 +277,13 @@ const SocialSignUP = ({ onSocial, closeSocial }) => {
                               <div className="rememebrmediv">
                                 <Field
                                   type="checkbox"
-                                  name="all"
+                                  name="agreeAge"
                                   className="checkboxemeber"
                                 />
                                 <label className="labelrememebrme">
-                                  I hereby declare that I am 18+ and ready to proceed responsibly{" "}
+                                  I hereby confirm and acknowledge that I am not
+                                  a minor, and that I am least 18 years old as
+                                  of today’s date.
                                 </label>
                               </div>
                             </div>

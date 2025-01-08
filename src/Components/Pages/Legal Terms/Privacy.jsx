@@ -13,7 +13,7 @@ function Privacy() {
       setIsLoading(true);
 
       const response = await axios.get(
-        "/get-all-static-content/privacy_policy",
+        "app/static-content/get-all-static-content/privacy_policy",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -40,7 +40,7 @@ function Privacy() {
           <div className="row rowmainheading_inner">
             <div className="col-md-12 colmainheading_innerpages">
               <div className="pageheading_main">
-                <h2>Legal Terms</h2>
+                <h2>Privacy Policies</h2>
               </div>
             </div>
           </div>
@@ -51,7 +51,7 @@ function Privacy() {
               <div className="navtabdiv">
                 <ul className="nav nav-tabs">
                   <li className="nav-item">
-                    <Link to="/tearms" className="nav-link" data-toggle="tab">
+                    <Link to="/terms" className="nav-link" data-toggle="tab">
                       {" "}
                       <div className="tabbingiconbgdiv">
                         {" "}
@@ -60,7 +60,7 @@ function Privacy() {
                           alt="Terms"
                         />{" "}
                       </div>{" "}
-                      <span className="navlinkname">Terms and Conditions</span>{" "}
+                      <span className="navlinkname">Terms & Conditions</span>{" "}
                     </Link>
                   </li>
                   <li className="nav-item">
@@ -89,7 +89,7 @@ function Privacy() {
                         />{" "}
                       </div>
                       <span className="navlinkname">
-                        Rules of Play &amp; FAQ’s
+                        Rules of Play &amp; FAQs
                       </span>
                     </Link>
                   </li>
@@ -113,11 +113,11 @@ function Privacy() {
                 <div className="tab-content">
                   <div id="pricvacypolicy" className="tab-pane active">
                     <div className="legaltermsdata_div">
-                      <div className="innerlegal_heaidngwithpara">
-                        <div className="innerlegal_heaidngwithpara">
                           <div
                             dangerouslySetInnerHTML={{ __html: isPrivacy }}
                           />
+                      {/* <div className="innerlegal_heaidngwithpara">
+                    
 
                           {/* {isLoading ? (
                             <Loader /> // Correctly render the Loader component
@@ -126,8 +126,8 @@ function Privacy() {
                               dangerouslySetInnerHTML={{ __html: isPrivacy }}
                             />
                           )} */}
-                        </div>
-                      </div>
+                        
+                      {/* </div> */}
                     </div>
                   </div>
                 </div>

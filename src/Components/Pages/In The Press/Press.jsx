@@ -10,7 +10,7 @@ function Press() {
     const token = localStorage.getItem("Web-token");
     try {
       setIsLoading(true);
-      const response = await axios.get("get-press", {
+      const response = await axios.get("app/press/get-press", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -37,12 +37,12 @@ function Press() {
 
   const truncateDescription = (description, index) => {
     const words = description.split(" ");
-    if (words.length > 36) {
+    if (words.length > 40) {
       return (
         <>
           {expandedIndex === index
             ? description
-            : words.slice(0, 36).join(" ") + "..."}
+            : words.slice(0, 40).join(" ") + "..."}
           <button
             onClick={() => toggleDescription(index)}
             className="see-more-btn"
@@ -62,7 +62,7 @@ function Press() {
           <div className="row rowmainheading_inner">
             <div className="col-md-12 colmainheading_innerpages">
               <div className="pageheading_main">
-                <h2>In The Press</h2>
+                <h2>Trending Articles </h2>
               </div>
             </div>
           </div>
@@ -88,7 +88,7 @@ function Press() {
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      See Full Article
+                      Read Full Article
                     </a>
                   </div>
                 </div>

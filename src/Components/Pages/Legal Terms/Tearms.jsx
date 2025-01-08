@@ -13,7 +13,7 @@ function Tearms() {
       setIsLoading(true);
 
       const response = await axios.get(
-        "/get-all-static-content/terms_and_condition",
+        "app/static-content/get-all-static-content/terms_and_condition",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -34,6 +34,10 @@ function Tearms() {
     fetchCondition();
   }, []);
 
+   useEffect(() => {
+      window.scrollTo(0, 0);
+    }, []);
+
   return (
     <div>
       <section className="maincont_section">
@@ -41,7 +45,7 @@ function Tearms() {
           <div className="row rowmainheading_inner">
             <div className="col-md-12 colmainheading_innerpages">
               <div className="pageheading_main">
-                <h2>Legal Terms</h2>
+                <h2>Terms & Conditions</h2>
               </div>
             </div>
           </div>
@@ -53,7 +57,7 @@ function Tearms() {
                 <ul className="nav nav-tabs">
                   <li className="nav-item">
                     <Link
-                      to="/tearms"
+                      to="/terms"
                       className="nav-link active"
                       data-toggle="tab"
                     >
@@ -65,7 +69,7 @@ function Tearms() {
                           alt="Terms"
                         />{" "}
                       </div>{" "}
-                      <span className="navlinkname">Terms and Conditions</span>{" "}
+                      <span className="navlinkname">Terms & Conditions</span>{" "}
                     </Link>
                   </li>
                   <li className="nav-item">
@@ -90,7 +94,7 @@ function Tearms() {
                         />{" "}
                       </div>
                       <span className="navlinkname">
-                        Rules of Play &amp; FAQ’s
+                        Rules of Play &amp; FAQs
                       </span>
                     </Link>
                   </li>
@@ -114,15 +118,15 @@ function Tearms() {
                 <div className="tab-content">
                   <div id="terms_conditions" className="tab-pane active">
                     <div className="legaltermsdata_div">
-                      <div className="innerlegal_heaidngwithpara">
                         <div dangerouslySetInnerHTML={{ __html: terms }} />
+                      {/* <div className="innerlegal_heaidngwithpara"> */}
 
                         {/* {isLoading ? (
                           <Loader /> // Correctly render the Loader component
                         ) : (
                           <div dangerouslySetInnerHTML={{ __html: terms }} />
                         )} */}
-                      </div>
+                      {/* </div> */}
                     </div>
                   </div>
                 </div>

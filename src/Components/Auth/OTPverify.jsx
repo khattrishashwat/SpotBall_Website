@@ -38,6 +38,8 @@ function OTPverify({ onClosedss, emailOrPhone }) {
       Swal.fire({
         icon: "error",
         text: "Please enter OTP",
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
       });
       return;
     }
@@ -46,13 +48,15 @@ function OTPverify({ onClosedss, emailOrPhone }) {
       Swal.fire({
         icon: "error",
         text: "Please enter valid OTP",
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
       });
       return;
     }
 
     try {
       const response = await axios.post(
-        "submit-otp",
+        "app/auth/submit-otp",
         { otp: otp.join("") },
         {
           headers: {
@@ -67,12 +71,14 @@ function OTPverify({ onClosedss, emailOrPhone }) {
         Swal.fire({
           icon: "success",
           text: "OTP verified successfully!",
+          confirmButtonText: "OK",
+          allowOutsideClick: false,
         });
         setShowNewPassword(true);
       } else {
         Swal.fire({
           icon: "error",
-          text: response.data.message || "OTP verification failed!",
+          text: response.data.message ,
         });
         setOtp(["", "", "", ""]);
       }
@@ -80,6 +86,8 @@ function OTPverify({ onClosedss, emailOrPhone }) {
       Swal.fire({
         icon: "error",
         text: error.response ? error.response.data.message : error.message,
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
       });
       setOtp(["", "", "", ""]);
     }
@@ -87,12 +95,13 @@ function OTPverify({ onClosedss, emailOrPhone }) {
 
   const resendOtp = async () => {
     if (timer > 0) return; // Prevent resending if timer is active
+  setTimer(60); 
 
     let token = localStorage.getItem("tokens");
 
     try {
       const response = await axios.post(
-        "send-otp",
+        "app/auth/send-otp",
         { emailOrPhone },
         {
           headers: {
@@ -107,14 +116,20 @@ function OTPverify({ onClosedss, emailOrPhone }) {
       Swal.fire({
         icon: "success",
         text: response.data.message,
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
       });
 
       // Start the timer
-      setTimer(60);
+      // setTimer(60);
     } catch (error) {
+          setTimer(0); 
+
       Swal.fire({
         icon: "error",
         text: error.response ? error.response.data.message : error.message,
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
       });
     }
   };

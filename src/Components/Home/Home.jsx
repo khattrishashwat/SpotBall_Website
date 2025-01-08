@@ -67,6 +67,8 @@ function Home() {
         icon: "info",
         title: "Login Required",
         text: "Please login to participate in this contest!",
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
       });
       return;
     }
@@ -76,6 +78,8 @@ function Home() {
         icon: "warning",
         title: "Participation Alert",
         text: "You have already participated in this contest!",
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
       });
     } else {
       setSelectedContest(contest);
@@ -83,7 +87,6 @@ function Home() {
       setSelectedDiscount(discount);
     }
   };
-
   const settings = {
     dots: true,
     infinite: true,
@@ -120,7 +123,7 @@ function Home() {
   const fetchVideoData = async () => {
     const token = localStorage.getItem("Web-token");
     try {
-      const response = await axios.get("get-how-to-play", {
+      const response = await axios.get("app/how-to-play/get-how-to-play", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -189,7 +192,13 @@ function Home() {
       const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-      setTimeLeft({ days, hours, minutes, seconds });
+      // Ensure all values are two digits
+      setTimeLeft({
+        days: String(days).padStart(2, "0"),
+        hours: String(hours).padStart(2, "0"),
+        minutes: String(minutes).padStart(2, "0"),
+        seconds: String(seconds).padStart(2, "0"),
+      });
     };
 
     const interval = setInterval(updateCountdown, 1000);
@@ -202,7 +211,7 @@ function Home() {
       const token = localStorage.getItem("Web-token");
 
       if (token) {
-        const response = await axios.get("get-all-contests", {
+        const response = await axios.get("app/contest/get-all-contests", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -224,7 +233,9 @@ function Home() {
         setCountss(unreadCount);
         setRestrictedStates(restrictedStates);
       } else {
-        const response = await axios.get("get-banner");
+        const response = await axios.get("app/banner/get-banner");
+       
+
         const { bannerDetails, contests, liveLinks, restrictedStates } =
           response.data.data;
         setLinks(liveLinks);
@@ -238,13 +249,13 @@ function Home() {
       console.error("Error fetching data:", error);
     }
   };
-  // console.log("juhsdfiuhsdfuj-.", links);
 
   useEffect(() => {
     fetchData();
   }, [token]);
 
   // console.log("corousal", corousal);
+  // console.log("contest -->", contests);
 
   const handleIncrease = () => {
     if (quantity < selectedContest?.maxTickets) {
@@ -254,6 +265,7 @@ function Home() {
         icon: "warning",
         title: "Max Ticket Limit Reached",
         text: `You can only purchase a maximum of ${selectedContest?.maxTickets} tickets per person.`,
+        allowOutsideClick: false,
         confirmButtonText: "OK",
       });
     }
@@ -376,11 +388,7 @@ function Home() {
                           )
                         )}
                     </h4>
-
-                    <h4>
-                      {/* Can you pinpoint the hidden cricket ball? */}
-                      {banner.title}
-                    </h4>
+                    <h4>{banner.title}</h4>
                   </div>
                 </div>
                 <div className="bottomfixedonbannertext_banner">
@@ -393,7 +401,7 @@ function Home() {
                         onClick={open}
                       >
                         <i className="fa fa-play" aria-hidden="true" /> How to
-                        play
+                        Play
                       </button>
                       {!token && (
                         <button
@@ -402,7 +410,7 @@ function Home() {
                           // onClick={OpenSignIn}
                           onClick={() => setLoginPopup(!isLoginPopup)}
                         >
-                          Sign Up/Sign In
+                          Sign in / Sign up
                         </button>
                       )}
                     </div>
@@ -410,7 +418,8 @@ function Home() {
                   <div className="entriesdate_withcountdown">
                     <div className="countdowndate_newshi">
                       <div className="countheading_endsin">
-                        <h2>Ends in</h2>
+                        {/* <h2>Closing by</h2> */}
+                        <h2>This Week's Game Ends In</h2>
                       </div>
                       <div id="countdown" className="countdown">
                         <div className="countdown-number">
@@ -462,7 +471,7 @@ function Home() {
               </div>
             </div>
           </section>
-          {contests && (
+          {contests && contests.length > 0 ? (
             <section className="compitionsection" id="compitions_div">
               <div className="container contcompitions">
                 <div className="col-md-12 col12maincompitions">
@@ -477,19 +486,13 @@ function Home() {
                         <div className="compitionleftside_new">
                           <div className="compititonmgdivnew">
                             <img
-                              src={contests[0].contest_banner?.file_url}
+                              src={contests[0]?.contest_banner?.file_url}
                               alt="Contest Banner"
                               className="play-img"
-                              // width="750" // Intrinsic width
-                              // height="500" // Intrinsic height
-                              // style={{
-                              //   width: "459px",
-                              //   height: "306px",
-                              // }}
                             />
-                            {/* <img
-                              src={`${process.env.PUBLIC_URL}/images/cricket_contest.jpg`}
-                            /> */}
+                            <p className="hidball">
+                              Mark the hidden ball in the picture!
+                            </p>
                           </div>
                         </div>
                         <div className="compitionsbox">
@@ -499,10 +502,9 @@ function Home() {
                                 <div className="contest_newtiming_strip">
                                   <img
                                     src={`${process.env.PUBLIC_URL}/images/ball_icon.png`}
-                                    // src="images/ball_icon.png"
                                     alt="Ball Icon"
                                   />
-                                  <h4>Every Week’s Contest Ends</h4>
+                                  <h4> Weekly contest ends </h4>
                                 </div>
                                 <div className="contestrightdaysdate">
                                   <h4 className="contslist_span_inner">
@@ -514,17 +516,16 @@ function Home() {
                                 <div className="contest_newtiming_strip">
                                   <img
                                     src={`${process.env.PUBLIC_URL}/images/ball_icon.png`}
-                                    // src="images/ball_icon.png"
                                     alt="Ball Icon"
                                   />
                                   <h4>
-                                    Every Week We Live Stream SpotsBall’s
-                                    “Weekly Winner Show”
+                                    {" "}
+                                    Live streaming of “Weekly Winner Show”{" "}
                                   </h4>
                                 </div>
                                 <div className="contestrightdaysdate">
                                   <h4 className="contslist_span_inner">
-                                    Monday- 00:00hrs
+                                    Monday- 21:00hrs
                                   </h4>
                                 </div>
                               </div>
@@ -539,7 +540,7 @@ function Home() {
                                     rel="noopener noreferrer"
                                   >
                                     <img
-                                      src={`${process.env.PUBLIC_URL}/images/fb_live_icon.png`}
+                                      src={`${process.env.PUBLIC_URL}/images/face.png`}
                                       alt="Facebook Live"
                                     />
                                   </a>
@@ -551,7 +552,7 @@ function Home() {
                                     rel="noopener noreferrer"
                                   >
                                     <img
-                                      src={`${process.env.PUBLIC_URL}/images/yb_live_icon.png`}
+                                      src={`${process.env.PUBLIC_URL}/images/you.png`}
                                       alt="YouTube Live"
                                     />
                                   </a>
@@ -562,12 +563,21 @@ function Home() {
                               <div className="gamejackpotdiv">
                                 <h4>
                                   Game Jackpot: ₹
-                                  {contests[0].jackpot_price.toLocaleString()}
+                                  {contests[0]?.jackpot_price.toLocaleString()}
                                 </h4>
+                                {/* <h4>
+                                  Game Jackpot: ₹
+                                  {contests?.jackpot_price !== undefined &&
+                                  contests?.jackpot_price !== null
+                                    ? Number(
+                                        contests.jackpot_price
+                                      ).toLocaleString()
+                                    : "0"}
+                                </h4> */}
                               </div>
                               <div className="gamejackpotdiv">
                                 <h4>
-                                  Ticket Price: ₹{contests[0].ticket_price}
+                                  Ticket Price: ₹{contests[0]?.ticket_price}
                                 </h4>
                               </div>
                             </div>
@@ -592,7 +602,143 @@ function Home() {
                 </div>
               </div>
             </section>
+          ) : (
+            <section className="no-contest-section">
+              <div className="container text-center">
+                <h2>No Current Contest Available</h2>
+                <p>
+                  Stay tuned for upcoming contests and exciting opportunities!
+                </p>
+              </div>
+            </section>
           )}
+
+          {/* {contests && (
+            <section className="compitionsection" id="compitions_div">
+              <div className="container contcompitions">
+                <div className="col-md-12 col12maincompitions">
+                  <div className="row rowcompititionsmaindiv">
+                    <div className="upcomingame_div_fortext">
+                      <h2>
+                        Current <span>contest</span>
+                      </h2>
+                    </div>
+                    <div className="col-md-12 col3compitions">
+                      <div className="pricecompitionmaindiv">
+                        <div className="compitionleftside_new">
+                          <div className="compititonmgdivnew">
+                            <img
+                              src={contests.contest_banner?.file_url}
+                              alt="Contest Banner"
+                              className="play-img"
+                            />
+                            <p className="hidball">
+                              Mark the hidden ball in the picture!
+                            </p>
+                          </div>
+                        </div>
+                        <div className="compitionsbox">
+                          <div className="compitiontextinfodivmain">
+                            <div className="contestpoints_main">
+                              <div className="contesteveryweekdiv">
+                                <div className="contest_newtiming_strip">
+                                  <img
+                                    src={`${process.env.PUBLIC_URL}/images/ball_icon.png`}
+                                    // src="images/ball_icon.png"
+                                    alt="Ball Icon"
+                                  />
+                                  <h4> Weekly contest ends </h4>
+                                </div>
+                                <div className="contestrightdaysdate">
+                                  <h4 className="contslist_span_inner">
+                                    Sunday- 23:59hrs
+                                  </h4>
+                                </div>
+                              </div>
+                              <div className="contesteveryweekdiv">
+                                <div className="contest_newtiming_strip">
+                                  <img
+                                    src={`${process.env.PUBLIC_URL}/images/ball_icon.png`}
+                                    // src="images/ball_icon.png"
+                                    alt="Ball Icon"
+                                  />
+                                  <h4>
+                                    Live streaming of “Weekly Winner Show”
+                                  </h4>
+                                </div>
+                                <div className="contestrightdaysdate">
+                                  <h4 className="contslist_span_inner">
+                                    Monday- 21:00hrs
+                                  </h4>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="everyweek_livewatchdiv">
+                              <div className="watchondiv">
+                                <h4>Watch On</h4>
+                                {links?.Facebook_Streaming && (
+                                  <a
+                                    href={links.Facebook_Streaming}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                  >
+                                    <img
+                                      // src={`${process.env.PUBLIC_URL}/images/fb_live_icon.png`}
+                                      src={`${process.env.PUBLIC_URL}/images/face.png`}
+                                      alt="Facebook Live"
+                                    />
+                                  </a>
+                                )}
+                                {links?.Youtube_Streaming && (
+                                  <a
+                                    href={links.Youtube_Streaming}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                  >
+                                    <img
+                                      // src={`${process.env.PUBLIC_URL}/images/yb_live_icon.png`}
+                                      src={`${process.env.PUBLIC_URL}/images/you.png`}
+                                      alt="YouTube Live"
+                                    />
+                                  </a>
+                                )}
+                              </div>
+                            </div>
+                            <div className="jackpotpricewithpayment">
+                              <div className="gamejackpotdiv">
+                                <h4>
+                                  Game Jackpot: ₹
+                                  {contests.jackpot_price.toLocaleString()}
+                                </h4>
+                              </div>
+                              <div className="gamejackpotdiv">
+                                <h4>
+                                  Ticket Price: ₹{contests.ticket_price}
+                                </h4>
+                              </div>
+                            </div>
+                            <div className="buyticketsbtndiv">
+                              <div className="addtocardbtnicon">
+                                <button
+                                  type="button"
+                                  className="buyticketbtn onclickcarticon_showcartpopup"
+                                  onClick={() =>
+                                    handleBuyTicketClick(contests[0], discounts)
+                                  }
+                                >
+                                  Buy Tickets to Play
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          )} */}
         </>
       )}
       <Login isVisible={isLoginPopup} onClose={ClosePopup} />
@@ -680,7 +826,9 @@ function Home() {
               <div className="contestheading">
                 <h2>
                   Weekly ₹
-                  {Number(selectedContest?.jackpot_price).toLocaleString()}{" "}
+                  {selectedContest?.jackpot_price
+                    ? Number(selectedContest.jackpot_price).toLocaleString()
+                    : "0"}{" "}
                   Jackpot Prize
                 </h2>
               </div>

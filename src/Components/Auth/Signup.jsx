@@ -17,7 +17,7 @@ import {
 const Signup = ({ isOpenness, Closed, back }) => {
   const [signupData, setSignupData] = useState({});
   const [isLoginPopup, setLoginPopup] = useState(false);
-
+const[emails,setEmails]=useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -25,6 +25,7 @@ const Signup = ({ isOpenness, Closed, back }) => {
   const [otp, setOtp] = useState(["", "", "", ""]);
   const [isSocialSignup, setIsSocialSignup] = useState(false);
   const location = useLocation();
+  const [timer, setTimer] = useState(0); // Timer state for resend OTP
 
   useEffect(() => {
     // Keep the popup open if navigating to linked pages like terms or rules
@@ -62,6 +63,7 @@ const Signup = ({ isOpenness, Closed, back }) => {
     confirm_password: "",
     agreeAllLegal: false,
     agreeRules: false,
+    agreeAge:false,
   };
 
   // Save data to localStorage on every change
@@ -124,7 +126,7 @@ const Signup = ({ isOpenness, Closed, back }) => {
     }
     setIsLoading(true);
     try {
-      const response = await axios.post("sign-up", {
+      const response = await axios.post("app/auth/sign-up", {
         ...values,
         phone: formattedPhone,
       });
@@ -140,7 +142,7 @@ const Signup = ({ isOpenness, Closed, back }) => {
       }).then(() => {
         openModals();
         // Call resendOtp directly, passing the email from values
-        resendOtp(values.email);
+        setEmails(values.email);
         // onClose();
       });
     } catch (error) {
@@ -148,19 +150,34 @@ const Signup = ({ isOpenness, Closed, back }) => {
         icon: "error",
         title: "Signup Failed",
         text: error.response ? error.response.data.message : error.message,
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
       });
     } finally {
       setIsLoading(false);
     }
   };
 
-  const resendOtp = async (email) => {
+   useEffect(() => {
+      let countdown;
+      if (timer > 0) {
+        countdown = setInterval(() => {
+          setTimer((prev) => prev - 1);
+        }, 1000);
+      }
+      return () => clearInterval(countdown);
+    }, [timer]);
+
+  const resendOtp = async () => {
+    if (timer > 0) return; // Prevent resending if timer is active
+    setTimer(60);
     let token = localStorage.getItem("tokens");
 
     try {
       const response = await axios.post(
-        "resend-otp-user-verification",
-        { emailOrPhone: email }, // Directly use email passed as argument
+        // "resend-otp-user-verification",
+        "app/auth/resend-otp-user-verification",
+        { emailOrPhone: emails }, // Directly use email passed as argument
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -176,11 +193,17 @@ const Signup = ({ isOpenness, Closed, back }) => {
       Swal.fire({
         icon: "success",
         text: response.data.message,
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
       });
     } catch (error) {
+                setTimer(0); 
+
       Swal.fire({
         icon: "error",
         text: error.response ? error.response.data.message : error.message,
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
       });
     }
   };
@@ -190,7 +213,7 @@ const Signup = ({ isOpenness, Closed, back }) => {
     try {
       const token = localStorage.getItem("tokens");
       const response = await axios.post(
-        "verify-user",
+        "app/auth/verify-user",
         { otp: otp.join("") }, // Join OTP array into a string
         {
           headers: {
@@ -203,6 +226,8 @@ const Signup = ({ isOpenness, Closed, back }) => {
         Swal.fire({
           icon: "success",
           text: "OTP verified successfully!",
+          confirmButtonText: "OK",
+          allowOutsideClick: false,
         }).then(() => {
           localStorage.clear();
           window.location.reload();
@@ -210,13 +235,17 @@ const Signup = ({ isOpenness, Closed, back }) => {
       } else {
         Swal.fire({
           icon: "error",
-          text: response.data.message || "OTP verification failed!",
+          text: response.data.message,
+          confirmButtonText: "OK",
+          allowOutsideClick: false,
         });
       }
     } catch (error) {
       Swal.fire({
         icon: "error",
         text: error.response ? error.response.data.message : error.message,
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
       });
     }
   };
@@ -228,7 +257,7 @@ const Signup = ({ isOpenness, Closed, back }) => {
     console.log("values", values);
 
     try {
-      const response = await axios.post("social-login", {
+      const response = await axios.post("app/auth/social-login", {
         ...values,
         phone: formattedPhone,
         signup_method: values.signup_method,
@@ -239,6 +268,7 @@ const Signup = ({ isOpenness, Closed, back }) => {
       localStorage.setItem("Web-token", token);
       Swal.fire({
         title: response.data.message,
+        allowOutsideClick: false,
         showConfirmButton: false,
         timer: 1000,
       }).then(() => {
@@ -250,12 +280,16 @@ const Signup = ({ isOpenness, Closed, back }) => {
           icon: "info",
           title: "Signup canceled",
           text: "It seems like you closed the signup popup before finishing.",
+          confirmButtonText: "OK",
+          allowOutsideClick: false,
         });
       } else {
         Swal.fire({
           icon: "error",
           title: "Signup Failed",
           text: error.message,
+          confirmButtonText: "OK",
+          allowOutsideClick: false,
         });
       }
     }
@@ -280,8 +314,22 @@ const Signup = ({ isOpenness, Closed, back }) => {
   const legalLinks = {
     title: "Legal",
     links: ["Terms & Conditions", "Privacy Policy", "Cookie Policy"],
-    paths: ["/tearms", "/privacy", "/cookies"],
+    paths: ["/terms", "/privacy", "/cookies"],
   };
+
+
+   useEffect(() => {
+      if (isModals) {
+        document.body.style.overflow = "hidden"; // Disable background scrolling
+      } else {
+        document.body.style.overflow = "auto"; // Enable background scrolling
+      }
+  
+      // Cleanup on component unmount or modal close
+      return () => {
+        document.body.style.overflow = "auto";
+      };
+    }, [isModals]);
 
   return (
     <>
@@ -528,7 +576,7 @@ const Signup = ({ isOpenness, Closed, back }) => {
                                         <span key={index}>
                                           <Link
                                             to={legalLinks.paths[index]}
-                                            state={{ popupOpen: true }}
+                                            state={{ popupOpen: false }}
                                             // target="_blank"
                                             // rel="noopener noreferrer"
                                           >
@@ -569,11 +617,13 @@ const Signup = ({ isOpenness, Closed, back }) => {
                                 <div className="rememebrmediv">
                                   <Field
                                     type="checkbox"
-                                    name="age"
+                                    name="agreeAge"
                                     className="checkboxemeber"
                                   />
                                   <label className="labelrememebrme">
-                                    I hereby declare that I am 18+ and ready to proceed responsibly{" "}
+                                    I hereby confirm and acknowledge that I am
+                                    not a minor, and that I am least 18 years
+                                    old as of today’s date.
                                   </label>
                                 </div>
                               </div>
@@ -748,8 +798,11 @@ const Signup = ({ isOpenness, Closed, back }) => {
                               type="button"
                               className="resentotpbtn"
                               onClick={resendOtp}
+                              disabled={timer > 0}
                             >
-                              Resend OTP
+                              {timer > 0
+                                ? `Resend OTP in ${timer}s`
+                                : "Resend OTP"}
                             </button>
                           </div>
                           <div className="form-control loginformctrl">

@@ -14,11 +14,14 @@ function Contact() {
     const token = localStorage.getItem("Web-token");
     try {
       setIsLoading(true);
-      const response = await axios.get("/get-all-static-content/contact_us", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.get(
+        "app/static-content/get-all-static-content/contact_us",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (response.data.data) {
         console.log("Fetched Contacts ", response.data.data);
@@ -70,7 +73,7 @@ function Contact() {
 
     try {
       const response = await axios.post(
-        "v1/app/static/contact-support",
+        "app/static/contact-support",
         { ...values, phone: formattedPhone },
         {
           headers: {
@@ -82,8 +85,8 @@ function Contact() {
       if (response) {
         Swal.fire({
           icon: "success",
-
           text: response?.data?.message,
+          allowOutsideClick: false,
           confirmButtonText: "OK",
         });
       }
@@ -94,6 +97,7 @@ function Contact() {
         icon: "error",
         text: error.response?.data?.message,
         confirmButtonText: "OK",
+        allowOutsideClick: false,
       });
       console.error("Error submitting contact form:", error);
     }
@@ -162,9 +166,10 @@ function Contact() {
                               href="https://www.instagram.com/spotsballofficial/"
                               target="_blank"
                               rel="noopener noreferrer"
+                              className="bggreen"
                             >
                               <img
-                                src={`${process.env.PUBLIC_URL}/images/instagram_contact.png`}
+                                src={`${process.env.PUBLIC_URL}/images/instagram_contact-white.png`}
                                 alt="Instagram"
                               />
                             </a>
@@ -292,7 +297,7 @@ function Contact() {
                             <div className="col-md-12 colcontactinputsdiv">
                               <div className="inputformdiv">
                                 <label className="contactlbl">
-                                  Select Subject?
+                                  Select Subject
                                 </label>
                                 <div className="subjectradioninputs">
                                   <div className="form-group">
