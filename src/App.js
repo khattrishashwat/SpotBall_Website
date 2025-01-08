@@ -29,6 +29,7 @@ import Screen from "./Components/Pages/Play/Screen";
 import PageNot from "./Components/PageNot/PageNot";
 import PlayVedio from "./Components/Pages/HowToPlay/PalyVedio";
 import Signup from "./Components/Auth/Signup";
+import Delete from "./Components/Pages/Delete/Delete";
 
 // Lazy load components
 const Loader = lazy(() => import("./Components/Loader/Loader"));
@@ -138,6 +139,7 @@ const App = () => {
             <Route path="/rules" element={<Rules />} />
             <Route path="/cookies" element={<Cookies />} />
             <Route path="/knows" element={<Know />} />
+            <Route path="/my_account_delete" element={<Delete />} />
 
             {/* Catch-all for 404 */}
             <Route path="*" element={<PageNot />} />
