@@ -19,16 +19,24 @@ const SocialSignUP = ({ onSocial, closeSocial }) => {
   //       onSocial(true);
   //     }
   //   }, [location.state]);
-  const initialValues = JSON.parse(localStorage.getItem("UIDNotFound")) || {
-    first_name: "",
-    last_name: "",
-    email: "",
-    phone: "",
-    signup_method: "",
-    agreeAllLegal: false,
-    agreeRules: false,
-    agreeAge: false,
-  };
+  let initialValues = localStorage.getItem("UIDNotFound");
+
+  if (!initialValues || initialValues === "undefined") {
+    localStorage.removeItem("UIDNotFound");
+    initialValues = {
+      first_name: "",
+      last_name: "",
+      email: "",
+      phone: "",
+      signup_method: "",
+      agreeAllLegal: false,
+      agreeRules: false,
+      agreeAge: false,
+    };
+  } else {
+    initialValues = JSON.parse(initialValues);
+  }
+
 
   const handleFieldChange = (field, value, setFieldValue) => {
     // setFieldValue(field, value);
@@ -113,7 +121,11 @@ const SocialSignUP = ({ onSocial, closeSocial }) => {
                         <button
                           type="button"
                           className="crossbtn_signinpopupclose singupcrossbtn"
-                          onClick={closeSocial}
+                          // onClick={closeSocial}
+                          onClick={() => {
+                            closeSocial();
+                            localStorage.removeItem("UIDNotFound");
+                          }}
                         >
                           <img
                             src={`${process.env.PUBLIC_URL}/images/cross_icon.png`}

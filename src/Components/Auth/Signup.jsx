@@ -17,7 +17,7 @@ import {
 const Signup = ({ isOpenness, Closed, back }) => {
   const [signupData, setSignupData] = useState({});
   const [isLoginPopup, setLoginPopup] = useState(false);
-const[emails,setEmails]=useState("");
+  const [emails, setEmails] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -63,7 +63,7 @@ const[emails,setEmails]=useState("");
     confirm_password: "",
     agreeAllLegal: false,
     agreeRules: false,
-    agreeAge:false,
+    agreeAge: false,
   };
 
   // Save data to localStorage on every change
@@ -158,15 +158,15 @@ const[emails,setEmails]=useState("");
     }
   };
 
-   useEffect(() => {
-      let countdown;
-      if (timer > 0) {
-        countdown = setInterval(() => {
-          setTimer((prev) => prev - 1);
-        }, 1000);
-      }
-      return () => clearInterval(countdown);
-    }, [timer]);
+  useEffect(() => {
+    let countdown;
+    if (timer > 0) {
+      countdown = setInterval(() => {
+        setTimer((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(countdown);
+  }, [timer]);
 
   const resendOtp = async () => {
     if (timer > 0) return; // Prevent resending if timer is active
@@ -197,7 +197,7 @@ const[emails,setEmails]=useState("");
         allowOutsideClick: false,
       });
     } catch (error) {
-                setTimer(0); 
+      setTimer(0);
 
       Swal.fire({
         icon: "error",
@@ -257,7 +257,11 @@ const[emails,setEmails]=useState("");
     console.log("values", values);
 
     try {
-      const response = await axios.post("app/auth/social-login", {
+      const response = await axios.post(
+        // ""
+        "app/auth/social-login"
+        ,
+         {
         ...values,
         phone: formattedPhone,
         signup_method: values.signup_method,
@@ -306,7 +310,6 @@ const[emails,setEmails]=useState("");
     signInWithFacebook(setFieldValue);
   };
   const handleTwitterSignup = (setFieldValue) => {
-    
     setFieldValue("signup_method", "twitter");
     signWithTwitter(setFieldValue);
   };
@@ -317,19 +320,18 @@ const[emails,setEmails]=useState("");
     paths: ["/terms", "/privacy", "/cookies"],
   };
 
+  useEffect(() => {
+    if (isModals) {
+      document.body.style.overflow = "hidden"; // Disable background scrolling
+    } else {
+      document.body.style.overflow = "auto"; // Enable background scrolling
+    }
 
-   useEffect(() => {
-      if (isModals) {
-        document.body.style.overflow = "hidden"; // Disable background scrolling
-      } else {
-        document.body.style.overflow = "auto"; // Enable background scrolling
-      }
-  
-      // Cleanup on component unmount or modal close
-      return () => {
-        document.body.style.overflow = "auto";
-      };
-    }, [isModals]);
+    // Cleanup on component unmount or modal close
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [isModals]);
 
   return (
     <>
@@ -353,7 +355,11 @@ const[emails,setEmails]=useState("");
                           <button
                             type="button"
                             className="crossbtn_signinpopupclose singupcrossbtn"
-                            onClick={Closed}
+                            // onClick={Closed}
+                            onClick={() => {
+                              Closed();
+                              localStorage.removeItem(localStorageKey);
+                            }}
                           >
                             <img
                               src={`${process.env.PUBLIC_URL}/images/cross_icon.png`}
@@ -604,7 +610,7 @@ const[emails,setEmails]=useState("");
                                     I have read & agree with{" "}
                                     <Link
                                       to="/rules"
-                                      state={{ popupOpen: true }}
+                                      // state={{ popupOpen: true }}
                                       // target="_blank"
                                       // rel="noopener noreferrer"
                                     >

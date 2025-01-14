@@ -32,7 +32,6 @@ function Checkout() {
     setIsImageRotated(!isImageRotated);
   };
 
-  
   const fetchData = async () => {
     const token = localStorage.getItem("Web-token");
     try {
@@ -471,7 +470,6 @@ function Checkout() {
     }
   };
 
- 
   const preparePaymentData = (paymentOrderId) => {
     if (!calculatedCarts.length) {
       throw new Error("Cart data is missing or incomplete.");
@@ -553,20 +551,40 @@ function Checkout() {
     };
   };
 
+  // const OrderStatus = async (paymentOrderId) => {
+  //   const token = localStorage.getItem("Web-token");
+  //   let order_id = paymentOrderId;
+  //   try {
+  //     const response = await axios.post(
+  //       `app/cashfree/update-order-status?order_id=${order_id}`,
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       }
+  //     );
+  //   } catch (error) {}
+  // };
+
   const OrderStatus = async (paymentOrderId) => {
-    const token = localStorage.getItem("Web-token");
-    let order_id = paymentOrderId;
     try {
-      const response = await axios.post(
-        `app/cashfree/update-order-status?order_id=${order_id}`,
-        
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-    } catch (error) {}
+      const token = localStorage.getItem("Web-token");
+      console.log("token", token); // Verify token is being retrieved correctly
+      if (token) {
+        const response = await axios.post(
+          `app/cashfree/update-order-status?order_id=${paymentOrderId}`,
+          {}, // Body (optional, empty here)
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        console.log(response.data); // Handle response as needed
+      }
+    } catch (error) {
+      console.error(error.response?.data || error.message); // Handle the error appropriately
+    }
   };
 
   const Pay = async (data) => {
@@ -574,7 +592,7 @@ function Checkout() {
 
     try {
       const response = await axios.post(
-        "app/contest/save-contest-payments",
+        "app/payments/save-contest-payments",
         data,
         {
           headers: {
