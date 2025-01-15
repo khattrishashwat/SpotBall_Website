@@ -37,6 +37,7 @@ const SocialSignUP = ({ onSocial, closeSocial }) => {
     initialValues = JSON.parse(initialValues);
   }
 
+// console.log("initialValues", initialValues);
 
   const handleFieldChange = (field, value, setFieldValue) => {
     // setFieldValue(field, value);
@@ -72,7 +73,7 @@ const SocialSignUP = ({ onSocial, closeSocial }) => {
         timer: 1000,
       }).then(() => {
         localStorage.removeItem("UIDNotFound");
-
+        localStorage.removeItem("localStorageKey");
         window.location.reload();
       });
     } catch (error) {

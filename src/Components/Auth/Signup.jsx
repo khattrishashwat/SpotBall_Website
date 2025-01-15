@@ -27,12 +27,12 @@ const Signup = ({ isOpenness, Closed, back }) => {
   const location = useLocation();
   const [timer, setTimer] = useState(0); // Timer state for resend OTP
 
-  useEffect(() => {
-    // Keep the popup open if navigating to linked pages like terms or rules
-    if (location.state?.popupOpen) {
-      isOpenness(true);
-    }
-  }, [location.state]);
+  // useEffect(() => {
+  //   // Keep the popup open if navigating to linked pages like terms or rules
+  //   if (location.state?.popupOpen) {
+  //     isOpenness(true);
+  //   }
+  // }, [location.state]);
   const openModals = () => {
     setIsModals(true);
   };
@@ -259,15 +259,15 @@ const Signup = ({ isOpenness, Closed, back }) => {
     try {
       const response = await axios.post(
         // ""
-        "app/auth/social-login"
-        ,
-         {
-        ...values,
-        phone: formattedPhone,
-        signup_method: values.signup_method,
-        device_type: "website",
-        device_token: localStorage.getItem("device_token"),
-      });
+        "app/auth/social-login",
+        {
+          ...values,
+          phone: formattedPhone,
+          signup_method: values.signup_method,
+          device_type: "website",
+          device_token: localStorage.getItem("device_token"),
+        }
+      );
       const token = response.data.data.token;
       localStorage.setItem("Web-token", token);
       Swal.fire({
@@ -582,7 +582,7 @@ const Signup = ({ isOpenness, Closed, back }) => {
                                         <span key={index}>
                                           <Link
                                             to={legalLinks.paths[index]}
-                                            state={{ popupOpen: false }}
+                                            // state={{ popupOpen: false }}
                                             // target="_blank"
                                             // rel="noopener noreferrer"
                                           >
