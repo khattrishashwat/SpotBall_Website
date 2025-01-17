@@ -3683,6 +3683,7 @@ ul.list-inline li a:hover {
   padding: 12px;
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
   border-radius: 10px;
+  height: 100%;
 }
 
 .inthepressdivmain img {
@@ -3701,6 +3702,7 @@ ul.list-inline li a:hover {
   margin-top: 20px;
   margin-bottom: 20px;
   text-align: justify;
+  height: 35%;
 }
 
 .inthepressdivmain a {

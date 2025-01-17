@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
 import Loader from "../../Loader/Loader";
@@ -12,6 +12,7 @@ function Checkout() {
   const [isLoading, setIsLoading] = useState(false);
   const [carts, setCarts] = useState("");
   const [calculatedCarts, setCalculatedCarts] = useState([]);
+  const [alertShown, setAlertShown] = useState(false);
 
   const [isEntrysActive, setIsEntrysActive] = useState(false);
   const [isImageRotated, setIsImageRotated] = useState(false);
@@ -31,8 +32,10 @@ function Checkout() {
     setIsEntrysActive(!isEntrysActive);
     setIsImageRotated(!isImageRotated);
   };
-
+  const isFetched = useRef(false);
   const fetchData = async () => {
+    if (isFetched.current) return; // Ensure API is only called once
+    isFetched.current = true;
     const token = localStorage.getItem("Web-token");
     try {
       const response = await axios.get("app/contest/get-all-cart-items", {
@@ -41,7 +44,9 @@ function Checkout() {
 
       const { cartItems, discounts, promocodes } = response.data.data;
 
-      if (cartItems.length === 0) {
+      if (cartItems.length === 0 && !alertShown) {
+        setAlertShown(true); // Prevent multiple alerts
+
         Swal.fire({
           icon: "info",
           text: "No game has been played yet.",
@@ -50,7 +55,6 @@ function Checkout() {
         }).then((result) => {
           if (result.isConfirmed) navigate("/");
         });
-        return;
       }
 
       setCarts(cartItems);
@@ -64,7 +68,6 @@ function Checkout() {
         } = cart.contest_id;
 
         const ticketsCount = cart.tickets_count;
-
         const totalTicketPrice = ticketPrice * ticketsCount;
         const gstAmount = totalTicketPrice * (gstRate / 100);
         const subtotal = totalTicketPrice + gstAmount;
@@ -120,8 +123,100 @@ function Checkout() {
   };
 
   useEffect(() => {
-    fetchData();
+    fetchData(); // Call API only once when component mounts
   }, []);
+
+  // const fetchData = async () => {
+  //   const token = localStorage.getItem("Web-token");
+  //   try {
+  //     const response = await axios.get("app/contest/get-all-cart-items", {
+  //       headers: { Authorization: `Bearer ${token}` },
+  //     });
+
+  //     const { cartItems, discounts, promocodes } = response.data.data;
+
+  //     if (cartItems.length === 0 && !alertShown) {
+  //       setAlertShown(true); // Set alert shown to true to prevent multiple alerts
+
+  //       Swal.fire({
+  //         icon: "info",
+  //         text: "No game has been played yet.",
+  //         confirmButtonText: "OK",
+  //         allowOutsideClick: false,
+  //       }).then((result) => {
+  //         if (result.isConfirmed) navigate("/");
+  //       });
+  //     }
+
+  //     setCarts(cartItems);
+
+  //     const calculated = cartItems.map((cart) => {
+  //       const {
+  //         ticket_price: ticketPrice,
+  //         gstRate,
+  //         platformFeeRate,
+  //         gstOnPlatformFeeRate,
+  //       } = cart.contest_id;
+
+  //       const ticketsCount = cart.tickets_count;
+
+  //       const totalTicketPrice = ticketPrice * ticketsCount;
+  //       const gstAmount = totalTicketPrice * (gstRate / 100);
+  //       const subtotal = totalTicketPrice + gstAmount;
+  //       const platformFee = subtotal * (platformFeeRate / 100);
+  //       const gstOnPlatformFee = platformFee * (gstOnPlatformFeeRate / 100);
+  //       const totalRazorpayFee = platformFee + gstOnPlatformFee;
+  //       const totalPayment = subtotal + totalRazorpayFee;
+
+  //       const initialCart = {
+  //         ...cart,
+  //         totalTicketPrice: totalTicketPrice.toFixed(2),
+  //         gstAmount: gstAmount.toFixed(2),
+  //         subtotal: subtotal.toFixed(2),
+  //         platformFee: platformFee.toFixed(2),
+  //         gstOnPlatformFee: gstOnPlatformFee.toFixed(2),
+  //         totalRazorpayFee: totalRazorpayFee.toFixed(2),
+  //         totalPayment: totalPayment.toFixed(2),
+  //         promoCode: cart.promocodeApplied || null, // Use promocodeApplied if present
+  //         discount: null,
+  //       };
+
+  //       // Apply discount logic only if promocode is not present
+  //       if (!cart.promocodeApplied) {
+  //         const applicableDiscount = discounts.find(
+  //           (discount) =>
+  //             ticketsCount >= discount.minTickets &&
+  //             ticketsCount <= discount.maxTickets
+  //         );
+
+  //         if (applicableDiscount) {
+  //           initialCart.discount = {
+  //             name: applicableDiscount.name,
+  //             discountPercentage: applicableDiscount.discountPercentage,
+  //             amount:
+  //               (totalTicketPrice * applicableDiscount.discountPercentage) /
+  //               100,
+  //           };
+  //         }
+  //       }
+
+  //       return initialCart;
+  //     });
+
+  //     setCalculatedCarts(calculated);
+  //     setDiscounts(discounts || []);
+  //     setPromoCodes(promocodes || []);
+  //   } catch (error) {
+  //     console.error(
+  //       "Error fetching cart data:",
+  //       error.response?.data?.message || error.message
+  //     );
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   fetchData();
+  // }, []);
 
   const totalBeforeDiscount = calculatedCarts.reduce((total, cart) => {
     if (cart.promoCode) {

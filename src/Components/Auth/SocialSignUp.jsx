@@ -11,40 +11,34 @@ import {
 
 const SocialSignUP = ({ onSocial, closeSocial }) => {
   const location = useLocation();
-  // console.log("location,location);
 
-  //   useEffect(() => {
-  //     // Keep the popup open if navigating to linked pages like terms or rules
-  //     if (location.state?.popupOpen) {
-  //       onSocial(true);
-  //     }
-  //   }, [location.state]);
-  let initialValues = localStorage.getItem("UIDNotFound");
+  let storedValues = localStorage.getItem("UIDNotFound");
 
-  if (!initialValues || initialValues === "undefined") {
+  let initialValues =
+    storedValues && storedValues !== "undefined"
+      ? JSON.parse(storedValues)
+      : {
+          first_name: "",
+          last_name: "",
+          email: "",
+          phone: "",
+          signup_method: "",
+          agreeAllLegal: false,
+          agreeRules: false,
+          agreeAge: false,
+        };
+
+  if (!storedValues || storedValues === "undefined") {
     localStorage.removeItem("UIDNotFound");
-    initialValues = {
-      first_name: "",
-      last_name: "",
-      email: "",
-      phone: "",
-      signup_method: "",
-      agreeAllLegal: false,
-      agreeRules: false,
-      agreeAge: false,
-    };
-  } else {
-    initialValues = JSON.parse(initialValues);
   }
 
-// console.log("initialValues", initialValues);
-
   const handleFieldChange = (field, value, setFieldValue) => {
-    // setFieldValue(field, value);
-    // const updatedValues =
-    //   JSON.parse(localStorage.getItem("localStorageKey")) || initialValues;
-    // updatedValues[field] = value;
-    // localStorage.setItem("localStorageKey", JSON.stringify(updatedValues));
+    setFieldValue(field, value);
+    const updatedValues = {
+      ...initialValues,
+      [field]: value,
+    };
+    localStorage.setItem("UIDNotFound", JSON.stringify(updatedValues));
   };
 
   const handleNumericInput = (value) =>
@@ -54,6 +48,7 @@ const SocialSignUP = ({ onSocial, closeSocial }) => {
     const formattedPhone = values.phone.startsWith("+91")
       ? values.phone
       : `+91${values.phone}`;
+
     try {
       const response = await axios.post("app/auth/social-login", {
         ...values,
@@ -62,21 +57,27 @@ const SocialSignUP = ({ onSocial, closeSocial }) => {
         device_type: "website",
         device_token: localStorage.getItem("device_token"),
       });
-      console.log("social token", response.data);
+
       const token = response.data.data.token;
       localStorage.setItem("Web-token", token);
+
       Swal.fire({
         title: response.data.message,
-       
         allowOutsideClick: false,
         showConfirmButton: false,
         timer: 1000,
       }).then(() => {
         localStorage.removeItem("UIDNotFound");
-        localStorage.removeItem("localStorageKey");
         window.location.reload();
       });
     } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Social Signup Failed",
+        text: error.response ? error.response.data.message : error.message,
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
+      });
       console.error(error);
     }
   };
@@ -277,7 +278,7 @@ const SocialSignUP = ({ onSocial, closeSocial }) => {
                                   I have read & agree with{" "}
                                   <Link
                                     to="/rules"
-                                    state={{ popupOpen: false }}
+                                    // state={{ popupOpen: false }}
                                     // target="_blank"
                                     // rel="noopener noreferrer"
                                   >

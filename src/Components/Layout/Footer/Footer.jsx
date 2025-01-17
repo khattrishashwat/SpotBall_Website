@@ -87,7 +87,7 @@ function Footer() {
                       },
                       {
                         title: "Apps",
-                        links: ["Ios", "Android"],
+                        links: ["iOS", "Android"],
                         paths: [null, null],
                       },
                     ].map((section, index) => (
@@ -218,12 +218,12 @@ function Footer() {
                   <span className="separator">|</span>
                   <div className="currencyselectdiv">
                     <p>
-                      Currency <i className="fa fa-inr" aria-hidden="true" />
-                      <select>
+                      Currency <i className="fa fa-inr" aria-hidden="true" /> INR
+                      {/* <select>
                         <option>INR</option>
                         <option>USD</option>
                         <option>EUR</option>
-                      </select>
+                      </select> */}
                     </p>
                   </div>
                 </div>

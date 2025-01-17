@@ -5,6 +5,7 @@ import Login from "../Auth/Login";
 import Swal from "sweetalert2";
 import Loader from "../Loader/Loader";
 import GeolocationPopup from "../Location/GeolocationPopup";
+import GameUnavailablePopup from "../Location/GameUnavailablePopup";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
@@ -29,35 +30,231 @@ function Home() {
   const [quantity, setQuantity] = useState(3);
   const [isGeolocationPopupVisible, setGeolocationPopupVisible] =
     useState(false);
+  const [isUnavailablePopupVisible, setIsUnavailablePopupVisible] =
+    useState(false);
 
   // const location = useLocation();
-
-  // useEffect(() => {
-  //   if (location.pathname === "/") {
-  //     window.scrollTo(0, 0);
-  //   }
-  // }, [location.pathname]);
 
   const open = async () => {
     setIsModals(true);
   };
-  // const handleBuyTicketClick = (contest, discount) => {
-  //   setSelectedContest(contest);
-  //   setSelectedDiscount(discount);
-  //   setOnCarts(true);
-  // };
-  // const handleBuyTicketClick = (contest) => {
-  //   if (!contest.allowance) {
-  //     Swal.fire({
-  //       icon: "warning",
-  //       title: "Participation Alert",
-  //       text: "You have already participated in this contest!",
-  //     });
-  //   } else {
-  //     setSelectedContest(contest);
-  //     setOnCarts(true);
-  //   }
-  // };
+  // console.log("know", restrictedStates);
+
+  // useEffect(() => {
+  //   const fetchLocation = async () => {
+  //     if (navigator.geolocation) {
+  //       navigator.geolocation.getCurrentPosition(
+  //         async (position) => {
+  //           const { latitude, longitude } = position.coords;
+  //           console.log("Latitude:", latitude, "Longitude:", longitude);
+
+  //           try {
+  //             const response = await axios.get(
+  //               `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=AIzaSyA8pM5yXTJ3LM8zBF-EkZHEyxlPXSttsl0`
+  //             );
+
+  //             const results = response.data.results;
+  //             if (!results || results.length === 0) {
+  //               console.error("No results found in geocode response.");
+  //               return;
+  //             }
+
+  //             const addressComponents = results[0].address_components || [];
+  //             let stateName = "";
+  //             let countryName = "";
+
+  //             // Extract state and country from address components
+  //             addressComponents.forEach((component) => {
+  //               if (component.types.includes("administrative_area_level_1")) {
+  //                 stateName = component.long_name;
+  //               }
+  //               if (component.types.includes("country")) {
+  //                 countryName = component.long_name;
+  //               }
+  //             });
+
+  //             console.log(
+  //               "State Name:",
+  //               stateName,
+  //               "Country Name:",
+  //               countryName
+  //             );
+
+  //             // Define restricted states here (example states)
+  //             const restrictedAreaStates = Array.isArray(restrictedStates)
+  //               ? restrictedStates
+  //               : []; // Example states to restrict
+  //             console.log("restrictedAreaStates", restrictedAreaStates);
+
+  //             if (restrictedAreaStates.length === 0) {
+  //               console.warn("No restricted states defined.");
+  //               return;
+  //             }
+  //             // Check if the country is not India
+  //             if (countryName.toLowerCase() !== "india") {
+  //               Swal.fire({
+  //                 title: "Area Restricted",
+  //                 text: `Access is restricted outside India. Current location: ${stateName}, ${countryName}`,
+  //                 icon: "error",
+  //                 confirmButtonText: "OK",
+  //               });
+
+  //               localStorage.setItem(
+  //                 "restrictedArea",
+  //                 JSON.stringify({ stateName, countryName })
+  //               );
+
+  //               setIsUnavailablePopupVisible(true); // Trigger the unavailable popup
+  //               return;
+  //             }
+
+  //             // Check if the state is restricted
+  //             const isRestrictedState = restrictedAreaStates.some(
+  //               (restrictedState) =>
+  //                 restrictedState.toLowerCase() === stateName.toLowerCase()
+  //             );
+
+  //             if (isRestrictedState) {
+  //               Swal.fire({
+  //                 title: "Area Restricted",
+  //                 text: `Access is restricted in the state: ${stateName}`,
+  //                 icon: "error",
+  //                 confirmButtonText: "OK",
+  //               });
+
+  //               localStorage.setItem(
+  //                 "restrictedArea",
+  //                 JSON.stringify({ stateName, countryName })
+  //               );
+
+  //               setIsUnavailablePopupVisible(true); // Trigger the unavailable popup
+  //               return;
+  //             }
+
+  //             // If valid, save the location
+  //             localStorage.setItem(
+  //               "location",
+  //               JSON.stringify({ stateName, countryName })
+  //             );
+  //             // setLocation({ state: stateName, country: countryName });
+  //             console.log("Location saved:", { stateName, countryName });
+  //           } catch (err) {
+  //             console.error("Error fetching geocode data:", err);
+  //             // setError("Failed to fetch location data.");
+  //           }
+  //         },
+  //         (error) => {
+  //           console.error("Geolocation error:", error.message);
+  //           // setError(error.message);
+  //         }
+  //       );
+  //     }
+  //   };
+
+  //   fetchLocation();
+  // }, []);
+
+  useEffect(() => {
+    const fetchLocation = async () => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          async (position) => {
+            const { latitude, longitude } = position.coords;
+            console.log("Latitude:", latitude, "Longitude:", longitude);
+
+            try {
+              const response = await axios.get(
+                `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=AIzaSyA8pM5yXTJ3LM8zBF-EkZHEyxlPXSttsl0`
+              );
+
+              const results = response.data.results;
+              if (!results || results.length === 0) {
+                console.error("No results found in geocode response.");
+                return;
+              }
+
+              const addressComponents = results[0].address_components || [];
+              let stateName = "";
+              let countryName = "";
+
+              // Extract state and country from address components
+              addressComponents.forEach((component) => {
+                if (component.types.includes("administrative_area_level_1")) {
+                  stateName = component.long_name;
+                }
+                if (component.types.includes("country")) {
+                  countryName = component.long_name;
+                }
+              });
+
+              console.log(
+                "State Name:",
+                stateName,
+                "Country Name:",
+                countryName
+              );
+
+              // Ensure restrictedStates is not null or undefined
+              const restrictedAreaStates = restrictedStates || [];
+              console.log("restrictedAreaStates", restrictedAreaStates);
+
+              // Check if the country is not India
+              if (countryName.toLowerCase() !== "india") {
+                Swal.fire({
+                  title: "Area Restricted",
+                  text: `Access is restricted outside India. Current location: ${stateName}, ${countryName}`,
+                  icon: "error",
+                  confirmButtonText: "OK",
+                });
+
+                localStorage.removeItem("location");
+                localStorage.setItem(
+                  "restrictedArea",
+                  JSON.stringify({ stateName, countryName })
+                );
+
+                setIsUnavailablePopupVisible(true);
+                return;
+              }
+
+              // Check if the state is restricted
+              const isRestrictedState = restrictedAreaStates.some(
+                (restrictedState) =>
+                  restrictedState.toLowerCase() === stateName.toLowerCase()
+              );
+
+              if (isRestrictedState) {
+                localStorage.removeItem("location");
+                localStorage.setItem(
+                  "restrictedArea",
+                  JSON.stringify({ stateName, countryName })
+                );
+
+                setIsUnavailablePopupVisible(true);
+                return;
+              }
+
+              // If not restricted, store location and remove restrictedArea
+              localStorage.removeItem("restrictedArea");
+              localStorage.setItem(
+                "location",
+                JSON.stringify({ stateName, countryName })
+              );
+
+              console.log("Location saved:", { stateName, countryName });
+            } catch (err) {
+              console.error("Error fetching geocode data:", err);
+            }
+          },
+          (error) => {
+            console.error("Geolocation error:", error.message);
+          }
+        );
+      }
+    };
+
+    fetchLocation();
+  }, [restrictedStates]);
 
   const handleBuyTicketClick = (contest, discount) => {
     const token = localStorage.getItem("Web-token"); // Replace with your token retrieval method
@@ -85,6 +282,22 @@ function Home() {
       setSelectedContest(contest);
       setOnCarts(true);
       setSelectedDiscount(discount);
+    }
+  };
+  const handleAskToPaly = () => {
+    const restrictedArea = localStorage.getItem("restrictedArea");
+    const location = localStorage.getItem("location");
+
+    if (restrictedArea) {
+      setGeolocationPopupVisible(false);
+      // Show the unavailable popup if restrictedArea is found in localStorage
+      setIsUnavailablePopupVisible(true);
+    } else if (location) {
+      // Only call handleBuyTicketClick if a location is found in localStorage
+      handleBuyTicketClick(contests[0], discounts);
+    } else {
+      // Optionally handle the case where no location is found in localStorage
+      console.log("Location not found in localStorage");
     }
   };
   const settings = {
@@ -234,7 +447,6 @@ function Home() {
         setRestrictedStates(restrictedStates);
       } else {
         const response = await axios.get("app/banner/get-banner");
-       
 
         const { bannerDetails, contests, liveLinks, restrictedStates } =
           response.data.data;
@@ -254,7 +466,7 @@ function Home() {
     fetchData();
   }, [token]);
 
-  // console.log("corousal", corousal);
+  // console.log("setRestrictedStates", restrictedStates);
   // console.log("contest -->", contests);
 
   const handleIncrease = () => {
@@ -290,33 +502,132 @@ function Home() {
     navigate("/play_screen", { state: { payload } });
   };
 
-  useEffect(() => {
-    const location = JSON.parse(localStorage.getItem("location"));
+  // useEffect(() => {
+  //   const location = JSON.parse(localStorage.getItem("location"));
 
-    if (token && location && Object.keys(location).length > 0) {
-      setGeolocationPopupVisible(false);
-    } else if (token) {
-      setGeolocationPopupVisible(true);
-    } else if (location && Object.keys(location).length > 0) {
-      setGeolocationPopupVisible(false);
-    } else {
-      setGeolocationPopupVisible(true);
-    }
+  //   if (token && location && Object.keys(location).length > 0) {
+  //     setGeolocationPopupVisible(false);
+  //   } else if (token) {
+  //     setGeolocationPopupVisible(true);
+  //   } else if (location && Object.keys(location).length > 0) {
+  //     setGeolocationPopupVisible(false);
+  //   } else {
+  //     setGeolocationPopupVisible(true);
+  //   }
+  // }, [token]);
+  // useEffect(() => {
+  //   const location = JSON.parse(localStorage.getItem("location"));
+
+  //   if (token && (!location || Object.keys(location).length === 0)) {
+  //     setGeolocationPopupVisible(true);
+  //   } else {
+  //     setGeolocationPopupVisible(false);
+  //   }
+  // }, [token]);
+
+  // useEffect(() => {
+  //   const location = JSON.parse(localStorage.getItem("location"));
+  //   const restrictedArea = JSON.parse(localStorage.getItem("restrictedArea"));
+
+  //   if (
+  //     token &&
+  //     (!location || Object.keys(location).length === 0 || !restrictedArea)
+  //   ) {
+  //     setGeolocationPopupVisible(true);
+  //   } else {
+  //     setGeolocationPopupVisible(false);
+  //   }
+  // }, [token]);
+
+  // useEffect(() => {
+  //   const location = JSON.parse(localStorage.getItem("location"));
+  //   const restrictedArea = JSON.parse(localStorage.getItem("restrictedArea"));
+
+  //   if (token) {
+  //     // Check if location is missing/invalid or restrictedArea is missing
+  //     if (!location || Object.keys(location).length === 0 || !restrictedArea) {
+  //       setGeolocationPopupVisible(true);
+  //     } else {
+  //       setGeolocationPopupVisible(false);
+  //     }
+  //   } else {
+  //     // If no token, make the popup visible only if location or restrictedArea is missing
+  //     if (!location || Object.keys(location).length === 0 || !restrictedArea) {
+  //       setGeolocationPopupVisible(false);
+  //     } else {
+  //       setGeolocationPopupVisible(true);
+  //     }
+  //   }
+  // }, [token]);
+
+  // useEffect(() => {
+  //   const location = JSON.parse(localStorage.getItem("location"));
+  //   const restrictedArea = JSON.parse(localStorage.getItem("restrictedArea"));
+
+  //   if (token) {
+  //     // If token exists, hide the popup if either location or restrictedArea is present
+  //     if ((location && Object.keys(location).length > 0) || restrictedArea) {
+  //       setGeolocationPopupVisible(false);
+  //     } else {
+  //       setGeolocationPopupVisible(true);
+  //     }
+  //   } else {
+  //     // If no token, the popup behavior depends on the presence of location or restrictedArea
+  //     if ((location && Object.keys(location).length > 0) || restrictedArea) {
+  //       setGeolocationPopupVisible(false);
+  //     } else {
+  //       setGeolocationPopupVisible(true);
+  //     }
+  //   }
+  // }, [token]);
+
+  useEffect(() => {
+    const checkGeolocation = () => {
+      const location = JSON.parse(localStorage.getItem("location"));
+      const restrictedArea = JSON.parse(localStorage.getItem("restrictedArea"));
+
+      if (token) {
+        if (
+          (location && Object.keys(location).length > 0) ||
+          (restrictedArea && Object.keys(restrictedArea).length > 0)
+        ) {
+          setGeolocationPopupVisible(false);
+        } else {
+          setGeolocationPopupVisible(true);
+        }
+      } else {
+        if (
+          !location ||
+          Object.keys(location).length === 0 ||
+          !restrictedArea ||
+          Object.keys(restrictedArea).length === 0
+        ) {
+          setGeolocationPopupVisible(false);
+        } else {
+          setGeolocationPopupVisible(true);
+        }
+      }
+    };
+
+    checkGeolocation();
+
+    // Add event listener for storage changes
+    const handleStorageChange = (event) => {
+      if (event.key === "location" || event.key === "restrictedArea") {
+        checkGeolocation();
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
   }, [token]);
 
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      localStorage.removeItem("location");
-      console.log("Location removed from localStorage");
-      setGeolocationPopupVisible(true);
-    }, 15 * 60 * 1000);
-
-    // Cleanup interval on component unmount
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, []);
-
+  const handleUnavailableOk = () => {
+    setIsUnavailablePopupVisible(false); // Close GameUnavailablePopup
+  };
   const handleCloseGeolocationPopup = () => {
     setGeolocationPopupVisible(false);
   };
@@ -586,9 +897,10 @@ function Home() {
                                 <button
                                   type="button"
                                   className="buyticketbtn onclickcarticon_showcartpopup"
-                                  onClick={() =>
-                                    handleBuyTicketClick(contests[0], discounts)
-                                  }
+                                  // onClick={() =>
+                                  //   handleBuyTicketClick(contests[0], discounts)
+                                  // }
+                                  onClick={handleAskToPaly}
                                 >
                                   Buy Tickets to Play
                                 </button>
@@ -612,133 +924,9 @@ function Home() {
               </div>
             </section>
           )}
-
-          {/* {contests && (
-            <section className="compitionsection" id="compitions_div">
-              <div className="container contcompitions">
-                <div className="col-md-12 col12maincompitions">
-                  <div className="row rowcompititionsmaindiv">
-                    <div className="upcomingame_div_fortext">
-                      <h2>
-                        Current <span>contest</span>
-                      </h2>
-                    </div>
-                    <div className="col-md-12 col3compitions">
-                      <div className="pricecompitionmaindiv">
-                        <div className="compitionleftside_new">
-                          <div className="compititonmgdivnew">
-                            <img
-                              src={contests.contest_banner?.file_url}
-                              alt="Contest Banner"
-                              className="play-img"
-                            />
-                            <p className="hidball">
-                              Mark the hidden ball in the picture!
-                            </p>
-                          </div>
-                        </div>
-                        <div className="compitionsbox">
-                          <div className="compitiontextinfodivmain">
-                            <div className="contestpoints_main">
-                              <div className="contesteveryweekdiv">
-                                <div className="contest_newtiming_strip">
-                                  <img
-                                    src={`${process.env.PUBLIC_URL}/images/ball_icon.png`}
-                                    // src="images/ball_icon.png"
-                                    alt="Ball Icon"
-                                  />
-                                  <h4> Weekly contest ends </h4>
-                                </div>
-                                <div className="contestrightdaysdate">
-                                  <h4 className="contslist_span_inner">
-                                    Sunday- 23:59hrs
-                                  </h4>
-                                </div>
-                              </div>
-                              <div className="contesteveryweekdiv">
-                                <div className="contest_newtiming_strip">
-                                  <img
-                                    src={`${process.env.PUBLIC_URL}/images/ball_icon.png`}
-                                    // src="images/ball_icon.png"
-                                    alt="Ball Icon"
-                                  />
-                                  <h4>
-                                    Live streaming of “Weekly Winner Show”
-                                  </h4>
-                                </div>
-                                <div className="contestrightdaysdate">
-                                  <h4 className="contslist_span_inner">
-                                    Monday- 21:00hrs
-                                  </h4>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="everyweek_livewatchdiv">
-                              <div className="watchondiv">
-                                <h4>Watch On</h4>
-                                {links?.Facebook_Streaming && (
-                                  <a
-                                    href={links.Facebook_Streaming}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                  >
-                                    <img
-                                      // src={`${process.env.PUBLIC_URL}/images/fb_live_icon.png`}
-                                      src={`${process.env.PUBLIC_URL}/images/face.png`}
-                                      alt="Facebook Live"
-                                    />
-                                  </a>
-                                )}
-                                {links?.Youtube_Streaming && (
-                                  <a
-                                    href={links.Youtube_Streaming}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                  >
-                                    <img
-                                      // src={`${process.env.PUBLIC_URL}/images/yb_live_icon.png`}
-                                      src={`${process.env.PUBLIC_URL}/images/you.png`}
-                                      alt="YouTube Live"
-                                    />
-                                  </a>
-                                )}
-                              </div>
-                            </div>
-                            <div className="jackpotpricewithpayment">
-                              <div className="gamejackpotdiv">
-                                <h4>
-                                  Game Jackpot: ₹
-                                  {contests.jackpot_price.toLocaleString()}
-                                </h4>
-                              </div>
-                              <div className="gamejackpotdiv">
-                                <h4>
-                                  Ticket Price: ₹{contests.ticket_price}
-                                </h4>
-                              </div>
-                            </div>
-                            <div className="buyticketsbtndiv">
-                              <div className="addtocardbtnicon">
-                                <button
-                                  type="button"
-                                  className="buyticketbtn onclickcarticon_showcartpopup"
-                                  onClick={() =>
-                                    handleBuyTicketClick(contests[0], discounts)
-                                  }
-                                >
-                                  Buy Tickets to Play
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </section>
-          )} */}
+          {isUnavailablePopupVisible && (
+            <GameUnavailablePopup onOk={handleUnavailableOk} />
+          )}
         </>
       )}
       <Login isVisible={isLoginPopup} onClose={ClosePopup} />

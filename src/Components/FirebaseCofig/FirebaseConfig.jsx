@@ -858,7 +858,7 @@ export const signWithTwitter = async (setFieldValue) => {
 
     Swal.fire({
       icon: "error",
-      text: errorMessages[error.code] || "An unexpected error occurred.",
+      text: errorMessages[error.code],
     });
   }
 };
@@ -917,14 +917,14 @@ export const LoginWithTwitter = async () => {
         showConfirmButton: false,
         timer: 2000,
       });
-      window.location.reload();
+      // window.location.reload();
     } else if (checkUIDResponse.data.message === "Uid Not Found") {
       // Inform user to sign up
       Swal.fire({
         icon: "error",
         text: "Go to Sign Up, then try social login",
       });
-      window.location.reload();
+      // window.location.reload();
     }
   } catch (error) {
     console.error("Twitter Login Error:", error);
@@ -941,13 +941,11 @@ export const LoginWithTwitter = async () => {
     Swal.fire({
       icon: "error",
       title: "Login Failed",
-      text:
-        errorMessages[error.code] ||
-        "An unexpected error occurred. Please try again later.",
+      text: errorMessages[error.code],
     });
 
     localStorage.setItem("UIDNotFound", JSON.stringify(userDetails));
-    window.location.reload();
+    // window.location.reload();
   }
 };
 
