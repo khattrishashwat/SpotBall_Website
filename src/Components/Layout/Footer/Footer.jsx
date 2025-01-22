@@ -7,7 +7,7 @@ function Footer() {
   const [footer, setFooter] = useState(""); // Footer content
   const [plays, setPlays] = useState(false); // Video state
   const [links, setLinks] = useState(false); // Video state
-
+const [androidLink, setAnroidsLinks] = useState(null);
   const fetchFooter = async () => {
     try {
       const response = await axios.get(
@@ -22,9 +22,21 @@ function Footer() {
       console.error("Error fetching footer data:", error);
     }
   };
+ const fetchAnroidLink = async () => {
+   try {
+     const response = await axios.get("app/apk-links");
+
+     if (response) {
+       setAnroidsLinks(response.data.data?.android_build); // Set the link
+     }
+   } catch (error) {
+     console.error("Error fetching Android data:", error);
+   }
+ };
 
   useEffect(() => {
     fetchFooter();
+    fetchAnroidLink();
   }, []);
 
   const openVideo = () => setPlays(true);
@@ -87,8 +99,14 @@ function Footer() {
                       },
                       {
                         title: "Apps",
-                        links: ["iOS", "Android"],
-                        paths: [null, null],
+                        links: ["iOS", androidLink ? "Android" : "Loading..."], // Conditionally render Android link
+                        paths: [null, androidLink || "#"], // Use androidLink if it's available
+                        onClick: [
+                          null,
+                          androidLink
+                            ? () => window.open(androidLink, "_blank")
+                            : null,
+                        ], // Open the APK link if it's available
                       },
                     ].map((section, index) => (
                       <div key={index} className="maindivforfooterlinks">
@@ -218,7 +236,8 @@ function Footer() {
                   <span className="separator">|</span>
                   <div className="currencyselectdiv">
                     <p>
-                      Currency <i className="fa fa-inr" aria-hidden="true" /> INR
+                      Currency <i className="fa fa-inr" aria-hidden="true" />{" "}
+                      INR
                       {/* <select>
                         <option>INR</option>
                         <option>USD</option>

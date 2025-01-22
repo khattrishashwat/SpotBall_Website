@@ -246,13 +246,13 @@ const GeolocationPopup = ({ Area, onClose }) => {
               restrictedState.toLowerCase() === stateName.toLowerCase()
           );
 
-          if (isRestrictedState) {
-            Swal.fire({
-              title: "Area Restricted",
-              text: `Access is restricted in the state: ${stateName}`,
-              icon: "error",
-              confirmButtonText: "OK",
-            });
+            if (isRestrictedState) {
+              Swal.fire({
+                title: "Area Restricted",
+                text: `Access is restricted in the state: ${stateName}`,
+                icon: "error",
+                confirmButtonText: "OK",
+              });
                       localStorage.setItem(
                         "restrictedArea",
                         JSON.stringify({ stateName, countryName })

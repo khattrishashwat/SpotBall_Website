@@ -38,122 +38,7 @@ function Home() {
   const open = async () => {
     setIsModals(true);
   };
-  // console.log("know", restrictedStates);
-
-  // useEffect(() => {
-  //   const fetchLocation = async () => {
-  //     if (navigator.geolocation) {
-  //       navigator.geolocation.getCurrentPosition(
-  //         async (position) => {
-  //           const { latitude, longitude } = position.coords;
-  //           console.log("Latitude:", latitude, "Longitude:", longitude);
-
-  //           try {
-  //             const response = await axios.get(
-  //               `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=AIzaSyA8pM5yXTJ3LM8zBF-EkZHEyxlPXSttsl0`
-  //             );
-
-  //             const results = response.data.results;
-  //             if (!results || results.length === 0) {
-  //               console.error("No results found in geocode response.");
-  //               return;
-  //             }
-
-  //             const addressComponents = results[0].address_components || [];
-  //             let stateName = "";
-  //             let countryName = "";
-
-  //             // Extract state and country from address components
-  //             addressComponents.forEach((component) => {
-  //               if (component.types.includes("administrative_area_level_1")) {
-  //                 stateName = component.long_name;
-  //               }
-  //               if (component.types.includes("country")) {
-  //                 countryName = component.long_name;
-  //               }
-  //             });
-
-  //             console.log(
-  //               "State Name:",
-  //               stateName,
-  //               "Country Name:",
-  //               countryName
-  //             );
-
-  //             // Define restricted states here (example states)
-  //             const restrictedAreaStates = Array.isArray(restrictedStates)
-  //               ? restrictedStates
-  //               : []; // Example states to restrict
-  //             console.log("restrictedAreaStates", restrictedAreaStates);
-
-  //             if (restrictedAreaStates.length === 0) {
-  //               console.warn("No restricted states defined.");
-  //               return;
-  //             }
-  //             // Check if the country is not India
-  //             if (countryName.toLowerCase() !== "india") {
-  //               Swal.fire({
-  //                 title: "Area Restricted",
-  //                 text: `Access is restricted outside India. Current location: ${stateName}, ${countryName}`,
-  //                 icon: "error",
-  //                 confirmButtonText: "OK",
-  //               });
-
-  //               localStorage.setItem(
-  //                 "restrictedArea",
-  //                 JSON.stringify({ stateName, countryName })
-  //               );
-
-  //               setIsUnavailablePopupVisible(true); // Trigger the unavailable popup
-  //               return;
-  //             }
-
-  //             // Check if the state is restricted
-  //             const isRestrictedState = restrictedAreaStates.some(
-  //               (restrictedState) =>
-  //                 restrictedState.toLowerCase() === stateName.toLowerCase()
-  //             );
-
-  //             if (isRestrictedState) {
-  //               Swal.fire({
-  //                 title: "Area Restricted",
-  //                 text: `Access is restricted in the state: ${stateName}`,
-  //                 icon: "error",
-  //                 confirmButtonText: "OK",
-  //               });
-
-  //               localStorage.setItem(
-  //                 "restrictedArea",
-  //                 JSON.stringify({ stateName, countryName })
-  //               );
-
-  //               setIsUnavailablePopupVisible(true); // Trigger the unavailable popup
-  //               return;
-  //             }
-
-  //             // If valid, save the location
-  //             localStorage.setItem(
-  //               "location",
-  //               JSON.stringify({ stateName, countryName })
-  //             );
-  //             // setLocation({ state: stateName, country: countryName });
-  //             console.log("Location saved:", { stateName, countryName });
-  //           } catch (err) {
-  //             console.error("Error fetching geocode data:", err);
-  //             // setError("Failed to fetch location data.");
-  //           }
-  //         },
-  //         (error) => {
-  //           console.error("Geolocation error:", error.message);
-  //           // setError(error.message);
-  //         }
-  //       );
-  //     }
-  //   };
-
-  //   fetchLocation();
-  // }, []);
-
+  
   useEffect(() => {
     const fetchLocation = async () => {
       if (navigator.geolocation) {
@@ -465,6 +350,63 @@ function Home() {
   useEffect(() => {
     fetchData();
   }, [token]);
+
+  // const fetchData = async () => {
+  //   try {
+  //     const token = localStorage.getItem("Web-token");
+  //     const now = new Date();
+  //     const day = now.getDay(); // 0 = Sunday, 1 = Monday, ...
+  //     const hours = now.getHours();
+
+  //     // Sunday 23:59 se Monday 12:00 PM tak contests empty rakhna
+  //     const shouldBeEmpty =
+  //       (day === 0 && hours === 23) || (day === 1 && hours < 12);
+
+  //     if (token) {
+  //       const response = await axios.get("app/contest/get-all-contests", {
+  //         headers: { Authorization: `Bearer ${token}` },
+  //       });
+
+  //       const {
+  //         banner_details,
+  //         unreadCount,
+  //         contests,
+  //         discounts,
+  //         restrictedStates,
+  //         livelinks,
+  //       } = response.data.data;
+
+  //       setLinks(livelinks);
+  //       setBanner(banner_details[0]);
+  //       setDiscounts(discounts);
+  //       setCorousal(banner_details[0]?.corousal);
+  //       setCountss(unreadCount);
+  //       setRestrictedStates(restrictedStates);
+
+  //       // Agar shouldBeEmpty true hai to contests empty set karein
+  //       setContests(shouldBeEmpty ? [] : contests);
+  //     } else {
+  //       const response = await axios.get("app/banner/get-banner");
+  //       const { bannerDetails, contests, liveLinks, restrictedStates } =
+  //         response.data.data;
+
+  //       setLinks(liveLinks);
+  //       setRestrictedStates(restrictedStates);
+  //       setBanner(bannerDetails[0]);
+  //       setCorousal(bannerDetails[0]?.corousal || []);
+
+  //       // Agar shouldBeEmpty true hai to contests empty set karein
+  //       setContests(shouldBeEmpty ? [] : contests);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching data:", error);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   fetchData();
+  // }, [token]);
+
 
   // console.log("setRestrictedStates", restrictedStates);
   // console.log("contest -->", contests);

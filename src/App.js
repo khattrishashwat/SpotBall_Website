@@ -43,8 +43,8 @@ const Footer = lazy(() => import("./Components/Layout/Footer/Footer"));
 
 // axios.defaults.baseURL = "http://localhost:10077/api/";
 // axios.defaults.baseURL = "http://44.195.125.80:10077/spotsball/api/";
-// axios.defaults.baseURL = "https://webmobrildemo.com/spotsball/api/v1/";
-axios.defaults.baseURL = "https://www.spotsball.com/spotsball/api/v1/";
+axios.defaults.baseURL = "https://webmobrildemo.com/spotsball/api/v1/";
+// axios.defaults.baseURL = "https://www.spotsball.com/spotsball/api/v1/";
 
 const ProtectedRoute = () => {
   // if (!localStorage.getItem("token")) {
