@@ -134,7 +134,7 @@ function Header() {
       icon: "success",
       title: "Logout Successful",
       text: "You have been logged out successfully.",
-     
+
       allowOutsideClick: false,
       timer: 2000,
       showConfirmButton: false,
@@ -167,14 +167,11 @@ function Header() {
     try {
       const token = localStorage.getItem("Web-token");
       if (!token) return;
-      const response = await axios.get(
-        "app/notifications/get-notifications",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await axios.get("app/notifications/get-notifications", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       setNotification(response.data.data);
       // setNotice(response.data.data.length);
@@ -192,30 +189,105 @@ function Header() {
     hours: 0,
     minutes: 0,
     seconds: 0,
+    isCompetitionStart: true, // Flag to track whether it's competition start or end
   });
+
+  useEffect(() => {
+    const checkAndReloadAtNoon = () => {
+      const now = new Date();
+      const dayOfWeek = now.getDay();
+      const hours = now.getHours();
+      const minutes = now.getMinutes();
+
+      // Check if it's Monday at 12:00 PM
+      if (dayOfWeek === 1 && hours === 12 && minutes === 0) {
+        // Reload the page at 12:00 PM on Monday
+        window.location.reload();
+      }
+    };
+
+    // Set interval to check every minute (60000 ms)
+    const interval = setInterval(checkAndReloadAtNoon, 60000);
+
+    return () => clearInterval(interval); // Clear interval when component unmounts
+  }, []);
+
+
+  const getNextMonday05AM = () => {
+    const now = new Date();
+    const dayOfWeek = now.getDay();
+    const daysUntilNextMonday = (7 - dayOfWeek + 1) % 7; // Next Monday
+    const nextMonday05AM = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate() + daysUntilNextMonday,
+      0, // 00:05 AM
+      5, // 5 minutes
+      0, // seconds
+      0 // milliseconds
+    );
+    return nextMonday05AM.getTime();
+  };
+
+  const getNextMondayNoon = () => {
+    const now = new Date();
+    const dayOfWeek = now.getDay();
+    const daysUntilNextMonday = (7 - dayOfWeek + 1) % 7; // Next Monday
+    const nextMondayNoon = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate() + daysUntilNextMonday,
+      12, // 12:00 PM
+      0, // minutes
+      0, // seconds
+      0 // milliseconds
+    );
+    return nextMondayNoon.getTime();
+  };
 
   const getNextSunday = () => {
     const now = new Date();
     const dayOfWeek = now.getDay();
-    const daysUntilNextSunday = (7 - dayOfWeek) % 7;
+    const daysUntilNextSunday = (7 - dayOfWeek) % 7; // Next Sunday
     const nextSunday = new Date(
       now.getFullYear(),
       now.getMonth(),
-      now.getDate() + daysUntilNextSunday
+      now.getDate() + daysUntilNextSunday,
+      23, // 11:59 PM
+      59, // minutes
+      59, // seconds
+      999 // milliseconds
     );
-    nextSunday.setHours(23, 59, 59, 999);
     return nextSunday.getTime();
   };
 
   useEffect(() => {
-    let countDownDate = getNextSunday();
+    let countDownDate;
+    const now = new Date().getTime();
+
+    // Determine if it's before or after Monday 12:00 PM
+    if (now < getNextMondayNoon()) {
+      // It's before Monday 12:00 PM, so show competition start countdown
+      countDownDate = getNextMonday05AM(); // Start at Monday 00:05 AM
+    } else {
+      // It's after Monday 12:00 PM, so show competition ends countdown
+      countDownDate = getNextSunday(); // Ends at Sunday 11:59 PM
+    }
 
     const updateCountdown = () => {
       const now = new Date().getTime();
-      const distance = countDownDate - now;
+      let distance = countDownDate - now;
 
       if (distance < 0) {
-        countDownDate = getNextSunday();
+        // If countdown is finished, reset depending on the case
+        if (countDownDate === getNextMonday05AM()) {
+          // If it was competition start, then show competition ends
+          countDownDate = getNextSunday();
+        } else {
+          // Otherwise show competition start (next Monday 00:05 AM)
+          countDownDate = getNextMonday05AM();
+        }
+        distance = countDownDate - now; // Reset distance
       }
 
       const days = Math.floor(distance / (1000 * 60 * 60 * 24));
@@ -231,6 +303,7 @@ function Header() {
         hours: String(hours).padStart(2, "0"),
         minutes: String(minutes).padStart(2, "0"),
         seconds: String(seconds).padStart(2, "0"),
+        isCompetitionStart: countDownDate === getNextMonday05AM(), // Set flag to determine if it's competition start
       });
     };
 
@@ -238,6 +311,46 @@ function Header() {
 
     return () => clearInterval(interval);
   }, []);
+
+  const [isActive, setIsActive] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [isDone, setIsDone] = useState(false);
+
+  const labelRef = useRef(null);
+  const counterRef = useRef(null);
+
+  const handleDownload = () => {
+    setIsActive(true);
+    setIsDownloading(true);
+    setProgress(0);
+    setIsDone(false);
+
+    // Simulate a download progress
+    const interval = setInterval(() => {
+      setProgress((prevProgress) => {
+        if (prevProgress < 100) {
+          return prevProgress + 10;
+        } else {
+          clearInterval(interval);
+          setIsDone(false);
+          return 100;
+        }
+      });
+    }, 1000); // Update progress every second
+
+    // After 10 seconds, reset to the default state
+  };
+
+  useEffect(() => {
+    if (isDone) {
+      const timeout = setTimeout(() => {
+        setIsActive(false);
+        setProgress(0);
+      }, 10000);
+      return () => clearTimeout(timeout);
+    }
+  }, [isDone]);
 
   return (
     <>
@@ -252,13 +365,15 @@ function Header() {
                   src={`${process.env.PUBLIC_URL}/images/instant-win.svg`}
                 />{" "}
               </div>
-              {/* <div className="endscompititions">
-                Competition Ends: {formatTime(timeLeft)}
-              </div> */}
               <div className="endscompititions">
+                {timeLeft.isCompetitionStart
+                  ? `Competition Ends : ${timeLeft.days} days: ${timeLeft.hours} hours: ${timeLeft.minutes} minutes: ${timeLeft.seconds} seconds`
+                  : `Competition Start : ${timeLeft.days} days: ${timeLeft.hours} hours: ${timeLeft.minutes} minutes: ${timeLeft.seconds} seconds`}
+              </div>
+              {/* <div className="endscompititions">
                 Competition Ends:{" "}
                 {`${timeLeft.days} days: ${timeLeft.hours} hours: ${timeLeft.minutes} minutes: ${timeLeft.seconds} seconds`}
-              </div>
+              </div> */}
             </a>
           </div>
         </div>
@@ -268,6 +383,140 @@ function Header() {
               <div className="h3-navbar">
                 <div className="container contmainformob_newshi">
                   <nav className="navbar navbar-expand-lg h3-nav navbar_mainnavdiv_shi">
+                    {/* <div className="download_app_icondiv">
+                      <div className="appstoreicondiv">
+                        <a
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          href="https://www.google.com/"
+                        >
+                          <img
+                            src={`${process.env.PUBLIC_URL}/images/google-play-store-badge.png`}
+                            alt="Google Play Store"
+                            className="w-100 mw-100"
+                            style={{ marginTop: "-2px" }}
+                          />
+                        </a>
+                      </div>
+                    </div> */}
+
+                    {/* <div className="download_app_icondiv">
+                      <div className="appstoreicondiv">
+                        <a
+                          className={`dl-button ${isActive ? "active" : ""} ${
+                            isDone ? "done" : ""
+                          }`}
+                          onClick={handleDownload}
+                        >
+                          <div>
+                            <div className="icon">
+                              <svg
+                                className="arrow"
+                                viewBox="0 0 20 18"
+                                fill="currentColor"
+                              >
+                                <polygon points="8 0 12 0 12 9 15 9 10 14 5 9 8 9" />
+                              </svg>
+                              <svg
+                                className="shape"
+                                viewBox="0 0 20 18"
+                                fill="currentColor"
+                              >
+                                <path d="M4.8,0 L15.2,0 C16,0 16.8,0.6 17.1,1.4 L19.7,10.4 C19.9,11 19.9,11.6 19.8,12.2 L19.2,16.3 C19,17.3 18.2,18 17.2,18 H2.8 C1.8,18 1,17.3 0.8,16.3 L0.1,12.2 C0.1,11.6 0.1,11 0.3,10.4 L2.9,1.4 C3.2,0.6 4,0 4.8,0 Z" />
+                              </svg>
+                            </div>
+                            <div className="label" ref={labelRef}>
+                              <div
+                                className={`show default ${
+                                  isDone ? "hide" : ""
+                                }`}
+                              >
+                                Download
+                              </div>
+                              <div className="state">
+                                <div className="counter" ref={counterRef}>
+                                  <span>{progress}%</span>
+                                </div>
+                                {isDone && <span>Done</span>}
+                              </div>
+                            </div>
+                            <div
+                              className="progress"
+                              style={{ transform: `scaleY(${progress / 100})` }}
+                            ></div>
+                          </div>{" "}
+                         
+                        </a>
+                      </div>
+                    </div> */}
+
+                    {/* <div className="download_app_icondiv">
+                      <div className="appstoreicondiv">
+                        <a
+                          className={`dl-button ${isActive ? "active" : ""} ${
+                            isDone ? "done" : ""
+                          }`}
+                          onClick={handleDownload}
+                        >
+                          <div>
+                            <div className="icon">
+                              <div>
+                                <svg
+                                  className="arrow"
+                                  viewBox="0 0 20 18"
+                                  fill="currentColor"
+                                >
+                                  <polygon points="8 0 12 0 12 9 15 9 10 14 5 9 8 9" />
+                                </svg>
+                                <svg
+                                  className="shape"
+                                  viewBox="0 0 20 18"
+                                  fill="currentColor"
+                                >
+                                  <path d="M4.82668561,0 L15.1733144,0 C16.0590479,0 16.8392841,0.582583769 17.0909106,1.43182334 L19.7391982,10.369794 C19.9108349,10.9490677 19.9490212,11.5596963 19.8508905,12.1558403 L19.1646343,16.3248465 C19.0055906,17.2910371 18.1703851,18 17.191192,18 L2.80880804,18 C1.82961488,18 0.994409401,17.2910371 0.835365676,16.3248465 L0.149109507,12.1558403 C0.0509788145,11.5596963 0.0891651114,10.9490677 0.260801785,10.369794 L2.90908938,1.43182334 C3.16071592,0.582583769 3.94095214,0 4.82668561,0 Z" />
+                                </svg>
+                              </div>
+                              <span />
+                            </div>
+                            <div className="label" ref={labelRef}>
+                              <div
+                                className={
+                                  isDownloading ? "default" : "show default"
+                                }
+                              >
+                                {isDone ? "Downloading apk..." : "Download Apk"}
+                              </div>
+
+                              <div
+                                className={`state ${
+                                  isDownloading ? "show" : ""
+                                } ${isDone ? "show" : ""}`}
+                              >
+                                <div
+                                  className={
+                                    isDownloading || isDone
+                                      ? "counter show"
+                                      : "counter "
+                                  }
+                                  ref={counterRef}
+                                >
+                                  {progress > 0 && !isDone && (
+                                    <span>{progress}%</span>
+                                  )}
+                                </div>
+                              </div>
+
+                              {isDone && <span>Download Done</span>}
+                            </div>
+                            <div
+                              className="progress"
+                              style={{ transform: `scaleY(${progress / 100})` }}
+                            ></div>
+                          </div>
+                        </a>
+                      </div>
+                    </div> */}
+
                     <Link
                       to="/"
                       className="navbar-brand navbarlogodiv"

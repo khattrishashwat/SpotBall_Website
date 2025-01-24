@@ -12,6 +12,8 @@ import Slider from "react-slick";
 
 function Home() {
   const navigate = useNavigate();
+  const spacing = 2;
+
   const [loading, setLoading] = useState(false);
   const [corousal, setCorousal] = useState([]);
   const [movies, setMovies] = useState("");
@@ -21,6 +23,7 @@ function Home() {
   const [selectedDiscount, setSelectedDiscount] = useState("");
   const [isModals, setIsModals] = useState("");
   const [onCarts, setOnCarts] = useState("");
+  const [onCloseComptition, setOnCloseComptition] = useState("");
   const [links, setLinks] = useState("");
   const [countss, setCountss] = useState("");
   const [restrictedStates, setRestrictedStates] = useState("");
@@ -38,14 +41,14 @@ function Home() {
   const open = async () => {
     setIsModals(true);
   };
-  
+
   useEffect(() => {
     const fetchLocation = async () => {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           async (position) => {
             const { latitude, longitude } = position.coords;
-            console.log("Latitude:", latitude, "Longitude:", longitude);
+            // console.log("Latitude:", latitude, "Longitude:", longitude);
 
             try {
               const response = await axios.get(
@@ -72,16 +75,16 @@ function Home() {
                 }
               });
 
-              console.log(
-                "State Name:",
-                stateName,
-                "Country Name:",
-                countryName
-              );
+              // console.log(
+              //   "State Name:",
+              //   stateName,
+              //   "Country Name:",
+              //   countryName
+              // );
 
               // Ensure restrictedStates is not null or undefined
               const restrictedAreaStates = restrictedStates || [];
-              console.log("restrictedAreaStates", restrictedAreaStates);
+              // console.log("restrictedAreaStates", restrictedAreaStates);
 
               // Check if the country is not India
               if (countryName.toLowerCase() !== "india") {
@@ -126,7 +129,7 @@ function Home() {
                 JSON.stringify({ stateName, countryName })
               );
 
-              console.log("Location saved:", { stateName, countryName });
+              // console.log("Location saved:", { stateName, countryName });
             } catch (err) {
               console.error("Error fetching geocode data:", err);
             }
@@ -137,10 +140,19 @@ function Home() {
         );
       }
     };
-
-    fetchLocation();
+    const token = localStorage.getItem("Web-token");
+    if (token) {
+      fetchLocation();
+    }
+    // fetchLocation();
   }, [restrictedStates]);
 
+  // const handleBuyTicketClick = (contest, discount) => {
+  //   setSelectedContest(contest);
+  //   SetOnCloseComptition(true);
+  //   setOnCarts(true);
+  //   setSelectedDiscount(discount);
+  // };
   const handleBuyTicketClick = (contest, discount) => {
     const token = localStorage.getItem("Web-token"); // Replace with your token retrieval method
 
@@ -163,25 +175,45 @@ function Home() {
         confirmButtonText: "OK",
         allowOutsideClick: false,
       });
-    } else {
-      setSelectedContest(contest);
-      setOnCarts(true);
-      setSelectedDiscount(discount);
+      return;
     }
+
+    if (!contest.is_active) {
+      setOnCarts(false);
+      setOnCloseComptition(true);
+      return;
+    }
+
+    // If contest is active, proceed with normal flow
+    setSelectedContest(contest);
+    setOnCarts(true);
+    setSelectedDiscount(discount);
   };
   const handleAskToPaly = () => {
     const restrictedArea = localStorage.getItem("restrictedArea");
     const location = localStorage.getItem("location");
+    const token = localStorage.getItem("Web-token");
+
+    if (!token) {
+      Swal.fire({
+        icon: "info",
+        title: "Login Required",
+        text: "Please login to participate in this contest!",
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
+      });
+      return; // Stop execution if no token
+    }
 
     if (restrictedArea) {
       setGeolocationPopupVisible(false);
-      // Show the unavailable popup if restrictedArea is found in localStorage
       setIsUnavailablePopupVisible(true);
-    } else if (location) {
-      // Only call handleBuyTicketClick if a location is found in localStorage
+      return;
+    }
+
+    if (location) {
       handleBuyTicketClick(contests[0], discounts);
     } else {
-      // Optionally handle the case where no location is found in localStorage
       console.log("Location not found in localStorage");
     }
   };
@@ -196,6 +228,7 @@ function Home() {
   };
   const ClosedCarts = async () => {
     setOnCarts(false);
+    setOnCloseComptition(false);
     setQuantity(3);
   };
 
@@ -253,34 +286,58 @@ function Home() {
   const videoData = movies.length > 0 ? movies[0] : null;
 
   const [timeLeft, setTimeLeft] = useState({
-    days: 0,
-    hours: 0,
-    minutes: 0,
-    seconds: 0,
+    days: "00",
+    hours: "00",
+    minutes: "00",
+    seconds: "00",
   });
+  const [countdownType, setCountdownType] = useState("ends"); // "starts" or "ends"
 
-  const getNextSunday = () => {
+  // Get the next target time
+  const getTargetTime = () => {
     const now = new Date();
     const dayOfWeek = now.getDay();
-    const daysUntilNextSunday = (7 - dayOfWeek) % 7;
-    const nextSunday = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate() + daysUntilNextSunday
-    );
-    nextSunday.setHours(23, 59, 59, 999);
-    return nextSunday.getTime();
+    const currentHours = now.getHours();
+    const currentMinutes = now.getMinutes();
+
+    // Define Monday 12:00 PM
+    const nextMondayNoon = new Date(now);
+    nextMondayNoon.setDate(now.getDate() + ((7 - dayOfWeek + 1) % 7)); // Get the next Monday
+    nextMondayNoon.setHours(12, 0, 0, 0); // Set to 12:00 PM Monday
+
+    // Define Sunday 23:59
+    const nextSundayEnd = new Date(now);
+    nextSundayEnd.setDate(now.getDate() + ((7 - dayOfWeek) % 7)); // Get the next Sunday
+    nextSundayEnd.setHours(23, 59, 59, 999); // Set to Sunday 23:59
+
+    // Define Monday 00:05
+    const mondayMorning = new Date(nextMondayNoon);
+    mondayMorning.setHours(0, 5, 0, 0);
+
+    if (
+      (dayOfWeek === 1 &&
+        currentHours >= 0 &&
+        currentMinutes >= 5 &&
+        currentHours < 12) ||
+      dayOfWeek === 0 // If it's Sunday, prepare for Monday start
+    ) {
+      setCountdownType("starts");
+      return nextMondayNoon.getTime();
+    } else {
+      setCountdownType("ends");
+      return nextSundayEnd.getTime();
+    }
   };
 
   useEffect(() => {
-    let countDownDate = getNextSunday();
+    let countDownDate = getTargetTime();
 
     const updateCountdown = () => {
       const now = new Date().getTime();
       const distance = countDownDate - now;
 
       if (distance < 0) {
-        countDownDate = getNextSunday();
+        countDownDate = getTargetTime();
       }
 
       const days = Math.floor(distance / (1000 * 60 * 60 * 24));
@@ -290,7 +347,6 @@ function Home() {
       const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-      // Ensure all values are two digits
       setTimeLeft({
         days: String(days).padStart(2, "0"),
         hours: String(hours).padStart(2, "0"),
@@ -299,6 +355,7 @@ function Home() {
       });
     };
 
+    updateCountdown();
     const interval = setInterval(updateCountdown, 1000);
 
     return () => clearInterval(interval);
@@ -314,7 +371,7 @@ function Home() {
             Authorization: `Bearer ${token}`,
           },
         });
-
+        console.log("get-all-contest", response.data.data);
         const {
           banner_details,
           unreadCount,
@@ -333,6 +390,7 @@ function Home() {
       } else {
         const response = await axios.get("app/banner/get-banner");
 
+        console.log("get", response.data.data);
         const { bannerDetails, contests, liveLinks, restrictedStates } =
           response.data.data;
         setLinks(liveLinks);
@@ -406,7 +464,6 @@ function Home() {
   // useEffect(() => {
   //   fetchData();
   // }, [token]);
-
 
   // console.log("setRestrictedStates", restrictedStates);
   // console.log("contest -->", contests);
@@ -671,8 +728,11 @@ function Home() {
                   <div className="entriesdate_withcountdown">
                     <div className="countdowndate_newshi">
                       <div className="countheading_endsin">
-                        {/* <h2>Closing by</h2> */}
-                        <h2>This Week's Game Ends In</h2>
+                        <h2>
+                          {countdownType === "starts"
+                            ? "This Week's Game Starts In"
+                            : "This Week's Game Ends In"}
+                        </h2>
                       </div>
                       <div id="countdown" className="countdown">
                         <div className="countdown-number">
@@ -944,6 +1004,207 @@ function Home() {
         </div>
       </div>
 
+      <div
+        className={`cartpopup_main cartpopupfor_contest ${
+          onCloseComptition ? "show" : ""
+        }`}
+        style={{ display: onCloseComptition ? "block" : "none" }}
+      >
+        <div className="addtocart_newpopup">
+          <div className="addtocart_content_popup">
+            <div className="contest_maindiv_popup_inner">
+              <div className="contestheading text-center">
+                <h2>
+                  <i class="fa fa-gamepad" aria-hidden="true"></i> Game Play
+                  Closed!
+                </h2>
+              </div>
+              {/* <div className="contesttickeprice">
+                <p>
+                  Ticket:{" "}
+                  <span>
+                    <i className="fa fa-inr" aria-hidden="true" />{" "}
+                    {selectedContest?.ticket_price}
+                  </span>
+                </p>
+              </div> */}
+              <div className="quantity_contest text-center mt-3">
+                <h3 className="text-white">
+                  The current gameplay has been closed.
+                </h3>
+                <h4 className="text-white">
+                  But don't worry, a new competition launches this Monday at
+                  12:00 HRS!
+                </h4>
+                {/* <div className="quantity">
+                  <button
+                    className="minus"
+                    onClick={handleDecrease}
+                    aria-label="Decrease"
+                  >
+                    −
+                  </button>
+                  <input
+                    type="number"
+                    className="quantity_input-box"
+                    value={quantity}
+                    readOnly
+                  />
+                  <button
+                    className="plus"
+                    onClick={handleIncrease}
+                    aria-label="Increase"
+                  >
+                    +
+                  </button>
+                </div> */}
+              </div>
+              <div className="contest_quantity_para_div">
+                <div className="addcart_contst_textinfo">
+                  {/* <img
+                    src={`${process.env.PUBLIC_URL}/images/ball_icon.png`}
+                    src="images/ball_icon.png"
+                    alt="Icon"
+                  /> */}
+                  <i
+                    className="fa fa-calendar"
+                    style={{
+                      background: "aliceblue",
+                      color: "#000",
+                      width: "30px",
+                      height: "30px",
+                      fontSize: "15px",
+                      padding: "0px",
+                      lineHeight: "30px",
+                      textAlign: "center",
+                      borderRadius: "50%",
+                      // marginRight: spacing + "em",
+                    }}
+                  ></i>{" "}
+                  <h2 className="text-white ">
+                    Mark your calendars and get ready to join the fun!
+                  </h2>
+                </div>
+                <div className="addcart_contst_textinfo">
+                  {/* <img
+                    src={`${process.env.PUBLIC_URL}/images/ball_icon.png`}
+                    src="images/ball_icon.png"
+                    alt="Icon"
+                  /> */}
+
+                  <i
+                    class="fa fa-television"
+                    style={{
+                      background: "aliceblue",
+                      color: "#000",
+                      width: "42px",
+                      height: "30px",
+                      fontSize: "15px",
+                      padding: "0px",
+                      lineHeight: "30px",
+                      textAlign: "center",
+                      borderRadius: "50%",
+                      // marginRight: spacing + "em",
+                    }}
+                  ></i>
+                  <h2 className="text-white">
+                    Don’t forget to tune in to our live streaming every Monday
+                    at 21:00 HRS to catch all the excitement.
+                  </h2>
+                </div>
+              </div>
+              <div className="everyweek_livewatchdiv text-center">
+                <h4 className="text-white">Watch On Live Streams</h4>
+                <div className="watchondiv justify-content-center">
+                  {links?.Facebook_Streaming && (
+                    <a
+                      href={links.Facebook_Streaming}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <img
+                        src={`${process.env.PUBLIC_URL}/images/face.png`}
+                        alt="Facebook Live"
+                      />
+                    </a>
+                  )}
+                  {links?.Youtube_Streaming && (
+                    <a
+                      href={links.Youtube_Streaming}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <img
+                        src={`${process.env.PUBLIC_URL}/images/you.png`}
+                        alt="YouTube Live"
+                      />
+                    </a>
+                  )}
+                </div>
+              </div>
+              {/* <div className="discount_cousal">
+                <h5>Discount</h5>
+                <Slider {...settings}>
+                  {Array.isArray(selectedDiscount) &&
+                    selectedDiscount.map((discount) => (
+                      <div key={discount._id} className="discount_card">
+                        <img
+                          src={`${process.env.PUBLIC_URL}/images/discount_img.png`}
+                        />
+                        
+                        <p>
+                          Tickets: {discount.minTickets} - {discount.maxTickets}
+                        </p>
+                        <p>Discount: {discount.discountPercentage}%</p>
+                      </div>
+                    ))}
+                </Slider>
+              </div>
+              <div className="bulkticketdiv">
+                <div className="buybulkticket_heaidng">
+                  <h2 className="bulkticketheading">Buy Bulk Tickets</h2>
+                </div>
+                <div className="chooseforinputsdiv_bulkticket">
+                  {(selectedContest?.quantities || []).map((value) => (
+                    <div className="choosefor_input action" key={value}>
+                      <label htmlFor={`choosefor-${value}`}>
+                        <input
+                          type="radio"
+                          id={`choosefor-${value}`} 
+                          name="choosefor"
+                          className="radio-custom"
+                          onChange={() => handleBulkSelect(value)}
+                          checked={quantity === value}
+                        />
+                        <span className="radio-custom-dummy" />
+                        <span className="spanforcheck">{value} Tickets</span>
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div> */}
+              <div className="addtocart_btn_popup_div">
+                <button className="addcartbtn_inpopup" onClick={handlePlayNow}>
+                  Close
+                </button>
+              </div>
+            </div>
+            <div className="contestcrossbtndiv">
+              <button
+                type="button"
+                className="crossbtn_popupclose"
+                onClick={ClosedCarts}
+              >
+                <img
+                  src={`${process.env.PUBLIC_URL}/images/cross_icon.png`}
+                  // src="images/cross_icon.png"
+                  alt="Close"
+                />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
       <div
         className={`cartpopup_main cartpopupfor_contest ${
           onCarts ? "show" : ""
