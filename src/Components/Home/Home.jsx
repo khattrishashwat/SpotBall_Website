@@ -1015,7 +1015,7 @@ function Home() {
             <div className="contest_maindiv_popup_inner">
               <div className="contestheading text-center">
                 <h2>
-                  <i class="fa fa-gamepad" aria-hidden="true"></i> Game Play
+                  <i className="fa fa-gamepad" aria-hidden="true"></i> Game Play
                   Closed!
                 </h2>
               </div>
@@ -1093,7 +1093,7 @@ function Home() {
                   /> */}
 
                   <i
-                    class="fa fa-television"
+                    className="fa fa-television"
                     style={{
                       background: "aliceblue",
                       color: "#000",

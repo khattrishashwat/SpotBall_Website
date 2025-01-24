@@ -1,6 +1,27 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import axios from "axios";
 
 function Weekly() {
+  const [links, setLinks] = useState(false); // Video state
+
+  const fetchLinks = async () => {
+    try {
+      const response = await axios.get(
+        "app/static-content/get-all-static-content/footer"
+      );
+
+      if (response) {
+        setLinks(response.data.data?.liveLinks);
+      }
+    } catch (error) {
+      console.error("Error fetching footer data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchLinks();
+  }, []);
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);

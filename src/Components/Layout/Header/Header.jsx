@@ -18,7 +18,22 @@ function Header() {
   const [loginPopup, setLoginPopup] = useState(false);
   const [isNot, setIsNot] = useState(false);
   const [notice, setNotice] = useState(false);
+  const [androidLink, setAndroidLink] = useState("");
 
+  const fetchAndroidLink = async () => {
+    try {
+      const response = await axios.get("app/apk-links");
+      if (response.data?.data?.android_build) {
+        setAndroidLink(response.data.data.android_build);
+      }
+    } catch (error) {
+      console.error("Error fetching Android data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchAndroidLink();
+  }, []);
   useEffect(() => {
     if (location.pathname === "/") {
       window.scrollTo(0, 0);
@@ -185,109 +200,58 @@ function Header() {
   }, []);
 
   const [timeLeft, setTimeLeft] = useState({
-    days: 0,
-    hours: 0,
-    minutes: 0,
-    seconds: 0,
-    isCompetitionStart: true, // Flag to track whether it's competition start or end
+    days: "00",
+    hours: "00",
+    minutes: "00",
+    seconds: "00",
   });
+  const [countdownType, setCountdownType] = useState("ends"); // "starts" or "ends"
 
-  useEffect(() => {
-    const checkAndReloadAtNoon = () => {
-      const now = new Date();
-      const dayOfWeek = now.getDay();
-      const hours = now.getHours();
-      const minutes = now.getMinutes();
-
-      // Check if it's Monday at 12:00 PM
-      if (dayOfWeek === 1 && hours === 12 && minutes === 0) {
-        // Reload the page at 12:00 PM on Monday
-        window.location.reload();
-      }
-    };
-
-    // Set interval to check every minute (60000 ms)
-    const interval = setInterval(checkAndReloadAtNoon, 60000);
-
-    return () => clearInterval(interval); // Clear interval when component unmounts
-  }, []);
-
-
-  const getNextMonday05AM = () => {
+  // Get the next target time
+  const getTargetTime = () => {
     const now = new Date();
     const dayOfWeek = now.getDay();
-    const daysUntilNextMonday = (7 - dayOfWeek + 1) % 7; // Next Monday
-    const nextMonday05AM = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate() + daysUntilNextMonday,
-      0, // 00:05 AM
-      5, // 5 minutes
-      0, // seconds
-      0 // milliseconds
-    );
-    return nextMonday05AM.getTime();
-  };
+    const currentHours = now.getHours();
+    const currentMinutes = now.getMinutes();
 
-  const getNextMondayNoon = () => {
-    const now = new Date();
-    const dayOfWeek = now.getDay();
-    const daysUntilNextMonday = (7 - dayOfWeek + 1) % 7; // Next Monday
-    const nextMondayNoon = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate() + daysUntilNextMonday,
-      12, // 12:00 PM
-      0, // minutes
-      0, // seconds
-      0 // milliseconds
-    );
-    return nextMondayNoon.getTime();
-  };
+    // Define Monday 12:00 PM
+    const nextMondayNoon = new Date(now);
+    nextMondayNoon.setDate(now.getDate() + ((7 - dayOfWeek + 1) % 7)); // Get the next Monday
+    nextMondayNoon.setHours(12, 0, 0, 0); // Set to 12:00 PM Monday
 
-  const getNextSunday = () => {
-    const now = new Date();
-    const dayOfWeek = now.getDay();
-    const daysUntilNextSunday = (7 - dayOfWeek) % 7; // Next Sunday
-    const nextSunday = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate() + daysUntilNextSunday,
-      23, // 11:59 PM
-      59, // minutes
-      59, // seconds
-      999 // milliseconds
-    );
-    return nextSunday.getTime();
-  };
+    // Define Sunday 23:59
+    const nextSundayEnd = new Date(now);
+    nextSundayEnd.setDate(now.getDate() + ((7 - dayOfWeek) % 7)); // Get the next Sunday
+    nextSundayEnd.setHours(23, 59, 59, 999); // Set to Sunday 23:59
 
-  useEffect(() => {
-    let countDownDate;
-    const now = new Date().getTime();
+    // Define Monday 00:05
+    const mondayMorning = new Date(nextMondayNoon);
+    mondayMorning.setHours(0, 5, 0, 0);
 
-    // Determine if it's before or after Monday 12:00 PM
-    if (now < getNextMondayNoon()) {
-      // It's before Monday 12:00 PM, so show competition start countdown
-      countDownDate = getNextMonday05AM(); // Start at Monday 00:05 AM
+    if (
+      (dayOfWeek === 1 &&
+        currentHours >= 0 &&
+        currentMinutes >= 5 &&
+        currentHours < 12) ||
+      dayOfWeek === 0 // If it's Sunday, prepare for Monday start
+    ) {
+      setCountdownType("starts");
+      return nextMondayNoon.getTime();
     } else {
-      // It's after Monday 12:00 PM, so show competition ends countdown
-      countDownDate = getNextSunday(); // Ends at Sunday 11:59 PM
+      setCountdownType("ends");
+      return nextSundayEnd.getTime();
     }
+  };
+
+  useEffect(() => {
+    let countDownDate = getTargetTime();
 
     const updateCountdown = () => {
       const now = new Date().getTime();
-      let distance = countDownDate - now;
+      const distance = countDownDate - now;
 
       if (distance < 0) {
-        // If countdown is finished, reset depending on the case
-        if (countDownDate === getNextMonday05AM()) {
-          // If it was competition start, then show competition ends
-          countDownDate = getNextSunday();
-        } else {
-          // Otherwise show competition start (next Monday 00:05 AM)
-          countDownDate = getNextMonday05AM();
-        }
-        distance = countDownDate - now; // Reset distance
+        countDownDate = getTargetTime();
       }
 
       const days = Math.floor(distance / (1000 * 60 * 60 * 24));
@@ -297,16 +261,15 @@ function Header() {
       const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-      // Format all values to always display two digits
       setTimeLeft({
         days: String(days).padStart(2, "0"),
         hours: String(hours).padStart(2, "0"),
         minutes: String(minutes).padStart(2, "0"),
         seconds: String(seconds).padStart(2, "0"),
-        isCompetitionStart: countDownDate === getNextMonday05AM(), // Set flag to determine if it's competition start
       });
     };
 
+    updateCountdown();
     const interval = setInterval(updateCountdown, 1000);
 
     return () => clearInterval(interval);
@@ -367,8 +330,8 @@ function Header() {
               </div>
               <div className="endscompititions">
                 {timeLeft.isCompetitionStart
-                  ? `Competition Ends : ${timeLeft.days} days: ${timeLeft.hours} hours: ${timeLeft.minutes} minutes: ${timeLeft.seconds} seconds`
-                  : `Competition Start : ${timeLeft.days} days: ${timeLeft.hours} hours: ${timeLeft.minutes} minutes: ${timeLeft.seconds} seconds`}
+                  ? `Competition Start : ${timeLeft.days} days: ${timeLeft.hours} hours: ${timeLeft.minutes} minutes: ${timeLeft.seconds} seconds`
+                  : `Competition End : ${timeLeft.days} days: ${timeLeft.hours} hours: ${timeLeft.minutes} minutes: ${timeLeft.seconds} seconds`}
               </div>
               {/* <div className="endscompititions">
                 Competition Ends:{" "}
@@ -516,6 +479,28 @@ function Header() {
                         </a>
                       </div>
                     </div> */}
+                    <div className="d-flex gap-5  justify-content-between align-items-center">
+                      <div className="d-flex gap-3 align-items-start">
+                        <img src="images/favicon.png" />
+                        <p className="text-white mb-0">Install SpotsBall App</p>
+                      </div>
+                      <div className="btn btn-dark">
+                        <a
+                          href={androidLink}
+                          className="btn-download"
+                          download
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {" "}
+                          <i
+                            className="fa fa-download"
+                            aria-hidden="true"
+                          />{" "}
+                          Download APK
+                        </a>
+                      </div>
+                    </div>
 
                     <Link
                       to="/"
@@ -541,7 +526,7 @@ function Header() {
                                 alt="bell"
                                 onClick={NotificationOpen}
                               />
-                              {/* <span class="cartcount">3</span> */}
+                              {/* <span className="cartcount">3</span> */}
                             </a>
                             <div
                               className={`notificationdiv_popup ${
@@ -788,10 +773,28 @@ function Header() {
                                     src={`${process.env.PUBLIC_URL}/images/icon_in_the_press.png`}
                                   />
                                 </div>
-                                <div className="menuname">
-                                  {/* <h4>Trending Articles</h4> */}
-                                  <h4>SpotsBall In the News</h4>
+                                <div
+                                  className="menuname"
+                                  style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "space-between",
+                                  }}
+                                >
+                                  <h4>SpotsBall In the News </h4>
+                                  <img
+                                    src="https://ges-inet.org/wp-content/uploads/2020/10/new-gif.gif"
+                                    style={{
+                                      width: 50,
+                                      marginTop: 6,
+                                      marginLeft: 10,
+                                    }}
+                                  />
                                 </div>
+
+                                {/* <div className="menuname">
+                                  <h4>SpotsBall In the News</h4>
+                                </div> */}
                               </div>
                               <div className="arrowicondiv">
                                 <img
