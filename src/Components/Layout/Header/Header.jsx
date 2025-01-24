@@ -18,7 +18,22 @@ function Header() {
   const [loginPopup, setLoginPopup] = useState(false);
   const [isNot, setIsNot] = useState(false);
   const [notice, setNotice] = useState(false);
+  const [androidLink, setAndroidLink] = useState("");
 
+  const fetchAndroidLink = async () => {
+    try {
+      const response = await axios.get("app/apk-links");
+      if (response.data?.data?.android_build) {
+        setAndroidLink(response.data.data.android_build);
+      }
+    } catch (error) {
+      console.error("Error fetching Android data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchAndroidLink();
+  }, []);
   useEffect(() => {
     if (location.pathname === "/") {
       window.scrollTo(0, 0);
@@ -134,7 +149,7 @@ function Header() {
       icon: "success",
       title: "Logout Successful",
       text: "You have been logged out successfully.",
-     
+
       allowOutsideClick: false,
       timer: 2000,
       showConfirmButton: false,
@@ -167,14 +182,11 @@ function Header() {
     try {
       const token = localStorage.getItem("Web-token");
       if (!token) return;
-      const response = await axios.get(
-        "app/notifications/get-notifications",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await axios.get("app/notifications/get-notifications", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       setNotification(response.data.data);
       // setNotice(response.data.data.length);
@@ -188,34 +200,58 @@ function Header() {
   }, []);
 
   const [timeLeft, setTimeLeft] = useState({
-    days: 0,
-    hours: 0,
-    minutes: 0,
-    seconds: 0,
+    days: "00",
+    hours: "00",
+    minutes: "00",
+    seconds: "00",
   });
+  const [countdownType, setCountdownType] = useState("ends"); // "starts" or "ends"
 
-  const getNextSunday = () => {
+  // Get the next target time
+  const getTargetTime = () => {
     const now = new Date();
     const dayOfWeek = now.getDay();
-    const daysUntilNextSunday = (7 - dayOfWeek) % 7;
-    const nextSunday = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate() + daysUntilNextSunday
-    );
-    nextSunday.setHours(23, 59, 59, 999);
-    return nextSunday.getTime();
+    const currentHours = now.getHours();
+    const currentMinutes = now.getMinutes();
+
+    // Define Monday 12:00 PM
+    const nextMondayNoon = new Date(now);
+    nextMondayNoon.setDate(now.getDate() + ((7 - dayOfWeek + 1) % 7)); // Get the next Monday
+    nextMondayNoon.setHours(12, 0, 0, 0); // Set to 12:00 PM Monday
+
+    // Define Sunday 23:59
+    const nextSundayEnd = new Date(now);
+    nextSundayEnd.setDate(now.getDate() + ((7 - dayOfWeek) % 7)); // Get the next Sunday
+    nextSundayEnd.setHours(23, 59, 59, 999); // Set to Sunday 23:59
+
+    // Define Monday 00:05
+    const mondayMorning = new Date(nextMondayNoon);
+    mondayMorning.setHours(0, 5, 0, 0);
+
+    if (
+      (dayOfWeek === 1 &&
+        currentHours >= 0 &&
+        currentMinutes >= 5 &&
+        currentHours < 12) ||
+      dayOfWeek === 0 // If it's Sunday, prepare for Monday start
+    ) {
+      setCountdownType("starts");
+      return nextMondayNoon.getTime();
+    } else {
+      setCountdownType("ends");
+      return nextSundayEnd.getTime();
+    }
   };
 
   useEffect(() => {
-    let countDownDate = getNextSunday();
+    let countDownDate = getTargetTime();
 
     const updateCountdown = () => {
       const now = new Date().getTime();
       const distance = countDownDate - now;
 
       if (distance < 0) {
-        countDownDate = getNextSunday();
+        countDownDate = getTargetTime();
       }
 
       const days = Math.floor(distance / (1000 * 60 * 60 * 24));
@@ -225,7 +261,6 @@ function Header() {
       const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-      // Format all values to always display two digits
       setTimeLeft({
         days: String(days).padStart(2, "0"),
         hours: String(hours).padStart(2, "0"),
@@ -234,10 +269,51 @@ function Header() {
       });
     };
 
+    updateCountdown();
     const interval = setInterval(updateCountdown, 1000);
 
     return () => clearInterval(interval);
   }, []);
+
+  const [isActive, setIsActive] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [isDone, setIsDone] = useState(false);
+
+  const labelRef = useRef(null);
+  const counterRef = useRef(null);
+
+  const handleDownload = () => {
+    setIsActive(true);
+    setIsDownloading(true);
+    setProgress(0);
+    setIsDone(false);
+
+    // Simulate a download progress
+    const interval = setInterval(() => {
+      setProgress((prevProgress) => {
+        if (prevProgress < 100) {
+          return prevProgress + 10;
+        } else {
+          clearInterval(interval);
+          setIsDone(false);
+          return 100;
+        }
+      });
+    }, 1000); // Update progress every second
+
+    // After 10 seconds, reset to the default state
+  };
+
+  useEffect(() => {
+    if (isDone) {
+      const timeout = setTimeout(() => {
+        setIsActive(false);
+        setProgress(0);
+      }, 10000);
+      return () => clearTimeout(timeout);
+    }
+  }, [isDone]);
 
   return (
     <>
@@ -252,13 +328,15 @@ function Header() {
                   src={`${process.env.PUBLIC_URL}/images/instant-win.svg`}
                 />{" "}
               </div>
-              {/* <div className="endscompititions">
-                Competition Ends: {formatTime(timeLeft)}
-              </div> */}
               <div className="endscompititions">
+                {timeLeft.isCompetitionStart
+                  ? `Competition Start : ${timeLeft.days} days: ${timeLeft.hours} hours: ${timeLeft.minutes} minutes: ${timeLeft.seconds} seconds`
+                  : `Competition End : ${timeLeft.days} days: ${timeLeft.hours} hours: ${timeLeft.minutes} minutes: ${timeLeft.seconds} seconds`}
+              </div>
+              {/* <div className="endscompititions">
                 Competition Ends:{" "}
                 {`${timeLeft.days} days: ${timeLeft.hours} hours: ${timeLeft.minutes} minutes: ${timeLeft.seconds} seconds`}
-              </div>
+              </div> */}
             </a>
           </div>
         </div>
@@ -268,6 +346,162 @@ function Header() {
               <div className="h3-navbar">
                 <div className="container contmainformob_newshi">
                   <nav className="navbar navbar-expand-lg h3-nav navbar_mainnavdiv_shi">
+                    {/* <div className="download_app_icondiv">
+                      <div className="appstoreicondiv">
+                        <a
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          href="https://www.google.com/"
+                        >
+                          <img
+                            src={`${process.env.PUBLIC_URL}/images/google-play-store-badge.png`}
+                            alt="Google Play Store"
+                            className="w-100 mw-100"
+                            style={{ marginTop: "-2px" }}
+                          />
+                        </a>
+                      </div>
+                    </div> */}
+
+                    {/* <div className="download_app_icondiv">
+                      <div className="appstoreicondiv">
+                        <a
+                          className={`dl-button ${isActive ? "active" : ""} ${
+                            isDone ? "done" : ""
+                          }`}
+                          onClick={handleDownload}
+                        >
+                          <div>
+                            <div className="icon">
+                              <svg
+                                className="arrow"
+                                viewBox="0 0 20 18"
+                                fill="currentColor"
+                              >
+                                <polygon points="8 0 12 0 12 9 15 9 10 14 5 9 8 9" />
+                              </svg>
+                              <svg
+                                className="shape"
+                                viewBox="0 0 20 18"
+                                fill="currentColor"
+                              >
+                                <path d="M4.8,0 L15.2,0 C16,0 16.8,0.6 17.1,1.4 L19.7,10.4 C19.9,11 19.9,11.6 19.8,12.2 L19.2,16.3 C19,17.3 18.2,18 17.2,18 H2.8 C1.8,18 1,17.3 0.8,16.3 L0.1,12.2 C0.1,11.6 0.1,11 0.3,10.4 L2.9,1.4 C3.2,0.6 4,0 4.8,0 Z" />
+                              </svg>
+                            </div>
+                            <div className="label" ref={labelRef}>
+                              <div
+                                className={`show default ${
+                                  isDone ? "hide" : ""
+                                }`}
+                              >
+                                Download
+                              </div>
+                              <div className="state">
+                                <div className="counter" ref={counterRef}>
+                                  <span>{progress}%</span>
+                                </div>
+                                {isDone && <span>Done</span>}
+                              </div>
+                            </div>
+                            <div
+                              className="progress"
+                              style={{ transform: `scaleY(${progress / 100})` }}
+                            ></div>
+                          </div>{" "}
+                         
+                        </a>
+                      </div>
+                    </div> */}
+
+                    {/* <div className="download_app_icondiv">
+                      <div className="appstoreicondiv">
+                        <a
+                          className={`dl-button ${isActive ? "active" : ""} ${
+                            isDone ? "done" : ""
+                          }`}
+                          onClick={handleDownload}
+                        >
+                          <div>
+                            <div className="icon">
+                              <div>
+                                <svg
+                                  className="arrow"
+                                  viewBox="0 0 20 18"
+                                  fill="currentColor"
+                                >
+                                  <polygon points="8 0 12 0 12 9 15 9 10 14 5 9 8 9" />
+                                </svg>
+                                <svg
+                                  className="shape"
+                                  viewBox="0 0 20 18"
+                                  fill="currentColor"
+                                >
+                                  <path d="M4.82668561,0 L15.1733144,0 C16.0590479,0 16.8392841,0.582583769 17.0909106,1.43182334 L19.7391982,10.369794 C19.9108349,10.9490677 19.9490212,11.5596963 19.8508905,12.1558403 L19.1646343,16.3248465 C19.0055906,17.2910371 18.1703851,18 17.191192,18 L2.80880804,18 C1.82961488,18 0.994409401,17.2910371 0.835365676,16.3248465 L0.149109507,12.1558403 C0.0509788145,11.5596963 0.0891651114,10.9490677 0.260801785,10.369794 L2.90908938,1.43182334 C3.16071592,0.582583769 3.94095214,0 4.82668561,0 Z" />
+                                </svg>
+                              </div>
+                              <span />
+                            </div>
+                            <div className="label" ref={labelRef}>
+                              <div
+                                className={
+                                  isDownloading ? "default" : "show default"
+                                }
+                              >
+                                {isDone ? "Downloading apk..." : "Download Apk"}
+                              </div>
+
+                              <div
+                                className={`state ${
+                                  isDownloading ? "show" : ""
+                                } ${isDone ? "show" : ""}`}
+                              >
+                                <div
+                                  className={
+                                    isDownloading || isDone
+                                      ? "counter show"
+                                      : "counter "
+                                  }
+                                  ref={counterRef}
+                                >
+                                  {progress > 0 && !isDone && (
+                                    <span>{progress}%</span>
+                                  )}
+                                </div>
+                              </div>
+
+                              {isDone && <span>Download Done</span>}
+                            </div>
+                            <div
+                              className="progress"
+                              style={{ transform: `scaleY(${progress / 100})` }}
+                            ></div>
+                          </div>
+                        </a>
+                      </div>
+                    </div> */}
+                    <div className="d-flex gap-5  justify-content-between align-items-center">
+                      <div className="d-flex gap-3 align-items-start">
+                        <img src="images/favicon.png" />
+                        <p className="text-white mb-0">Install SpotsBall App</p>
+                      </div>
+                      <div className="btn btn-dark">
+                        <a
+                          href={androidLink}
+                          className="btn-download"
+                          download
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {" "}
+                          <i
+                            className="fa fa-download"
+                            aria-hidden="true"
+                          />{" "}
+                          Download APK
+                        </a>
+                      </div>
+                    </div>
+
                     <Link
                       to="/"
                       className="navbar-brand navbarlogodiv"
@@ -292,7 +526,7 @@ function Header() {
                                 alt="bell"
                                 onClick={NotificationOpen}
                               />
-                              {/* <span class="cartcount">3</span> */}
+                              {/* <span className="cartcount">3</span> */}
                             </a>
                             <div
                               className={`notificationdiv_popup ${
@@ -539,10 +773,28 @@ function Header() {
                                     src={`${process.env.PUBLIC_URL}/images/icon_in_the_press.png`}
                                   />
                                 </div>
-                                <div className="menuname">
-                                  {/* <h4>Trending Articles</h4> */}
-                                  <h4>SpotsBall In the News</h4>
+                                <div
+                                  className="menuname"
+                                  style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "space-between",
+                                  }}
+                                >
+                                  <h4>SpotsBall In the News </h4>
+                                  <img
+                                    src="https://ges-inet.org/wp-content/uploads/2020/10/new-gif.gif"
+                                    style={{
+                                      width: 50,
+                                      marginTop: 6,
+                                      marginLeft: 10,
+                                    }}
+                                  />
                                 </div>
+
+                                {/* <div className="menuname">
+                                  <h4>SpotsBall In the News</h4>
+                                </div> */}
                               </div>
                               <div className="arrowicondiv">
                                 <img

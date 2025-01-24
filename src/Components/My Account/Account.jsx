@@ -200,7 +200,7 @@ function Account() {
                 />
                 <img
                   src={`${process.env.PUBLIC_URL}/images/edit_pro.png`}
-                  class="editicon_input"
+                  className="editicon_input"
                 />
                 <ErrorMessage
                   name="first_name"
@@ -224,7 +224,7 @@ function Account() {
                 />
                 <img
                   src={`${process.env.PUBLIC_URL}/images/edit_pro.png`}
-                  class="editicon_input"
+                  className="editicon_input"
                 />
                 <ErrorMessage
                   name="last_name"
@@ -338,7 +338,7 @@ function Account() {
                   />
                   <img
                     src={`${process.env.PUBLIC_URL}/images/edit_pro.png`}
-                    class="editicon_input"
+                    className="editicon_input"
                   />
                   <ErrorMessage
                     name="first_name"
@@ -362,7 +362,7 @@ function Account() {
                   />
                   <img
                     src={`${process.env.PUBLIC_URL}/images/edit_pro.png`}
-                    class="editicon_input"
+                    className="editicon_input"
                   />
                   <ErrorMessage
                     name="last_name"
