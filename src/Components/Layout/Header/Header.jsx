@@ -66,18 +66,6 @@ function Header() {
     setIsLogout(false);
   };
 
-  // const handleClickOutside = (event) => {
-  //   if (menuRef.current && !menuRef.current.contains(event.target)) {
-  //     setIsMenuVisible(false);
-  //   }
-  // };
-  // useEffect(() => {
-  //   document.addEventListener("mousedown", handleClickOutside);
-  //   return () => {
-  //     document.removeEventListener("mousedown", handleClickOutside);
-  //   };
-  // }, []);
-
   const handleClickOutside = (event) => {
     // Menu elements
     const menuButton = document.querySelector(".menubaricons");
@@ -204,54 +192,54 @@ function Header() {
     hours: "00",
     minutes: "00",
     seconds: "00",
+    isCompetitionStart: false, // Tracks if competition is starting or ending
   });
-  const [countdownType, setCountdownType] = useState("ends"); // "starts" or "ends"
 
-  // Get the next target time
   const getTargetTime = () => {
     const now = new Date();
-    const dayOfWeek = now.getDay();
+    const dayOfWeek = now.getDay(); // Sunday = 0, Monday = 1, ..., Saturday = 6
     const currentHours = now.getHours();
-    const currentMinutes = now.getMinutes();
 
-    // Define Monday 12:00 PM
     const nextMondayNoon = new Date(now);
-    nextMondayNoon.setDate(now.getDate() + ((7 - dayOfWeek + 1) % 7)); // Get the next Monday
-    nextMondayNoon.setHours(12, 0, 0, 0); // Set to 12:00 PM Monday
+    nextMondayNoon.setDate(now.getDate() + ((7 - dayOfWeek + 1) % 7)); // Next Monday
+    nextMondayNoon.setHours(12, 0, 0, 0); // Monday 12:00 PM
 
-    // Define Sunday 23:59
     const nextSundayEnd = new Date(now);
-    nextSundayEnd.setDate(now.getDate() + ((7 - dayOfWeek) % 7)); // Get the next Sunday
-    nextSundayEnd.setHours(23, 59, 59, 999); // Set to Sunday 23:59
+    nextSundayEnd.setDate(now.getDate() + ((7 - dayOfWeek) % 7)); // Next Sunday
+    nextSundayEnd.setHours(23, 59, 59, 999); // Sunday 23:59
 
-    // Define Monday 00:05
-    const mondayMorning = new Date(nextMondayNoon);
-    mondayMorning.setHours(0, 5, 0, 0);
+    let targetTime;
+    let isStart = false;
 
-    if (
-      (dayOfWeek === 1 &&
-        currentHours >= 0 &&
-        currentMinutes >= 5 &&
-        currentHours < 12) ||
-      dayOfWeek === 0 // If it's Sunday, prepare for Monday start
-    ) {
-      setCountdownType("starts");
-      return nextMondayNoon.getTime();
+    if (dayOfWeek === 0) {
+      // **Sunday**
+      if (currentHours < 12) {
+        targetTime = nextMondayNoon.getTime(); // Countdown to Monday 12:00 PM
+        isStart = true;
+      } else {
+        targetTime = nextSundayEnd.getTime(); // Countdown to Sunday 23:59
+      }
+    } else if (dayOfWeek === 1 && currentHours < 12) {
+      // **Monday before 12 PM**
+      targetTime = nextMondayNoon.getTime(); // Countdown to Monday 12:00 PM
+      isStart = true;
     } else {
-      setCountdownType("ends");
-      return nextSundayEnd.getTime();
+      // **Monday 12:00 PM - Sunday 23:59**
+      targetTime = nextSundayEnd.getTime(); // Countdown to Sunday 23:59
     }
+
+    return { targetTime, isStart };
   };
 
   useEffect(() => {
-    let countDownDate = getTargetTime();
+    let { targetTime, isStart } = getTargetTime();
 
     const updateCountdown = () => {
       const now = new Date().getTime();
-      const distance = countDownDate - now;
+      const distance = targetTime - now;
 
       if (distance < 0) {
-        countDownDate = getTargetTime();
+        ({ targetTime, isStart } = getTargetTime());
       }
 
       const days = Math.floor(distance / (1000 * 60 * 60 * 24));
@@ -266,6 +254,7 @@ function Header() {
         hours: String(hours).padStart(2, "0"),
         minutes: String(minutes).padStart(2, "0"),
         seconds: String(seconds).padStart(2, "0"),
+        isCompetitionStart: isStart,
       });
     };
 
@@ -274,47 +263,6 @@ function Header() {
 
     return () => clearInterval(interval);
   }, []);
-
-  const [isActive, setIsActive] = useState(false);
-  const [isDownloading, setIsDownloading] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [isDone, setIsDone] = useState(false);
-
-  const labelRef = useRef(null);
-  const counterRef = useRef(null);
-
-  const handleDownload = () => {
-    setIsActive(true);
-    setIsDownloading(true);
-    setProgress(0);
-    setIsDone(false);
-
-    // Simulate a download progress
-    const interval = setInterval(() => {
-      setProgress((prevProgress) => {
-        if (prevProgress < 100) {
-          return prevProgress + 10;
-        } else {
-          clearInterval(interval);
-          setIsDone(false);
-          return 100;
-        }
-      });
-    }, 1000); // Update progress every second
-
-    // After 10 seconds, reset to the default state
-  };
-
-  useEffect(() => {
-    if (isDone) {
-      const timeout = setTimeout(() => {
-        setIsActive(false);
-        setProgress(0);
-      }, 10000);
-      return () => clearTimeout(timeout);
-    }
-  }, [isDone]);
-
   return (
     <>
       <header className={headerClass}>
@@ -481,7 +429,9 @@ function Header() {
                     </div> */}
                     <div className="d-flex gap-5  justify-content-between align-items-center">
                       <div className="d-flex gap-3 align-items-start">
-                        <img src="images/favicon.png" />
+                        <img
+                          src={`${process.env.PUBLIC_URL}/images/favicon.png`}
+                        />
                         <p className="text-white mb-0">Install SpotsBall App</p>
                       </div>
                       <div className="btn btn-dark">

@@ -40,6 +40,6 @@ if (firebase.messaging.isSupported()) {
   console.log("Firebase Messaging is not supported in this browser.");
 }
 
-self.addEventListener("message", (e) => {
-  console.log("Message received in service worker:", e.data);
-});
+// self.addEventListener("message", (e) => {
+//   console.log("Message received in service worker:", e.data);
+// });

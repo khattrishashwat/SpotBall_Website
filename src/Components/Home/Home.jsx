@@ -13,8 +13,10 @@ import Slider from "react-slick";
 function Home() {
   const navigate = useNavigate();
   const spacing = 2;
+  const [countdownType, setCountdownType] = useState("ends"); // "starts" or "ends"
 
   const [loading, setLoading] = useState(false);
+  const [leftticket, setLeftticket] = useState("");
   const [corousal, setCorousal] = useState([]);
   const [movies, setMovies] = useState("");
   const [contests, setContests] = useState("");
@@ -167,11 +169,22 @@ function Home() {
       return;
     }
 
-    if (!contest.allowance) {
+    // if (!contest.allowance) {
+    //   Swal.fire({
+    //     icon: "warning",
+    //     title: "Participation Alert",
+    //     text: "You have already participated in this contest!",
+    //     confirmButtonText: "OK",
+    //     allowOutsideClick: false,
+    //   });
+    //   return;
+    // }
+
+    if (contest.totalTickets === 75) {
       Swal.fire({
-        icon: "warning",
-        title: "Participation Alert",
-        text: "You have already participated in this contest!",
+        icon: "error",
+        title: "No More Tickets",
+        text: "You have chosen all the tickets, now you can't play the game!",
         confirmButtonText: "OK",
         allowOutsideClick: false,
       });
@@ -217,6 +230,108 @@ function Home() {
       console.log("Location not found in localStorage");
     }
   };
+
+  {
+    /*--------------
+    
+    const MAX_TICKETS = 75;
+
+const handleBuyTicketClick = (contest, discount) => {
+  const token = localStorage.getItem("Web-token");
+
+  if (!token) {
+    Swal.fire({
+      icon: "info",
+      title: "Login Required",
+      text: "Please login to participate in this contest!",
+      confirmButtonText: "OK",
+      allowOutsideClick: false,
+    });
+    return;
+  }
+
+  if (!contest.allowance) {
+    Swal.fire({
+      icon: "warning",
+      title: "Participation Alert",
+      text: "You have already participated in this contest!",
+      confirmButtonText: "OK",
+      allowOutsideClick: false,
+    });
+    return;
+  }
+
+  if (!contest.is_active) {
+    setOnCarts(false);
+    setOnCloseComptition(true);
+    return;
+  }
+
+  // Ensure tickets chosen do not exceed 75
+  let availableTickets = contest.chooseticket || 0; // Ensure it has a valid number
+  if (availableTickets > MAX_TICKETS) {
+    Swal.fire({
+      icon: "warning",
+      title: "Ticket Limit Exceeded",
+      text: `You can only choose up to ${MAX_TICKETS} tickets.`,
+      confirmButtonText: "OK",
+      allowOutsideClick: false,
+    });
+    return;
+  }
+
+  // Subtract selected tickets from max allowed tickets
+  let remainingTickets = MAX_TICKETS - availableTickets;
+
+  if (remainingTickets >= 0) {
+    setSelectedContest(contest);
+    setOnCarts(true);
+    setSelectedDiscount(discount);
+
+    console.log(`You have chosen ${availableTickets} tickets.`);
+    console.log(`Remaining tickets you can choose: ${remainingTickets}`);
+  } else {
+    Swal.fire({
+      icon: "error",
+      title: "Invalid Ticket Selection",
+      text: `You cannot choose more than ${MAX_TICKETS} tickets.`,
+      confirmButtonText: "OK",
+      allowOutsideClick: false,
+    });
+  }
+};
+
+const handleAskToPlay = () => {
+  const restrictedArea = localStorage.getItem("restrictedArea");
+  const location = localStorage.getItem("location");
+  const token = localStorage.getItem("Web-token");
+
+  if (!token) {
+    Swal.fire({
+      icon: "info",
+      title: "Login Required",
+      text: "Please login to participate in this contest!",
+      confirmButtonText: "OK",
+      allowOutsideClick: false,
+    });
+    return;
+  }
+
+  if (restrictedArea) {
+    setGeolocationPopupVisible(false);
+    setIsUnavailablePopupVisible(true);
+    return;
+  }
+
+  if (location) {
+    handleBuyTicketClick(contests[0], discounts);
+  } else {
+    console.log("Location not found in localStorage");
+  }
+};
+
+    -------------*/
+  }
   const settings = {
     dots: true,
     infinite: true,
@@ -291,41 +406,42 @@ function Home() {
     minutes: "00",
     seconds: "00",
   });
-  const [countdownType, setCountdownType] = useState("ends"); // "starts" or "ends"
 
-  // Get the next target time
+  // Function to get the next countdown time
   const getTargetTime = () => {
     const now = new Date();
-    const dayOfWeek = now.getDay();
+    const dayOfWeek = now.getDay(); // Sunday = 0, Monday = 1, ..., Saturday = 6
     const currentHours = now.getHours();
     const currentMinutes = now.getMinutes();
 
-    // Define Monday 12:00 PM
     const nextMondayNoon = new Date(now);
     nextMondayNoon.setDate(now.getDate() + ((7 - dayOfWeek + 1) % 7)); // Get the next Monday
-    nextMondayNoon.setHours(12, 0, 0, 0); // Set to 12:00 PM Monday
+    nextMondayNoon.setHours(12, 0, 0, 0); // Monday 12:00 PM
 
-    // Define Sunday 23:59
     const nextSundayEnd = new Date(now);
     nextSundayEnd.setDate(now.getDate() + ((7 - dayOfWeek) % 7)); // Get the next Sunday
-    nextSundayEnd.setHours(23, 59, 59, 999); // Set to Sunday 23:59
+    nextSundayEnd.setHours(23, 59, 59, 999); // Sunday 23:59
 
-    // Define Monday 00:05
     const mondayMorning = new Date(nextMondayNoon);
-    mondayMorning.setHours(0, 5, 0, 0);
+    mondayMorning.setHours(0, 5, 0, 0); // Monday 00:05 AM
 
-    if (
-      (dayOfWeek === 1 &&
-        currentHours >= 0 &&
-        currentMinutes >= 5 &&
-        currentHours < 12) ||
-      dayOfWeek === 0 // If it's Sunday, prepare for Monday start
-    ) {
+    if (dayOfWeek === 0) {
+      // **Sunday**
+      if (currentHours >= 0 && currentHours < 12) {
+        setCountdownType("starts");
+        return nextMondayNoon.getTime(); // Countdown to Monday 12:00 PM
+      } else {
+        setCountdownType("ends");
+        return nextSundayEnd.getTime(); // Countdown to Sunday 23:59
+      }
+    } else if (dayOfWeek === 1 && currentHours >= 0 && currentHours < 12) {
+      // **Monday before 12:00 PM**
       setCountdownType("starts");
-      return nextMondayNoon.getTime();
+      return nextMondayNoon.getTime(); // Countdown to Monday 12:00 PM
     } else {
+      // **Monday 12:00 PM - Sunday 23:59**
       setCountdownType("ends");
-      return nextSundayEnd.getTime();
+      return nextSundayEnd.getTime(); // Countdown to Sunday 23:59
     }
   };
 
@@ -360,7 +476,6 @@ function Home() {
 
     return () => clearInterval(interval);
   }, []);
-
   const fetchData = async () => {
     try {
       const token = localStorage.getItem("Web-token");
@@ -371,7 +486,7 @@ function Home() {
             Authorization: `Bearer ${token}`,
           },
         });
-        console.log("get-all-contest", response.data.data);
+        // console.log("get-all-contest", response.data.data);
         const {
           banner_details,
           unreadCount,
@@ -390,7 +505,7 @@ function Home() {
       } else {
         const response = await axios.get("app/banner/get-banner");
 
-        console.log("get", response.data.data);
+        // console.log("get", response.data.data);
         const { bannerDetails, contests, liveLinks, restrictedStates } =
           response.data.data;
         setLinks(liveLinks);
@@ -469,13 +584,18 @@ function Home() {
   // console.log("contest -->", contests);
 
   const handleIncrease = () => {
-    if (quantity < selectedContest?.maxTickets) {
+    const ticketsLeft =
+      selectedContest.maxTickets - selectedContest.totalTickets;
+    setLeftticket(ticketsLeft);
+
+    // Check if the quantity to be increased exceeds available tickets
+    if (quantity < selectedContest?.maxTickets && quantity < ticketsLeft) {
       setQuantity((prev) => prev + 1);
     } else {
       Swal.fire({
         icon: "warning",
         title: "Max Ticket Limit Reached",
-        text: `You can only purchase a maximum of ${selectedContest?.maxTickets} tickets per person.`,
+        text: `You can only purchase a maximum of ${selectedContest?.maxTickets} tickets per person, but you have already chosen ${selectedContest?.totalTickets} tickets.`,
         allowOutsideClick: false,
         confirmButtonText: "OK",
       });
@@ -489,11 +609,26 @@ function Home() {
   };
 
   const handleBulkSelect = (value) => {
+    const ticketsLeft =
+      selectedContest.maxTickets - selectedContest.totalTickets;
+    setLeftticket(ticketsLeft);
+    // If the selected value exceeds the available tickets, show an error
+    if (value > ticketsLeft) {
+      Swal.fire({
+        icon: "error",
+        title: "Ticket Limit Exceeded",
+        text: `You cannot choose more than ${ticketsLeft} tickets!`,
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
+      });
+      return; // Stop execution if the selection is invalid
+    }
     setQuantity(value);
   };
 
   const handlePlayNow = () => {
     const payload = {
+      leftticket: leftticket,
       quantity: quantity,
       responseData: selectedContest,
     };
@@ -918,12 +1053,12 @@ function Home() {
             </section>
           ) : (
             <section className="no-contest-section">
-              <div className="container text-center">
+              {/* <div className="container text-center">
                 <h2>No Current Contest Available</h2>
                 <p>
                   Stay tuned for upcoming contests and exciting opportunities!
                 </p>
-              </div>
+              </div> */}
             </section>
           )}
           {isUnavailablePopupVisible && (
@@ -1142,54 +1277,14 @@ function Home() {
                   )}
                 </div>
               </div>
-              {/* <div className="discount_cousal">
-                <h5>Discount</h5>
-                <Slider {...settings}>
-                  {Array.isArray(selectedDiscount) &&
-                    selectedDiscount.map((discount) => (
-                      <div key={discount._id} className="discount_card">
-                        <img
-                          src={`${process.env.PUBLIC_URL}/images/discount_img.png`}
-                        />
-                        
-                        <p>
-                          Tickets: {discount.minTickets} - {discount.maxTickets}
-                        </p>
-                        <p>Discount: {discount.discountPercentage}%</p>
-                      </div>
-                    ))}
-                </Slider>
-              </div>
-              <div className="bulkticketdiv">
-                <div className="buybulkticket_heaidng">
-                  <h2 className="bulkticketheading">Buy Bulk Tickets</h2>
-                </div>
-                <div className="chooseforinputsdiv_bulkticket">
-                  {(selectedContest?.quantities || []).map((value) => (
-                    <div className="choosefor_input action" key={value}>
-                      <label htmlFor={`choosefor-${value}`}>
-                        <input
-                          type="radio"
-                          id={`choosefor-${value}`} 
-                          name="choosefor"
-                          className="radio-custom"
-                          onChange={() => handleBulkSelect(value)}
-                          checked={quantity === value}
-                        />
-                        <span className="radio-custom-dummy" />
-                        <span className="spanforcheck">{value} Tickets</span>
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              </div> */}
+
               <div className="addtocart_btn_popup_div">
-                <button className="addcartbtn_inpopup" onClick={handlePlayNow}>
+                <button className="addcartbtn_inpopup" onClick={ClosedCarts}>
                   Close
                 </button>
               </div>
             </div>
-            <div className="contestcrossbtndiv">
+            {/* <div className="contestcrossbtndiv">
               <button
                 type="button"
                 className="crossbtn_popupclose"
@@ -1197,11 +1292,10 @@ function Home() {
               >
                 <img
                   src={`${process.env.PUBLIC_URL}/images/cross_icon.png`}
-                  // src="images/cross_icon.png"
                   alt="Close"
                 />
               </button>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
@@ -1306,7 +1400,7 @@ function Home() {
                       <label htmlFor={`choosefor-${value}`}>
                         <input
                           type="radio"
-                          id={`choosefor-${value}`} // Unique ID for each radio button
+                          id={`choosefor-${value}`}
                           name="choosefor"
                           className="radio-custom"
                           onChange={() => handleBulkSelect(value)}

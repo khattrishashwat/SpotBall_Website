@@ -44,8 +44,8 @@ const Footer = lazy(() => import("./Components/Layout/Footer/Footer"));
 
 // axios.defaults.baseURL = "http://localhost:10077/api/";
 // axios.defaults.baseURL = "http://44.195.125.80:10077/spotsball/api/";
-// axios.defaults.baseURL = "https://webmobrildemo.com/spotsball/api/v1/";
-axios.defaults.baseURL = "https://www.spotsball.com/spotsball/api/v1/";
+axios.defaults.baseURL = "https://webmobrildemo.com/spotsball/api/v1/";
+// axios.defaults.baseURL = "https://www.spotsball.com/spotsball/api/v1/";
 
 const ProtectedRoute = () => {
   // if (!localStorage.getItem("token")) {
@@ -114,7 +114,7 @@ const App = () => {
       <Helmet>
         <title>{loader ? "loader....." : "SpotsBall"}</title>
       </Helmet>
-      <Router basename="/spotsball/web/">
+      <Router basename="/spotsball/web">
         {" "}
         <Suspense fallback={<Loader />}>
           <Header />
@@ -128,7 +128,10 @@ const App = () => {
             <Route path="/contact_us" element={<Contact />} />
             <Route path="/playss" element={<PlayVedio />} />
             <Route path="/in_the_press" element={<Press />} />
-            <Route path="/press_details" element={<PressDetails />} />
+            <Route
+              path="/press-details/:id/:title"
+              element={<PressDetails />}
+            />
             {/* <Route path="/login" element={<Login />} />
             <Route path="/sign" element={<Signup />} /> */}
             <Route path="/load" element={<Loader />} />

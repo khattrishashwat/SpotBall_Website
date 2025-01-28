@@ -202,9 +202,9 @@ const [androidLink, setAnroidsLinks] = useState(null);
                                 <img
                                   src={`${process.env.PUBLIC_URL}/images/${icon}`}
                                   alt={capitalizedName}
-                                  onError={(e) => {
-                                    e.target.src = `${process.env.PUBLIC_URL}/images/${icon}`; // Fallback image
-                                  }}
+                                  // onError={(e) => {
+                                  //   e.target.src = `${process.env.PUBLIC_URL}/images/${icon}`; // Fallback image
+                                  // }}
                                 />
                               </a>
                             ) : (
