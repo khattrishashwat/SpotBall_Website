@@ -27,12 +27,12 @@ const Signup = ({ isOpenness, Closed, back }) => {
   const location = useLocation();
   const [timer, setTimer] = useState(0); // Timer state for resend OTP
 
-  // useEffect(() => {
-  //   // Keep the popup open if navigating to linked pages like terms or rules
-  //   if (location.state?.popupOpen) {
-  //     isOpenness(true);
-  //   }
-  // }, [location.state]);
+  useEffect(() => {
+    // Keep the popup open if navigating to linked pages like terms or rules
+    if (location.state?.popupOpen) {
+      isOpenness(true);
+    }
+  }, [location.state]);
   const openModals = () => {
     setIsModals(true);
   };
@@ -106,7 +106,6 @@ const Signup = ({ isOpenness, Closed, back }) => {
       return;
     }
 
-    console.log("handlesubmits", values);
 
     if (values.signup_method) {
       // Social signup
@@ -582,7 +581,7 @@ const Signup = ({ isOpenness, Closed, back }) => {
                                         <span key={index}>
                                           <Link
                                             to={legalLinks.paths[index]}
-                                            // state={{ popupOpen: false }}
+                                            state={{ popupOpen: false }}
                                             // target="_blank"
                                             // rel="noopener noreferrer"
                                           >
@@ -610,7 +609,7 @@ const Signup = ({ isOpenness, Closed, back }) => {
                                     I have read & agree with{" "}
                                     <Link
                                       to="/rules"
-                                      // state={{ popupOpen: true }}
+                                      state={{ popupOpen: false }}
                                       // target="_blank"
                                       // rel="noopener noreferrer"
                                     >

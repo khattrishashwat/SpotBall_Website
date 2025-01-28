@@ -238,6 +238,7 @@ const SocialSignUP = ({ onSocial, closeSocial }) => {
                                       <React.Fragment key={index}>
                                         <Link
                                           to={legalLinks.paths[index]}
+                                          state={{ popupOpen: false }}
                                           onClick={(e) => {
                                             // e.preventDefault();
 
@@ -278,7 +279,7 @@ const SocialSignUP = ({ onSocial, closeSocial }) => {
                                   I have read & agree with{" "}
                                   <Link
                                     to="/rules"
-                                    // state={{ popupOpen: false }}
+                                    state={{ popupOpen: false }}
                                     // target="_blank"
                                     // rel="noopener noreferrer"
                                   >

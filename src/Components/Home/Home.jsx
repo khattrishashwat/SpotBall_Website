@@ -30,7 +30,7 @@ function Home() {
   const [countss, setCountss] = useState("");
   const [restrictedStates, setRestrictedStates] = useState("");
   const videoRef = useRef(null);
-  const [isLoginPopup, setLoginPopup] = useState(false);
+  const [loginPopup, setLoginPopup] = useState(false);
   const [banner, setBanner] = useState(false);
   const [quantity, setQuantity] = useState(3);
   const [isGeolocationPopupVisible, setGeolocationPopupVisible] =
@@ -626,94 +626,52 @@ const handleAskToPlay = () => {
     setQuantity(value);
   };
 
+  // const handlePlayNow = () => {
+
+  //   const payload = {
+  //     leftticket: leftticket,
+  //     quantity: quantity,
+  //     responseData: selectedContest,
+  //   };
+
+  //   navigate("/play_screen", { state: { payload } });
+  // };
   const handlePlayNow = () => {
+    const ticketsLeft =
+      selectedContest.maxTickets - selectedContest.totalTickets;
+    setLeftticket(ticketsLeft);
+
+    // Ensure the default quantity (3) doesn't exceed available tickets
+    if (ticketsLeft === 0) {
+      Swal.fire({
+        icon: "error",
+        title: "No Tickets Available",
+        text: "There are no tickets left for this contest.",
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
+      });
+      return;
+    }
+
+    if (quantity > ticketsLeft) {
+      Swal.fire({
+        icon: "error",
+        title: "Not Enough Tickets Available",
+        text: `Only ${ticketsLeft} tickets are available. Please select a valid quantity.`,
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
+      });
+      return;
+    }
+
     const payload = {
-      leftticket: leftticket,
-      quantity: quantity,
+      leftticket: ticketsLeft,
+      quantity: quantity > ticketsLeft ? ticketsLeft : quantity, // Ensure quantity does not exceed available tickets
       responseData: selectedContest,
     };
 
     navigate("/play_screen", { state: { payload } });
   };
-
-  // useEffect(() => {
-  //   const location = JSON.parse(localStorage.getItem("location"));
-
-  //   if (token && location && Object.keys(location).length > 0) {
-  //     setGeolocationPopupVisible(false);
-  //   } else if (token) {
-  //     setGeolocationPopupVisible(true);
-  //   } else if (location && Object.keys(location).length > 0) {
-  //     setGeolocationPopupVisible(false);
-  //   } else {
-  //     setGeolocationPopupVisible(true);
-  //   }
-  // }, [token]);
-  // useEffect(() => {
-  //   const location = JSON.parse(localStorage.getItem("location"));
-
-  //   if (token && (!location || Object.keys(location).length === 0)) {
-  //     setGeolocationPopupVisible(true);
-  //   } else {
-  //     setGeolocationPopupVisible(false);
-  //   }
-  // }, [token]);
-
-  // useEffect(() => {
-  //   const location = JSON.parse(localStorage.getItem("location"));
-  //   const restrictedArea = JSON.parse(localStorage.getItem("restrictedArea"));
-
-  //   if (
-  //     token &&
-  //     (!location || Object.keys(location).length === 0 || !restrictedArea)
-  //   ) {
-  //     setGeolocationPopupVisible(true);
-  //   } else {
-  //     setGeolocationPopupVisible(false);
-  //   }
-  // }, [token]);
-
-  // useEffect(() => {
-  //   const location = JSON.parse(localStorage.getItem("location"));
-  //   const restrictedArea = JSON.parse(localStorage.getItem("restrictedArea"));
-
-  //   if (token) {
-  //     // Check if location is missing/invalid or restrictedArea is missing
-  //     if (!location || Object.keys(location).length === 0 || !restrictedArea) {
-  //       setGeolocationPopupVisible(true);
-  //     } else {
-  //       setGeolocationPopupVisible(false);
-  //     }
-  //   } else {
-  //     // If no token, make the popup visible only if location or restrictedArea is missing
-  //     if (!location || Object.keys(location).length === 0 || !restrictedArea) {
-  //       setGeolocationPopupVisible(false);
-  //     } else {
-  //       setGeolocationPopupVisible(true);
-  //     }
-  //   }
-  // }, [token]);
-
-  // useEffect(() => {
-  //   const location = JSON.parse(localStorage.getItem("location"));
-  //   const restrictedArea = JSON.parse(localStorage.getItem("restrictedArea"));
-
-  //   if (token) {
-  //     // If token exists, hide the popup if either location or restrictedArea is present
-  //     if ((location && Object.keys(location).length > 0) || restrictedArea) {
-  //       setGeolocationPopupVisible(false);
-  //     } else {
-  //       setGeolocationPopupVisible(true);
-  //     }
-  //   } else {
-  //     // If no token, the popup behavior depends on the presence of location or restrictedArea
-  //     if ((location && Object.keys(location).length > 0) || restrictedArea) {
-  //       setGeolocationPopupVisible(false);
-  //     } else {
-  //       setGeolocationPopupVisible(true);
-  //     }
-  //   }
-  // }, [token]);
 
   useEffect(() => {
     const checkGeolocation = () => {
@@ -853,7 +811,7 @@ const handleAskToPlay = () => {
                           type="button"
                           className="bannerfixedbtn regis showsigninpopup_onclick"
                           // onClick={OpenSignIn}
-                          onClick={() => setLoginPopup(!isLoginPopup)}
+                          onClick={() => setLoginPopup(!loginPopup)}
                         >
                           Sign in / Sign up
                         </button>
@@ -1066,7 +1024,7 @@ const handleAskToPlay = () => {
           )}
         </>
       )}
-      <Login isVisible={isLoginPopup} onClose={ClosePopup} />
+      <Login isVisible={loginPopup} onClose={ClosePopup} />
       {isGeolocationPopupVisible && (
         <GeolocationPopup
           onClose={handleCloseGeolocationPopup}

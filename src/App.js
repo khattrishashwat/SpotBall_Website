@@ -6,6 +6,8 @@ import {
   Navigate,
   Outlet,
 } from "react-router-dom";
+import { LanguageProvider } from "./LanguageContext";
+
 import "./App.css";
 import axios from "axios";
 import { Helmet } from "react-helmet";
@@ -116,6 +118,7 @@ const App = () => {
       </Helmet>
       <Router basename="/spotsball/web">
         {" "}
+        {/* <LanguageProvider> */}
         <Suspense fallback={<Loader />}>
           <Header />
           <Routes>
@@ -151,6 +154,7 @@ const App = () => {
           </Routes>
           <Footer />
         </Suspense>
+        {/* </LanguageProvider> */}
       </Router>
     </>
   );

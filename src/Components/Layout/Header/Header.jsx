@@ -53,7 +53,7 @@ function Header() {
     setLoginPopup(true);
   };
 
-  const ClosePopup = () => {
+  const  ClosePopup = () => {
     setLoginPopup(false);
   };
   const toggleMenu = () => {
@@ -630,8 +630,9 @@ function Header() {
                           <li className="mainmenulist">
                             <a
                               onClick={() => {
-                                OpenSignIn();
-                                setIsMenuVisible(false);
+                                // OpenSignIn();
+                                // setIsMenuVisible(false);
+                                setLoginPopup(!loginPopup);
                               }}
                               className="showsigninpopup_onclick"
                             >
