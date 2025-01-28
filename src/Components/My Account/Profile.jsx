@@ -352,8 +352,12 @@ function Profile() {
                 <p>
                   You choose to temporarily OptOut from Playing SpotsBall, we
                   put your account in a suspended state. When/if you want to
-                  reactivate, you can send an email to support@spotsball.com,
-                  and will receive reset instructions for your password.
+                  reactivate, you can send an email to{" "}
+                  <span className="support-email">
+                    {" "}
+                    support.in@spotsball.com
+                  </span>
+                  , and will receive reset instructions for your password.
                 </p>
               </div>
             </div>

@@ -7,7 +7,7 @@ function Footer() {
   const [footer, setFooter] = useState(""); // Footer content
   const [plays, setPlays] = useState(false); // Video state
   const [links, setLinks] = useState(false); // Video state
-const [androidLink, setAnroidsLinks] = useState(null);
+  const [androidLink, setAnroidsLinks] = useState(null);
   const fetchFooter = async () => {
     try {
       const response = await axios.get(
@@ -22,17 +22,17 @@ const [androidLink, setAnroidsLinks] = useState(null);
       console.error("Error fetching footer data:", error);
     }
   };
- const fetchAnroidLink = async () => {
-   try {
-     const response = await axios.get("app/apk-links");
+  const fetchAnroidLink = async () => {
+    try {
+      const response = await axios.get("app/apk-links");
 
-     if (response) {
-       setAnroidsLinks(response.data.data?.android_build); // Set the link
-     }
-   } catch (error) {
-     console.error("Error fetching Android data:", error);
-   }
- };
+      if (response) {
+        setAnroidsLinks(response.data.data?.android_build); // Set the link
+      }
+    } catch (error) {
+      console.error("Error fetching Android data:", error);
+    }
+  };
 
   useEffect(() => {
     fetchFooter();
