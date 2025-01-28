@@ -9,9 +9,10 @@ function Screen() {
   const imgRef = useRef(null);
 
   const [colorIndex, setColorIndex] = useState(""); // Track the current color index
- 
+
   const location = useLocation();
-  const { quantity, responseData } = location.state.payload || {};
+  const { quantity, responseData, leftticket } = location.state.payload || {};
+  console.log("leftticket", leftticket);
 
   const [usedTickets, setUsedTickets] = useState(0);
   const [totalTickets, setTotalTickets] = useState(quantity || "");
@@ -95,9 +96,35 @@ function Screen() {
     );
   }, [tickets]);
 
+  // const handleTicket = () => {
+  //   // Check if totalTickets is less than responseData.maxTickets
+  //   if (totalTickets < responseData.maxTickets) {
+  //     const newTicket = {
+  //       id: tickets.length + 1,
+  //       xCord: "____",
+  //       yCord: "____",
+  //     };
+
+  //     setTickets((prev) => [...prev, newTicket]);
+  //     setTotalTickets((prev) => prev + 1); // Increment totalTickets, but not usedTickets yet
+  //   } else {
+  //     Swal.fire({
+  //       icon: "warning",
+  //       title: "Maximum ticket limit reached",
+  //       text: `You cannot add more than ${responseData.maxTickets} tickets.`,
+  //       confirmButtonText: "OK",
+  //       allowOutsideClick: false,
+  //     });
+  //   }
+  // };
   const handleTicket = () => {
+    const choosedTicket = responseData.maxTickets - leftticket; // Calculate choosedTicket
+
     // Check if totalTickets is less than responseData.maxTickets
-    if (totalTickets < responseData.maxTickets) {
+    if (
+      totalTickets < responseData.maxTickets &&
+      totalTickets + 1 <= leftticket
+    ) {
       const newTicket = {
         id: tickets.length + 1,
         xCord: "____",
@@ -110,7 +137,10 @@ function Screen() {
       Swal.fire({
         icon: "warning",
         title: "Maximum ticket limit reached",
-        text: `You cannot add more than ${responseData.maxTickets} tickets.`,
+        text:
+          leftticket === 0
+            ? "There are no tickets left to add."
+            : `You can only purchase a maximum of ${responseData.maxTickets} tickets per person, but you have already chosen ${choosedTicket} tickets, or you have exceeded the available tickets (${leftticket}).`,
         confirmButtonText: "OK",
         allowOutsideClick: false,
       });
@@ -121,11 +151,45 @@ function Screen() {
     window.scrollTo(0, 0);
   }, []);
 
+  // const handleAddTicket = () => {
+  //   // Check if usedTickets is less than maxTickets
+  //   if (
+  //     usedTickets < responseData.maxTickets &&
+  //     totalTickets < responseData.maxTickets
+  //   ) {
+  //     const newTicket = {
+  //       id: tickets.length + 1, // Increment ID based on the current length of tickets
+  //       xCord: "____",
+  //       yCord: "____",
+  //     };
+
+  //     // Add the new ticket
+  //     setTickets((prev) => [...prev, newTicket]);
+
+  //     // Increment usedTickets and totalTickets
+  //     setUsedTickets((prev) => prev + 1); // Increment usedTickets
+  //     setTotalTickets((prev) => prev + 1); // Update totalTickets
+  //   } else {
+  //     // Show a message if the maximum limit is reached
+  //     Swal.fire({
+  //       icon: "warning",
+  //       title: "Maximum ticket limit reached",
+  //       text: `You cannot add more than ${responseData.maxTickets} tickets.`,
+  //       confirmButtonText: "OK",
+  //       allowOutsideClick: false,
+  //     });
+  //   }
+  // };
+
   const handleAddTicket = () => {
-    // Check if usedTickets is less than maxTickets
+    const choosedTicket = responseData.maxTickets - leftticket; // Calculate choosedTicket
+
+    // Check if we can add more tickets without exceeding the leftticket count
     if (
       usedTickets < responseData.maxTickets &&
-      totalTickets < responseData.maxTickets
+      totalTickets < responseData.maxTickets &&
+      leftticket > 0 && // Check if there are tickets left
+      totalTickets + 1 <= leftticket // Ensure totalTickets doesn't exceed leftticket
     ) {
       const newTicket = {
         id: tickets.length + 1, // Increment ID based on the current length of tickets
@@ -140,11 +204,14 @@ function Screen() {
       setUsedTickets((prev) => prev + 1); // Increment usedTickets
       setTotalTickets((prev) => prev + 1); // Update totalTickets
     } else {
-      // Show a message if the maximum limit is reached
+      // Show a message if the maximum limit is reached or no tickets left
       Swal.fire({
         icon: "warning",
-        title: "Maximum ticket limit reached",
-        text: `You cannot add more than ${responseData.maxTickets} tickets.`,
+        title: "Cannot add more tickets",
+        text:
+          leftticket === 0
+            ? "There are no tickets left to add."
+            : `You can only purchase a maximum of ${responseData.maxTickets} tickets per person, but you have already chosen ${choosedTicket} tickets, or you have exceeded the available tickets (${leftticket}).`,
         confirmButtonText: "OK",
         allowOutsideClick: false,
       });
@@ -284,7 +351,6 @@ function Screen() {
   };
 
   const handleClick = (e) => {
-
     setColorIndex(responseData.cursor_color);
     // Check if the user has used all their chances
     if (clickCount >= totalTickets) {
@@ -352,7 +418,6 @@ function Screen() {
           Authorization: `Bearer ${token}`,
         },
       });
-
 
       Swal.fire({
         icon: "success",
@@ -432,7 +497,6 @@ function Screen() {
                         fontSize: "40px",
                       }}
                     />
-                    
                   </div>
                 ))}
 
