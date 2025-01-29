@@ -53,7 +53,7 @@ function Header() {
     setLoginPopup(true);
   };
 
-  const  ClosePopup = () => {
+  const ClosePopup = () => {
     setLoginPopup(false);
   };
   const toggleMenu = () => {
@@ -626,12 +626,12 @@ function Header() {
                       style={{ display: isMenuVisible ? "block" : "none" }}
                     >
                       <ul className="menubar_list_ul">
-                        {!token && (
+                        {/* {!token && (
                           <li className="mainmenulist">
                             <a
                               onClick={() => {
                                 // OpenSignIn();
-                                // setIsMenuVisible(false);
+                                setIsMenuVisible(false);
                                 setLoginPopup(!loginPopup);
                               }}
                               className="showsigninpopup_onclick"
@@ -658,7 +658,7 @@ function Header() {
                               </div>
                             </a>
                           </li>
-                        )}
+                        )} */}
 
                         <li className="mainmenulist">
                           <Link

@@ -27,10 +27,19 @@ const Signup = ({ isOpenness, Closed, back }) => {
   const location = useLocation();
   const [timer, setTimer] = useState(0); // Timer state for resend OTP
 
+  // useEffect(() => {
+  //   // Keep the popup open if navigating to linked pages like terms or rules
+  //   if (location.state?.popupOpen) {
+  //     isOpenness(true);
+  //   }
+  // }, [location.state]);
+
   useEffect(() => {
-    // Keep the popup open if navigating to linked pages like terms or rules
-    if (location.state?.popupOpen) {
-      isOpenness(true);
+    // Check if popupOpen is false in the location state
+    if (location.state?.popupOpen === false) {
+      isOpenness(false); // Close the popup
+    } else if (location.state?.popupOpen === true) {
+      isOpenness(true); // Keep the popup open if navigating to linked pages like terms or rules
     }
   }, [location.state]);
   const openModals = () => {
@@ -105,7 +114,6 @@ const Signup = ({ isOpenness, Closed, back }) => {
       console.error("No values provided to handleSubmits.");
       return;
     }
-
 
     if (values.signup_method) {
       // Social signup
@@ -605,13 +613,24 @@ const Signup = ({ isOpenness, Closed, back }) => {
                                     name="agreeRules"
                                     className="checkboxemeber"
                                   />
+                                  {/* <label className="labelrememebrme">
+                                    I have read & agree with{" "}
+                                    <Link
+                                      to="/rules"
+                                      state={{ popupOpen: false }}
+                                     
+                                    >
+                                      Rules of Play & FAQ's
+                                    </Link>
+                                  </label> */}
                                   <label className="labelrememebrme">
                                     I have read & agree with{" "}
                                     <Link
                                       to="/rules"
                                       state={{ popupOpen: false }}
-                                      // target="_blank"
-                                      // rel="noopener noreferrer"
+                                      onClick={() =>
+                                        console.log("popupOpen:", false)
+                                      }
                                     >
                                       Rules of Play & FAQ's
                                     </Link>

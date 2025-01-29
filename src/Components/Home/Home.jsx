@@ -180,16 +180,17 @@ function Home() {
     //   return;
     // }
 
-    if (contest.totalTickets === 75) {
-      Swal.fire({
-        icon: "error",
-        title: "No More Tickets",
-        text: "You have chosen all the tickets, now you can't play the game!",
-        confirmButtonText: "OK",
-        allowOutsideClick: false,
-      });
-      return;
-    }
+   if (contest.totalTickets === 75) {
+     Swal.fire({
+       icon: "error",
+       title: "No More Tickets",
+       text: "You have already participated in this contest! You have chosen all the tickets.",
+       confirmButtonText: "OK",
+       allowOutsideClick: false,
+     });
+     return;
+   }
+
 
     if (!contest.is_active) {
       setOnCarts(false);
@@ -583,24 +584,24 @@ const handleAskToPlay = () => {
   // console.log("setRestrictedStates", restrictedStates);
   // console.log("contest -->", contests);
 
-  const handleIncrease = () => {
-    const ticketsLeft =
-      selectedContest.maxTickets - selectedContest.totalTickets;
-    setLeftticket(ticketsLeft);
+ const handleIncrease = () => {
+   const ticketsLeft =
+     selectedContest.maxTickets - selectedContest.totalTickets;
+   setLeftticket(ticketsLeft);
 
-    // Check if the quantity to be increased exceeds available tickets
-    if (quantity < selectedContest?.maxTickets && quantity < ticketsLeft) {
-      setQuantity((prev) => prev + 1);
-    } else {
-      Swal.fire({
-        icon: "warning",
-        title: "Max Ticket Limit Reached",
-        text: `You can only purchase a maximum of ${selectedContest?.maxTickets} tickets per person, but you have already chosen ${selectedContest?.totalTickets} tickets.`,
-        allowOutsideClick: false,
-        confirmButtonText: "OK",
-      });
-    }
-  };
+   if (quantity < selectedContest?.maxTickets && quantity < ticketsLeft) {
+     setQuantity((prev) => prev + 1);
+   } else {
+     Swal.fire({
+       icon: "warning",
+       title: "Max Ticket Limit Reached",
+       text: `You can only purchase a maximum of ${selectedContest?.maxTickets} tickets per person, but you have already bought ${selectedContest?.totalTickets} tickets. You have only ${ticketsLeft} ticket(s) left to purchase.`,
+       allowOutsideClick: false,
+       confirmButtonText: "OK",
+     });
+   }
+ };
+
 
   const handleDecrease = () => {
     if (quantity > 1) {
@@ -617,7 +618,7 @@ const handleAskToPlay = () => {
       Swal.fire({
         icon: "error",
         title: "Ticket Limit Exceeded",
-        text: `You cannot choose more than ${ticketsLeft} tickets!`,
+        text: `You can only purchase a maximum of ${selectedContest?.maxTickets} tickets per person, but you have already bought ${selectedContest?.totalTickets} tickets. You have only ${ticketsLeft} ticket(s) left to purchase.`,
         confirmButtonText: "OK",
         allowOutsideClick: false,
       });

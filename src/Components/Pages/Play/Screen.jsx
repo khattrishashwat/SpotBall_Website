@@ -140,7 +140,7 @@ function Screen() {
         text:
           leftticket === 0
             ? "There are no tickets left to add."
-            : `You can only purchase a maximum of ${responseData.maxTickets} tickets per person, but you have already chosen ${choosedTicket} tickets, or you have exceeded the available tickets (${leftticket}).`,
+            : `You can only purchase a maximum of ${responseData.maxTickets} tickets per person, but you have already bought ${choosedTicket} tickets. You have only (${leftticket}) ticket left to purchase .`,
         confirmButtonText: "OK",
         allowOutsideClick: false,
       });
@@ -211,7 +211,7 @@ function Screen() {
         text:
           leftticket === 0
             ? "There are no tickets left to add."
-            : `You can only purchase a maximum of ${responseData.maxTickets} tickets per person, but you have already chosen ${choosedTicket} tickets, or you have exceeded the available tickets (${leftticket}).`,
+            : `You can only purchase a maximum of ${responseData.maxTickets} tickets per person, but you have already bought  ${choosedTicket} tickets.You have only (${leftticket})  ticket left to purchase`,
         confirmButtonText: "OK",
         allowOutsideClick: false,
       });
