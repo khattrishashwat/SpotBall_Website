@@ -1278,7 +1278,7 @@ const handleAskToPlay = () => {
               </div>
               <div className="contesttickeprice">
                 <p>
-                  Ticket:{" "}
+                  Ticket Price:{" "}
                   <span>
                     <i className="fa fa-inr" aria-hidden="true" />{" "}
                     {selectedContest?.ticket_price}
