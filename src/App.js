@@ -6,7 +6,7 @@ import {
   Navigate,
   Outlet,
 } from "react-router-dom";
-import { LanguageProvider } from "./LanguageContext";
+// import { LanguageProvider } from "./LanguageContext";
 
 import "./App.css";
 import axios from "axios";
