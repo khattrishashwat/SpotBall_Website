@@ -33,6 +33,7 @@ import PlayVedio from "./Components/Pages/HowToPlay/PalyVedio";
 import Signup from "./Components/Auth/Signup";
 import Delete from "./Components/Pages/Delete/Delete";
 import PressDetails from "./Components/Pages/In The Press/PressDetails";
+import PopupCheckout from "./Components/Pages/Play/PopupCheckout";
 
 // Lazy load components
 const Loader = lazy(() => import("./Components/Loader/Loader"));
@@ -148,7 +149,7 @@ const App = () => {
             <Route path="/cookies" element={<Cookies />} />
             <Route path="/knows" element={<Know />} />
             <Route path="/my_account_delete" element={<Delete />} />
-
+            <Route path="/popupCheckout" element={<PopupCheckout />} />
             {/* Catch-all for 404 */}
             <Route path="*" element={<PageNot />} />
           </Routes>

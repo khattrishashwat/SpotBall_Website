@@ -130,27 +130,27 @@ if ("serviceWorker" in navigator) {
           console.error("Error getting token:", err);
 
           // Check if it's a permission blocked error
-          if (err.code === "messaging/permission-blocked") {
-            // Check for Incognito mode by testing localStorage access
-            try {
-              localStorage.setItem("test", "test");
-              localStorage.removeItem("test");
-              Swal.fire({
-                title: "Notification Permission Denied",
-                text: "Please allow notifications on your browser.",
-                icon: "warning",
-                confirmButtonText: "OK",
-              });
-            } catch (e) {
-              // If localStorage access fails, user is likely in Incognito mode
-              Swal.fire({
-                title: "Notifications Unavailable in Incognito Mode",
-                text: "You can't receive notifications in Incognito Mode. Please use a normal browser.",
-                icon: "warning",
-                confirmButtonText: "OK",
-              });
-            }
-          }
+          // if (err.code === "messaging/permission-blocked") {
+          //   // Check for Incognito mode by testing localStorage access
+          //   try {
+          //     localStorage.setItem("test", "test");
+          //     localStorage.removeItem("test");
+          //     Swal.fire({
+          //       title: "Notification Permission Denied",
+          //       text: "Please allow notifications on your browser.",
+          //       icon: "warning",
+          //       confirmButtonText: "OK",
+          //     });
+          //   } catch (e) {
+          //     // If localStorage access fails, user is likely in Incognito mode
+          //     Swal.fire({
+          //       title: "Notifications Unavailable in Incognito Mode",
+          //       text: "You can't receive notifications in Incognito Mode. Please use a normal browser.",
+          //       icon: "warning",
+          //       confirmButtonText: "OK",
+          //     });
+          //   }
+          // }
         });
 
       onMessage(messaging, (payload) => {
@@ -313,7 +313,7 @@ export const signInWithFacebook = async (setFieldValue) => {
       Swal.fire({
         icon: "warning",
         title: "Popup closed",
-        text: "The sign-in popup was closed before completing the sign-in process. Please try again.",
+        text: error.message,
       });
     } else {
       Swal.fire({
@@ -324,6 +324,80 @@ export const signInWithFacebook = async (setFieldValue) => {
     }
   }
 };
+
+// export const LoginWithFacebook = async () => {
+//   try {
+//     console.log("Starting Facebook login process...");
+
+//     // Sign in with Facebook
+//     const result = await signInWithPopup(auth, facebookProvider);
+//     const user = result.user;
+//     console.log("Facebook user data:", user);
+
+//     const userData = {
+//       uid: user.uid,
+//       displayName: user.displayName,
+//       email: user.email,
+//       photoURL: user.photoURL,
+//       signup_method: "facebook",
+//     };
+
+//     // Split user name into first and last name
+//     const nameParts = userData.displayName
+//       ? userData.displayName.split(" ")
+//       : [];
+//     const first_name = nameParts[0] || "";
+//     const last_name = nameParts.length > 1 ? nameParts.slice(1).join(" ") : "";
+
+//     // Store user details locally
+//     const UserDetails = { ...userData, first_name, last_name };
+//     console.log("Facebook Sign-In successful. UserDetails:", UserDetails);
+
+//     // Check UID in database
+//     const checkUIDResponse = await axios.get(
+//       `app/auth/check-uid-exists/${user.uid}`
+//     );
+
+//     if (checkUIDResponse.data.message === "Uid found") {
+//       // UID found, proceed with social login
+//       const response = await axios.post("app/auth/social-login", {
+//         signup_method: "facebook",
+//         uid: user.uid,
+//         device_type: "website",
+//         device_token: localStorage.getItem("device_token"),
+//       });
+
+//       console.log("Social login response:", response.data);
+
+//       // Save token and show success message
+//       const token = response.data.data.token;
+//       localStorage.setItem("Web-token", token);
+//       Swal.fire({
+//         icon: "success",
+//         title: "Login Successful",
+//         showConfirmButton: false,
+//         timer: 2000,
+//       });
+
+//       // Reload page
+//       window.location.reload();
+//     } else if (checkUIDResponse.data.message === "Uid Not Found") {
+//       // UID not found, redirect user to sign-up
+//       Swal.fire({
+//         icon: "error",
+//         text: ,
+//       });
+
+//       // window.location.reload();
+//     }
+//   } catch (error) {
+//     console.error("Facebook Sign-In or API request failed:", error);
+
+//     localStorage.setItem("UIDNotFound", JSON.stringify(UserDetails));
+
+//     window.location.reload();
+//   }
+// };
 
 export const LoginWithFacebook = async () => {
   try {
@@ -385,17 +459,32 @@ export const LoginWithFacebook = async () => {
       // UID not found, redirect user to sign-up
       Swal.fire({
         icon: "error",
-        text: "Go to SignUp, then try social login",
+        text: "User not found. Please sign up first.",
       });
 
-      window.location.reload();
+      // Store UIDNotFound data
+      localStorage.setItem("UIDNotFound", JSON.stringify(UserDetails));
+      console.log("impotant -->", JSON.stringify(UserDetails));
+      // window.location.reload(); // Uncomment if necessary
     }
   } catch (error) {
     console.error("Facebook Sign-In or API request failed:", error);
 
-    localStorage.setItem("UIDNotFound", JSON.stringify(UserDetails));
+    if (error.code === "auth/popup-closed-by-user") {
+      Swal.fire({
+        icon: "warning",
+        title: "Login Cancelled",
+        text: "It looks like you closed the popup before completing the sign-in. Please try again.",
+      });
+      return;
+    }
 
-    window.location.reload();
+    Swal.fire({
+      icon: "error",
+      title: "Login Failed",
+      text:
+        error.message || "An error occurred during login. Please try again.",
+    });
   }
 };
 

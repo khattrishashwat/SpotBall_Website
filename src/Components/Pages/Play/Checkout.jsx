@@ -462,7 +462,6 @@ function Checkout() {
       }
     });
   };
-
   const Money = async () => {
     const token = localStorage.getItem("Web-token");
     if (!token) {
@@ -486,9 +485,14 @@ function Checkout() {
         }
       );
 
+      // Log the full response for debugging
+      console.log("API Response:", response.data);
+
+      // Extract payment session ID from the response
       const paymentOrderId = response.data?.data?.order_id;
       const paymentSessionId = response.data?.data?.payment_session_id;
 
+      // Ensure paymentSessionId is present
       if (!paymentSessionId) {
         Swal.fire({
           icon: "error",
@@ -498,11 +502,17 @@ function Checkout() {
         return;
       }
 
-      // Step 2: Initialize Cashfree SDK
+      console.log("Payment Session ID:", paymentSessionId);
+
+      // Step 2: Initialize Cashfree SDK in production mode
       let cashfree;
       try {
         cashfree = await load({
-          mode: "sandbox",
+          mode: "production",
+          environment: "production",
+
+          // mode: "PRODUCTION",
+          // environment: "PRODUCTION", // Always use production mode
         });
         console.log("Cashfree SDK initialized successfully.");
       } catch (sdkError) {
@@ -515,10 +525,11 @@ function Checkout() {
         return;
       }
 
-      // Step 3: Configure Cashfree Checkout
+      // Step 3: Configure Cashfree Checkout for production mode
       const checkoutOptions = {
         paymentSessionId,
-        redirectTarget: "_modal",
+        // mode: "PRODUCTION", // Always use production mode
+        mode: "production", // Always use production mode
         callback_url: `https://www.spotsball.com/spotsball/web/popupCheckout?order_id={paymentOrderId}`,
       };
 
@@ -530,7 +541,7 @@ function Checkout() {
             title: "Payment Error!",
             text: result.error.data || result.error.message,
           });
-          // console.error("sacda", result.error);
+          console.error("Checkout Error:", result.error);
         } else if (result.paymentDetails) {
           Swal.fire({
             icon: "success",

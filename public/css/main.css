@@ -6852,3 +6852,42 @@ a.btn-download {
 .support-email {
   color: #8ee78e;
 }
+
+.notification_settingdiv {
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #333;
+  padding: 20px;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.notification_settingdiv h2 {
+  font-size: 24px;
+  font-weight: bold;
+  color: #4CAF50;
+  margin-bottom: 15px;
+}
+
+.notification_settingdiv p {
+  font-size: 16px;
+  color: #555;
+  margin-bottom: 10px;
+  display: flow-root;
+  /* align-items: center; */
+}
+
+.notification_settingdiv p span {
+  margin-left: 5px;
+}
+
+.notification_settingdiv p i {
+  font-size: 18px;
+  color: #4CAF50;
+}
+
+.notification_settingdiv p b {
+  font-weight: bold;
+  color: #4CAF50;
+}
