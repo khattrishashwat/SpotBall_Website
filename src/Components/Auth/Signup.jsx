@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
@@ -26,6 +26,7 @@ const Signup = ({ isOpenness, Closed, back }) => {
   const [isSocialSignup, setIsSocialSignup] = useState(false);
   const location = useLocation();
   const [timer, setTimer] = useState(0); // Timer state for resend OTP
+  const formikRef = useRef(null);
 
   // useEffect(() => {
   //   // Keep the popup open if navigating to linked pages like terms or rules
@@ -33,6 +34,7 @@ const Signup = ({ isOpenness, Closed, back }) => {
   //     isOpenness(true);
   //   }
   // }, [location.state]);
+  const otpRefs = useRef([]);
 
   useEffect(() => {
     // Check if popupOpen is false in the location state
@@ -93,16 +95,23 @@ const Signup = ({ isOpenness, Closed, back }) => {
   };
 
   const handleInputChange = (index, value) => {
+    if (!/^\d?$/.test(value)) return; // Allow only one digit (0-9)
+
     const newOtp = [...otp];
-    newOtp[index] = value.slice(-1); // Only take the last digit
+    newOtp[index] = value;
     setOtp(newOtp);
 
-    // Move to the next input
+    // Move focus to the next input field if the current input has a value
     if (value && index < otp.length - 1) {
-      const nextInput = document.querySelector(
-        `.otp__digit:nth-child(${index + 2})`
-      );
-      if (nextInput) nextInput.focus();
+      otpRefs.current[index + 1]?.focus();
+    } else if (!value && index > 0) {
+      otpRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handleKeyPress = (e, index) => {
+    if (e.key === "Backspace" && !otp[index] && index > 0) {
+      otpRefs.current[index - 1]?.focus();
     }
   };
 
@@ -145,10 +154,10 @@ const Signup = ({ isOpenness, Closed, back }) => {
       Swal.fire({
         title: response.data.message,
         showConfirmButton: false,
-        timer: 1000,
+        timer: 4000,
       }).then(() => {
         openModals();
-        // Call resendOtp directly, passing the email from values
+
         setEmails(values.email);
         // onClose();
       });
@@ -184,12 +193,13 @@ const Signup = ({ isOpenness, Closed, back }) => {
       const response = await axios.post(
         // "resend-otp-user-verification",
         "app/auth/resend-otp-user-verification",
-        { emailOrPhone: emails }, // Directly use email passed as argument
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { emailOrPhone: emails }
+        // , // Directly use email passed as argument
+        // {
+        //   headers: {
+        //     Authorization: `Bearer ${token}`,
+        //   },
+        // }
       );
 
       console.log("resend", response.data.data.tokens);
@@ -328,7 +338,7 @@ const Signup = ({ isOpenness, Closed, back }) => {
   };
 
   useEffect(() => {
-    if (isModals) {
+    if (isModals || isOpenness) {
       document.body.style.overflow = "hidden"; // Disable background scrolling
     } else {
       document.body.style.overflow = "auto"; // Enable background scrolling
@@ -338,7 +348,7 @@ const Signup = ({ isOpenness, Closed, back }) => {
     return () => {
       document.body.style.overflow = "auto";
     };
-  }, [isModals]);
+  }, [isModals, isOpenness]);
 
   return (
     <>
@@ -364,6 +374,7 @@ const Signup = ({ isOpenness, Closed, back }) => {
                             className="crossbtn_signinpopupclose singupcrossbtn"
                             // onClick={Closed}
                             onClick={() => {
+                              formikRef.current?.resetForm();
                               Closed();
                               localStorage.removeItem(localStorageKey);
                             }}
@@ -377,6 +388,7 @@ const Signup = ({ isOpenness, Closed, back }) => {
                         <h2>Sign Up</h2>
 
                         <Formik
+                          innerRef={formikRef}
                           initialValues={initialValues}
                           validateOnChange={true}
                           validateOnBlur={true}
@@ -806,12 +818,14 @@ const Signup = ({ isOpenness, Closed, back }) => {
                               {otp.map((digit, index) => (
                                 <input
                                   key={index}
+                                  ref={(el) => (otpRefs.current[index] = el)} // Set ref for each input
                                   type="text"
                                   className="otp__digit"
                                   value={digit}
                                   onChange={(e) =>
                                     handleInputChange(index, e.target.value)
                                   }
+                                  onKeyDown={(e) => handleKeyPress(e, index)}
                                   maxLength={1}
                                 />
                               ))}

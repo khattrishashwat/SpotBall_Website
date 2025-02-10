@@ -7,7 +7,7 @@ import axios from "axios";
 import Forget from "./Forget";
 import Signup from "./Signup";
 import SocialSignUP from "./SocialSignUp";
-import Loader from "../Loader/Loader";
+import "./notificationImg.jpg";
 import {
   messaging,
   getToken,
@@ -33,6 +33,7 @@ function Login({ isVisible, onClose }) {
   if (stateFromLocalStorage) {
     state = true;
   }
+  const formikRef = useRef(null);
 
   const otpRefs = useRef([]);
 
@@ -78,6 +79,95 @@ function Login({ isVisible, onClose }) {
     password: "",
   };
 
+  const Login = async (values) => {
+    console.log("Attempting to login with values:", values);
+
+    // Check if the input is a phone number and prepend country code if needed
+    const isPhoneNumber = /^[6-9]\d{9}$/.test(values.emailOrPhone);
+    if (isPhoneNumber) {
+      values.emailOrPhone = `+91${values.emailOrPhone}`;
+    }
+
+    setIsLoading(true);
+
+    // Get device token from localStorage
+    const device_token = localStorage.getItem("device_token");
+
+    if (device_token === null) {
+      // If device token is not found, show a notification prompt
+      Swal.fire({
+        title: "Please allow notifications",
+        html: `
+      <div class="notification_settingdiv">
+        <h2>Notification Setting</h2> 
+        <p>Open Chrome.</p>
+        <p>At the top right, select More <span><i class="fa fa-ellipsis-v" aria-hidden="true"></i> <i class="fa fa-chevron-right" aria-hidden="true"></i></span> <b>Settings</b> <span><i class="fa fa-chevron-right" aria-hidden="true"></i></span> Privacy and security.</p>
+        <p>Select <b>Site settings</b>.</p>
+        <p>Under “Permissions,” select <b>Notification</b>.</p>
+      </div>
+    `,
+        imageUrl: `${process.env.PUBLIC_URL}/images/notificationImg.jpg`,
+        imageWidth: 300,
+        imageHeight: 200,
+        imageAlt: "Custom image",
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
+      });
+      setIsLoading(false);
+      return; // Exit if device token is not available
+    }
+
+    console.log("Device token:", device_token);
+
+    try {
+      const response = await axios.post("app/auth/login", {
+        ...values,
+        device_token,
+        device_type: "website",
+      });
+
+      console.log("Login successful! Response:", response.data.data);
+
+      // Check if OTP has been sent or user is not verified
+      if (response.data.data.is_verified_user === false) {
+        openModals();
+        setEmails(response.data.data.email);
+        localStorage.setItem("tokens", response.data.data.token);
+      } else {
+        // Store the backend token in local storage
+        localStorage.setItem("Web-token", response.data.data.token);
+
+        // Show success message
+        Swal.fire({
+          icon: "success",
+          title: response.data.message,
+          allowOutsideClick: false,
+          showConfirmButton: false,
+          timer: 1000,
+        });
+
+        // Redirect after successful login
+        navigate("/");
+        onClose();
+      }
+    } catch (error) {
+      console.error(
+        "Login failed:",
+        error.response ? error.response.data : error.message
+      );
+
+      Swal.fire({
+        icon: "error",
+        title: "Login Failed",
+        text: error.response ? error.response.data.message : error.message,
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // const Login = async (values) => {
   //   console.log("Attempting to login with values:", values);
 
@@ -110,10 +200,9 @@ function Login({ isVisible, onClose }) {
   //       setIsLoading(false);
   //       return;
   //     }
-
   //     console.log("Device token:", device_token);
 
-  //     const response = await axios.post("login", {
+  //     const response = await axios.post("app/auth/login", {
   //       ...values,
   //       device_token,
   //       device_type: "website",
@@ -121,21 +210,28 @@ function Login({ isVisible, onClose }) {
 
   //     console.log("Login successful! Response:", response.data.data);
 
-  //     // Store the backend token in local storage
-  //     localStorage.setItem("Web-token", response.data.data.token);
+  //     // setEmails(response.data.data.email);
+  //     // Check if OTP has been sent or user is not verified
+  //     if (response.data.data.is_verified_user === false) {
+  //       openModals();
+  //       setEmails(response.data.data.email);
+  //       localStorage.setItem("tokens", response.data.data.token);
+  //     } else {
+  //       // Store the backend token in local storage
+  //       localStorage.setItem("Web-token", response.data.data.token);
 
-  //     // Show success message
-  //     Swal.fire({
-  //       icon: "success",
-  //       title: response.data.message,
-
-  //       allowOutsideClick: false,
-  //       showConfirmButton: false,
-  //       timer: 1000,
-  //     });
-  //     // window.location.reload();
-  //     navigate("/");
-  //     onClose();
+  //       // Show success message
+  //       Swal.fire({
+  //         icon: "success",
+  //         title: response.data.message,
+  //         allowOutsideClick: false,
+  //         showConfirmButton: false,
+  //         timer: 1000,
+  //       });
+  //       // window.location.reload(); // Optional: You can refresh the page
+  //       navigate("/");
+  //       onClose();
+  //     }
   //   } catch (error) {
   //     console.error(
   //       "Login failed:",
@@ -153,89 +249,6 @@ function Login({ isVisible, onClose }) {
   //     setIsLoading(false);
   //   }
   // };
-
-  const Login = async (values) => {
-    console.log("Attempting to login with values:", values);
-
-    // Check if the input is a phone number and prepend country code if needed
-    const isPhoneNumber = /^[6-9]\d{9}$/.test(values.emailOrPhone);
-    if (isPhoneNumber) {
-      values.emailOrPhone = `+91${values.emailOrPhone}`;
-    }
-
-    setIsLoading(true);
-
-    try {
-      // Retrieve Firebase token for push notifications
-      const device_token = await getToken(messaging, {
-        vapidKey:
-          "BNkI-Se9LgfgnkAxsoNDTe3uQDR7HBWV6rY-Mhc3A6AioGIl-VnUn49NTAdTZHgBnt6id6KokU02Pku4G0GpYxA",
-      });
-
-      if (!device_token) {
-        console.log(
-          "No Firebase token available. Request permission to generate one."
-        );
-        Swal.fire({
-          icon: "error",
-          title: "Notification Permission Required",
-          text: "Please enable notifications to continue.",
-          confirmButtonText: "OK",
-          allowOutsideClick: false,
-        });
-        setIsLoading(false);
-        return;
-      }
-
-      console.log("Device token:", device_token);
-
-      const response = await axios.post("app/auth/login", {
-        ...values,
-        device_token,
-        device_type: "website",
-      });
-
-      console.log("Login successful! Response:", response.data.data);
-
-      // setEmails(response.data.data.email);
-      // Check if OTP has been sent or user is not verified
-      if (response.data.data.is_verified_user === false) {
-        openModals();
-        setEmails(response.data.data.email);
-        localStorage.setItem("tokens", response.data.data.token);
-      } else {
-        // Store the backend token in local storage
-        localStorage.setItem("Web-token", response.data.data.token);
-
-        // Show success message
-        Swal.fire({
-          icon: "success",
-          title: response.data.message,
-          allowOutsideClick: false,
-          showConfirmButton: false,
-          timer: 1000,
-        });
-        // window.location.reload(); // Optional: You can refresh the page
-        navigate("/");
-        onClose();
-      }
-    } catch (error) {
-      console.error(
-        "Login failed:",
-        error.response ? error.response.data : error.message
-      );
-
-      Swal.fire({
-        icon: "error",
-        title: "Login Failed",
-        text: error.response ? error.response.data.message : error.message,
-        confirmButtonText: "OK",
-        allowOutsideClick: false,
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const handleSocialSignup = () => {
     setIsSocialSignup(true);
@@ -275,17 +288,31 @@ function Login({ isVisible, onClose }) {
     };
   }, [isVisible]);
 
+  // const handleInputChange = (index, value) => {
+  //   const newOtp = [...otp];
+  //   newOtp[index] = value.slice(-1); // Only take the last digit
+  //   setOtp(newOtp);
+
+  //   // Move to the next input
+  //   if (value && index < otp.length - 1) {
+  //     const nextInput = document.querySelector(
+  //       `.otp__digit:nth-child(${index + 2})`
+  //     );
+  //     if (nextInput) nextInput.focus();
+  //   }
+  // };
+
   const handleInputChange = (index, value) => {
+    if (!/^\d?$/.test(value)) return;
+
     const newOtp = [...otp];
-    newOtp[index] = value.slice(-1); // Only take the last digit
+    newOtp[index] = value;
     setOtp(newOtp);
 
-    // Move to the next input
     if (value && index < otp.length - 1) {
-      const nextInput = document.querySelector(
-        `.otp__digit:nth-child(${index + 2})`
-      );
-      if (nextInput) nextInput.focus();
+      otpRefs.current[index + 1]?.focus();
+    } else if (!value && index > 0) {
+      otpRefs.current[index - 1]?.focus();
     }
   };
 
@@ -394,7 +421,10 @@ function Login({ isVisible, onClose }) {
                           <button
                             type="button"
                             className="crossbtn_signinpopupclose signincrossbtnnew"
-                            onClick={onClose}
+                            onClick={() => {
+                              onClose();
+                              formikRef.current?.resetForm();
+                            }}
                           >
                             <img
                               src={`${process.env.PUBLIC_URL}/images/cross_icon.png`}
@@ -405,6 +435,7 @@ function Login({ isVisible, onClose }) {
                         <h2>Sign In</h2>
 
                         <Formik
+                          innerRef={formikRef}
                           initialValues={LoginValues}
                           onSubmit={Login}
                           validateOnChange={true}

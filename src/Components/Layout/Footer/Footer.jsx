@@ -15,6 +15,8 @@ function Footer() {
       );
 
       if (response) {
+        console.log("links", response.data.data?.liveLinks);
+
         setLinks(response.data.data?.liveLinks);
         setFooter(response.data.data?.footer?.description || "");
       }
@@ -100,13 +102,14 @@ function Footer() {
                       {
                         title: "Apps",
                         links: ["iOS", androidLink ? "Android" : "Loading..."], // Conditionally render Android link
-                        paths: [null, androidLink || "#"], // Use androidLink if it's available
-                        onClick: [
-                          null,
-                          androidLink
-                            ? () => window.open(androidLink, "_blank")
-                            : null,
-                        ], // Open the APK link if it's available
+                        paths: [links?.Apple_Store, androidLink || "#"], // Store paths for both links
+                        onClick: (index) => {
+                          const url =
+                            index === 0 ? links?.Apple_Store : androidLink; // Determine which link to open
+                          if (url) {
+                            window.open(url, "_blank", "noopener,noreferrer");
+                          }
+                        },
                       },
                     ].map((section, index) => (
                       <div key={index} className="maindivforfooterlinks">
@@ -136,16 +139,20 @@ function Footer() {
                   {/* App Store and Social Media Icons */}
                   <div className="footer_downloadapp_icons">
                     <div className="download_app_icondiv">
-                      <div className="appstoreicondiv">
+                      <div className="btn btn-dark">
                         <a
-                          href={links?.Play_Store}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                          href={androidLink}
+                          className="btn-download"
+                          download
+                          // target="_blank"
+                          // rel="noopener noreferrer"
                         >
-                          <img
-                            src={`${process.env.PUBLIC_URL}/images/google-play-store-badge.png`}
-                            alt="Google Play Store"
-                          />
+                          {" "}
+                          <i
+                            className="fa fa-download"
+                            aria-hidden="true"
+                          />{" "}
+                          Download APK
                         </a>
                       </div>
                       <div className="appstoreicondiv">
