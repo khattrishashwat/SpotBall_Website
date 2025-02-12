@@ -41,6 +41,14 @@ function Header() {
   }, [location.pathname]);
   const token = localStorage.getItem("Web-token");
 
+  const handleLogoClick = () => {
+    if (location.pathname === "/") {
+      window.location.reload(); // Reload the page if already on the homepage
+    } else {
+      // Otherwise, navigate to the homepage
+      navigate("/");
+    }
+  };
   const NotificationOpen = () => {
     setIsNot((prevState) => !prevState);
   };
@@ -170,22 +178,55 @@ function Header() {
     try {
       const token = localStorage.getItem("Web-token");
       if (!token) return;
-      const response = await axios.get("app/notifications/get-notifications", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+
+      const response = await axios.get(
+        "app/notifications/get-notifications?skip=0&limit=10",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       setNotification(response.data.data);
-      // setNotice(response.data.data.length);
     } catch (error) {
-      console.error("Error fetching profile:", error);
+      console.error("Error fetching notifications:", error);
+    }
+  };
+
+  const updateNotifications = async () => {
+    try {
+      const token = localStorage.getItem("Web-token");
+      if (!token) return;
+
+      await axios.patch(
+        "app/notifications/mark-as-read",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      fetchNotification();
+    } catch (error) {
+      console.error("Error updating notifications:", error);
     }
   };
 
   useEffect(() => {
     fetchNotification();
   }, []);
+
+  const unreadCount = Array.isArray(notification)
+    ? notification.filter((item) => !item.isRead).length
+    : 0;
+
+  const handleNotificationClick = () => {
+    setIsNot((prev) => !prev);
+    updateNotifications();
+  };
 
   const [timeLeft, setTimeLeft] = useState({
     days: "00",
@@ -452,19 +493,15 @@ function Header() {
                       </div>
                     </div>
 
-                    <Link
-                      to="/"
+                    <div
                       className="navbar-brand navbarlogodiv"
-                      // onClick={() => {
-                      //   window.scrollTo(0, 0);
-                      //   window.location.reload();
-                      // }}
+                      onClick={handleLogoClick}
                     >
                       <img
                         src={`${process.env.PUBLIC_URL}/images/logo.png`}
                         alt="logo"
                       />
-                    </Link>
+                    </div>
 
                     {token ? (
                       <div className="navbar-collapse newnavbarleft">
@@ -474,9 +511,11 @@ function Header() {
                               <img
                                 src={`${process.env.PUBLIC_URL}/images/bell_icon.png`}
                                 alt="bell"
-                                onClick={NotificationOpen}
+                                onClick={handleNotificationClick}
                               />
-                              {/* <span className="cartcount">3</span> */}
+                              {unreadCount > 0 && (
+                                <span className="cartcount">{unreadCount}</span>
+                              )}
                             </a>
                             <div
                               className={`notificationdiv_popup ${
@@ -533,7 +572,6 @@ function Header() {
                                   >
                                     <img
                                       src={`${process.env.PUBLIC_URL}/images/cross_icon.png`}
-                                      // src="images/cross_icon.png"
                                       alt="close"
                                     />
                                   </button>
@@ -545,8 +583,6 @@ function Header() {
                             <Link to="/cart" className="itmelink_menus">
                               <img
                                 src={`${process.env.PUBLIC_URL}/images/cart_icon.png`}
-                                // src="images/cart_icon.png"
-                                // alt="cart"
                               />
                               {/* <span className="cartcount">1</span> */}
                             </Link>
@@ -566,11 +602,10 @@ function Header() {
                                 />
                               </div>
 
-                              {profile?.is_verified_user && ( // Conditionally render verify image
+                              {profile?.is_verified_user && (
                                 <div className="userverifyimg">
                                   <img
                                     src={`${process.env.PUBLIC_URL}/images/verify.png`}
-                                    // src="images/verify.png"
                                     alt="verify"
                                   />
                                 </div>
@@ -581,10 +616,6 @@ function Header() {
                         <ul className="navbar moremenubar">
                           <li className="nav-item humbergermenulist">
                             <button
-                              // type="button"
-                              // className="menubaricons showmenus_clickbtn"
-                              // // onClick={toggleMenu}
-                              // onClick={() => setIsMenuVisible(!isMenuVisible)}
                               type="button"
                               className="menubaricons showmenus_clickbtn"
                               aria-controls="menu-list"

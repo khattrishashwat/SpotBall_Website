@@ -64,7 +64,7 @@ function Profile() {
         },
       });
 
-      if (response.status === 200) {
+      if (response) {
         // Clear token and navigate to homepage
         localStorage.removeItem("Web-token");
         Swal.fire({
@@ -101,7 +101,7 @@ function Profile() {
         },
       });
 
-      if (response.status === 200) {
+      if (response) {
         // Clear token and navigate to homepage
         localStorage.removeItem("Web-token");
         Swal.fire({

@@ -96,27 +96,6 @@ function Screen() {
     );
   }, [tickets]);
 
-  // const handleTicket = () => {
-  //   // Check if totalTickets is less than responseData.maxTickets
-  //   if (totalTickets < responseData.maxTickets) {
-  //     const newTicket = {
-  //       id: tickets.length + 1,
-  //       xCord: "____",
-  //       yCord: "____",
-  //     };
-
-  //     setTickets((prev) => [...prev, newTicket]);
-  //     setTotalTickets((prev) => prev + 1); // Increment totalTickets, but not usedTickets yet
-  //   } else {
-  //     Swal.fire({
-  //       icon: "warning",
-  //       title: "Maximum ticket limit reached",
-  //       text: `You cannot add more than ${responseData.maxTickets} tickets.`,
-  //       confirmButtonText: "OK",
-  //       allowOutsideClick: false,
-  //     });
-  //   }
-  // };
   const handleTicket = () => {
     const choosedTicket = responseData.maxTickets - leftticket; // Calculate choosedTicket
 
@@ -150,36 +129,6 @@ function Screen() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-
-  // const handleAddTicket = () => {
-  //   // Check if usedTickets is less than maxTickets
-  //   if (
-  //     usedTickets < responseData.maxTickets &&
-  //     totalTickets < responseData.maxTickets
-  //   ) {
-  //     const newTicket = {
-  //       id: tickets.length + 1, // Increment ID based on the current length of tickets
-  //       xCord: "____",
-  //       yCord: "____",
-  //     };
-
-  //     // Add the new ticket
-  //     setTickets((prev) => [...prev, newTicket]);
-
-  //     // Increment usedTickets and totalTickets
-  //     setUsedTickets((prev) => prev + 1); // Increment usedTickets
-  //     setTotalTickets((prev) => prev + 1); // Update totalTickets
-  //   } else {
-  //     // Show a message if the maximum limit is reached
-  //     Swal.fire({
-  //       icon: "warning",
-  //       title: "Maximum ticket limit reached",
-  //       text: `You cannot add more than ${responseData.maxTickets} tickets.`,
-  //       confirmButtonText: "OK",
-  //       allowOutsideClick: false,
-  //     });
-  //   }
-  // };
 
   const handleAddTicket = () => {
     const choosedTicket = responseData.maxTickets - leftticket; // Calculate choosedTicket
@@ -397,6 +346,8 @@ function Screen() {
   };
 
   const handleCheckout = async () => {
+    if (usedTickets !== totalTickets) return;
+
     const contest_id = responseData._id;
     const usedTicketCoordinates = tickets
       .filter((ticket) => ticket.xCord !== "____" && ticket.yCord !== "____")
@@ -650,7 +601,10 @@ function Screen() {
                 <div className="ticketcheckout_btn">
                   <button
                     onClick={handleCheckout}
-                    className="bottomcheckoutbtn"
+                    className={`bottomcheckoutbtn ${
+                      usedTickets !== totalTickets ? "disabled-btn" : ""
+                    }`} // Add disabled-btn class when the condition is met
+                    disabled={usedTickets !== totalTickets} // Button disabled until condition is met
                   >
                     Checkout
                   </button>
