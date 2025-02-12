@@ -75,25 +75,25 @@ const ProtectedRoute = () => {
   return <Outlet />;
 };
 
-axios.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response && error.response.status === 401) {
-      localStorage.removeItem("Web-token");
-      Swal.fire({
-        icon: "error",
-        title: "Something went wrong!",
-        text: error.response ? error.response.data.message : error.message,
-        allowOutsideClick: false,
-        showConfirmButton: true,
-        confirmButtonText: "OK",
-      }).then(() => {
-        window.location.reload();
-      });
-    }
-    return Promise.reject(error);
-  }
-);
+// axios.interceptors.response.use(
+//   (response) => response,
+//   (error) => {
+//     if (error.response && error.response.status === 401) {
+//       localStorage.removeItem("Web-token");
+//       Swal.fire({
+//         icon: "error",
+//         title: "Something went wrong!",
+//         text: error.response ? error.response.data.message : error.message,
+//         allowOutsideClick: false,
+//         showConfirmButton: true,
+//         confirmButtonText: "OK",
+//       }).then(() => {
+//         window.location.reload();
+//       });
+//     }
+//     return Promise.reject(error);
+//   }
+// );
 
 const App = () => {
   const [loader, setLoading] = useState(false);

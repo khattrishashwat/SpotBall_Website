@@ -193,7 +193,7 @@ function Home() {
 
 
     if (!contest.is_active) {
-      setOnCarts(false);
+      // setOnCarts(false);
       setOnCloseComptition(true);
       return;
     }

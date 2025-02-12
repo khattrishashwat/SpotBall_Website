@@ -1,52 +1,62 @@
-// import React from 'react'
-
-// function PopupCheckout() {
-//   return (
-//     <>
-//       <div className="access_location_popup" style={{ display: "block" }}>
-//         <div className="locationsettingpopup">
-//           <div className="location_settingdiv">
-//             <h2>Cancel Payment</h2>
-//             <p>Your payment for this cart has been canceled.</p>
-//             <p>You will now be redirected to the Home screen.</p>
-//             <div className="getpermission_okbtndiv">
-//               <button
-//                 type="button"
-//                 className="location_info_okaybtn"
-//                 onClick={() => (window.location.href = "/")} // Redirect to Home
-//               >
-//                 OK
-//               </button>
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-//     </>
-//   );
-// }
-
-// export default PopupCheckout
 import { useLocation, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 const PopupCheckout = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [timer, setTimer] = useState(10); // Set initial timer to 10 seconds
 
   useEffect(() => {
-    const params = new URLSearchParams(location.search); // To parse query string
-    const orderId = params.get("order_id"); // Get order_id from query string
+    const params = new URLSearchParams(location.search); // Parse the query string
+    const orderId = params.get("order_id"); // Get the order_id from query string
 
-    // If order_id is present, navigate to the Cart page
     if (orderId) {
-      navigate("/cart");
+      const OrderStatus = async (order_id) => {
+        try {
+          const token = localStorage.getItem("Web-token");
+          if (token) {
+            const response = await axios.post(
+              `app/cashfree/update-order-status?order_id=${order_id}`,
+              {},
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            );
+            console.log(response.data); // Handle response as needed
+          }
+        } catch (error) {
+          console.error(error.response?.data || error.message); // Handle the error appropriately
+        }
+      };
+
+      // Trigger the API call
+      OrderStatus(orderId);
+
+      // Set a timer to decrease the timer state every second
+      const intervalId = setInterval(() => {
+        setTimer((prevTimer) => {
+          if (prevTimer === 1) {
+            clearInterval(intervalId); // Clear the interval when the timer reaches 0
+            navigate("/"); // Navigate to the home page
+            return 0;
+          }
+          return prevTimer - 1; // Decrease the timer by 1 second
+        });
+      }, 1000); // 1000ms = 1 second
     }
   }, [location.search, navigate]);
 
   return (
     <div>
-      {/* Optionally, you can display a message or loader here */}
-      <p>Redirecting to Cart...</p>
+      {loading ? (
+        <p>Redirecting in {timer} seconds...</p> // Display the countdown
+      ) : (
+        <p>Redirecting...</p>
+      )}
     </div>
   );
 };

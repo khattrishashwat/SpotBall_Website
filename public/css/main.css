@@ -6891,3 +6891,8 @@ a.btn-download {
   font-weight: bold;
   color: #4CAF50;
 }
+
+.disabled-btn {
+  background-color: gray;
+  cursor: not-allowed;
+}
