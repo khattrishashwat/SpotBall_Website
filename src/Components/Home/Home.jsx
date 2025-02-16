@@ -14,6 +14,9 @@ function Home() {
   const navigate = useNavigate();
   const spacing = 2;
   const [countdownType, setCountdownType] = useState("ends"); // "starts" or "ends"
+  const [loginPopup, setLoginPopup] = useState(false);
+
+  // Toggle sign-in popup visibility
 
   const [loading, setLoading] = useState(false);
   const [leftticket, setLeftticket] = useState("");
@@ -30,7 +33,6 @@ function Home() {
   const [countss, setCountss] = useState("");
   const [restrictedStates, setRestrictedStates] = useState("");
   const videoRef = useRef(null);
-  const [loginPopup, setLoginPopup] = useState(false);
   const [banner, setBanner] = useState(false);
   const [quantity, setQuantity] = useState(3);
   const [isGeolocationPopupVisible, setGeolocationPopupVisible] =
@@ -43,7 +45,13 @@ function Home() {
   const open = async () => {
     setIsModals(true);
   };
+   const OpenSignIn = () => {
+     setLoginPopup(true);
+   };
 
+   const ClosePopup = () => {
+     setLoginPopup(false);
+   };
   useEffect(() => {
     const fetchLocation = async () => {
       if (navigator.geolocation) {
@@ -180,17 +188,16 @@ function Home() {
     //   return;
     // }
 
-   if (contest.totalTickets === 75) {
-     Swal.fire({
-       icon: "error",
-       title: "No More Tickets",
-       text: "You have already participated in this contest! You have chosen all the tickets.",
-       confirmButtonText: "OK",
-       allowOutsideClick: false,
-     });
-     return;
-   }
-
+    if (contest.totalTickets === 75) {
+      Swal.fire({
+        icon: "error",
+        title: "No More Tickets",
+        text: "You have already participated in this contest! You have chosen all the tickets.",
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
+      });
+      return;
+    }
 
     if (!contest.is_active) {
       // setOnCarts(false);
@@ -357,14 +364,6 @@ const handleAskToPlay = () => {
       videoElement.pause();
       videoElement.currentTime = 0;
     }
-  };
-
-  const OpenSignIn = () => {
-    setLoginPopup(true);
-  };
-
-  const ClosePopup = () => {
-    setLoginPopup(false);
   };
 
   const fetchVideoData = async () => {
@@ -584,24 +583,23 @@ const handleAskToPlay = () => {
   // console.log("setRestrictedStates", restrictedStates);
   // console.log("contest -->", contests);
 
- const handleIncrease = () => {
-   const ticketsLeft =
-     selectedContest.maxTickets - selectedContest.totalTickets;
-   setLeftticket(ticketsLeft);
+  const handleIncrease = () => {
+    const ticketsLeft =
+      selectedContest.maxTickets - selectedContest.totalTickets;
+    setLeftticket(ticketsLeft);
 
-   if (quantity < selectedContest?.maxTickets && quantity < ticketsLeft) {
-     setQuantity((prev) => prev + 1);
-   } else {
-     Swal.fire({
-       icon: "warning",
-       title: "Max Ticket Limit Reached",
-       text: `You can only purchase a maximum of ${selectedContest?.maxTickets} tickets per person, but you have already bought ${selectedContest?.totalTickets} tickets. You have only ${ticketsLeft} ticket(s) left to purchase.`,
-       allowOutsideClick: false,
-       confirmButtonText: "OK",
-     });
-   }
- };
-
+    if (quantity < selectedContest?.maxTickets && quantity < ticketsLeft) {
+      setQuantity((prev) => prev + 1);
+    } else {
+      Swal.fire({
+        icon: "warning",
+        title: "Max Ticket Limit Reached",
+        text: `You can only purchase a maximum of ${selectedContest?.maxTickets} tickets per person, but you have already bought ${selectedContest?.totalTickets} tickets. You have only ${ticketsLeft} ticket(s) left to purchase.`,
+        allowOutsideClick: false,
+        confirmButtonText: "OK",
+      });
+    }
+  };
 
   const handleDecrease = () => {
     if (quantity > 1) {
@@ -811,8 +809,8 @@ const handleAskToPlay = () => {
                         <button
                           type="button"
                           className="bannerfixedbtn regis showsigninpopup_onclick"
-                          // onClick={OpenSignIn}
                           onClick={() => setLoginPopup(!loginPopup)}
+                          // onClick={handleSigninPopup} // Open the sign-in popup
                         >
                           Sign in / Sign up
                         </button>
@@ -1032,7 +1030,6 @@ const handleAskToPlay = () => {
           Area={restrictedStates}
         />
       )}
-
       <div
         className={`howtoplay_popup_new ${isModals ? "show" : ""}`}
         id="howtoplaypopup_new"
@@ -1097,7 +1094,6 @@ const handleAskToPlay = () => {
           </div>
         </div>
       </div>
-
       <div
         className={`cartpopup_main cartpopupfor_contest ${
           onCloseComptition ? "show" : ""

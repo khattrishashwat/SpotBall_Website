@@ -411,7 +411,7 @@ function Checkout() {
 
     Swal.fire({
       title: "Are you sure?",
-      text: "Do you really want to delete this item?",
+      text: "Do you really w  ant to delete this item?",
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Yes, delete it!",
@@ -472,6 +472,7 @@ function Checkout() {
   //     });
   //     return;
   //   }
+  //   console.log("new", totalBeforeDiscount);
 
   //   try {
   //     // Step 1: Call Money API to get paymentSessionId
@@ -551,8 +552,6 @@ function Checkout() {
   //             result.paymentDetails.paymentMessage,
   //         });
 
-  //         // await handlePaymentAndRedirect(paymentOrderId);
-
   //         // Prepare payment data
   //         const paymentData = preparePaymentData(paymentOrderId);
 
@@ -561,7 +560,11 @@ function Checkout() {
 
   //         // Update order status
   //         await OrderStatus(paymentOrderId);
-  //       } else if (result) {
+  //       } else if (result.redirect) {
+  //         console.log(
+  //           "Payment will be redirected to a new page.",
+  //           result.redirect
+  //         );
   //       }
   //     });
   //   } catch (error) {
@@ -574,14 +577,115 @@ function Checkout() {
   //   }
   // };
 
+  // const Money = async () => {
+  //   const token = localStorage.getItem("Web-token");
+  //   console.log("total", totalBeforeDiscount);
+
+  //   if (!token) {
+  //     Swal.fire({
+  //       icon: "error",
+  //       title: "Error!",
+  //       text: "You are not authenticated. Please log in.",
+  //     });
+  //     return;
+  //   }
+
+  //   try {
+  //     // Step 1: Call Money API to get paymentSessionId
+  //     const response = await axios.post(
+  //       "app/cashfree/create-order",
+  //       // { order_amount: Math.round(totalBeforeDiscount) },
+  //       { order_amount: 1 },
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       }
+  //     );
+
+  //     // Extract payment session ID and order ID from the response
+  //     const paymentOrderId = response.data?.data?.order_id;
+  //     const paymentSessionId = response.data?.data?.payment_session_id;
+
+  //     if (!paymentSessionId) {
+  //       Swal.fire({
+  //         icon: "error",
+  //         title: "Error!",
+  //         text: "Payment session ID is missing. Unable to proceed with payment.",
+  //       });
+  //       return;
+  //     }
+
+  //     console.log("Payment Session ID:", paymentSessionId);
+
+  //     // Step 2: Prepare payment data
+  //     // const paymentData = preparePaymentData(paymentOrderId);
+  //     // // Call Pay function to process the payment data
+  //     // Pay(paymentData);
+
+  //     // Step 2: Initialize Cashfree SDK in production mode
+  //     let cashfree;
+  //     try {
+  //       cashfree = await load({ mode: "production" });
+  //       console.log("Cashfree SDK initialized successfully.");
+  //     } catch (sdkError) {
+  //       Swal.fire({
+  //         icon: "error",
+  //         title: "SDK Initialization Error",
+  //         text: "Failed to initialize Cashfree SDK. Please try again later.",
+  //       });
+  //       console.error("SDK Initialization Error:", sdkError);
+  //       return;
+  //     }
+
+  //     // Step 3: Configure Cashfree Checkout
+  //     const checkoutOptions = {
+  //       paymentSessionId,
+  //       redirectTarget: "_self", // Opens the checkout as a popup
+  //       callback_url: `https://www.spotsball.com/spotsball/web/popupCheckout?order_id=${paymentOrderId}`,
+  //     };
+
+  //     // Step 4: Process Payment
+  //     cashfree.checkout(checkoutOptions).then(async (result) => {
+  //       if (result.error) {
+  //         Swal.fire({
+  //           icon: "error",
+  //           title: "Payment Error!",
+  //           text: result.error.data || result.error.message,
+  //         });
+  //         console.error("Checkout Error:", result.error);
+  //       } else if (result.paymentDetails) {
+  //         console.log("Payment Details Response:", result.paymentDetails);
+  //         console.log("Payment Message:", result.paymentDetails.paymentMessage);
+
+  //         Swal.fire({
+  //           icon: "success",
+  //           title: "Payment Successful!",
+  //           text: result.paymentDetails.paymentMessage,
+  //         });
+
+  //         // Update order status if necessary
+  //         // await OrderStatus(paymentOrderId);
+  //       } else {
+  //         console.log("Unhandled Checkout Result:", result);
+  //       }
+  //     });
+  //   } catch (error) {
+  //     Swal.fire({
+  //       icon: "error",
+  //       title: "Error!",
+  //       text: error.response?.data?.message || error.message,
+  //     });
+  //     console.error("Money API Error:", error);
+  //   }
+  // };
+
   const Money = async () => {
     const token = localStorage.getItem("Web-token");
+    console.log("total", totalBeforeDiscount);
+
     if (!token) {
-      Swal.fire({
-        icon: "error",
-        title: "Error!",
-        text: "You are not authenticated. Please log in.",
-      });
+      console.error("Error: You are not authenticated. Please log in.");
       return;
     }
 
@@ -589,7 +693,8 @@ function Checkout() {
       // Step 1: Call Money API to get paymentSessionId
       const response = await axios.post(
         "app/cashfree/create-order",
-        { order_amount: Math.round(totalBeforeDiscount) }, // Ensure totalBeforeDiscount is defined
+        // { order_amount: Math.round(totalBeforeDiscount) },
+        { order_amount: 1 },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -597,86 +702,65 @@ function Checkout() {
         }
       );
 
-      // Log the full response for debugging
-      console.log("API Response:", response.data);
-
-      // Extract payment session ID from the response
+      // Extract payment session ID and order ID from the response
       const paymentOrderId = response.data?.data?.order_id;
       const paymentSessionId = response.data?.data?.payment_session_id;
 
-      // Ensure paymentSessionId is present
       if (!paymentSessionId) {
-        Swal.fire({
-          icon: "error",
-          title: "Error!",
-          text: "Payment session ID is missing. Unable to proceed with payment.",
-        });
+        console.error(
+          "Error: Payment session ID is missing. Unable to proceed."
+        );
         return;
       }
 
       console.log("Payment Session ID:", paymentSessionId);
 
-      // Step 2: Prepare payment data
-      const paymentData = preparePaymentData(paymentOrderId);
-      // Call Pay function to process the payment data
-      Pay(paymentData);
-
-      // Step 3: Initialize Cashfree SDK in production mode
+      // Step 2: Initialize Cashfree SDK in production mode
       let cashfree;
       try {
-        cashfree = await load({
-          mode: "production",
-          environment: "production",
-        });
+        cashfree = await load({ mode: "production" });
         console.log("Cashfree SDK initialized successfully.");
       } catch (sdkError) {
-        Swal.fire({
-          icon: "error",
-          title: "SDK Initialization Error",
-          text: "Failed to initialize Cashfree SDK. Please try again later.",
-        });
         console.error("SDK Initialization Error:", sdkError);
         return;
       }
 
-      // Step 4: Configure Cashfree Checkout for production mode
+      // Step 3: Configure Cashfree Checkout
       const checkoutOptions = {
         paymentSessionId,
-        mode: "production", // Always use production mode
-        callback_url: `https://www.spotsball.com/spotsball/web/popupCheckout?order_id={paymentOrderId}`,
+        redirectTarget: "_modal", // Opens the checkout as a popup
+        callback_url: `https://www.spotsball.com/spotsball/web/popupCheckout?order_id=${paymentOrderId}`,
       };
 
-      // Handle checkout and payment result
+      // Step 4: Process Payment
       cashfree.checkout(checkoutOptions).then(async (result) => {
         if (result.error) {
-          Swal.fire({
-            icon: "error",
-            title: "Payment Error!",
-            text: result.error.data || result.error.message,
-          });
-          console.error("Checkout Error:", result.error);
+          console.error("Payment Failed Error:", result.error);
+          window.history.back(); // Redirect back after error
         } else if (result.paymentDetails) {
-          Swal.fire({
-            icon: "success",
-            title: "Payment Successful!",
-            text:
-              result.paymentDetails.paymentMessage ||
-              result.paymentDetails.paymentMessage,
-          });
+          console.log("Payment Details:", result.paymentDetails);
+          const paymentStatus = result.paymentDetails.paymentStatus;
 
-          // Prepare payment data
-          // await OrderStatus(paymentOrderId);
-        } else if (result) {
-          // Handle other result scenarios
+          if (paymentStatus === "SUCCESS") {
+            console.log("Payment Successful!");
+            window.location.href = `https://www.spotsball.com/spotsball/web/popupCheckout?order_id=${paymentOrderId}`;
+          } else if (paymentStatus === "FAILED") {
+            console.error("Transaction Failed!");
+            window.history.back();
+          } else if (paymentStatus === "PENDING") {
+            console.log("Payment Pending. Redirecting...");
+            window.location.href = `https://www.spotsball.com/spotsball/web/popupCheckout?order_id=${paymentOrderId}`;
+          }
+        } else {
+          console.log("User closed the payment window.");
+          window.history.back(); // Redirect back when user cancels payment
         }
       });
     } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Error!",
-        text: error.data || error.message,
-      });
-      console.error("Money API Error:", error);
+      console.error(
+        "Money API Error:",
+        error.response?.data?.message || error.message
+      );
     }
   };
 
@@ -762,61 +846,68 @@ function Checkout() {
   };
 
   // const OrderStatus = async (paymentOrderId) => {
+  //   const token = localStorage.getItem("Web-token");
+  //   let order_id = paymentOrderId;
   //   try {
-  //     const token = localStorage.getItem("Web-token");
-  //     console.log("token", token); // Verify token is being retrieved correctly
-  //     if (token) {
-  //       const response = await axios.post(
-  //         `app/cashfree/update-order-status?order_id=${paymentOrderId}`,
-  //         {}, // Body (optional, empty here)
-  //         {
-  //           headers: {
-  //             Authorization: `Bearer ${token}`,
-  //           },
-  //         }
-  //       );
-  //       console.log(response.data); // Handle response as needed
-  //     }
-  //   } catch (error) {
-  //     console.error(error.response?.data || error.message); // Handle the error appropriately
-  //   }
+  //     const response = await axios.post(
+  //       `app/cashfree/update-order-status?order_id=${order_id}`,
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       }
+  //     );
+  //   } catch (error) {}
   // };
+
+  const OrderStatus = async (paymentOrderId) => {
+    try {
+      const token = localStorage.getItem("Web-token");
+      console.log("token", token); // Verify token is being retrieved correctly
+      if (token) {
+        const response = await axios.post(
+          `app/cashfree/update-order-status?order_id=${paymentOrderId}`,
+          {}, // Body (optional, empty here)
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        console.log(response.data); // Handle response as needed
+      }
+    } catch (error) {
+      console.error(error.response?.data || error.message); // Handle the error appropriately
+    }
+  };
 
   const Pay = async (data) => {
     const token = localStorage.getItem("Web-token");
 
-    if (!token) {
-      console.error("Token is missing!");
-      return;
-    }
-
     try {
       const response = await axios.post(
-        "app/payments/save-contest-payments", // API endpoint for saving payment
-        data, // The payment data you're sending
+        "app/payments/save-contest-payments",
+        data,
         {
           headers: {
-            Authorization: `Bearer ${token}`, // Pass the token for authentication
+            Authorization: `Bearer ${token}`,
           },
         }
       );
 
-      // You can log or process the response data here, if needed
-      console.log("Payment saved successfully:", response.data);
-    } catch (error) {
-      // Catch errors from the request
-      console.error("Error saving payment:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text:
-          error.response?.data?.message ||
-          error.message ||
-          "An error occurred while saving the payment.",
-      });
-    }
+      if (response) {
+        Swal.fire(
+          "Payment recorded!",
+          "Your payment has been recorded successfully.",
+          "success"
+        ).then(() => {
+          setTimeout(() => {
+            navigate("/");
+          }, 1000);
+        });
+      }
+    } catch (error) {}
   };
-
   const handlePaymentClick = () => {
     Money();
   };

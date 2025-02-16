@@ -399,12 +399,104 @@ export const signInWithFacebook = async (setFieldValue) => {
 //   }
 // };
 
+// export const LoginWithFacebook = async () => {
+//   try {
+//     console.log("Starting Facebook login process...");
+
+//     // Sign in with Facebook
+//     const result = await signInWithPopup(auth, facebookProvider);
+//     const user = result.user;
+//     console.log("Facebook user data:", user);
+
+//     const userData = {
+//       uid: user.uid,
+//       displayName: user.displayName,
+//       email: user.email,
+//       photoURL: user.photoURL,
+//       signup_method: "facebook",
+//     };
+
+//     // Split user name into first and last name
+//     const nameParts = userData.displayName
+//       ? userData.displayName.split(" ")
+//       : [];
+//     const first_name = nameParts[0] || "";
+//     const last_name = nameParts.length > 1 ? nameParts.slice(1).join(" ") : "";
+
+//     // Store user details locally
+//     const UserDetails = { ...userData, first_name, last_name };
+//     console.log("Facebook Sign-In successful. UserDetails:", UserDetails);
+
+//     // Check UID in database
+//     const checkUIDResponse = await axios.get(
+//       `app/auth/check-uid-exists/${user.uid}`
+//     );
+
+//     if (checkUIDResponse.data.message === "Uid found") {
+//       // UID found, proceed with social login
+//       const response = await axios.post("app/auth/social-login", {
+//         signup_method: "facebook",
+//         uid: user.uid,
+//         device_type: "website",
+//         device_token: localStorage.getItem("device_token"),
+//       });
+
+//       console.log("Social login response:", response.data);
+
+//       // Save token and show success message
+//       const token = response.data.data.token;
+//       localStorage.setItem("Web-token", token);
+//       Swal.fire({
+//         icon: "success",
+//         title: "Login Successful",
+//         showConfirmButton: false,
+//         timer: 2000,
+//       });
+
+//       // Reload page
+//       window.location.reload();
+//     } else if (checkUIDResponse.data.message === "Uid Not Found") {
+//       // UID not found, redirect user to sign-up
+//       Swal.fire({
+//         icon: "error",
+//         text: "User not found. Please sign up first.",
+//       });
+
+//       // Store UIDNotFound data
+//       localStorage.setItem("UIDNotFound", JSON.stringify(UserDetails));
+//       console.log("impotant -->", JSON.stringify(UserDetails));
+//       // window.location.reload(); // Uncomment if necessary
+//     }
+//   } catch (error) {
+//     console.error("Facebook Sign-In or API request failed:", error);
+
+//     if (error.code === "auth/popup-closed-by-user") {
+//       Swal.fire({
+//         icon: "warning",
+//         title: "Login Cancelled",
+//         text: "It looks like you closed the popup before completing the sign-in. Please try again.",
+//       });
+//       return;
+//     }
+
+//     Swal.fire({
+//       icon: "error",
+//       title: "Login Failed",
+//       text:
+//         error.message || "An error occurred during login. Please try again.",
+//     });
+//   }
+// };
+
 export const LoginWithFacebook = async () => {
   try {
     console.log("Starting Facebook login process...");
 
     // Sign in with Facebook
     const result = await signInWithPopup(auth, facebookProvider);
+    if (!result)
+      throw new Error("Popup was blocked. Please allow popups and try again.");
+
     const user = result.user;
     console.log("Facebook user data:", user);
 
@@ -416,12 +508,10 @@ export const LoginWithFacebook = async () => {
       signup_method: "facebook",
     };
 
-    // Split user name into first and last name
-    const nameParts = userData.displayName
-      ? userData.displayName.split(" ")
-      : [];
+    // Extract first and last name
+    const nameParts = userData.displayName?.split(" ") || [];
     const first_name = nameParts[0] || "";
-    const last_name = nameParts.length > 1 ? nameParts.slice(1).join(" ") : "";
+    const last_name = nameParts.slice(1).join(" ") || "";
 
     // Store user details locally
     const UserDetails = { ...userData, first_name, last_name };
@@ -433,7 +523,7 @@ export const LoginWithFacebook = async () => {
     );
 
     if (checkUIDResponse.data.message === "Uid found") {
-      // UID found, proceed with social login
+      // Proceed with social login
       const response = await axios.post("app/auth/social-login", {
         signup_method: "facebook",
         uid: user.uid,
@@ -444,8 +534,7 @@ export const LoginWithFacebook = async () => {
       console.log("Social login response:", response.data);
 
       // Save token and show success message
-      const token = response.data.data.token;
-      localStorage.setItem("Web-token", token);
+      localStorage.setItem("Web-token", response.data.data.token);
       Swal.fire({
         icon: "success",
         title: "Login Successful",
@@ -455,26 +544,40 @@ export const LoginWithFacebook = async () => {
 
       // Reload page
       window.location.reload();
-    } else if (checkUIDResponse.data.message === "Uid Not Found") {
-      // UID not found, redirect user to sign-up
+    } else {
+      // UID not found, prompt user to sign up
       Swal.fire({
         icon: "error",
         text: "User not found. Please sign up first.",
       });
 
-      // Store UIDNotFound data
+      // Store data locally for sign-up flow
       localStorage.setItem("UIDNotFound", JSON.stringify(UserDetails));
-      console.log("impotant -->", JSON.stringify(UserDetails));
-      // window.location.reload(); // Uncomment if necessary
+      console.log(
+        "User details saved for sign-up:",
+        JSON.stringify(UserDetails)
+      );
     }
   } catch (error) {
     console.error("Facebook Sign-In or API request failed:", error);
 
     if (error.code === "auth/popup-closed-by-user") {
-      Swal.fire({
+      const retry = await Swal.fire({
         icon: "warning",
         title: "Login Cancelled",
-        text: "It looks like you closed the popup before completing the sign-in. Please try again.",
+        text: "You closed the popup before completing sign-in. Do you want to try again?",
+        showCancelButton: true,
+        confirmButtonText: "Retry",
+      });
+
+      if (retry.isConfirmed) return LoginWithFacebook(); // Retry login
+    }
+
+    if (error.message.includes("Popup was blocked")) {
+      Swal.fire({
+        icon: "error",
+        title: "Popup Blocked",
+        text: "Please allow popups for this site and try again.",
       });
       return;
     }
@@ -485,6 +588,10 @@ export const LoginWithFacebook = async () => {
       text:
         error.message || "An error occurred during login. Please try again.",
     });
+
+    // Fallback to sign-in with redirect for better compatibility
+    console.log("Falling back to sign-in with redirect...");
+    await signInWithRedirect(auth, facebookProvider);
   }
 };
 
