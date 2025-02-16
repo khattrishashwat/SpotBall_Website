@@ -149,7 +149,11 @@ const App = () => {
             <Route path="/cookies" element={<Cookies />} />
             <Route path="/knows" element={<Know />} />
             <Route path="/my_account_delete" element={<Delete />} />
-            <Route path="/popupCheckout" element={<PopupCheckout />} />
+            {/* <Route path="/popupCheckout/:order_id" element={<PopupCheckout />} /> */}
+            <Route
+              path="/popupCheckout"
+              element={<PopupCheckout />}
+            />
             {/* Catch-all for 404 */}
             <Route path="*" element={<PageNot />} />
           </Routes>
