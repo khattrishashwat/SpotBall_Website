@@ -84,20 +84,19 @@ function PopupCheckout() {
   };
 
   // Choose appropriate GIF based on paymentStatus
-  const getStatusGif = () => {
-    switch (paymentStatus) {
-      case "SUCCESS":
-        return "images/payment_done_new.gif"; // Success GIF
-      case "PENDING":
-        return "images/payment_pending.gif"; // Pending GIF
-      case "FAILED":
-        return "images/payment_failed.gif"; // Failed GIF
-      case "Unknown":
-        return "Please contact Spotsball team"; // Unknown status message
-      default:
-        return "images/payment_failed.gif"; // Default / Failed GIF
-    }
-  };
+ const getStatusGif = () => {
+   switch (paymentStatus) {
+     case "SUCCESS":
+       return "images/payment_done_new.gif"; // Success GIF
+     case "PENDING":
+       return "images/payment_pending.gif"; // Pending GIF
+     case "FAILED":
+       return "images/payment_failed.gif"; // Failed GIF
+     case "Unknown":
+       return "Please contact Spotsball team"; // Unknown status message
+   }
+ };
+
 
   return (
     <>
