@@ -680,6 +680,90 @@ function Checkout() {
   //   }
   // };
 
+  // const Money = async () => {
+  //   const token = localStorage.getItem("Web-token");
+  //   console.log("total", totalBeforeDiscount);
+
+  //   if (!token) {
+  //     console.error("Error: You are not authenticated. Please log in.");
+  //     return;
+  //   }
+
+  //   try {
+  //     // Step 1: Call Money API to get paymentSessionId
+  //     const response = await axios.post(
+  //       "app/cashfree/create-order",
+  //       // { order_amount: Math.round(totalBeforeDiscount) },
+  //       { order_amount: 1 },
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       }
+  //     );
+
+  //     // Extract payment session ID and order ID from the response
+  //     const paymentOrderId = response.data?.data?.order_id;
+  //     const paymentSessionId = response.data?.data?.payment_session_id;
+
+  //     if (!paymentSessionId) {
+  //       console.error(
+  //         "Error: Payment session ID is missing. Unable to proceed."
+  //       );
+  //       return;
+  //     }
+
+  //     console.log("Payment Session ID:", paymentSessionId);
+
+  //     // Step 2: Initialize Cashfree SDK in production mode
+  //     let cashfree;
+  //     try {
+  //       cashfree = await load({ mode: "production" });
+  //       console.log("Cashfree SDK initialized successfully.");
+  //     } catch (sdkError) {
+  //       console.error("SDK Initialization Error:", sdkError);
+  //       return;
+  //     }
+
+  //     // Step 3: Configure Cashfree Checkout
+  //     const checkoutOptions = {
+  //       paymentSessionId,
+  //       redirectTarget: "_modal",
+  //       callback_url: `https://www.spotsball.com/spotsball/web/popupCheckout?order_id=${paymentOrderId}`,
+  //     };
+
+  //     // Step 4: Process Payment
+  //     cashfree.checkout(checkoutOptions).then(async (result) => {
+  //       if (result.error) {
+  //         console.error("Payment Failed Error:", result.error);
+  //         window.history.back(); // Redirect back after error
+  //       } else if (result.paymentDetails) {
+  //         console.log("Payment Details:", result.paymentDetails);
+  //         const paymentStatus = result.paymentDetails.paymentStatus;
+
+  //         if (paymentStatus === "SUCCESS") {
+  //           console.log("Payment Successful!");
+  //           window.location.href = `https://www.spotsball.com/spotsball/web/popupCheckout?order_id=${paymentOrderId}`;
+  //         } else if (paymentStatus === "FAILED") {
+  //           console.error("Transaction Failed!");
+  //           window.history.back();
+  //         } else if (paymentStatus === "PENDING") {
+  //           console.log("Payment Pending. Redirecting...");
+  //           window.location.href = `https://www.spotsball.com/spotsball/web/popupCheckout?order_id=${paymentOrderId}`;
+  //         }
+  //       } else {
+  //         console.log("User closed the payment window.");
+  //         window.history.back(); // Redirect back when user cancels payment
+  //       }
+  //     });
+  //   } catch (error) {
+  //     console.error(
+  //       "Money API Error:",
+  //       error.response?.data?.message || error.message
+  //     );
+  //   }
+  // };
+
   const Money = async () => {
     const token = localStorage.getItem("Web-token");
     console.log("total", totalBeforeDiscount);
@@ -693,7 +777,6 @@ function Checkout() {
       // Step 1: Call Money API to get paymentSessionId
       const response = await axios.post(
         "app/cashfree/create-order",
-        // { order_amount: Math.round(totalBeforeDiscount) },
         { order_amount: 1 },
         {
           headers: {
@@ -715,6 +798,11 @@ function Checkout() {
 
       console.log("Payment Session ID:", paymentSessionId);
 
+      //         // Prepare payment data
+      const paymentData = preparePaymentData(paymentOrderId);
+
+      //         // Call Pay function to process the payment data
+      Pay(paymentData);
       // Step 2: Initialize Cashfree SDK in production mode
       let cashfree;
       try {
@@ -728,7 +816,7 @@ function Checkout() {
       // Step 3: Configure Cashfree Checkout
       const checkoutOptions = {
         paymentSessionId,
-        redirectTarget: "_modal", // Opens the checkout as a popup
+        redirectTarget: "_modal",
         callback_url: `https://www.spotsball.com/spotsball/web/popupCheckout?order_id=${paymentOrderId}`,
       };
 
@@ -736,7 +824,11 @@ function Checkout() {
       cashfree.checkout(checkoutOptions).then(async (result) => {
         if (result.error) {
           console.error("Payment Failed Error:", result.error);
-          window.history.back(); // Redirect back after error
+          Swal.fire({
+            icon: "error",
+            title: "Payment Failed",
+            text: "Something went wrong. Please try again.",
+          });
         } else if (result.paymentDetails) {
           console.log("Payment Details:", result.paymentDetails);
           const paymentStatus = result.paymentDetails.paymentStatus;
@@ -746,14 +838,22 @@ function Checkout() {
             window.location.href = `https://www.spotsball.com/spotsball/web/popupCheckout?order_id=${paymentOrderId}`;
           } else if (paymentStatus === "FAILED") {
             console.error("Transaction Failed!");
-            window.history.back();
+            Swal.fire({
+              icon: "error",
+              title: "Transaction Failed",
+              text: "Your payment could not be processed. Please try again later.",
+            });
           } else if (paymentStatus === "PENDING") {
             console.log("Payment Pending. Redirecting...");
             window.location.href = `https://www.spotsball.com/spotsball/web/popupCheckout?order_id=${paymentOrderId}`;
           }
         } else {
           console.log("User closed the payment window.");
-          window.history.back(); // Redirect back when user cancels payment
+          Swal.fire({
+            icon: "info",
+            title: "Payment Cancelled",
+            text: "You have closed the payment window.",
+          });
         }
       });
     } catch (error) {

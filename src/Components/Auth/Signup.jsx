@@ -194,12 +194,11 @@ const Signup = ({ isOpenness, Closed, back }) => {
         // "resend-otp-user-verification",
         "app/auth/resend-otp-user-verification",
         { emailOrPhone: emails }
-        // , // Directly use email passed as argument
-        // {
-        //   headers: {
-        //     Authorization: `Bearer ${token}`,
-        //   },
-        // }
+      //  ,        {
+      //     headers: {
+      //       Authorization: `Bearer ${token}`,
+      //     },
+      //   }
       );
 
       console.log("resend", response.data.data.tokens);

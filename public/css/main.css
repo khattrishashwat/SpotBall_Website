@@ -5592,7 +5592,7 @@ ul.list-inline li a:hover {
 
 .payment_process_popup {
   position: relative;
-  top: 0;
+  top: 10px;
   /* background: #303030a3; */
   width: 100%;
   height: 100%;

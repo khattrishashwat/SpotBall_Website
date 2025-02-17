@@ -315,8 +315,8 @@ function Screen() {
     const yRelative = e.clientY - rect.top; // Y coordinate relative to the image
 
     // Calculate the click's position based on the image's natural size
-    const x = ((xRelative / rect.width) * image.naturalWidth).toFixed(2); // X based on image's intrinsic width
-    const y = ((yRelative / rect.height) * image.naturalHeight).toFixed(2); // Y based on image's intrinsic height
+    const x = ((xRelative / rect.width) * image.naturalWidth).toFixed(0); // X based on image's intrinsic width
+    const y = ((yRelative / rect.height) * image.naturalHeight).toFixed(0); // Y based on image's intrinsic height
 
     const updatedTickets = [...tickets];
 
@@ -344,6 +344,48 @@ function Screen() {
       alert("All tickets are already filled.");
     }
   };
+
+  // const handleClick = (e) => {
+  //   setColorIndex(responseData.cursor_color);
+
+  //   if (clickCount >= totalTickets) {
+  //     alert("You've used all your tickets. Click '+' to add more.");
+  //     return;
+  //   }
+
+  //   const image = e.target;
+  //   const rect = image.getBoundingClientRect();
+
+  //   // Get relative position
+  //   const xRelative = e.clientX - rect.left;
+  //   const yRelative = e.clientY - rect.top;
+
+  //   // Calculate based on natural size
+  //   const x = (xRelative / rect.width) * image.naturalWidth;
+  //   const y = (yRelative / rect.height) * image.naturalHeight;
+
+  //   const updatedTickets = [...tickets];
+
+  //   // Find a ticket with empty coordinates
+  //   const ticketIndex = updatedTickets.findIndex(
+  //     (ticket) => ticket.xCord === "____" && ticket.yCord === "____"
+  //   );
+
+  //   if (ticketIndex !== -1) {
+  //     updatedTickets[ticketIndex] = {
+  //       ...updatedTickets[ticketIndex],
+  //       xCord: x,
+  //       yCord: y,
+  //     };
+
+  //     setTickets(updatedTickets);
+  //     setClickedPoints((prev) => [...prev, { x, y }]); // No filtering, allow exact overlap
+  //     setClickCount((prev) => prev + 1);
+  //     setUsedTickets((prev) => prev + 1);
+  //   } else {
+  //     alert("All tickets are already filled.");
+  //   }
+  // };
 
   const handleCheckout = async () => {
     if (usedTickets !== totalTickets) return;
@@ -426,7 +468,7 @@ function Screen() {
                   alt="Player"
                 />
 
-                {clickedPoints.map((point, index) => (
+                {/* {clickedPoints.map((point, index) => (
                   <div
                     key={index}
                     style={{
@@ -446,6 +488,32 @@ function Screen() {
                       style={{
                         color: colorIndex,
                         fontSize: "40px",
+                      }}
+                    />
+                  </div>
+                ))} */}
+                {clickedPoints.map((point, index) => (
+                  <div
+                    key={index}
+                    style={{
+                      position: "absolute",
+                      left: `${
+                        (point.x / imgRef.current.naturalWidth) *
+                        imgRef.current.clientWidth
+                      }px`,
+                      top: `${
+                        (point.y / imgRef.current.naturalHeight) *
+                        imgRef.current.clientHeight
+                      }px`,
+                      transform: "translate(-50%, -50%)", // Keeps it centered
+                      pointerEvents: "none", // So that clicks do not interfere
+                    }}
+                  >
+                    <RxCross2
+                      style={{
+                        color: colorIndex,
+                        fontSize: "40px",
+                        // position: "absolute",
                       }}
                     />
                   </div>
