@@ -169,15 +169,6 @@ function Login({ isVisible, onClose }) {
   // };
 
   const Login = async (values) => {
-    console.log("Attempting to login with values:", values);
-
-    // Ensure values are present before proceeding
-    // if (!values || !values.emailOrPhone) {
-    //   console.error("Login values are missing.");
-    //   return;
-    // }
-
-    // Check if the input is a phone number and prepend country code if needed
     const isPhoneNumber = /^[6-9]\d{9}$/.test(values.emailOrPhone);
     if (isPhoneNumber) {
       values.emailOrPhone = `+91${values.emailOrPhone}`;
