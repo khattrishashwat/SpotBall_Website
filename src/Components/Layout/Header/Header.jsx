@@ -1,9 +1,12 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import Login from "../../Auth/Login";
 import axios from "axios";
 import moment from "moment";
 import Swal from "sweetalert2";
+import { useTranslation } from "react-i18next";
+import { LanguageContext } from "../../../LanguageContext";
+import "../../../i18n";
 
 function Header() {
   const navigate = useNavigate();
@@ -14,26 +17,21 @@ function Header() {
   const [profile, setProfile] = useState({});
 
   const [isMenuVisible, setIsMenuVisible] = useState(false);
+  const [islang, setIsLang] = useState(false);
   const [isLogout, setIsLogout] = useState("");
   const [loginPopup, setLoginPopup] = useState(false);
   const [isNot, setIsNot] = useState(false);
   const [notice, setNotice] = useState(false);
   const [androidLink, setAndroidLink] = useState("");
 
-  const fetchAndroidLink = async () => {
-    try {
-      const response = await axios.get("app/apk-links");
-      if (response.data?.data?.android_build) {
-        setAndroidLink(response.data.data.android_build);
-      }
-    } catch (error) {
-      console.error("Error fetching Android data:", error);
-    }
+  const { t } = useTranslation();
+  const { selectedLanguage, setSelectedLanguage } = useContext(LanguageContext);
+
+  const toggleLanguage = (e, lang) => {
+    e.preventDefault();
+    setSelectedLanguage(lang); // Pass language code here
   };
 
-  useEffect(() => {
-    fetchAndroidLink();
-  }, []);
   useEffect(() => {
     if (location.pathname === "/") {
       window.scrollTo(0, 0);
@@ -66,6 +64,9 @@ function Header() {
   };
   const toggleMenu = () => {
     setIsMenuVisible((prevState) => !prevState); // Toggle the state
+  };
+  const toggleMenulang = () => {
+    setIsLang((prevState) => !prevState); // Toggle the state
   };
   const OpenLogout = () => {
     setIsLogout(true);
@@ -310,22 +311,23 @@ function Header() {
         <div className="topfirstbar">
           <div className="ends_compititionssiv_top">
             <a className="topmainbar">
-              <div className="newbtn_top">New</div>
+              <div className="newbtn_top">{t("new")}</div>
               <div className="instantimgdiv">
-                {" "}
-                <img
-                  src={`${process.env.PUBLIC_URL}/images/instant-win.svg`}
-                />{" "}
+                <img src={`${process.env.PUBLIC_URL}/images/instant-win.svg`} />
               </div>
               <div className="endscompititions">
                 {timeLeft.isCompetitionStart
-                  ? `Competition Start : ${timeLeft.days} days: ${timeLeft.hours} hours: ${timeLeft.minutes} minutes: ${timeLeft.seconds} seconds`
-                  : `Competition End : ${timeLeft.days} days: ${timeLeft.hours} hours: ${timeLeft.minutes} minutes: ${timeLeft.seconds} seconds`}
+                  ? `${t("Competition Start")}: ${timeLeft.days} ${t(
+                      "days"
+                    )}: ${timeLeft.hours} ${t("hours")}: ${
+                      timeLeft.minutes
+                    } ${t("minutes")}: ${timeLeft.seconds} ${t("seconds")}`
+                  : `${t("Competition End")}: ${timeLeft.days} ${t("days")}: ${
+                      timeLeft.hours
+                    } ${t("hours")}: ${timeLeft.minutes} ${t("minutes")}: ${
+                      timeLeft.seconds
+                    } ${t("seconds")}`}
               </div>
-              {/* <div className="endscompititions">
-                Competition Ends:{" "}
-                {`${timeLeft.days} days: ${timeLeft.hours} hours: ${timeLeft.minutes} minutes: ${timeLeft.seconds} seconds`}
-              </div> */}
             </a>
           </div>
         </div>
@@ -335,164 +337,6 @@ function Header() {
               <div className="h3-navbar">
                 <div className="container contmainformob_newshi">
                   <nav className="navbar navbar-expand-lg h3-nav navbar_mainnavdiv_shi">
-                    {/* <div className="download_app_icondiv">
-                      <div className="appstoreicondiv">
-                        <a
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          href="https://www.google.com/"
-                        >
-                          <img
-                            src={`${process.env.PUBLIC_URL}/images/google-play-store-badge.png`}
-                            alt="Google Play Store"
-                            className="w-100 mw-100"
-                            style={{ marginTop: "-2px" }}
-                          />
-                        </a>
-                      </div>
-                    </div> */}
-
-                    {/* <div className="download_app_icondiv">
-                      <div className="appstoreicondiv">
-                        <a
-                          className={`dl-button ${isActive ? "active" : ""} ${
-                            isDone ? "done" : ""
-                          }`}
-                          onClick={handleDownload}
-                        >
-                          <div>
-                            <div className="icon">
-                              <svg
-                                className="arrow"
-                                viewBox="0 0 20 18"
-                                fill="currentColor"
-                              >
-                                <polygon points="8 0 12 0 12 9 15 9 10 14 5 9 8 9" />
-                              </svg>
-                              <svg
-                                className="shape"
-                                viewBox="0 0 20 18"
-                                fill="currentColor"
-                              >
-                                <path d="M4.8,0 L15.2,0 C16,0 16.8,0.6 17.1,1.4 L19.7,10.4 C19.9,11 19.9,11.6 19.8,12.2 L19.2,16.3 C19,17.3 18.2,18 17.2,18 H2.8 C1.8,18 1,17.3 0.8,16.3 L0.1,12.2 C0.1,11.6 0.1,11 0.3,10.4 L2.9,1.4 C3.2,0.6 4,0 4.8,0 Z" />
-                              </svg>
-                            </div>
-                            <div className="label" ref={labelRef}>
-                              <div
-                                className={`show default ${
-                                  isDone ? "hide" : ""
-                                }`}
-                              >
-                                Download
-                              </div>
-                              <div className="state">
-                                <div className="counter" ref={counterRef}>
-                                  <span>{progress}%</span>
-                                </div>
-                                {isDone && <span>Done</span>}
-                              </div>
-                            </div>
-                            <div
-                              className="progress"
-                              style={{ transform: `scaleY(${progress / 100})` }}
-                            ></div>
-                          </div>{" "}
-                         
-                        </a>
-                      </div>
-                    </div> */}
-
-                    {/* <div className="download_app_icondiv">
-                      <div className="appstoreicondiv">
-                        <a
-                          className={`dl-button ${isActive ? "active" : ""} ${
-                            isDone ? "done" : ""
-                          }`}
-                          onClick={handleDownload}
-                        >
-                          <div>
-                            <div className="icon">
-                              <div>
-                                <svg
-                                  className="arrow"
-                                  viewBox="0 0 20 18"
-                                  fill="currentColor"
-                                >
-                                  <polygon points="8 0 12 0 12 9 15 9 10 14 5 9 8 9" />
-                                </svg>
-                                <svg
-                                  className="shape"
-                                  viewBox="0 0 20 18"
-                                  fill="currentColor"
-                                >
-                                  <path d="M4.82668561,0 L15.1733144,0 C16.0590479,0 16.8392841,0.582583769 17.0909106,1.43182334 L19.7391982,10.369794 C19.9108349,10.9490677 19.9490212,11.5596963 19.8508905,12.1558403 L19.1646343,16.3248465 C19.0055906,17.2910371 18.1703851,18 17.191192,18 L2.80880804,18 C1.82961488,18 0.994409401,17.2910371 0.835365676,16.3248465 L0.149109507,12.1558403 C0.0509788145,11.5596963 0.0891651114,10.9490677 0.260801785,10.369794 L2.90908938,1.43182334 C3.16071592,0.582583769 3.94095214,0 4.82668561,0 Z" />
-                                </svg>
-                              </div>
-                              <span />
-                            </div>
-                            <div className="label" ref={labelRef}>
-                              <div
-                                className={
-                                  isDownloading ? "default" : "show default"
-                                }
-                              >
-                                {isDone ? "Downloading apk..." : "Download Apk"}
-                              </div>
-
-                              <div
-                                className={`state ${
-                                  isDownloading ? "show" : ""
-                                } ${isDone ? "show" : ""}`}
-                              >
-                                <div
-                                  className={
-                                    isDownloading || isDone
-                                      ? "counter show"
-                                      : "counter "
-                                  }
-                                  ref={counterRef}
-                                >
-                                  {progress > 0 && !isDone && (
-                                    <span>{progress}%</span>
-                                  )}
-                                </div>
-                              </div>
-
-                              {isDone && <span>Download Done</span>}
-                            </div>
-                            <div
-                              className="progress"
-                              style={{ transform: `scaleY(${progress / 100})` }}
-                            ></div>
-                          </div>
-                        </a>
-                      </div>
-                    </div> */}
-                    <div className="d-flex gap-5  justify-content-between align-items-center">
-                      <div className="d-flex gap-3 align-items-start">
-                        <img
-                          src={`${process.env.PUBLIC_URL}/images/favicon.png`}
-                        />
-                        <p className="text-white mb-0">Install SpotsBall App</p>
-                      </div>
-                      <div className="btn btn-dark">
-                        <a
-                          href={androidLink}
-                          className="btn-download"
-                          download
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          {" "}
-                          <i
-                            className="fa fa-download"
-                            aria-hidden="true"
-                          />{" "}
-                          Download APK
-                        </a>
-                      </div>
-                    </div>
-
                     <div
                       className="navbar-brand navbarlogodiv"
                       onClick={handleLogoClick}
@@ -506,6 +350,64 @@ function Header() {
                     {token ? (
                       <div className="navbar-collapse newnavbarleft">
                         <ul className="navbar navbar_afterlogin">
+                          <li className="nav-item afterlogin_icons_nav lang_icons">
+                            <a
+                              className="itmelink_menus "
+                              onClick={toggleMenulang}
+                            >
+                              <img
+                                src={`${process.env.PUBLIC_URL}/images/language_icon.png`}
+                                alt="language-icon"
+                              />
+                            </a>
+                            <div
+                              id="menu-list"
+                              className="menulist_divmanin"
+                              style={{
+                                display: islang ? "block" : "none",
+                              }}
+                            >
+                              <ul className="menubar_list_ul">
+                                {[
+                                  { name: "English", code: "en" },
+                                  { name: "Hindi", code: "hi" },
+                                  { name: "Tamil", code: "ta" },
+                                  { name: "Telugu", code: "te" },
+                                ].map((language, index) => (
+                                  <li key={index} className="mainmenulist">
+                                    <a
+                                      onClick={(e) =>
+                                        toggleLanguage(e, language.code)
+                                      }
+                                    >
+                                      <div className="menubar_divmain">
+                                        <div className="menuname_withicon">
+                                          <div className="menuiconimgdiv">
+                                            <img
+                                              src={`${process.env.PUBLIC_URL}/images/icon_who_we_are.png`}
+                                              alt={`${language.name}-icon`}
+                                            />
+                                          </div>
+                                          <div className="menuname">
+                                            <h4>{language.name}</h4>{" "}
+                                            {/* Show the language name */}
+                                          </div>
+                                        </div>
+                                        <div className="arrowicondiv">
+                                          <img
+                                            src={`${process.env.PUBLIC_URL}/images/menu_arrow_icon.png`}
+                                            className="arrowicon_menu"
+                                            alt="arrow-icon"
+                                          />
+                                        </div>
+                                      </div>
+                                    </a>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          </li>
+
                           <li className="nav-item afterlogin_icons_nav notificationclick">
                             <a className="itmelink_menus">
                               <img
@@ -529,7 +431,7 @@ function Header() {
                                 id="popupContent"
                               >
                                 <div className="notificationheading">
-                                  <h2>Notifications</h2>
+                                  <h2>{t("Notifications")}</h2>
                                 </div>
                                 <div className="notifi_innerdiv">
                                   {notification.length > 0 ? (
@@ -560,7 +462,8 @@ function Header() {
                                       </div>
                                     ))
                                   ) : (
-                                    <p>No notifications available.</p>
+                                    <p>{t("No notifications available.")}</p>
+                                    // <p>No notifications available.</p>
                                   )}
                                 </div>
                                 <div className="crossicondiv">
@@ -621,7 +524,7 @@ function Header() {
                               aria-controls="menu-list"
                               onClick={toggleMenu}
                             >
-                              <span className="moretextmenu">More</span>
+                              <span className="moretextmenu">{t("More")}</span>
                               <img
                                 src={`${process.env.PUBLIC_URL}/images/humbergur_menu.png`}
                                 alt="menu"
@@ -640,7 +543,7 @@ function Header() {
                               aria-controls="menu-list"
                               onClick={toggleMenu}
                             >
-                              <span className="moretextmenu">More</span>
+                              <span className="moretextmenu">{t("More")}</span>
                               <img
                                 src={`${process.env.PUBLIC_URL}/images/humbergur_menu.png`}
                                 alt="menu"
@@ -704,6 +607,7 @@ function Header() {
                                   />
                                 </div>
                                 <div className="menuname">
+                                  {/* <h4>{t("Who We Are")}</h4> */}
                                   <h4>Who We Are</h4>
                                 </div>
                               </div>
@@ -730,7 +634,7 @@ function Header() {
                                   />
                                 </div>
                                 <div className="menuname">
-                                  <h4>The Winners Circle</h4>
+                                  <h4>{t("The Winners Circle")}</h4>
                                 </div>
                               </div>
                               <div className="arrowicondiv">
@@ -763,7 +667,7 @@ function Header() {
                                     justifyContent: "space-between",
                                   }}
                                 >
-                                  <h4>SpotsBall In the News </h4>
+                                  <h4>{t("SpotsBall In the News")}</h4>
                                   <img
                                     src="https://ges-inet.org/wp-content/uploads/2020/10/new-gif.gif"
                                     style={{
@@ -802,7 +706,7 @@ function Header() {
                                 </div>
                                 <div className="menuname">
                                   {/* <h4>Live Weekly Winner</h4> */}
-                                  <h4>Monday Live Stream : Who Won</h4>
+                                  <h4>{t("Monday Live Stream : Who Won")}</h4>
                                 </div>
                               </div>
                               <div className="arrowicondiv">
@@ -828,7 +732,7 @@ function Header() {
                                   />
                                 </div>
                                 <div className="menuname">
-                                  <h4>Contact Us</h4>
+                                  <h4>{t("Contact Us")}</h4>
                                 </div>
                               </div>
                               <div className="arrowicondiv">
@@ -854,7 +758,7 @@ function Header() {
                                   />
                                 </div>
                                 <div className="menuname">
-                                  <h4>Legal</h4>
+                                  <h4>{t("Legal")}</h4>
                                 </div>
                               </div>
                               <div className="arrowicondiv">
@@ -884,7 +788,7 @@ function Header() {
                                     />
                                   </div>
                                   <div className="menuname">
-                                    <h4>Logout</h4>
+                                    <h4>{t("Logout")}</h4>
                                   </div>
                                 </div>
                                 <div className="arrowicondiv">
@@ -937,8 +841,8 @@ function Header() {
             </button>
             <div className="modal-body mdlbdy_delete_account logoutaccount_divmain">
               <div className="deleteacc_text_data logoutdatamain">
-                <h2>Logout</h2>
-                <p>Are you sure you want to logout?</p>
+                <h2>{t("Logout")}</h2>
+                <p>{t("Are you sure you want to logout?")}</p>
               </div>
             </div>
             <div className="mdlftr_delete_acc_actionbtn">
@@ -949,7 +853,7 @@ function Header() {
                   data-dismiss="modal"
                   onClick={CloseLogout}
                 >
-                  Cancel
+                  {t("Cancel")}
                 </button>
               </div>
               <div className="actionbtn_delete">
@@ -957,7 +861,7 @@ function Header() {
                   className="delete_btn_delete actionbtnmain"
                   onClick={handleLogout}
                 >
-                  Logout
+                  {t("Logout")}
                 </a>
               </div>
             </div>

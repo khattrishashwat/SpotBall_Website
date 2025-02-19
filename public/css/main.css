@@ -6897,3 +6897,13 @@ a.btn-download {
   background-color: gray;
   cursor: not-allowed;
 }
+
+.lang_icons .menulist_divmanin .menubar_list_ul {
+  padding: 10px;
+  width: 200px;
+}
+
+.lang_icons .mainmenulist .menubar_divmain {
+
+  padding: 1px 15px;
+}
