@@ -817,7 +817,7 @@ function Checkout() {
       const checkoutOptions = {
         paymentSessionId,
         redirectTarget: "_modal",
-        callback_url: `https://www.spotsball.com/spotsball/web/popupCheckout?order_id=${paymentOrderId}`,
+        // callback_url: `https://www.spotsball.com/spotsball/web/popupCheckout?order_id=${paymentOrderId}`,
       };
 
       // Step 4: Process Payment
@@ -827,8 +827,9 @@ function Checkout() {
           Swal.fire({
             icon: "error",
             title: "Payment Failed",
-            text: "Something went wrong. Please try again.",
+            text: result.error,
           });
+          
         } else if (result.paymentDetails) {
           console.log("Payment Details:", result.paymentDetails);
           const paymentStatus = result.paymentDetails.paymentStatus;

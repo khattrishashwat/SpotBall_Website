@@ -15,6 +15,8 @@ import Swal from "sweetalert2";
 
 // Import components
 
+import { LanguageProvider } from "./LanguageContext";
+
 import Contact from "./Components/Pages/Contact Us/Contact";
 import Press from "./Components/Pages/In The Press/Press";
 import Are from "./Components/Pages/Who we are/Are";
@@ -119,47 +121,44 @@ const App = () => {
       </Helmet>
       <Router basename="/spotsball/web">
         {" "}
-        {/* <LanguageProvider> */}
-        <Suspense fallback={<Loader />}>
-          <Header />
-          <Routes>
-            <Route element={<ProtectedRoute />}>
-              <Route path="/my_account" element={<Profile />} />
-              <Route path="/play_screen" element={<Screen />} />
-              <Route path="/cart" element={<Checkout />} />
-            </Route>
-            <Route path="/" element={<Home />} />
-            <Route path="/contact_us" element={<Contact />} />
-            <Route path="/playss" element={<PlayVedio />} />
-            <Route path="/in_the_press" element={<Press />} />
-            <Route
-              path="/press-details/:id/:title"
-              element={<PressDetails />}
-            />
-            {/* <Route path="/login" element={<Login />} />
+        <LanguageProvider>
+          <Suspense fallback={<Loader />}>
+            <Header />
+            <Routes>
+              <Route element={<ProtectedRoute />}>
+                <Route path="/my_account" element={<Profile />} />
+                <Route path="/play_screen" element={<Screen />} />
+                <Route path="/cart" element={<Checkout />} />
+              </Route>
+              <Route path="/" element={<Home />} />
+              <Route path="/contact_us" element={<Contact />} />
+              <Route path="/playss" element={<PlayVedio />} />
+              <Route path="/in_the_press" element={<Press />} />
+              <Route
+                path="/press-details/:id/:title"
+                element={<PressDetails />}
+              />
+              {/* <Route path="/login" element={<Login />} />
             <Route path="/sign" element={<Signup />} /> */}
-            <Route path="/load" element={<Loader />} />
-            {/* <Route path="/legal_terms" element={<Legal />} /> */}
-            <Route path="/who_we_are" element={<Are />} />
-            <Route path="/the_winners_circle" element={<Circle />} />
-            <Route path="/live_weekly_winner" element={<Weekly />} />
-            <Route path="/terms" element={<Tearms />} />
-            <Route path="/privacy" element={<Privacy />} />
-            <Route path="/rules" element={<Rules />} />
-            <Route path="/cookies" element={<Cookies />} />
-            <Route path="/knows" element={<Know />} />
-            <Route path="/my_account_delete" element={<Delete />} />
-            {/* <Route path="/popupCheckout/:order_id" element={<PopupCheckout />} /> */}
-            <Route
-              path="/popupCheckout"
-              element={<PopupCheckout />}
-            />
-            {/* Catch-all for 404 */}
-            <Route path="*" element={<PageNot />} />
-          </Routes>
-          <Footer />
-        </Suspense>
-        {/* </LanguageProvider> */}
+              <Route path="/load" element={<Loader />} />
+              {/* <Route path="/legal_terms" element={<Legal />} /> */}
+              <Route path="/who_we_are" element={<Are />} />
+              <Route path="/the_winners_circle" element={<Circle />} />
+              <Route path="/live_weekly_winner" element={<Weekly />} />
+              <Route path="/terms" element={<Tearms />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/rules" element={<Rules />} />
+              <Route path="/cookies" element={<Cookies />} />
+              <Route path="/knows" element={<Know />} />
+              <Route path="/my_account_delete" element={<Delete />} />
+              {/* <Route path="/popupCheckout/:order_id" element={<PopupCheckout />} /> */}
+              <Route path="/popupCheckout" element={<PopupCheckout />} />
+              {/* Catch-all for 404 */}
+              <Route path="*" element={<PageNot />} />
+            </Routes>
+            <Footer />
+          </Suspense>
+        </LanguageProvider>
       </Router>
     </>
   );
