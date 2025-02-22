@@ -169,7 +169,7 @@ function Login({ isVisible, onClose }) {
       // Retrieve Firebase token for push notifications
       const device_token = await getToken(messaging, {
         vapidKey:
-          "BNkI-Se9LgfgnkAxsoNDTe3uQDR7HBWV6rY-Mhc3A6AioGIl-VnUn49NTAdTZHgBnt6id6KokU02Pku4G0GpYxA",
+          "BC1L5qE6WKJSgEU46nuptM9bCKtljihEjAikiBrpzRIomSiw6Dd9Wq6jmM4CfIHJokkhmqblgU5qbVaqizNlmeo",
       });
 
       if (!device_token) {

@@ -51,7 +51,6 @@ function detectIncognitoMode() {
   });
 }
 
-// Main logic
 // if ("serviceWorker" in navigator) {
 //   detectIncognitoMode().then((isIncognito) => {
 //     if (isIncognito) {
@@ -65,15 +64,16 @@ function detectIncognitoMode() {
 //     }
 
 //     navigator.serviceWorker
-//       .register("/firebase-messaging-sw.js", {
+//       .register("/spotsball/web/firebase-messaging-sw.js", {
 //         scope: "/spotsball/web/",
 //       })
+
 //       .then((registration) => {
 //         console.log("Service Worker registered:", registration);
 
 //         getToken(messaging, {
 //           vapidKey:
-//             "BNkI-Se9LgfgnkAxsoNDTe3uQDR7HBWV6rY-Mhc3A6AioGIl-VnUn49NTAdTZHgBnt6id6KokU02Pku4G0GpYxA",
+//             "BC1L5qE6WKJSgEU46nuptM9bCKtljihEjAikiBrpzRIomSiw6Dd9Wq6jmM4CfIHJokkhmqblgU5qbVaqizNlmeo",
 //         })
 //           .then((currentToken) => {
 //             if (currentToken) {
@@ -104,17 +104,85 @@ function detectIncognitoMode() {
 //       });
 //   });
 // }
+// if ("serviceWorker" in navigator) {
+//   navigator.serviceWorker
+//     .register("/spotsball/web/firebase-messaging-sw.js", {
+//       scope: "/spotsball/web/",
+//     })
+//     .then((registration) => {
+//       console.log("Service Worker registered:", registration);
+
+//       getToken(messaging, {
+//         vapidKey:
+//           "BC1L5qE6WKJSgEU46nuptM9bCKtljihEjAikiBrpzRIomSiw6Dd9Wq6jmM4CfIHJokkhmqblgU5qbVaqizNlmeo",
+//       })
+//         .then((currentToken) => {
+//           if (currentToken) {
+//             console.log("Current token:", currentToken);
+//             localStorage.setItem("device_token", currentToken);
+//           } else {
+//             console.log(
+//               "No registration token available. Request permission to generate one."
+//             );
+//           }
+//         })
+//         .catch((err) => {
+//           console.error("Error getting token:", err);
+
+//           // Check if it's a permission blocked error
+//           if (err.code === "messaging/permission-blocked") {
+//             // Check for Incognito mode by testing localStorage access
+//             try {
+//               localStorage.setItem("test", "test");
+//               localStorage.removeItem("test");
+//               Swal.fire({
+//                 title: "Notification Permission Denied",
+//                 text: "Please allow notifications on your browser.",
+//                 icon: "warning",
+//                 confirmButtonText: "OK",
+//               });
+//             } catch (e) {
+//               // If localStorage access fails, user is likely in Incognito mode
+//               Swal.fire({
+//                 title: "Notifications Unavailable in Incognito Mode",
+//                 text: "You can't receive notifications in Incognito Mode. Please use a normal browser.",
+//                 icon: "warning",
+//                 confirmButtonText: "OK",
+//               });
+//             }
+//           }
+//         });
+
+//       onMessage(messaging, (payload) => {
+//         console.log("Message received:", payload);
+//         Swal.fire({
+//           title: "New Message!",
+//           text: payload.notification.body,
+//           icon: "info",
+//           confirmButtonText: "OK",
+//         });
+//       });
+//     })
+//     .catch((error) => {
+//       console.error("Service Worker registration failed:", error);
+//     });
+// }
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker
-    .register("/firebase-messaging-sw.js", {
-      scope: "/spotsball/web/",
-    })
+    .register(
+      "/spotsball/web/firebase-messaging-sw.js"
+      //   , {
+      //   scope: "/spotsball/web/",
+      // }
+    )
     .then((registration) => {
       console.log("Service Worker registered:", registration);
 
+      // Pass the registration to getToken:
       getToken(messaging, {
+        serviceWorkerRegistration: registration,
         vapidKey:
-          "BNkI-Se9LgfgnkAxsoNDTe3uQDR7HBWV6rY-Mhc3A6AioGIl-VnUn49NTAdTZHgBnt6id6KokU02Pku4G0GpYxA",
+          "BC1L5qE6WKJSgEU46nuptM9bCKtljihEjAikiBrpzRIomSiw6Dd9Wq6jmM4CfIHJokkhmqblgU5qbVaqizNlmeo",
       })
         .then((currentToken) => {
           if (currentToken) {
@@ -131,7 +199,6 @@ if ("serviceWorker" in navigator) {
 
           // Check if it's a permission blocked error
           if (err.code === "messaging/permission-blocked") {
-            // Check for Incognito mode by testing localStorage access
             try {
               localStorage.setItem("test", "test");
               localStorage.removeItem("test");
@@ -142,7 +209,6 @@ if ("serviceWorker" in navigator) {
                 confirmButtonText: "OK",
               });
             } catch (e) {
-              // If localStorage access fails, user is likely in Incognito mode
               Swal.fire({
                 title: "Notifications Unavailable in Incognito Mode",
                 text: "You can't receive notifications in Incognito Mode. Please use a normal browser.",
