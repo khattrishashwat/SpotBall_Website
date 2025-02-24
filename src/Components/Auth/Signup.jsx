@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
@@ -25,7 +25,8 @@ const Signup = ({ isOpenness, Closed, back }) => {
   const [otp, setOtp] = useState(["", "", "", ""]);
   const [isSocialSignup, setIsSocialSignup] = useState(false);
   const location = useLocation();
-  const [timer, setTimer] = useState(0); // Timer state for resend OTP
+  const [timer, setTimer] = useState(60); // Timer state for resend OTP
+  const formikRef = useRef(null);
 
   // useEffect(() => {
   //   // Keep the popup open if navigating to linked pages like terms or rules
@@ -33,6 +34,16 @@ const Signup = ({ isOpenness, Closed, back }) => {
   //     isOpenness(true);
   //   }
   // }, [location.state]);
+  const otpRefs = useRef([]);
+
+  useEffect(() => {
+    // Check if popupOpen is false in the location state
+    if (location.state?.popupOpen === false) {
+      isOpenness(false); // Close the popup
+    } else if (location.state?.popupOpen === true) {
+      isOpenness(true); // Keep the popup open if navigating to linked pages like terms or rules
+    }
+  }, [location.state]);
   const openModals = () => {
     setIsModals(true);
   };
@@ -42,6 +53,7 @@ const Signup = ({ isOpenness, Closed, back }) => {
 
   const handleLogin = () => {
     setLoginPopup(true);
+    // Closed()
     // onClosed();
   };
   // const handleLogin = () => {
@@ -66,6 +78,33 @@ const Signup = ({ isOpenness, Closed, back }) => {
     agreeAge: false,
   };
 
+   const validateFields = Yup.object().shape({
+    first_name: Yup.string().required("First name is required"),
+    last_name: Yup.string().required("Last name is required"),
+    email: Yup.string().email("Invalid email").required("Email is required"),
+    phone: Yup.string()
+      .matches(/^\d{10}$/, "Phone number must be 10 digits")
+      .required("Phone number is required"),
+    
+      password: Yup.string()
+      .min(8, "Password must be at least 8 characters")
+      .matches(/[A-Z]/, "Password must contain at least one uppercase letter")
+      .matches(/[a-z]/, "Password must contain at least one lowercase letter")
+      .matches(/[0-9]/, "Password must contain at least one number")
+      .matches(
+        /[@$!%*?&]/,
+        "Password must contain at least one special character (@, $, !, %, *, ?, &)"
+      )
+      .required("Password is required"),
+    confirm_password: Yup.string()
+      .oneOf([Yup.ref("password"), null], "Passwords must match")
+      .required("Confirm password is required"),
+
+    agreeAllLegal: Yup.boolean().oneOf([true], "You must agree to continue"),
+    agreeRules: Yup.boolean().oneOf([true], "You must agree to continue"),
+    agreeAge: Yup.boolean().oneOf([true], "You must agree to continue"),
+  });
+
   // Save data to localStorage on every change
   const handleFieldChange = (field, value, setFieldValue) => {
     setFieldValue(field, value);
@@ -84,16 +123,23 @@ const Signup = ({ isOpenness, Closed, back }) => {
   };
 
   const handleInputChange = (index, value) => {
+    if (!/^\d?$/.test(value)) return; // Allow only one digit (0-9)
+
     const newOtp = [...otp];
-    newOtp[index] = value.slice(-1); // Only take the last digit
+    newOtp[index] = value;
     setOtp(newOtp);
 
-    // Move to the next input
+    // Move focus to the next input field if the current input has a value
     if (value && index < otp.length - 1) {
-      const nextInput = document.querySelector(
-        `.otp__digit:nth-child(${index + 2})`
-      );
-      if (nextInput) nextInput.focus();
+      otpRefs.current[index + 1]?.focus();
+    } else if (!value && index > 0) {
+      otpRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handleKeyPress = (e, index) => {
+    if (e.key === "Backspace" && !otp[index] && index > 0) {
+      otpRefs.current[index - 1]?.focus();
     }
   };
 
@@ -105,8 +151,6 @@ const Signup = ({ isOpenness, Closed, back }) => {
       console.error("No values provided to handleSubmits.");
       return;
     }
-
-    console.log("handlesubmits", values);
 
     if (values.signup_method) {
       // Social signup
@@ -136,12 +180,14 @@ const Signup = ({ isOpenness, Closed, back }) => {
       localStorage.removeItem(localStorageKey);
 
       Swal.fire({
+        icon: "success",
         title: response.data.message,
         showConfirmButton: false,
-        timer: 1000,
+        timer: 4000,
       }).then(() => {
         openModals();
-        // Call resendOtp directly, passing the email from values
+        setTimer(60)
+
         setEmails(values.email);
         // onClose();
       });
@@ -154,6 +200,7 @@ const Signup = ({ isOpenness, Closed, back }) => {
         allowOutsideClick: false,
       });
     } finally {
+     
       setIsLoading(false);
     }
   };
@@ -177,12 +224,12 @@ const Signup = ({ isOpenness, Closed, back }) => {
       const response = await axios.post(
         // "resend-otp-user-verification",
         "app/auth/resend-otp-user-verification",
-        { emailOrPhone: emails }, // Directly use email passed as argument
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { emailOrPhone: emails }
+      //  ,        {
+      //     headers: {
+      //       Authorization: `Bearer ${token}`,
+      //     },
+      //   }
       );
 
       console.log("resend", response.data.data.tokens);
@@ -321,7 +368,7 @@ const Signup = ({ isOpenness, Closed, back }) => {
   };
 
   useEffect(() => {
-    if (isModals) {
+    if (isModals || isOpenness) {
       document.body.style.overflow = "hidden"; // Disable background scrolling
     } else {
       document.body.style.overflow = "auto"; // Enable background scrolling
@@ -331,7 +378,7 @@ const Signup = ({ isOpenness, Closed, back }) => {
     return () => {
       document.body.style.overflow = "auto";
     };
-  }, [isModals]);
+  }, [isModals, isOpenness]);
 
   return (
     <>
@@ -357,6 +404,7 @@ const Signup = ({ isOpenness, Closed, back }) => {
                             className="crossbtn_signinpopupclose singupcrossbtn"
                             // onClick={Closed}
                             onClick={() => {
+                              formikRef.current?.resetForm();
                               Closed();
                               localStorage.removeItem(localStorageKey);
                             }}
@@ -370,7 +418,9 @@ const Signup = ({ isOpenness, Closed, back }) => {
                         <h2>Sign Up</h2>
 
                         <Formik
+                          innerRef={formikRef}
                           initialValues={initialValues}
+                          validationSchema={validateFields}
                           validateOnChange={true}
                           validateOnBlur={true}
                           onSubmit={(values) => handleSubmits(values)}
@@ -411,7 +461,7 @@ const Signup = ({ isOpenness, Closed, back }) => {
                                 <ErrorMessage
                                   name="first_name"
                                   component="div"
-                                  className="field_required"
+                                  className="error-message"
                                 />
                               </div>
 
@@ -443,7 +493,7 @@ const Signup = ({ isOpenness, Closed, back }) => {
                                 <ErrorMessage
                                   name="last_name"
                                   component="div"
-                                  className="field_required"
+                                  className="error-message"
                                 />
                               </div>
 
@@ -460,6 +510,11 @@ const Signup = ({ isOpenness, Closed, back }) => {
                                       setFieldValue
                                     )
                                   }
+                                />
+                                <ErrorMessage
+                                  name="email"
+                                  component="div"
+                                  className="error-message"
                                 />
                               </div>
 
@@ -485,7 +540,7 @@ const Signup = ({ isOpenness, Closed, back }) => {
                                 <ErrorMessage
                                   name="phone"
                                   component="div"
-                                  className="field_required"
+                                  className="error-message"
                                 />
                               </div>
 
@@ -506,6 +561,7 @@ const Signup = ({ isOpenness, Closed, back }) => {
                                         )
                                       }
                                     />
+                                  
                                     <span
                                       onClick={toggleNewPasswordVisibility}
                                       className="eyeiconfor"
@@ -521,7 +577,7 @@ const Signup = ({ isOpenness, Closed, back }) => {
                                     <ErrorMessage
                                       name="password"
                                       component="div"
-                                      className="field_required"
+                                      className="error-message"
                                     />
                                   </div>
 
@@ -557,7 +613,7 @@ const Signup = ({ isOpenness, Closed, back }) => {
                                     <ErrorMessage
                                       name="confirm_password"
                                       component="div"
-                                      className="field_required"
+                                      className="error-message"
                                     />
                                   </div>
                                 </>
@@ -565,11 +621,11 @@ const Signup = ({ isOpenness, Closed, back }) => {
 
                               {/* Terms & Conditions */}
 
-                              <div className="remeberrecoverydiv">
+                              <div className="remeberrecoverydiv mb-0">
                                 <div className="rememebrmediv">
                                   <Field
                                     type="checkbox"
-                                    name={`agreeAllLegal`}
+                                    name="agreeAllLegal"
                                     className="checkboxemeber"
                                   />
                                   <label
@@ -582,7 +638,7 @@ const Signup = ({ isOpenness, Closed, back }) => {
                                         <span key={index}>
                                           <Link
                                             to={legalLinks.paths[index]}
-                                            // state={{ popupOpen: false }}
+                                            state={{ popupOpen: false }}
                                             // target="_blank"
                                             // rel="noopener noreferrer"
                                           >
@@ -597,29 +653,51 @@ const Signup = ({ isOpenness, Closed, back }) => {
                                   </label>
                                 </div>
                               </div>
+                              <ErrorMessage
+                                      name="agreeAllLegal"
+                                      component="div"
+                                      className="error-message"
+                                    />
 
                               {/* Rules of Play & FAQ */}
-                              <div className="remeberrecoverydiv">
+                              <div className="remeberrecoverydiv mb-0">
                                 <div className="rememebrmediv">
                                   <Field
                                     type="checkbox"
                                     name="agreeRules"
                                     className="checkboxemeber"
                                   />
+                                  {/* <label className="labelrememebrme">
+                                    I have read & agree with{" "}
+                                    <Link
+                                      to="/rules"
+                                      state={{ popupOpen: false }}
+                                     
+                                    >
+                                      Rules of Play & FAQ's
+                                    </Link>
+                                  </label> */}
                                   <label className="labelrememebrme">
                                     I have read & agree with{" "}
                                     <Link
                                       to="/rules"
-                                      // state={{ popupOpen: true }}
-                                      // target="_blank"
-                                      // rel="noopener noreferrer"
+                                      state={{ popupOpen: false }}
+                                      onClick={() =>
+                                        console.log("popupOpen:", false)
+                                      }
                                     >
                                       Rules of Play & FAQ's
                                     </Link>
                                   </label>
                                 </div>
                               </div>
-                              <div className="remeberrecoverydiv">
+                              <ErrorMessage
+                                      name="agreeRules"
+                                      component="div"
+                                      className="error-message"
+                                    />
+                              
+                              <div className="remeberrecoverydiv mb-0">
                                 <div className="rememebrmediv">
                                   <Field
                                     type="checkbox"
@@ -633,6 +711,11 @@ const Signup = ({ isOpenness, Closed, back }) => {
                                   </label>
                                 </div>
                               </div>
+                              <ErrorMessage
+                                      name="agreeAge"
+                                      component="div"
+                                      className="error-message"
+                                    />
 
                               {/* Submit Button */}
                               <div className="form-control loginformctrl">
@@ -651,7 +734,9 @@ const Signup = ({ isOpenness, Closed, back }) => {
                                     <li>
                                       <a
                                         onClick={() => {
+                                          Closed()
                                           setIsSocialSignup(true);
+
                                           handleGoogleSignup(
                                             setFieldValue,
                                             "google"
@@ -668,6 +753,7 @@ const Signup = ({ isOpenness, Closed, back }) => {
                                     <li>
                                       <a
                                         onClick={() => {
+                                          Closed()
                                           setIsSocialSignup(true);
                                           handleFacebookSignup(
                                             setFieldValue,
@@ -685,6 +771,7 @@ const Signup = ({ isOpenness, Closed, back }) => {
                                     <li>
                                       <a
                                         onClick={() => {
+                                          Closed()
                                           setIsSocialSignup(true);
                                           handleTwitterSignup(
                                             setFieldValue,
@@ -727,11 +814,12 @@ const Signup = ({ isOpenness, Closed, back }) => {
                                     className="showsigninbtn_div"
                                     // onClick={handleLogin}
                                     onClick={() => {
-                                      setLoginPopup(!isLoginPopup);
+                                      // setLoginPopup(!isLoginPopup);
                                       localStorage.removeItem("showSignup");
-
-                                      // Closed();
+                                    
+                                      back()
                                     }}
+                                    
                                   >
                                     Sign In
                                   </a>
@@ -749,7 +837,7 @@ const Signup = ({ isOpenness, Closed, back }) => {
           </div>
         </div>
       </div>
-      {isLoginPopup && <Login isVisible={isLoginPopup} onClose={ClosePopup} />}
+      {isLoginPopup && <Login isVisible={isLoginPopup} setLoginOpen={true} onClose={ClosePopup} />}
 
       <div
         className={`signinpopup_main ${isModals ? "show" : ""}`}
@@ -788,12 +876,14 @@ const Signup = ({ isOpenness, Closed, back }) => {
                               {otp.map((digit, index) => (
                                 <input
                                   key={index}
+                                  ref={(el) => (otpRefs.current[index] = el)} // Set ref for each input
                                   type="text"
                                   className="otp__digit"
                                   value={digit}
                                   onChange={(e) =>
                                     handleInputChange(index, e.target.value)
                                   }
+                                  onKeyDown={(e) => handleKeyPress(e, index)}
                                   maxLength={1}
                                 />
                               ))}

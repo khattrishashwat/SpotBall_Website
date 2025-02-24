@@ -5130,10 +5130,10 @@ ul.list-inline li a:hover {
 .col3ticketscontest .ticketaxis_div {
   background: #fff;
   height: 100%;
-  padding: 20px 15px;
+  padding: 10px 10px;
   border-radius: 10px;
 }
-
+.actionicon_btn .threeicons_action p{margin-bottom: 0;}
 .ticketaxis_div .ticketheading {
   margin-bottom: 10px;
 }
@@ -5142,7 +5142,7 @@ ul.list-inline li a:hover {
   text-align: center;
   font-weight: 600;
   color: #000;
-  font-size: 25px;
+  font-size: 18px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -5152,7 +5152,7 @@ ul.list-inline li a:hover {
   justify-content: center;
   align-items: center;
   gap: 20px;
-  margin-bottom: 10px;
+  /* margin-bottom: 10px; */
 }
 
 .actionicon_btn .threeicons_action {
@@ -5204,7 +5204,7 @@ ul.list-inline li a:hover {
 }
 
 .allticketmaindiv_contest {
-  max-height: 375px;
+  max-height: 191px;
   overflow: auto;
 }
 
@@ -5214,9 +5214,9 @@ ul.list-inline li a:hover {
 
 .contestticketdiv_main .contest_cordinates_div {
   background: #ab0505;
-  padding: 15px;
+  padding: 7px 12px;
   border-radius: 4px;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 /* .contestticketdiv_main .contest_cordinates_div:last-child {
@@ -5226,7 +5226,7 @@ ul.list-inline li a:hover {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
+  margin-bottom: 8px;
 }
 
 .contestprice_tickets .pricewithcontest h3 {
@@ -5273,7 +5273,7 @@ ul.list-inline li a:hover {
   margin-bottom: 0;
   color: #fff;
   font-weight: 600;
-  font-size: 22px;
+  font-size: 18px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -5591,9 +5591,9 @@ ul.list-inline li a:hover {
 }
 
 .payment_process_popup {
-  position: fixed;
-  top: 0;
-  background: #303030a3;
+  position: relative;
+  top: 10px;
+  /* background: #303030a3; */
   width: 100%;
   height: 100%;
   z-index: 99;
@@ -5662,6 +5662,7 @@ ul.list-inline li a:hover {
   display: block;
   line-height: 50px;
   text-align: center;
+  cursor: pointer;
 }
 
 .successfullypayment .cross_payprocess {
@@ -6847,4 +6848,62 @@ a.btn-download {
     width: 102px;
     padding: 6px 3px;
   }
+}
+
+.support-email {
+  color: #8ee78e;
+}
+
+.notification_settingdiv {
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #333;
+  padding: 20px;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.notification_settingdiv h2 {
+  font-size: 24px;
+  font-weight: bold;
+  color: #4CAF50;
+  margin-bottom: 15px;
+}
+
+.notification_settingdiv p {
+  font-size: 16px;
+  color: #555;
+  margin-bottom: 10px;
+  display: flow-root;
+  /* align-items: center; */
+}
+
+.notification_settingdiv p span {
+  margin-left: 5px;
+}
+
+.notification_settingdiv p i {
+  font-size: 18px;
+  color: #4CAF50;
+}
+
+.notification_settingdiv p b {
+  font-weight: bold;
+  color: #4CAF50;
+}
+
+.disabled-btn {
+  background-color: gray;
+  cursor: not-allowed;
+}
+
+.lang_icons .menulist_divmanin .menubar_list_ul {
+  padding: 10px;
+  width: 200px;
+}
+
+.lang_icons .mainmenulist .menubar_divmain {
+
+  padding: 1px 15px;
 }

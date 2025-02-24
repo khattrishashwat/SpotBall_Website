@@ -45,25 +45,43 @@ function Contact() {
 
   const handleNumericInput = (value) =>
     value.replace(/[^0-9]/g, "").slice(0, 10);
-
   const validationContact = Yup.object().shape({
     first_name: Yup.string()
       .required("First Name is required")
-      .matches(/^[A-Z]/, "First letter must be capital"),
+      .matches(/^[A-Z]/, "First letter must be capital")
+      .max(20, "First Name cannot exceed 20 characters"), // Max 20 characters
+
     last_name: Yup.string()
       .required("Last Name is required")
-      .matches(/^[A-Z]/, "First letter must be capital"),
+      .matches(/^[A-Z]/, "First letter must be capital")
+      .max(20, "Last Name cannot exceed 20 characters"), // Max 20 characters
+
     email: Yup.string()
+      .required("Email is required")
       .email("Invalid email address")
-      .required("Email is required"),
+      .matches(
+        /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+        "Invalid email format. Please enter a valid email address."
+      )
+      .matches(
+        /@(gmail\.com|yahoo\.com|outlook\.com|hotmail\.com)$/,
+        "Only Gmail, Yahoo, Outlook, and Hotmail domains are allowed"
+      ), // Restrict to specific email providers
+
     phone: Yup.string()
       .required("Phone number is required")
       .matches(/^(?:\+91)?[6-9][0-9]{9}$/, "Invalid Indian phone number"),
-    subject: Yup.string().required("Subject is required"),
+
+    subject: Yup.string()
+      .required("Subject is required")
+      .max(150, "Subject cannot exceed 150 characters"), // Max 150 characters
+
     message: Yup.string()
       .required("Message is required")
-      .matches(/^[A-Z]/, "First letter of the message must be capital"),
+      .matches(/^[A-Z]/, "First letter of the message must be capital")
+      .max(500, "Message cannot exceed 500 characters"), // Max 500 characters
   });
+
 
   const Contact_Us = async (values, { resetForm }) => {
     const token = localStorage.getItem("Web-token");

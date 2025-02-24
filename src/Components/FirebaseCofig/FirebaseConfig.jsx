@@ -52,61 +52,8 @@ function detectIncognitoMode() {
 }
 
 // if ("serviceWorker" in navigator) {
-//   detectIncognitoMode().then((isIncognito) => {
-//     if (isIncognito) {
-//       Swal.fire({
-//         title: "Incognito Mode Detected",
-//         text: "Push notifications are disabled in incognito mode. Please switch to normal mode for full functionality.",
-//         icon: "warning",
-//         confirmButtonText: "OK",
-//       });
-//       return; // Stop execution if incognito mode is detected
-//     }
-
-//     navigator.serviceWorker
-//       .register("/spotsball/web/firebase-messaging-sw.js", {
-//         scope: "/spotsball/web/",
-//       })
-
-//       .then((registration) => {
-//         console.log("Service Worker registered:", registration);
-
-//         getToken(messaging, {
-//           vapidKey:
-//             "BC1L5qE6WKJSgEU46nuptM9bCKtljihEjAikiBrpzRIomSiw6Dd9Wq6jmM4CfIHJokkhmqblgU5qbVaqizNlmeo",
-//         })
-//           .then((currentToken) => {
-//             if (currentToken) {
-//               console.log("Current token:", currentToken);
-//               localStorage.setItem("device_token", currentToken);
-//             } else {
-//               console.log(
-//                 "No registration token available. Request permission to generate one."
-//               );
-//             }
-//           })
-//           .catch((err) => {
-//             console.error("Error getting token:", err);
-//           });
-
-//         onMessage(messaging, (payload) => {
-//           console.log("Message received:", payload);
-//           Swal.fire({
-//             title: "New Message!",
-//             text: payload.notification.body,
-//             icon: "info",
-//             confirmButtonText: "OK",
-//           });
-//         });
-//       })
-//       .catch((error) => {
-//         console.error("Service Worker registration failed:", error);
-//       });
-//   });
-// }
-// if ("serviceWorker" in navigator) {
 //   navigator.serviceWorker
-//     .register("/spotsball/web/firebase-messaging-sw.js", {
+//     .register("/firebase-messaging-sw.js", {
 //       scope: "/spotsball/web/",
 //     })
 //     .then((registration) => {
@@ -128,33 +75,10 @@ function detectIncognitoMode() {
 //         })
 //         .catch((err) => {
 //           console.error("Error getting token:", err);
-
-//           // Check if it's a permission blocked error
-//           if (err.code === "messaging/permission-blocked") {
-//             // Check for Incognito mode by testing localStorage access
-//             try {
-//               localStorage.setItem("test", "test");
-//               localStorage.removeItem("test");
-//               Swal.fire({
-//                 title: "Notification Permission Denied",
-//                 text: "Please allow notifications on your browser.",
-//                 icon: "warning",
-//                 confirmButtonText: "OK",
-//               });
-//             } catch (e) {
-//               // If localStorage access fails, user is likely in Incognito mode
-//               Swal.fire({
-//                 title: "Notifications Unavailable in Incognito Mode",
-//                 text: "You can't receive notifications in Incognito Mode. Please use a normal browser.",
-//                 icon: "warning",
-//                 confirmButtonText: "OK",
-//               });
-//             }
-//           }
 //         });
 
 //       onMessage(messaging, (payload) => {
-//         console.log("Message received:", payload);
+//         // console.log("Message received:", payload);
 //         Swal.fire({
 //           title: "New Message!",
 //           text: payload.notification.body,
@@ -167,14 +91,60 @@ function detectIncognitoMode() {
 //       console.error("Service Worker registration failed:", error);
 //     });
 // }
+// if ("serviceWorker" in navigator) {
+//   navigator.serviceWorker
+//     .register("/firebase-messaging-sw.js")
+//     .then((registration) => {
+//       console.log("Service Worker registered:", registration);
+
+//       // Request notification permission
+//       Notification.requestPermission().then((permission) => {
+//         if (permission === "granted") {
+//           console.log("Notification permission granted.");
+
+//           // Retrieve the current token
+//           getToken(messaging, {
+//             vapidKey:
+//               "BC1L5qE6WKJSgEU46nuptM9bCKtljihEjAikiBrpzRIomSiw6Dd9Wq6jmM4CfIHJokkhmqblgU5qbVaqizNlmeo",
+//           })
+//             .then((currentToken) => {
+//               if (currentToken) {
+//                 console.log("Current token:", currentToken);
+//                 localStorage.setItem("device_token", currentToken);
+//               } else {
+//                 console.log(
+//                   "No registration token available. Request permission to generate one."
+//                 );
+//               }
+//             })
+//             .catch((err) => {
+//               console.error("Error getting token:", err);
+//             });
+
+//           // Handle incoming messages
+//           onMessage(messaging, (payload) => {
+//             console.log("Message received:", payload);
+//             Swal.fire({
+//               title: payload.notification?.title || "New Message!",
+//               text:
+//                 payload.notification?.body || "You have a new notification.",
+//               icon: "info",
+//               confirmButtonText: "OK",
+//             });
+//           });
+//         } else {
+//           console.log("Notification permission denied.");
+//         }
+//       });
+//     })
+//     .catch((error) => {
+//       console.error("Service Worker registration failed:", error);
+//     });
+// }
+
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker
-    .register(
-      "/spotsball/web/firebase-messaging-sw.js"
-      //   , {
-      //   scope: "/spotsball/web/",
-      // }
-    )
+    .register("/firebase-messaging-sw.js")
     .then((registration) => {
       console.log("Service Worker registered:", registration);
 
@@ -196,27 +166,9 @@ if ("serviceWorker" in navigator) {
         })
         .catch((err) => {
           console.error("Error getting token:", err);
+          localStorage.setItem("device_token", "currentToken");
 
           // Check if it's a permission blocked error
-          if (err.code === "messaging/permission-blocked") {
-            try {
-              localStorage.setItem("test", "test");
-              localStorage.removeItem("test");
-              Swal.fire({
-                title: "Notification Permission Denied",
-                text: "Please allow notifications on your browser.",
-                icon: "warning",
-                confirmButtonText: "OK",
-              });
-            } catch (e) {
-              Swal.fire({
-                title: "Notifications Unavailable in Incognito Mode",
-                text: "You can't receive notifications in Incognito Mode. Please use a normal browser.",
-                icon: "warning",
-                confirmButtonText: "OK",
-              });
-            }
-          }
         });
 
       onMessage(messaging, (payload) => {
@@ -233,7 +185,51 @@ if ("serviceWorker" in navigator) {
       console.error("Service Worker registration failed:", error);
     });
 }
+// if ("serviceWorker" in navigator) {
+//   navigator.serviceWorker
+//     .register("/spotsball/web/firebase-messaging-sw.js", {
+//       scope: "/spotsball/web/",
+//     })
+//     .then((registration) => {
+//       console.log("Service Worker registered:", registration);
 
+//       // Pass the registration to getToken:
+//       getToken(messaging, {
+//         serviceWorkerRegistration: registration,
+//         vapidKey:
+//           "BC1L5qE6WKJSgEU46nuptM9bCKtljihEjAikiBrpzRIomSiw6Dd9Wq6jmM4CfIHJokkhmqblgU5qbVaqizNlmeo",
+//       })
+//         .then((currentToken) => {
+//           if (currentToken) {
+//             console.log("Current token:", currentToken);
+//             localStorage.setItem("device_token", currentToken);
+//           } else {
+//             console.log(
+//               "No registration token available. Request permission to generate one."
+//             );
+//           }
+//         })
+//         .catch((err) => {
+//           console.error("Error getting token:", err);
+//           localStorage.setItem("device_token", "currentToken");
+
+//           // Check if it's a permission blocked error
+//         });
+
+//       onMessage(messaging, (payload) => {
+//         console.log("Message received:", payload);
+//         Swal.fire({
+//           title: "New Message!",
+//           text: payload.notification.body,
+//           icon: "info",
+//           confirmButtonText: "OK",
+//         });
+//       });
+//     })
+//     .catch((error) => {
+//       console.error("Service Worker registration failed:", error);
+//     });
+// }
 let userDetails;
 let UserDetails;
 
@@ -375,28 +371,196 @@ export const signInWithFacebook = async (setFieldValue) => {
     console.error("Error during Facebook sign-in:", error);
 
     // Handle specific errors
-    if (error.code === "auth/popup-closed-by-user") {
-      Swal.fire({
-        icon: "warning",
-        title: "Popup closed",
-        text: "The sign-in popup was closed before completing the sign-in process. Please try again.",
-      });
-    } else {
-      Swal.fire({
-        icon: "error",
-        title: "Sign-in failed",
-        text: error.message,
-      });
-    }
+    // if (error.code === "auth/popup-closed-by-user") {
+    //   Swal.fire({
+    //     icon: "warning",
+    //     title: "Popup closed",
+    //     text: error.message,
+    //   });
+    // } else {
+    //   Swal.fire({
+    //     icon: "error",
+    //     title: "Sign-in failed",
+    //     text: error.message,
+    //   });
+    // }
   }
 };
 
+// export const LoginWithFacebook = async () => {
+//   try {
+//     console.log("Starting Facebook login process...");
+
+//     // Sign in with Facebook
+//     const result = await signInWithPopup(auth, facebookProvider);
+//     const user = result.user;
+//     console.log("Facebook user data:", user);
+
+//     const userData = {
+//       uid: user.uid,
+//       displayName: user.displayName,
+//       email: user.email,
+//       photoURL: user.photoURL,
+//       signup_method: "facebook",
+//     };
+
+//     // Split user name into first and last name
+//     const nameParts = userData.displayName
+//       ? userData.displayName.split(" ")
+//       : [];
+//     const first_name = nameParts[0] || "";
+//     const last_name = nameParts.length > 1 ? nameParts.slice(1).join(" ") : "";
+
+//     // Store user details locally
+//     const UserDetails = { ...userData, first_name, last_name };
+//     console.log("Facebook Sign-In successful. UserDetails:", UserDetails);
+
+//     // Check UID in database
+//     const checkUIDResponse = await axios.get(
+//       `app/auth/check-uid-exists/${user.uid}`
+//     );
+
+//     if (checkUIDResponse.data.message === "Uid found") {
+//       // UID found, proceed with social login
+//       const response = await axios.post("app/auth/social-login", {
+//         signup_method: "facebook",
+//         uid: user.uid,
+//         device_type: "website",
+//         device_token: localStorage.getItem("device_token"),
+//       });
+
+//       console.log("Social login response:", response.data);
+
+//       // Save token and show success message
+//       const token = response.data.data.token;
+//       localStorage.setItem("Web-token", token);
+//       Swal.fire({
+//         icon: "success",
+//         title: "Login Successful",
+//         showConfirmButton: false,
+//         timer: 2000,
+//       });
+
+//       // Reload page
+//       window.location.reload();
+//     } else if (checkUIDResponse.data.message === "Uid Not Found") {
+//       // UID not found, redirect user to sign-up
+//       Swal.fire({
+//         icon: "error",
+//         text: ,
+//       });
+
+//       // window.location.reload();
+//     }
+//   } catch (error) {
+//     console.error("Facebook Sign-In or API request failed:", error);
+
+//     localStorage.setItem("UIDNotFound", JSON.stringify(UserDetails));
+
+//     window.location.reload();
+//   }
+// };
+
+// export const LoginWithFacebook = async () => {
+//   try {
+//     console.log("Starting Facebook login process...");
+
+//     // Sign in with Facebook
+//     const result = await signInWithPopup(auth, facebookProvider);
+//     const user = result.user;
+//     console.log("Facebook user data:", user);
+
+//     const userData = {
+//       uid: user.uid,
+//       displayName: user.displayName,
+//       email: user.email,
+//       photoURL: user.photoURL,
+//       signup_method: "facebook",
+//     };
+
+//     // Split user name into first and last name
+//     const nameParts = userData.displayName
+//       ? userData.displayName.split(" ")
+//       : [];
+//     const first_name = nameParts[0] || "";
+//     const last_name = nameParts.length > 1 ? nameParts.slice(1).join(" ") : "";
+
+//     // Store user details locally
+//     const UserDetails = { ...userData, first_name, last_name };
+//     console.log("Facebook Sign-In successful. UserDetails:", UserDetails);
+
+//     // Check UID in database
+//     const checkUIDResponse = await axios.get(
+//       `app/auth/check-uid-exists/${user.uid}`
+//     );
+
+//     if (checkUIDResponse.data.message === "Uid found") {
+//       // UID found, proceed with social login
+//       const response = await axios.post("app/auth/social-login", {
+//         signup_method: "facebook",
+//         uid: user.uid,
+//         device_type: "website",
+//         device_token: localStorage.getItem("device_token"),
+//       });
+
+//       console.log("Social login response:", response.data);
+
+//       // Save token and show success message
+//       const token = response.data.data.token;
+//       localStorage.setItem("Web-token", token);
+//       Swal.fire({
+//         icon: "success",
+//         title: "Login Successful",
+//         showConfirmButton: false,
+//         timer: 2000,
+//       });
+
+//       // Reload page
+//       window.location.reload();
+//     } else if (checkUIDResponse.data.message === "Uid Not Found") {
+//       // UID not found, redirect user to sign-up
+//       Swal.fire({
+//         icon: "error",
+//         text: "User not found. Please sign up first.",
+//       });
+
+//       // Store UIDNotFound data
+//       localStorage.setItem("UIDNotFound", JSON.stringify(UserDetails));
+//       console.log("impotant -->", JSON.stringify(UserDetails));
+//       // window.location.reload(); // Uncomment if necessary
+//     }
+//   } catch (error) {
+//     console.error("Facebook Sign-In or API request failed:", error);
+
+//     if (error.code === "auth/popup-closed-by-user") {
+//       Swal.fire({
+//         icon: "warning",
+//         title: "Login Cancelled",
+//         text: "It looks like you closed the popup before completing the sign-in. Please try again.",
+//       });
+//       return;
+//     }
+
+//     Swal.fire({
+//       icon: "error",
+//       title: "Login Failed",
+//       text:
+//         error.message || "An error occurred during login. Please try again.",
+//     });
+//   }
+// };
+
 export const LoginWithFacebook = async () => {
   try {
-    console.log("Starting Facebook login process...");
+    // Sign out previous session
+    await auth.signOut();
 
     // Sign in with Facebook
+
     const result = await signInWithPopup(auth, facebookProvider);
+    if (!result)
+      throw new Error("Popup was blocked. Please allow popups and try again.");
+
     const user = result.user;
     console.log("Facebook user data:", user);
 
@@ -408,12 +572,10 @@ export const LoginWithFacebook = async () => {
       signup_method: "facebook",
     };
 
-    // Split user name into first and last name
-    const nameParts = userData.displayName
-      ? userData.displayName.split(" ")
-      : [];
+    // Extract first and last name
+    const nameParts = userData.displayName?.split(" ") || [];
     const first_name = nameParts[0] || "";
-    const last_name = nameParts.length > 1 ? nameParts.slice(1).join(" ") : "";
+    const last_name = nameParts.slice(1).join(" ") || "";
 
     // Store user details locally
     const UserDetails = { ...userData, first_name, last_name };
@@ -425,7 +587,7 @@ export const LoginWithFacebook = async () => {
     );
 
     if (checkUIDResponse.data.message === "Uid found") {
-      // UID found, proceed with social login
+      // Proceed with social login
       const response = await axios.post("app/auth/social-login", {
         signup_method: "facebook",
         uid: user.uid,
@@ -436,8 +598,7 @@ export const LoginWithFacebook = async () => {
       console.log("Social login response:", response.data);
 
       // Save token and show success message
-      const token = response.data.data.token;
-      localStorage.setItem("Web-token", token);
+      localStorage.setItem("Web-token", response.data.data.token);
       Swal.fire({
         icon: "success",
         title: "Login Successful",
@@ -445,23 +606,58 @@ export const LoginWithFacebook = async () => {
         timer: 2000,
       });
 
-      // Reload page
-      window.location.reload();
-    } else if (checkUIDResponse.data.message === "Uid Not Found") {
-      // UID not found, redirect user to sign-up
+      // Reload page after a delay to avoid race conditions
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+    } else {
+      // UID not found, prompt user to sign up
       Swal.fire({
         icon: "error",
-        text: "Go to SignUp, then try social login",
+        text: "User not found. Please sign up first.",
       });
 
-      window.location.reload();
+      // Store data locally for sign-up flow
+      localStorage.setItem("UIDNotFound", JSON.stringify(UserDetails));
+      console.log(
+        "User details saved for sign-up:",
+        JSON.stringify(UserDetails)
+      );
     }
   } catch (error) {
     console.error("Facebook Sign-In or API request failed:", error);
 
-    localStorage.setItem("UIDNotFound", JSON.stringify(UserDetails));
+    // if (error.code === "auth/popup-closed-by-user") {
+    //   const retry = await Swal.fire({
+    //     icon: "warning",
+    //     title: "Login Cancelled",
+    //     text: "You closed the popup before completing sign-in. Do you want to try again?",
+    //     showCancelButton: true,
+    //     confirmButtonText: "Retry",
+    //   });
 
-    window.location.reload();
+    //   if (retry.isConfirmed) return LoginWithFacebook(); // Retry login
+    // }
+
+    if (error.message.includes("Popup was blocked")) {
+      Swal.fire({
+        icon: "error",
+        title: "Popup Blocked",
+        text: "Please allow popups for this site and try again.",
+      });
+      return;
+    }
+
+    // Swal.fire({
+    //   icon: "error",
+    //   title: "Login Failed",
+    //   text:
+    //     error.message || "An error occurred during login. Please try again.",
+    // });
+
+    // Fallback to sign-in with redirect for better compatibility
+    console.log("Falling back to sign-in with redirect...");
+    //await signInWithRedirect(auth, facebookProvider);
   }
 };
 

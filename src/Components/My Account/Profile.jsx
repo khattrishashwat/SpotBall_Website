@@ -64,33 +64,52 @@ function Profile() {
         },
       });
 
-      if (response.status === 200) {
-        // Clear token and navigate to homepage
-        localStorage.removeItem("Web-token");
+      if (response) {
         Swal.fire({
           title: response.data.message,
           confirmButtonText: "OK",
           allowOutsideClick: false,
         }).then(() => {
-          navigate("/");
-        });
-      } else {
-        Swal.fire({
-          title: response.data.message,
-          confirmButtonText: "OK",
-          allowOutsideClick: false,
+          setTimeout(() => {
+            localStorage.removeItem("Web-token");
+            navigate("/");
+          }, 20000); // 20 seconds delay
         });
       }
     } catch (error) {
-      Swal.fire({
-        text: error.response ? error.response.data.message : error.message,
-        confirmButtonText: "OK",
-        allowOutsideClick: false,
-      });
+      console.log("err", error);
     } finally {
       setIsLoading(false);
     }
   };
+
+  // const fetchDeactive = async () => {
+  //   const token = localStorage.getItem("Web-token");
+  //   try {
+  //     setIsLoading(true);
+  //     const response = await axios.get(`app/profile/active-inactive`, {
+  //       headers: {
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //     });
+
+  //     if (response) {
+  //       // Clear token and navigate to homepage
+  //       localStorage.removeItem("Web-token");
+  //       Swal.fire({
+  //         title: response.data.message,
+  //         confirmButtonText: "OK",
+  //         allowOutsideClick: false,
+  //       }).then(() => {
+  //         navigate("/");
+  //       },10000);
+  //     }
+  //   } catch (error) {
+  //     console.log("err",error)
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
   const fetchDelete = async () => {
     const token = localStorage.getItem("Web-token");
     try {
@@ -101,7 +120,7 @@ function Profile() {
         },
       });
 
-      if (response.status === 200) {
+      if (response) {
         // Clear token and navigate to homepage
         localStorage.removeItem("Web-token");
         Swal.fire({
@@ -109,21 +128,13 @@ function Profile() {
           confirmButtonText: "OK",
           allowOutsideClick: false,
         }).then(() => {
-          window.location.reload();
-        });
-      } else {
-        Swal.fire({
-          title: response.data.message,
-          confirmButtonText: "OK",
-          allowOutsideClick: false,
+          setTimeout(() => {
+            window.location.reload();
+          }, [10000]);
         });
       }
     } catch (error) {
-      Swal.fire({
-        text: error.response ? error.response.data.message : error.message,
-        confirmButtonText: "OK",
-        allowOutsideClick: false,
-      });
+      
     } finally {
       setIsLoading(false);
     }
@@ -352,8 +363,12 @@ function Profile() {
                 <p>
                   You choose to temporarily OptOut from Playing SpotsBall, we
                   put your account in a suspended state. When/if you want to
-                  reactivate, you can send an email to support@spotsball.com,
-                  and will receive reset instructions for your password.
+                  reactivate, you can send an email to{" "}
+                  <span className="support-email">
+                    {" "}
+                    support.in@spotsball.com
+                  </span>
+                  , and will receive reset instructions for your password.
                 </p>
               </div>
             </div>
@@ -410,11 +425,7 @@ function Profile() {
               <div className="deleteacc_text_data">
                 <h2>Delete Account</h2>
                 <p>
-                  If you delete or terminate your access to the SpotsBall app or
-                  website, your ID and passwords will no longer work. To rejoin,
-                  you'll need to sign up as a new user. However, for legacy,
-                  archiving, and audit purposes, your profile and data will be
-                  retained for up to 180 days from the date of deletion.
+                You chose to temporarily opt out of playing SpotsBall, so we have put your account in deleted state. If you wish to reactivate your deleted account, you can send an email to support.in@spotsball.com.
                 </p>
               </div>
             </div>
