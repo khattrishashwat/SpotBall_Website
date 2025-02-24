@@ -560,8 +560,8 @@ function Checkout() {
       coordinates,
       tickets,
       discountApplied: {
-        name: promoName,
-        amount: promoAmount,
+        name: promoName || discount?.name,
+        discountPercentage: discountPercentage || promoAmount,
       },
       // discountApplied: {
       //   name: discount.name || "",
