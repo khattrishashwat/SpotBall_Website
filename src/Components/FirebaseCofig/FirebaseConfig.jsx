@@ -106,15 +106,18 @@ function detectIncognitoMode() {
 // }
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker
-    .register("/firebase-messaging-sw.js", {
-      scope: "/spotsball/web/",
-    })
+    .register(
+      "/firebase-messaging-sw.js"
+      //   , {
+      //   scope: "/spotsball/web/",
+      // }
+    )
     .then((registration) => {
       console.log("Service Worker registered:", registration);
 
       getToken(messaging, {
         vapidKey:
-          "BNkI-Se9LgfgnkAxsoNDTe3uQDR7HBWV6rY-Mhc3A6AioGIl-VnUn49NTAdTZHgBnt6id6KokU02Pku4G0GpYxA",
+          "BC1L5qE6WKJSgEU46nuptM9bCKtljihEjAikiBrpzRIomSiw6Dd9Wq6jmM4CfIHJokkhmqblgU5qbVaqizNlmeo",
       })
         .then((currentToken) => {
           if (currentToken) {
@@ -128,29 +131,6 @@ if ("serviceWorker" in navigator) {
         })
         .catch((err) => {
           console.error("Error getting token:", err);
-
-          // Check if it's a permission blocked error
-          // if (err.code === "messaging/permission-blocked") {
-          //   // Check for Incognito mode by testing localStorage access
-          //   try {
-          //     localStorage.setItem("test", "test");
-          //     localStorage.removeItem("test");
-          //     Swal.fire({
-          //       title: "Notification Permission Denied",
-          //       text: "Please allow notifications on your browser.",
-          //       icon: "warning",
-          //       confirmButtonText: "OK",
-          //     });
-          //   } catch (e) {
-          //     // If localStorage access fails, user is likely in Incognito mode
-          //     Swal.fire({
-          //       title: "Notifications Unavailable in Incognito Mode",
-          //       text: "You can't receive notifications in Incognito Mode. Please use a normal browser.",
-          //       icon: "warning",
-          //       confirmButtonText: "OK",
-          //     });
-          //   }
-          // }
         });
 
       onMessage(messaging, (payload) => {
