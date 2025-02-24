@@ -7,7 +7,7 @@ import axios from "axios";
 import Forget from "./Forget";
 import Signup from "./Signup";
 import SocialSignUP from "./SocialSignUp";
-import Loader from "../Loader/Loader";
+import "./notificationImg.jpg";
 import {
   messaging,
   getToken,
@@ -20,9 +20,10 @@ import {
 
 import { GoogleLogin } from "@react-oauth/google";
 
-function Login({ isVisible, onClose }) {
+function Login({ isVisible, setLoginOpen, onClose }) {
   // console.log("logincomponent");
   const [timer, setTimer] = useState(0); // Timer state for resend OTP
+  const [open, setOpen] = useState(isVisible);
   const [otp, setOtp] = useState(["", "", "", ""]);
   const [isModals, setIsModals] = useState("");
   const [emails, setEmails] = useState("");
@@ -33,6 +34,7 @@ function Login({ isVisible, onClose }) {
   if (stateFromLocalStorage) {
     state = true;
   }
+  const formikRef = useRef(null);
 
   const otpRefs = useRef([]);
 
@@ -43,6 +45,33 @@ function Login({ isVisible, onClose }) {
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
+
+  const validateFields = Yup.object().shape({
+    emailOrPhone: Yup.string()
+      .required("Email or Mobile Number is required")
+      .test("emailOrPhone", "Invalid Email or Phone Number", (value) => {
+        // Debug: Uncomment to see value on each validation
+        // console.log("Validating emailOrPhone:", value);
+        return (
+          /^[\w.-]+@[\w.-]+\.\w{2,4}$/.test(value) || /^\d{10,15}$/.test(value)
+        );
+      }),
+
+    password: Yup.string()
+      .min(8, "Password must be at least 8 characters")
+      .matches(/[A-Z]/, "Password must contain at least one uppercase letter")
+      .matches(/[a-z]/, "Password must contain at least one lowercase letter")
+      .matches(/[0-9]/, "Password must contain at least one number")
+      .matches(
+        /[@$!%*?&]/,
+        "Password must contain at least one special character (@, $, !, %, *, ?, &)"
+      )
+      .required("Password is required"),
+
+    agreeAllLegal: Yup.boolean().oneOf([true], "You must agree to continue"),
+    agreeRules: Yup.boolean().oneOf([true], "You must agree to continue"),
+    agreeAge: Yup.boolean().oneOf([true], "You must agree to continue"),
+  });
 
   const [isSocialSignup, setIsSocialSignup] = useState(false);
   useEffect(() => {
@@ -78,6 +107,19 @@ function Login({ isVisible, onClose }) {
     password: "",
   };
 
+  const LoginSchema = Yup.object().shape({
+    emailOrPhone: Yup.string()
+      .required("Email or Mobile Number is required")
+      .test(
+        "emailOrPhone",
+        "Invalid Email or Phone Number",
+        (value) =>
+          /^[\w.-]+@[\w.-]+\.\w{2,4}$/.test(value) || /^\d{10,15}$/.test(value)
+      ),
+    password: Yup.string()
+      .required("Password is required")
+      .min(6, "Password must be at least 6 characters"),
+  });
   // const Login = async (values) => {
   //   console.log("Attempting to login with values:", values);
 
@@ -89,31 +131,37 @@ function Login({ isVisible, onClose }) {
 
   //   setIsLoading(true);
 
-  //   try {
-  //     // Retrieve Firebase token for push notifications
-  //     const device_token = await getToken(messaging, {
-  //       vapidKey:
-  //         "BNkI-Se9LgfgnkAxsoNDTe3uQDR7HBWV6rY-Mhc3A6AioGIl-VnUn49NTAdTZHgBnt6id6KokU02Pku4G0GpYxA",
+  //   // Get device token from localStorage
+  //   const device_token = localStorage.getItem("device_token");
+
+  //   if (device_token === null) {
+  //     // If device token is not found, show a notification prompt
+  //     Swal.fire({
+  //       title: "Please allow notifications",
+  //       html: `
+  //     <div class="notification_settingdiv">
+  //       <h2>Notification Setting</h2>
+  //       <p>Open Chrome.</p>
+  //       <p>At the top right, select More <span><i class="fa fa-ellipsis-v" aria-hidden="true"></i> <i class="fa fa-chevron-right" aria-hidden="true"></i></span> <b>Settings</b> <span><i class="fa fa-chevron-right" aria-hidden="true"></i></span> Privacy and security.</p>
+  //       <p>Select <b>Site settings</b>.</p>
+  //       <p>Under “Permissions,” select <b>Notification</b>.</p>
+  //     </div>
+  //   `,
+  //       imageUrl: `${process.env.PUBLIC_URL}/images/notificationImg.jpg`,
+  //       imageWidth: 300,
+  //       imageHeight: 200,
+  //       imageAlt: "Custom image",
+  //       confirmButtonText: "OK",
+  //       allowOutsideClick: false,
   //     });
+  //     setIsLoading(false);
+  //     return; // Exit if device token is not available
+  //   }
 
-  //     if (!device_token) {
-  //       console.log(
-  //         "No Firebase token available. Request permission to generate one."
-  //       );
-  //       Swal.fire({
-  //         icon: "error",
-  //         title: "Notification Permission Required",
-  //         text: "Please enable notifications to continue.",
-  //         confirmButtonText: "OK",
-  //         allowOutsideClick: false,
-  //       });
-  //       setIsLoading(false);
-  //       return;
-  //     }
+  //   console.log("Device token:", device_token);
 
-  //     console.log("Device token:", device_token);
-
-  //     const response = await axios.post("login", {
+  //   try {
+  //     const response = await axios.post("app/auth/login", {
   //       ...values,
   //       device_token,
   //       device_type: "website",
@@ -121,21 +169,28 @@ function Login({ isVisible, onClose }) {
 
   //     console.log("Login successful! Response:", response.data.data);
 
-  //     // Store the backend token in local storage
-  //     localStorage.setItem("Web-token", response.data.data.token);
+  //     // Check if OTP has been sent or user is not verified
+  //     if (response.data.data.is_verified_user === false) {
+  //       openModals();
+  //       setEmails(response.data.data.email);
+  //       localStorage.setItem("tokens", response.data.data.token);
+  //     } else {
+  //       // Store the backend token in local storage
+  //       localStorage.setItem("Web-token", response.data.data.token);
 
-  //     // Show success message
-  //     Swal.fire({
-  //       icon: "success",
-  //       title: response.data.message,
+  //       // Show success message
+  //       Swal.fire({
+  //         icon: "success",
+  //         title: response.data.message,
+  //         allowOutsideClick: false,
+  //         showConfirmButton: false,
+  //         timer: 1000,
+  //       });
 
-  //       allowOutsideClick: false,
-  //       showConfirmButton: false,
-  //       timer: 1000,
-  //     });
-  //     // window.location.reload();
-  //     navigate("/");
-  //     onClose();
+  //       // Redirect after successful login
+  //       navigate("/");
+  //       onClose();
+  //     }
   //   } catch (error) {
   //     console.error(
   //       "Login failed:",
@@ -155,40 +210,45 @@ function Login({ isVisible, onClose }) {
   // };
 
   const Login = async (values) => {
-    console.log("Attempting to login with values:", values);
+    setIsLoading(true);
 
-    // Check if the input is a phone number and prepend country code if needed
+    const device_token = localStorage.getItem("device_token");
+
+    if (!device_token) {
+      console.warn("Device token not found.");
+
+      Swal.fire({
+        title: "Please allow notifications",
+        html: `
+            <div class="notification_settingdiv">
+                <h2>Notification Setting</h2>
+                <p>Open Chrome.</p>
+                <p>At the top right, select More <span><i class="fa fa-ellipsis-v" aria-hidden="true"></i> <i class="fa fa-chevron-right" aria-hidden="true"></i></span> <b>Settings</b> <span><i class="fa fa-chevron-right" aria-hidden="true"></i></span> Privacy and security.</p>
+                <p>Select <b>Site settings</b>.</p>
+                <p>Under “Permissions,” select <b>Notification</b>.</p>
+            </div>
+            `,
+        imageUrl: `${process.env.PUBLIC_URL}/images/notificationImg.jpg`,
+        imageWidth: 300,
+        imageHeight: 200,
+        imageAlt: "Custom image",
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
+      });
+
+      setIsLoading(false);
+      return;
+    }
+
+    console.log("Device token:", device_token);
+
+    // Check if emailOrPhone is a phone number and doesn't already start with +91
     const isPhoneNumber = /^[6-9]\d{9}$/.test(values.emailOrPhone);
-    if (isPhoneNumber) {
+    if (isPhoneNumber && !values.emailOrPhone.startsWith("+91")) {
       values.emailOrPhone = `+91${values.emailOrPhone}`;
     }
 
-    setIsLoading(true);
-
     try {
-      // Retrieve Firebase token for push notifications
-      const device_token = await getToken(messaging, {
-        vapidKey:
-          "BC1L5qE6WKJSgEU46nuptM9bCKtljihEjAikiBrpzRIomSiw6Dd9Wq6jmM4CfIHJokkhmqblgU5qbVaqizNlmeo",
-      });
-
-      if (!device_token) {
-        console.log(
-          "No Firebase token available. Request permission to generate one."
-        );
-        Swal.fire({
-          icon: "error",
-          title: "Notification Permission Required",
-          text: "Please enable notifications to continue.",
-          confirmButtonText: "OK",
-          allowOutsideClick: false,
-        });
-        setIsLoading(false);
-        return;
-      }
-
-      console.log("Device token:", device_token);
-
       const response = await axios.post("app/auth/login", {
         ...values,
         device_token,
@@ -197,17 +257,13 @@ function Login({ isVisible, onClose }) {
 
       console.log("Login successful! Response:", response.data.data);
 
-      // setEmails(response.data.data.email);
-      // Check if OTP has been sent or user is not verified
-      if (response.data.data.is_verified_user === false) {
+      if (!response.data.data.is_verified_user) {
         openModals();
         setEmails(response.data.data.email);
         localStorage.setItem("tokens", response.data.data.token);
       } else {
-        // Store the backend token in local storage
         localStorage.setItem("Web-token", response.data.data.token);
 
-        // Show success message
         Swal.fire({
           icon: "success",
           title: response.data.message,
@@ -215,7 +271,8 @@ function Login({ isVisible, onClose }) {
           showConfirmButton: false,
           timer: 1000,
         });
-        // window.location.reload(); // Optional: You can refresh the page
+
+        // Redirect after successful login
         navigate("/");
         onClose();
       }
@@ -237,6 +294,95 @@ function Login({ isVisible, onClose }) {
     }
   };
 
+  // const Login = async (values) => {
+  //   const isPhoneNumber = /^[6-9]\d{9}$/.test(values.emailOrPhone);
+  //   if (isPhoneNumber) {
+  //     values.emailOrPhone = `+91${values.emailOrPhone}`;
+  //   }
+
+  //   setIsLoading(true);
+
+  //   let device_token = localStorage.getItem("device_token");
+
+  //   if (!device_token) {
+  //     console.warn("Device token not found.");
+
+  //     Swal.fire({
+  //       title: "Please allow notifications",
+  //       html: `
+  //       <div class="notification_settingdiv">
+  //         <h2>Notification Setting</h2>
+  //         <p>Open Chrome.</p>
+  //         <p>At the top right, select More <span><i class="fa fa-ellipsis-v"></i> <i class="fa fa-chevron-right"></i></span> <b>Settings</b> <span><i class="fa fa-chevron-right"></i></span> Privacy and security.</p>
+  //         <p>Select <b>Site settings</b>.</p>
+  //         <p>Under “Permissions,” select <b>Notification</b>.</p>
+  //       </div>
+  //     `,
+  //       imageUrl: `${process.env.PUBLIC_URL}/images/notificationImg.jpg`,
+  //       imageWidth: 300,
+  //       imageHeight: 200,
+  //       imageAlt: "Custom image",
+  //       confirmButtonText: "OK",
+  //       allowOutsideClick: false,
+  //     });
+
+  //     setIsLoading(false);
+  //     return;
+  //   }
+
+  //   console.log("Device token:", device_token);
+
+  //   try {
+  //     // Get the latest device token
+  //     device_token = await getToken(messaging, {
+  //       vapidKey:
+  //         "BC1L5qE6WKJSgEU46nuptM9bCKtljihEjAikiBrpzRIomSiw6Dd9Wq6jmM4CfIHJokkhmqblgU5qbVaqizNlmeo",
+  //     });
+
+  //     const response = await axios.post("app/auth/login", {
+  //       ...values,
+  //       device_token,
+  //       device_type: "website",
+  //     });
+
+  //     console.log("Login successful! Response:", response.data.data);
+
+  //     if (!response.data.data.is_verified_user) {
+  //       openModals();
+  //       setEmails(response.data.data.email);
+  //       localStorage.setItem("tokens", response.data.data.token);
+  //     } else {
+  //       localStorage.setItem("Web-token", response.data.data.token);
+
+  //       Swal.fire({
+  //         icon: "success",
+  //         title: response.data.message,
+  //         allowOutsideClick: false,
+  //         showConfirmButton: false,
+  //         timer: 1000,
+  //       });
+
+  //       navigate("/");
+  //       onClose();
+  //     }
+  //   } catch (error) {
+  //     console.error(
+  //       "Login failed:",
+  //       error.response ? error.response.data : error.message
+  //     );
+
+  //     Swal.fire({
+  //       icon: "error",
+  //       title: "Login Failed",
+  //       text: error.response ? error.response.data.message : error.message,
+  //       confirmButtonText: "OK",
+  //       allowOutsideClick: false,
+  //     });
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
   const handleSocialSignup = () => {
     setIsSocialSignup(true);
     onClose(); // Ensure onClose is defined
@@ -254,7 +400,8 @@ function Login({ isVisible, onClose }) {
   };
   const handlebackSignup = () => {
     setShowSignup(false);
-    isVisible();
+    setOpen(true);
+    setLoginOpen(true);
   };
 
   const handleForgotPassword = () => {
@@ -275,17 +422,31 @@ function Login({ isVisible, onClose }) {
     };
   }, [isVisible]);
 
+  // const handleInputChange = (index, value) => {
+  //   const newOtp = [...otp];
+  //   newOtp[index] = value.slice(-1); // Only take the last digit
+  //   setOtp(newOtp);
+
+  //   // Move to the next input
+  //   if (value && index < otp.length - 1) {
+  //     const nextInput = document.querySelector(
+  //       `.otp__digit:nth-child(${index + 2})`
+  //     );
+  //     if (nextInput) nextInput.focus();
+  //   }
+  // };
+
   const handleInputChange = (index, value) => {
+    if (!/^\d?$/.test(value)) return;
+
     const newOtp = [...otp];
-    newOtp[index] = value.slice(-1); // Only take the last digit
+    newOtp[index] = value;
     setOtp(newOtp);
 
-    // Move to the next input
     if (value && index < otp.length - 1) {
-      const nextInput = document.querySelector(
-        `.otp__digit:nth-child(${index + 2})`
-      );
-      if (nextInput) nextInput.focus();
+      otpRefs.current[index + 1]?.focus();
+    } else if (!value && index > 0) {
+      otpRefs.current[index - 1]?.focus();
     }
   };
 
@@ -394,7 +555,10 @@ function Login({ isVisible, onClose }) {
                           <button
                             type="button"
                             className="crossbtn_signinpopupclose signincrossbtnnew"
-                            onClick={onClose}
+                            onClick={() => {
+                              onClose();
+                              formikRef.current?.resetForm();
+                            }}
                           >
                             <img
                               src={`${process.env.PUBLIC_URL}/images/cross_icon.png`}
@@ -405,7 +569,9 @@ function Login({ isVisible, onClose }) {
                         <h2>Sign In</h2>
 
                         <Formik
+                          innerRef={formikRef}
                           initialValues={LoginValues}
+                          validationSchema={validateFields}
                           onSubmit={Login}
                           validateOnChange={true}
                           validateOnBlur={true}
@@ -427,8 +593,8 @@ function Login({ isVisible, onClose }) {
                                   />
                                   <ErrorMessage
                                     name="emailOrPhone"
-                                    component="span"
-                                    className="field_required"
+                                    component="div"
+                                    className="error-message"
                                   />
                                 </div>
 
@@ -457,8 +623,8 @@ function Login({ isVisible, onClose }) {
                                   </div>
                                   <ErrorMessage
                                     name="password"
-                                    component="span"
-                                    className="field_required"
+                                    component="div"
+                                    className="error-message"
                                   />
                                 </div>
 
@@ -505,6 +671,7 @@ function Login({ isVisible, onClose }) {
                                         <a
                                           onClick={() => {
                                             // setIsSocialSignup(true);
+                                            onClose();
                                             LoginWithGoogle();
                                           }}
                                           style={{ cursor: "pointer" }}
@@ -519,6 +686,7 @@ function Login({ isVisible, onClose }) {
                                         <a
                                           onClick={() => {
                                             // setIsSocialSignup(true);
+                                            onClose();
                                             LoginWithFacebook();
                                           }}
                                           style={{ cursor: "pointer" }}
@@ -533,6 +701,7 @@ function Login({ isVisible, onClose }) {
                                         <a
                                           onClick={() => {
                                             // setIsSocialSignup(true);
+                                            onClose();
                                             LoginWithTwitter();
                                           }}
                                           style={{ cursor: "pointer" }}
@@ -600,6 +769,7 @@ function Login({ isVisible, onClose }) {
           isOpenness={handleSignup}
           Closed={() => {
             localStorage.removeItem("showSignup");
+            localStorage.removeItem("signupFormData");
             setShowSignup(false);
           }}
         />

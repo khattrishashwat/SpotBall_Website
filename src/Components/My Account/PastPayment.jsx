@@ -93,7 +93,7 @@ function PastPayment() {
                   <div className="pastpay_invoicediv">
                     <a
                       className="downloadinvoice_hreftag"
-                      onClick={(e) => handleDownload(e, payment._id)}
+                      onClick={(e) => handleDownload(e, payment?.paymentId)}
                     >
                       <img
                         src={`${process.env.PUBLIC_URL}/images/download_invoice.png`}

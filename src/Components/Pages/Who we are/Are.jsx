@@ -56,7 +56,10 @@ function Are() {
                 <div className="col-md-8 colaboutusdiv_inner">
                   <div className="aboutusdiv_text">
                     <h3>{whos[0]?.subTitle || ""}</h3>
-                    <p>{whos[0]?.description}</p>
+                    <div
+                      className="aboutus-description"
+                      dangerouslySetInnerHTML={{ __html: whos[0]?.description }}
+                    />
                   </div>
                 </div>
                 <div className="col-md-4 col4aboutus_imgdiv">
@@ -74,7 +77,10 @@ function Are() {
                 <div className="col-md-8 colaboutusdiv_inner">
                   <div className="aboutusdiv_text">
                     <h3>{whos[1]?.subTitle}</h3>
-                    <p>{whos[1]?.description}</p>
+                    <div
+                      className="aboutus-description"
+                      dangerouslySetInnerHTML={{ __html: whos[1]?.description }}
+                    />
                   </div>
                 </div>
               </div>

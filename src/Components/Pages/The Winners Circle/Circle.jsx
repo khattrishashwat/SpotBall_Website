@@ -257,7 +257,7 @@ function Circle() {
         </div> */}
         <div className="row winnercirlce_timeline_row">
           <div id="winner_circle-timeline">
-            {Object.keys(groupedLinks).length === 0 ? (
+            {Object.keys(groupedLinks)?.length === 0 ? (
               <div
                 className="no-data-message"
                 data-aos="fade-up"
@@ -305,29 +305,29 @@ function Circle() {
                                     <div className="winnercrclimg">
                                       <img
                                         src={
-                                          item.userId.profile_url ||
+                                          item?.userId?.profile_url ||
                                           `${process.env.PUBLIC_URL}/images/winner_img.png`
                                         }
-                                        alt={`${item.userId.first_name} ${item.userId.last_name}`}
+                                        alt={`${item?.userId?.first_name} ${item.userId?.last_name}`}
                                         data-aos="flip-left"
                                       />
                                     </div>
                                     <div className="winnerabouttext">
                                       <h3>
-                                        {`${item.userId.first_name} ${item.userId.last_name}`.toUpperCase()}
+                                        {`${item?.userId?.first_name} ${item?.userId?.last_name}`.toUpperCase()}
                                       </h3>
                                       <p>{`Jackpot ${formatDate(
-                                        item.createdAt
+                                        item?.createdAt
                                       )}`}</p>
                                       <p>
                                         Winning Coordinates:{" "}
-                                        {`X: ${item.contestId.winning_coordinates.x}, Y: ${item.contestId.winning_coordinates.y}`}
+                                        {`X: ${item?.contestId?.winning_coordinates?.x}, Y: ${item?.contestId?.winning_coordinates?.y}`}
                                       </p>
                                       <p>
                                         Closest Coordinate:{" "}
-                                        {`X: ${item.closestCoordinate.x}, Y: ${item.closestCoordinate.y}`}
+                                        {`X: ${item?.closestCoordinate?.x}, Y: ${item?.closestCoordinate?.y}`}
                                       </p>
-                                      <h4>{`₹${item.prize.toLocaleString(
+                                      <h4>{`₹${item?.prize.toLocaleString(
                                         "en-IN"
                                       )}`}</h4>
                                     </div>

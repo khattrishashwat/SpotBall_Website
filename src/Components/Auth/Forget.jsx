@@ -26,7 +26,7 @@ function Forget({ onClosed }) {
 
   const PhoneSubmit = async (values, { resetForm }) => {
     try {
-      setIsSubmitting(true); // Disable button
+      setIsSubmitting(true); // Disable buttohin
 
       // Ensure valid phone numbers are always prefixed with +91
       const isPhoneNumber = /^[6-9]\d{9}$/.test(values.emailOrPhone);
@@ -100,27 +100,39 @@ function Forget({ onClosed }) {
                         validationSchema={validationSchema}
                         onSubmit={PhoneSubmit}
                       >
-                        {() => (
+                        {({ errors, touched }) => (
                           <Form>
                             <div className="formstart forgotpass_inputmaindiv">
                               <div className="form-control frmctrldiv">
                                 <Field
                                   name="emailOrPhone"
                                   type="text"
-                                  className="error"
+                                  className={`error ${
+                                    errors.emailOrPhone && touched.emailOrPhone
+                                      ? "field-error"
+                                      : ""
+                                  }`}
                                   placeholder="E-Mail / Mobile Number"
                                 />
-                                <ErrorMessage
-                                  name="emailOrPhone"
-                                  component="span"
-                                  className="field_required"
-                                />
+                                <ErrorMessage name="emailOrPhone">
+                                  {(msg) => (
+                                    <span
+                                      style={{
+                                        color: "red",
+                                        display: "block",
+                                        backgroundClip: "blue",
+                                      }}
+                                    >
+                                      {msg}
+                                    </span>
+                                  )}
+                                </ErrorMessage>
                               </div>
                               <div className="form-control loginformctrl">
                                 <button
                                   type="submit"
                                   className="loginbtn sbmtbtn_showotpscreen"
-                                  disabled={isSubmitting} // Disable button during submission
+                                  disabled={isSubmitting}
                                 >
                                   {isSubmitting ? "Submitting..." : "Submit"}
                                 </button>

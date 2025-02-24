@@ -11,11 +11,11 @@ function Screen() {
   const [colorIndex, setColorIndex] = useState(""); // Track the current color index
 
   const location = useLocation();
-  const { quantity, responseData, leftticket } = location.state.payload || {};
-  console.log("leftticket", leftticket);
+  const { responseData, leftticket } = location.state.payload || {};
+  const quantity = parseInt(localStorage.getItem("quantity"), 10);
 
   const [usedTickets, setUsedTickets] = useState(0);
-  const [totalTickets, setTotalTickets] = useState(quantity || "");
+  const [totalTickets, setTotalTickets] = useState(quantity || 0);
   const [tickets, setTickets] = useState(
     Array.from({ length: quantity }, (_, i) => ({
       id: i + 1,
@@ -96,43 +96,28 @@ function Screen() {
     );
   }, [tickets]);
 
-  // const handleTicket = () => {
-  //   // Check if totalTickets is less than responseData.maxTickets
-  //   if (totalTickets < responseData.maxTickets) {
-  //     const newTicket = {
-  //       id: tickets.length + 1,
-  //       xCord: "____",
-  //       yCord: "____",
-  //     };
-
-  //     setTickets((prev) => [...prev, newTicket]);
-  //     setTotalTickets((prev) => prev + 1); // Increment totalTickets, but not usedTickets yet
-  //   } else {
-  //     Swal.fire({
-  //       icon: "warning",
-  //       title: "Maximum ticket limit reached",
-  //       text: `You cannot add more than ${responseData.maxTickets} tickets.`,
-  //       confirmButtonText: "OK",
-  //       allowOutsideClick: false,
-  //     });
-  //   }
-  // };
   const handleTicket = () => {
     const choosedTicket = responseData.maxTickets - leftticket; // Calculate choosedTicket
 
-    // Check if totalTickets is less than responseData.maxTickets
+    console.log("Current Total Tickets:", typeof totalTickets);
+
     if (
       totalTickets < responseData.maxTickets &&
       totalTickets + 1 <= leftticket
     ) {
-      const newTicket = {
-        id: tickets.length + 1,
-        xCord: "____",
-        yCord: "____",
-      };
+      setTickets((prevTickets) => [
+        ...prevTickets,
+        {
+          id: prevTickets.length + 1,
+          xCord: "____",
+          yCord: "____",
+        },
+      ]);
 
-      setTickets((prev) => [...prev, newTicket]);
-      setTotalTickets((prev) => prev + 1); // Increment totalTickets, but not usedTickets yet
+      setTotalTickets((prevTotal) => {
+        console.log("Previous Total:", prevTotal);
+        return prevTotal + 1;
+      });
     } else {
       Swal.fire({
         icon: "warning",
@@ -140,7 +125,7 @@ function Screen() {
         text:
           leftticket === 0
             ? "There are no tickets left to add."
-            : `You can only purchase a maximum of ${responseData.maxTickets} tickets per person, but you have already chosen ${choosedTicket} tickets, or you have exceeded the available tickets (${leftticket}).`,
+            : `You can only purchase a maximum of ${responseData.maxTickets} tickets per person, but you have already bought ${choosedTicket} tickets. You have only (${leftticket}) ticket left to purchase.`,
         confirmButtonText: "OK",
         allowOutsideClick: false,
       });
@@ -150,36 +135,6 @@ function Screen() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-
-  // const handleAddTicket = () => {
-  //   // Check if usedTickets is less than maxTickets
-  //   if (
-  //     usedTickets < responseData.maxTickets &&
-  //     totalTickets < responseData.maxTickets
-  //   ) {
-  //     const newTicket = {
-  //       id: tickets.length + 1, // Increment ID based on the current length of tickets
-  //       xCord: "____",
-  //       yCord: "____",
-  //     };
-
-  //     // Add the new ticket
-  //     setTickets((prev) => [...prev, newTicket]);
-
-  //     // Increment usedTickets and totalTickets
-  //     setUsedTickets((prev) => prev + 1); // Increment usedTickets
-  //     setTotalTickets((prev) => prev + 1); // Update totalTickets
-  //   } else {
-  //     // Show a message if the maximum limit is reached
-  //     Swal.fire({
-  //       icon: "warning",
-  //       title: "Maximum ticket limit reached",
-  //       text: `You cannot add more than ${responseData.maxTickets} tickets.`,
-  //       confirmButtonText: "OK",
-  //       allowOutsideClick: false,
-  //     });
-  //   }
-  // };
 
   const handleAddTicket = () => {
     const choosedTicket = responseData.maxTickets - leftticket; // Calculate choosedTicket
@@ -211,7 +166,7 @@ function Screen() {
         text:
           leftticket === 0
             ? "There are no tickets left to add."
-            : `You can only purchase a maximum of ${responseData.maxTickets} tickets per person, but you have already chosen ${choosedTicket} tickets, or you have exceeded the available tickets (${leftticket}).`,
+            : `You can only purchase a maximum of ${responseData.maxTickets} tickets per person, but you have already bought  ${choosedTicket} tickets.You have only (${leftticket})  ticket left to purchase`,
         confirmButtonText: "OK",
         allowOutsideClick: false,
       });
@@ -248,6 +203,7 @@ function Screen() {
       confirmButtonText: "Yes, delete it",
       cancelButtonText: "No, cancel",
     }).then((result) => {
+      // debugger
       if (result.isConfirmed) {
         // Proceed with deletion
         const updatedTickets = tickets.filter((ticket) => ticket.id !== id);
@@ -256,6 +212,9 @@ function Screen() {
           ...ticket,
           id: index + 1,
         }));
+
+        // console.log("ticket",reindexedTickets.length)
+        localStorage.setItem("quantity", reindexedTickets?.length);
 
         setTickets(reindexedTickets);
 
@@ -286,6 +245,16 @@ function Screen() {
   };
 
   const handleReply = (id) => {
+    const ticketToUpdate = tickets.find((ticket) => ticket.id === id);
+
+    if (
+      !ticketToUpdate ||
+      ticketToUpdate.xCord === "____" ||
+      ticketToUpdate.yCord === "____"
+    ) {
+      return;
+    }
+
     Swal.fire({
       title: "Are you sure?",
       text: "Do you want to remove this coordinate?",
@@ -297,6 +266,7 @@ function Screen() {
       confirmButtonText: "Yes, delete it",
       cancelButtonText: "No, cancel",
     }).then((result) => {
+      console.log("res", result);
       if (result.isConfirmed) {
         const updatedTickets = tickets.map((ticket) =>
           ticket.id === id
@@ -350,11 +320,106 @@ function Screen() {
     setShowTooltip(false);
   };
 
+  // const handleClick = (e) => {
+  //   setColorIndex(responseData.cursor_color);
+  //   // Check if the user has used all their chances
+  //   if (clickCount >= totalTickets) {
+  //     alert("You've used all your tickets. Click '+' to add more.");
+  //     return;
+  //   }
+
+  //   const image = e.target;
+  //   const rect = image.getBoundingClientRect(); // Get the image position and size in the viewport
+
+  //   // Get the relative position of the click within the image
+  //   const xRelative = e.clientX - rect.left; // X coordinate relative to the image
+  //   const yRelative = e.clientY - rect.top; // Y coordinate relative to the image
+
+  //   // Calculate the click's position based on the image's natural size
+  //   const x = ((xRelative / rect.width) * image.naturalWidth).toFixed(2); // X based on image's intrinsic width
+  //   const y = ((yRelative / rect.height) * image.naturalHeight).toFixed(2); // Y based on image's intrinsic height
+
+  //   const updatedTickets = [...tickets];
+
+  //   // Find a ticket with empty coordinates
+  //   const ticketIndex = updatedTickets.findIndex(
+  //     (ticket) => ticket.xCord === "____" && ticket.yCord === "____"
+  //   );
+
+  //   if (ticketIndex !== -1) {
+  //     // Update the ticket's coordinates
+  //     updatedTickets[ticketIndex] = {
+  //       ...updatedTickets[ticketIndex],
+  //       xCord: x,
+  //       yCord: y,
+  //     };
+
+  //     // Update state
+  //     setTickets(updatedTickets);
+  //     setClickedPoints((prev) => [...prev, { x, y }]);
+  //     setClickCount((prev) => prev + 1); // Increment clickCount
+
+  //     // Only now increment usedTickets, since a ticket is now fully filled
+  //     setUsedTickets((prev) => prev + 1);
+  //   } else {
+  //     alert("All tickets are already filled.");
+  //   }
+  // };
+
+  // const handleClick = (e) => {
+  //   setColorIndex(responseData.cursor_color);
+
+  //   if (clickCount >= totalTickets) {
+  //     alert("You've used all your tickets. Click '+' to add more.");
+  //     return;
+  //   }
+
+  //   const image = e.target;
+  //   const rect = image.getBoundingClientRect();
+
+  //   // Get relative position
+  //   const xRelative = e.clientX - rect.left;
+  //   const yRelative = e.clientY - rect.top;
+
+  //   // Calculate based on natural size
+  //   const x = (xRelative / rect.width) * image.naturalWidth;
+  //   const y = (yRelative / rect.height) * image.naturalHeight;
+
+  //   const updatedTickets = [...tickets];
+
+  //   // Find a ticket with empty coordinates
+  //   const ticketIndex = updatedTickets.findIndex(
+  //     (ticket) => ticket.xCord === "____" && ticket.yCord === "____"
+  //   );
+
+  //   if (ticketIndex !== -1) {
+  //     updatedTickets[ticketIndex] = {
+  //       ...updatedTickets[ticketIndex],
+  //       xCord: x,
+  //       yCord: y,
+  //     };
+
+  //     setTickets(updatedTickets);
+  //     setClickedPoints((prev) => [...prev, { x, y }]); // No filtering, allow exact overlap
+  //     setClickCount((prev) => prev + 1);
+  //     setUsedTickets((prev) => prev + 1);
+  //   } else {
+  //     alert("All tickets are already filled.");
+  //   }
+  // };
+
   const handleClick = (e) => {
     setColorIndex(responseData.cursor_color);
+
     // Check if the user has used all their chances
     if (clickCount >= totalTickets) {
-      alert("You've used all your tickets. Click '+' to add more.");
+      Swal.fire({
+        icon: "warning",
+        title: "Limit Reached",
+        text: "You've used all your tickets. Click '+' to add more.",
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
+      });
       return;
     }
 
@@ -368,6 +433,22 @@ function Screen() {
     // Calculate the click's position based on the image's natural size
     const x = ((xRelative / rect.width) * image.naturalWidth).toFixed(2); // X based on image's intrinsic width
     const y = ((yRelative / rect.height) * image.naturalHeight).toFixed(2); // Y based on image's intrinsic height
+
+    // Check if the coordinates already exist
+    const isDuplicate = clickedPoints.some(
+      (point) => point.x === x && point.y === y
+    );
+
+    if (isDuplicate) {
+      Swal.fire({
+        icon: "error",
+        title: "Duplicate Coordinates",
+        text: "You have already played a ticket with these coordinates.",
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
+      });
+      return;
+    }
 
     const updatedTickets = [...tickets];
 
@@ -392,11 +473,19 @@ function Screen() {
       // Only now increment usedTickets, since a ticket is now fully filled
       setUsedTickets((prev) => prev + 1);
     } else {
-      alert("All tickets are already filled.");
+      Swal.fire({
+        icon: "warning",
+        title: "All Tickets Used",
+        text: "All tickets are already filled.",
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
+      });
     }
   };
 
   const handleCheckout = async () => {
+    if (usedTickets !== totalTickets) return;
+
     const contest_id = responseData._id;
     const usedTicketCoordinates = tickets
       .filter((ticket) => ticket.xCord !== "____" && ticket.yCord !== "____")
@@ -449,6 +538,9 @@ function Screen() {
     }
   };
 
+  const handleContextMenu = (event) => {
+    event.preventDefault(); // Prevent right-click menu
+  };
   return (
     <>
       <section className="playgame_section">
@@ -465,6 +557,7 @@ function Screen() {
                   onMouseMove={handleMouseMove}
                   onClick={handleClick}
                   onLoad={handleImageLoad}
+                  onContextMenu={handleContextMenu}
                   onMouseEnter={handleMouseEnter}
                   onMouseLeave={handleMouseLeave}
                   style={{
@@ -475,7 +568,7 @@ function Screen() {
                   alt="Player"
                 />
 
-                {clickedPoints.map((point, index) => (
+                {/* {clickedPoints.map((point, index) => (
                   <div
                     key={index}
                     style={{
@@ -495,6 +588,32 @@ function Screen() {
                       style={{
                         color: colorIndex,
                         fontSize: "40px",
+                      }}
+                    />
+                  </div>
+                ))} */}
+                {clickedPoints.map((point, index) => (
+                  <div
+                    key={index}
+                    style={{
+                      position: "absolute",
+                      left: `${
+                        (point.x / imgRef.current.naturalWidth) *
+                        imgRef.current.clientWidth
+                      }px`,
+                      top: `${
+                        (point.y / imgRef.current.naturalHeight) *
+                        imgRef.current.clientHeight
+                      }px`,
+                      transform: "translate(-50%, -50%)", // Keeps it centered
+                      pointerEvents: "none", // So that clicks do not interfere
+                    }}
+                  >
+                    <RxCross2
+                      style={{
+                        color: colorIndex,
+                        fontSize: "40px",
+                        // position: "absolute",
                       }}
                     />
                   </div>
@@ -650,7 +769,10 @@ function Screen() {
                 <div className="ticketcheckout_btn">
                   <button
                     onClick={handleCheckout}
-                    className="bottomcheckoutbtn"
+                    className={`bottomcheckoutbtn ${
+                      usedTickets !== totalTickets ? "disabled-btn" : ""
+                    }`} // Add disabled-btn class when the condition is met
+                    disabled={usedTickets !== totalTickets} // Button disabled until condition is met
                   >
                     Checkout
                   </button>

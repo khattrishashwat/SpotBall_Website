@@ -101,7 +101,7 @@ function Delete() {
 
         // Redirect to the home page after 10 seconds
         setTimeout(() => {
-          window.location.href = "/spotsball/web/";
+          window.location.href = "/";
         }, 5000);
       } else {
         Swal.fire({

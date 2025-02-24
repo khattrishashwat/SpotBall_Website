@@ -14,6 +14,7 @@ function Header() {
   const [profile, setProfile] = useState({});
 
   const [isMenuVisible, setIsMenuVisible] = useState(false);
+  const [islang, setIsLang] = useState(false);
   const [isLogout, setIsLogout] = useState("");
   const [loginPopup, setLoginPopup] = useState(false);
   const [isNot, setIsNot] = useState(false);
@@ -41,6 +42,14 @@ function Header() {
   }, [location.pathname]);
   const token = localStorage.getItem("Web-token");
 
+  const handleLogoClick = () => {
+    if (location.pathname === "/") {
+      window.location.reload(); // Reload the page if already on the homepage
+    } else {
+      // Otherwise, navigate to the homepage
+      navigate("/");
+    }
+  };
   const NotificationOpen = () => {
     setIsNot((prevState) => !prevState);
   };
@@ -58,6 +67,9 @@ function Header() {
   };
   const toggleMenu = () => {
     setIsMenuVisible((prevState) => !prevState); // Toggle the state
+  };
+  const toggleMenulang = () => {
+    setIsLang((prevState) => !prevState); // Toggle the state
   };
   const OpenLogout = () => {
     setIsLogout(true);
@@ -105,10 +117,11 @@ function Header() {
     };
   }, []);
   const isHomePage = location.pathname === "/";
+
   const handleScroll = () => {
     const currentScrollY = window.scrollY;
 
-    if (currentScrollY > lastScrollY) {
+    if (currentScrollY > 0) {
       setHeaderClass(
         isHomePage ? "headerfixed" : "innerheader_new headerfixed"
       );
@@ -170,22 +183,55 @@ function Header() {
     try {
       const token = localStorage.getItem("Web-token");
       if (!token) return;
-      const response = await axios.get("app/notifications/get-notifications", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+
+      const response = await axios.get(
+        "app/notifications/get-notifications?skip=0&limit=10",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       setNotification(response.data.data);
-      // setNotice(response.data.data.length);
     } catch (error) {
-      console.error("Error fetching profile:", error);
+      console.error("Error fetching notifications:", error);
+    }
+  };
+
+  const updateNotifications = async () => {
+    try {
+      const token = localStorage.getItem("Web-token");
+      if (!token) return;
+
+      await axios.patch(
+        "app/notifications/mark-as-read",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      fetchNotification();
+    } catch (error) {
+      console.error("Error updating notifications:", error);
     }
   };
 
   useEffect(() => {
     fetchNotification();
   }, []);
+
+  const unreadCount = Array.isArray(notification)
+    ? notification.filter((item) => !item.isRead).length
+    : 0;
+
+  const handleNotificationClick = () => {
+    setIsNot((prev) => !prev);
+    updateNotifications();
+  };
 
   const [timeLeft, setTimeLeft] = useState({
     days: "00",
@@ -294,31 +340,238 @@ function Header() {
               <div className="h3-navbar">
                 <div className="container contmainformob_newshi">
                   <nav className="navbar navbar-expand-lg h3-nav navbar_mainnavdiv_shi">
-                    <Link
-                      to="/"
+                    {/* <div className="download_app_icondiv">
+                      <div className="appstoreicondiv">
+                        <a
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          href="https://www.google.com/"
+                        >
+                          <img
+                            src={`${process.env.PUBLIC_URL}/images/google-play-store-badge.png`}
+                            alt="Google Play Store"
+                            className="w-100 mw-100"
+                            style={{ marginTop: "-2px" }}
+                          />
+                        </a>
+                      </div>
+                    </div> */}
+
+                    {/* <div className="download_app_icondiv">
+                      <div className="appstoreicondiv">
+                        <a
+                          className={`dl-button ${isActive ? "active" : ""} ${
+                            isDone ? "done" : ""
+                          }`}
+                          onClick={handleDownload}
+                        >
+                          <div>
+                            <div className="icon">
+                              <svg
+                                className="arrow"
+                                viewBox="0 0 20 18"
+                                fill="currentColor"
+                              >
+                                <polygon points="8 0 12 0 12 9 15 9 10 14 5 9 8 9" />
+                              </svg>
+                              <svg
+                                className="shape"
+                                viewBox="0 0 20 18"
+                                fill="currentColor"
+                              >
+                                <path d="M4.8,0 L15.2,0 C16,0 16.8,0.6 17.1,1.4 L19.7,10.4 C19.9,11 19.9,11.6 19.8,12.2 L19.2,16.3 C19,17.3 18.2,18 17.2,18 H2.8 C1.8,18 1,17.3 0.8,16.3 L0.1,12.2 C0.1,11.6 0.1,11 0.3,10.4 L2.9,1.4 C3.2,0.6 4,0 4.8,0 Z" />
+                              </svg>
+                            </div>
+                            <div className="label" ref={labelRef}>
+                              <div
+                                className={`show default ${
+                                  isDone ? "hide" : ""
+                                }`}
+                              >
+                                Download
+                              </div>
+                              <div className="state">
+                                <div className="counter" ref={counterRef}>
+                                  <span>{progress}%</span>
+                                </div>
+                                {isDone && <span>Done</span>}
+                              </div>
+                            </div>
+                            <div
+                              className="progress"
+                              style={{ transform: `scaleY(${progress / 100})` }}
+                            ></div>
+                          </div>{" "}
+                         
+                        </a>
+                      </div>
+                    </div> */}
+
+                    {/* <div className="download_app_icondiv">
+                      <div className="appstoreicondiv">
+                        <a
+                          className={`dl-button ${isActive ? "active" : ""} ${
+                            isDone ? "done" : ""
+                          }`}
+                          onClick={handleDownload}
+                        >
+                          <div>
+                            <div className="icon">
+                              <div>
+                                <svg
+                                  className="arrow"
+                                  viewBox="0 0 20 18"
+                                  fill="currentColor"
+                                >
+                                  <polygon points="8 0 12 0 12 9 15 9 10 14 5 9 8 9" />
+                                </svg>
+                                <svg
+                                  className="shape"
+                                  viewBox="0 0 20 18"
+                                  fill="currentColor"
+                                >
+                                  <path d="M4.82668561,0 L15.1733144,0 C16.0590479,0 16.8392841,0.582583769 17.0909106,1.43182334 L19.7391982,10.369794 C19.9108349,10.9490677 19.9490212,11.5596963 19.8508905,12.1558403 L19.1646343,16.3248465 C19.0055906,17.2910371 18.1703851,18 17.191192,18 L2.80880804,18 C1.82961488,18 0.994409401,17.2910371 0.835365676,16.3248465 L0.149109507,12.1558403 C0.0509788145,11.5596963 0.0891651114,10.9490677 0.260801785,10.369794 L2.90908938,1.43182334 C3.16071592,0.582583769 3.94095214,0 4.82668561,0 Z" />
+                                </svg>
+                              </div>
+                              <span />
+                            </div>
+                            <div className="label" ref={labelRef}>
+                              <div
+                                className={
+                                  isDownloading ? "default" : "show default"
+                                }
+                              >
+                                {isDone ? "Downloading apk..." : "Download Apk"}
+                              </div>
+
+                              <div
+                                className={`state ${
+                                  isDownloading ? "show" : ""
+                                } ${isDone ? "show" : ""}`}
+                              >
+                                <div
+                                  className={
+                                    isDownloading || isDone
+                                      ? "counter show"
+                                      : "counter "
+                                  }
+                                  ref={counterRef}
+                                >
+                                  {progress > 0 && !isDone && (
+                                    <span>{progress}%</span>
+                                  )}
+                                </div>
+                              </div>
+
+                              {isDone && <span>Download Done</span>}
+                            </div>
+                            <div
+                              className="progress"
+                              style={{ transform: `scaleY(${progress / 100})` }}
+                            ></div>
+                          </div>
+                        </a>
+                      </div>
+                    </div> */}
+                    {/* <div className="d-flex gap-5  justify-content-between align-items-center">
+                      <div className="d-flex gap-3 align-items-start">
+                        <img
+                          src={`${process.env.PUBLIC_URL}/images/favicon.png`}
+                        />
+                        <p className="text-white mb-0">Install SpotsBall App</p>
+                      </div>
+                      <div className="btn btn-dark">
+                        <a
+                          href={androidLink}
+                          className="btn-download"
+                          download
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {" "}
+                          <i
+                            className="fa fa-download"
+                            aria-hidden="true"
+                          />{" "}
+                          Download APK
+                        </a>
+                      </div>
+                    </div> */}
+
+                    <div
                       className="navbar-brand navbarlogodiv"
-                      // onClick={() => {
-                      //   window.scrollTo(0, 0);
-                      //   window.location.reload();
-                      // }}
+                      style={{ cursor: "pointer" }}
+                      onClick={handleLogoClick}
                     >
                       <img
                         src={`${process.env.PUBLIC_URL}/images/logo.png`}
                         alt="logo"
                       />
-                    </Link>
+                    </div>
 
                     {token ? (
                       <div className="navbar-collapse newnavbarleft">
                         <ul className="navbar navbar_afterlogin">
+                          {/* <li className="nav-item afterlogin_icons_nav lang_icons">
+                            <a
+                              className="itmelink_menus "
+                              onClick={toggleMenulang}
+                            >
+                              <img
+                                src={`${process.env.PUBLIC_URL}/images/language_icon.png`}
+                                alt="language-icon"
+                              />
+                            </a>
+                            <div
+                              id="menu-list"
+                              className="menulist_divmanin"
+                              style={{
+                                display: islang ? "block" : "none",
+                              }}
+                            >
+                              <ul className="menubar_list_ul">
+                                {["Hindi", "Tamil", "Telugu"].map(
+                                  (language, index) => (
+                                    <li key={index} className="mainmenulist">
+                                      <a>
+                                        <div className="menubar_divmain">
+                                          <div className="menuname_withicon">
+                                            <div className="menuiconimgdiv">
+                                              <img
+                                                src={`${process.env.PUBLIC_URL}/images/icon_who_we_are.png`}
+                                                alt={`${language}-icon`}
+                                              />
+                                            </div>
+                                            <div className="menuname">
+                                              <h4>{language}</h4>
+                                            </div>
+                                          </div>
+                                          <div className="arrowicondiv">
+                                            <img
+                                              src={`${process.env.PUBLIC_URL}/images/menu_arrow_icon.png`}
+                                              className="arrowicon_menu"
+                                              alt="arrow-icon"
+                                            />
+                                          </div>
+                                        </div>
+                                      </a>
+                                    </li>
+                                  )
+                                )}
+                              </ul>
+                            </div>
+                          </li> */}
+
                           <li className="nav-item afterlogin_icons_nav notificationclick">
                             <a className="itmelink_menus">
                               <img
                                 src={`${process.env.PUBLIC_URL}/images/bell_icon.png`}
                                 alt="bell"
-                                onClick={NotificationOpen}
+                                onClick={handleNotificationClick}
                               />
-                              {/* <span className="cartcount">3</span> */}
+                              {unreadCount > 0 && (
+                                <span className="cartcount">{unreadCount}</span>
+                              )}
                             </a>
                             <div
                               className={`notificationdiv_popup ${
@@ -344,7 +597,7 @@ function Header() {
                                         <a className="notifylinkdiv">
                                           <div className="notify-icondiv">
                                             <img
-                                              src={`${process.env.PUBLIC_URL}/images/get_notify_icon_.png`}
+                                              src={`${process.env.PUBLIC_URL}/images/favicon.png`}
                                               alt="notification"
                                             />
                                           </div>
@@ -375,7 +628,6 @@ function Header() {
                                   >
                                     <img
                                       src={`${process.env.PUBLIC_URL}/images/cross_icon.png`}
-                                      // src="images/cross_icon.png"
                                       alt="close"
                                     />
                                   </button>
@@ -387,8 +639,6 @@ function Header() {
                             <Link to="/cart" className="itmelink_menus">
                               <img
                                 src={`${process.env.PUBLIC_URL}/images/cart_icon.png`}
-                                // src="images/cart_icon.png"
-                                // alt="cart"
                               />
                               {/* <span className="cartcount">1</span> */}
                             </Link>
@@ -408,11 +658,10 @@ function Header() {
                                 />
                               </div>
 
-                              {profile?.is_verified_user && ( // Conditionally render verify image
+                              {profile?.is_verified_user && (
                                 <div className="userverifyimg">
                                   <img
                                     src={`${process.env.PUBLIC_URL}/images/verify.png`}
-                                    // src="images/verify.png"
                                     alt="verify"
                                   />
                                 </div>
@@ -423,10 +672,6 @@ function Header() {
                         <ul className="navbar moremenubar">
                           <li className="nav-item humbergermenulist">
                             <button
-                              // type="button"
-                              // className="menubaricons showmenus_clickbtn"
-                              // // onClick={toggleMenu}
-                              // onClick={() => setIsMenuVisible(!isMenuVisible)}
                               type="button"
                               className="menubaricons showmenus_clickbtn"
                               aria-controls="menu-list"
@@ -468,12 +713,13 @@ function Header() {
                       style={{ display: isMenuVisible ? "block" : "none" }}
                     >
                       <ul className="menubar_list_ul">
-                        {!token && (
+                        {/* {!token && (
                           <li className="mainmenulist">
                             <a
                               onClick={() => {
-                                OpenSignIn();
+                                // OpenSignIn();
                                 setIsMenuVisible(false);
+                                setLoginPopup(!loginPopup);
                               }}
                               className="showsigninpopup_onclick"
                             >
@@ -499,7 +745,7 @@ function Header() {
                               </div>
                             </a>
                           </li>
-                        )}
+                        )} */}
 
                         <li className="mainmenulist">
                           <Link
