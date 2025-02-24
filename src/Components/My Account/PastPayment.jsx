@@ -86,6 +86,7 @@ function PastPayment() {
                     <span>
                       {new Date(payment?.createdAt).toLocaleDateString()}
                     </span>
+                    <span>Status:{payment?.transaction_status}</span>
                     <h4>{payment?.tickets} Tickets</h4>
                   </div>
                 </div>

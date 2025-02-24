@@ -1,7 +1,7 @@
 {
   "name": "spotsball",
   "version": "0.1.0",
-  "homepage": "/",
+  "homepage": "/spotsball/web",
   "private": true,
   "dependencies": {
     "@cashfreepayments/cashfree-js": "^1.0.5",

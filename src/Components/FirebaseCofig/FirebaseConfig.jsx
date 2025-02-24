@@ -142,54 +142,9 @@ function detectIncognitoMode() {
 //     });
 // }
 
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker
-    .register("/firebase-messaging-sw.js")
-    .then((registration) => {
-      console.log("Service Worker registered:", registration);
-
-      // Pass the registration to getToken:
-      getToken(messaging, {
-        serviceWorkerRegistration: registration,
-        vapidKey:
-          "BC1L5qE6WKJSgEU46nuptM9bCKtljihEjAikiBrpzRIomSiw6Dd9Wq6jmM4CfIHJokkhmqblgU5qbVaqizNlmeo",
-      })
-        .then((currentToken) => {
-          if (currentToken) {
-            console.log("Current token:", currentToken);
-            localStorage.setItem("device_token", currentToken);
-          } else {
-            console.log(
-              "No registration token available. Request permission to generate one."
-            );
-          }
-        })
-        .catch((err) => {
-          console.error("Error getting token:", err);
-          localStorage.setItem("device_token", "currentToken");
-
-          // Check if it's a permission blocked error
-        });
-
-      onMessage(messaging, (payload) => {
-        console.log("Message received:", payload);
-        Swal.fire({
-          title: "New Message!",
-          text: payload.notification.body,
-          icon: "info",
-          confirmButtonText: "OK",
-        });
-      });
-    })
-    .catch((error) => {
-      console.error("Service Worker registration failed:", error);
-    });
-}
 // if ("serviceWorker" in navigator) {
 //   navigator.serviceWorker
-//     .register("/spotsball/web/firebase-messaging-sw.js", {
-//       scope: "/spotsball/web/",
-//     })
+//     .register("/firebase-messaging-sw.js")
 //     .then((registration) => {
 //       console.log("Service Worker registered:", registration);
 
@@ -230,6 +185,51 @@ if ("serviceWorker" in navigator) {
 //       console.error("Service Worker registration failed:", error);
 //     });
 // }
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker
+    .register("/spotsball/web/firebase-messaging-sw.js", {
+      scope: "/spotsball/web/",
+    })
+    .then((registration) => {
+      console.log("Service Worker registered:", registration);
+
+      // Pass the registration to getToken:
+      getToken(messaging, {
+        serviceWorkerRegistration: registration,
+        vapidKey:
+          "BC1L5qE6WKJSgEU46nuptM9bCKtljihEjAikiBrpzRIomSiw6Dd9Wq6jmM4CfIHJokkhmqblgU5qbVaqizNlmeo",
+      })
+        .then((currentToken) => {
+          if (currentToken) {
+            console.log("Current token:", currentToken);
+            localStorage.setItem("device_token", currentToken);
+          } else {
+            console.log(
+              "No registration token available. Request permission to generate one."
+            );
+          }
+        })
+        .catch((err) => {
+          console.error("Error getting token:", err);
+          localStorage.setItem("device_token", "currentToken");
+
+          // Check if it's a permission blocked error
+        });
+
+      onMessage(messaging, (payload) => {
+        console.log("Message received:", payload);
+        Swal.fire({
+          title: "New Message!",
+          text: payload.notification.body,
+          icon: "info",
+          confirmButtonText: "OK",
+        });
+      });
+    })
+    .catch((error) => {
+      console.error("Service Worker registration failed:", error);
+    });
+}
 let userDetails;
 let UserDetails;
 
