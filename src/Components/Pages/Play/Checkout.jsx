@@ -400,7 +400,10 @@ function Checkout() {
         });
         return;
       }
+        const paymentData = preparePaymentData(paymentOrderId);
 
+        //     //         // Call Pay function to process the payment data
+        Pay(paymentData);
       console.log("Payment Session ID:", paymentSessionId);
 
       // If order_amount is 0, skip Cashfree SDK and process as successful payment
@@ -419,8 +422,8 @@ function Checkout() {
       // Step 2: Initialize Cashfree SDK (Only if order_amount > 0)
       let cashfree;
       try {
-        cashfree = await load({ mode: "sandbox" });
-        // cashfree = await load({ mode: "production" });
+        // cashfree = await load({ mode: "sandbox" });
+        cashfree = await load({ mode: "production" });
 
         console.log("Cashfree SDK initialized successfully.");
       } catch (sdkError) {
@@ -437,26 +440,29 @@ function Checkout() {
       const checkoutOptions = {
         paymentSessionId,
         redirectTarget: "_modal",
+callback_url: `https://www.spotsball.com/popupCheckout?order_id=${paymentOrderId}`,
       };
-
+      
       // Step 4: Process Payment
       cashfree
-        .checkout(checkoutOptions)
-        .then(async (result) => {
-          if (result.error) {
-            console.error("Payment Failed Error:", result.error);
-            Swal.fire({
-              icon: "error",
-              title: "Payment Failed",
-              text: result.error,
-            });
-          } else if (result.paymentDetails) {
-            console.log("Payment Details:", result.paymentDetails);
-            const paymentStatus = result.paymentDetails.paymentStatus;
+      .checkout(checkoutOptions)
+      .then(async (result) => {
+        if (result.error) {
+          console.error("Payment Failed Error:", result.error);
+          Swal.fire({
+            icon: "error",
+            title: "Payment Failed",
+            text: result.error,
+          });
+        } else if (result.paymentDetails) {
+          console.log("Payment Details:", result.paymentDetails);
+          const paymentStatus = result.paymentDetails.paymentStatus;
+          console.log("paymentStatus", result.paymentDetails.paymentStatus);
+          await OrderStatus(paymentOrderId);
 
             if (paymentStatus === "SUCCESS") {
               console.log("Payment Successful!");
-              await OrderStatus();
+              await OrderStatus(paymentOrderId);
               window.location.href = `https://www.spotsball.com/popupCheckout?order_id=${paymentOrderId}`;
             } else if (paymentStatus === "FAILED") {
               console.error("Transaction Failed!");
@@ -466,6 +472,7 @@ function Checkout() {
                 text: "Your payment could not be processed. Please try again later.",
               });
             } else if (paymentStatus === "PENDING") {
+              await OrderStatus(paymentOrderId);
               console.log("Payment Pending. Redirecting...");
               window.location.href = `https://www.spotsball.com/popupCheckout?order_id=${paymentOrderId}`;
             }
@@ -495,8 +502,7 @@ function Checkout() {
         icon: "error",
         title: "Payment Error",
         text:
-          error.response?.data?.message ||
-          "An unexpected error occurred. Please try again.",
+          error.response?.data?.message,
       });
     }
   };

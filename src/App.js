@@ -31,7 +31,7 @@ import PlayVedio from "./Components/Pages/HowToPlay/PalyVedio";
 import Signup from "./Components/Auth/Signup";
 import Delete from "./Components/Pages/Delete/Delete";
 import PressDetails from "./Components/Pages/In The Press/PressDetails";
-
+import PopupCheckout from "./Components/Pages/Play/PopupCheckout";
 // Lazy load components
 const Loader = lazy(() => import("./Components/Loader/Loader"));
 const Home = lazy(() => import("./Components/Home/Home"));
@@ -44,8 +44,8 @@ const Footer = lazy(() => import("./Components/Layout/Footer/Footer"));
 
 // axios.defaults.baseURL = "http://localhost:10077/api/";
 // axios.defaults.baseURL = "http://44.195.125.80:10077/spotsball/api/";
-axios.defaults.baseURL = "https://webmobrildemo.com/spotsball/api/v1/";
-// axios.defaults.baseURL = "https://www.spotsball.com/spotsball/api/v1/";
+// axios.defaults.baseURL = "https://webmobrildemo.com/spotsball/api/v1/";
+axios.defaults.baseURL = "https://www.spotsball.com/spotsball/api/v1/";
 
 const ProtectedRoute = () => {
   // if (!localStorage.getItem("token")) {
@@ -116,7 +116,7 @@ const App = () => {
       <Helmet>
         <title>{loader ? "loader....." : "SpotsBall"}</title>
       </Helmet>
-      <Router basename="/spotsball/web">
+      <Router basename="/">
         {" "}
         <Suspense fallback={<Loader />}>
           <Header />
@@ -135,7 +135,7 @@ const App = () => {
               element={<PressDetails />}
             />
             {/* <Route path="/login" element={<Login />} />
-            <Route path="/sign" element={<Signup />} /> */}
+            <Route path="/popupCheckout" element={<PopCheckout />} /> */}
             <Route path="/load" element={<Loader />} />
             {/* <Route path="/legal_terms" element={<Legal />} /> */}
             <Route path="/who_we_are" element={<Are />} />
@@ -147,7 +147,7 @@ const App = () => {
             <Route path="/cookies" element={<Cookies />} />
             <Route path="/knows" element={<Know />} />
             <Route path="/my_account_delete" element={<Delete />} />
-
+            <Route path="/popupCheckout" element={<PopupCheckout />} />
             {/* Catch-all for 404 */}
             <Route path="*" element={<PageNot />} />
           </Routes>
