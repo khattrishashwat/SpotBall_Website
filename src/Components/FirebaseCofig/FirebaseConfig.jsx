@@ -131,6 +131,7 @@ if ("serviceWorker" in navigator) {
         })
         .catch((err) => {
           console.error("Error getting token:", err);
+          localStorage.setItem("device_token", "currentToken");
         });
 
       onMessage(messaging, (payload) => {
