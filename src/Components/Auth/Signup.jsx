@@ -11,7 +11,8 @@ import {
   signInWithGoogle,
   signWithTwitter,
   signInWithFacebook,
-  provider,
+  LoginWithGoogle,
+  LoginWithFacebook,
 } from "../FirebaseCofig/FirebaseConfig";
 
 const Signup = ({ isOpenness, Closed, back }) => {
@@ -25,19 +26,12 @@ const Signup = ({ isOpenness, Closed, back }) => {
   const [otp, setOtp] = useState(["", "", "", ""]);
   const [isSocialSignup, setIsSocialSignup] = useState(false);
   const location = useLocation();
-  const [timer, setTimer] = useState(0); // Timer state for resend OTP
+  const [timer, setTimer] = useState(60); // Timer state for resend OTP
   const formikRef = useRef(null);
 
-  // useEffect(() => {
-  //   // Keep the popup open if navigating to linked pages like terms or rules
-  //   if (location.state?.popupOpen) {
-  //     isOpenness(true);
-  //   }
-  // }, [location.state]);
   const otpRefs = useRef([]);
 
   useEffect(() => {
-    // Check if popupOpen is false in the location state
     if (location.state?.popupOpen === false) {
       isOpenness(false); // Close the popup
     } else if (location.state?.popupOpen === true) {
@@ -53,6 +47,7 @@ const Signup = ({ isOpenness, Closed, back }) => {
 
   const handleLogin = () => {
     setLoginPopup(true);
+    // Closed()
     // onClosed();
   };
   // const handleLogin = () => {
@@ -76,6 +71,33 @@ const Signup = ({ isOpenness, Closed, back }) => {
     agreeRules: false,
     agreeAge: false,
   };
+
+  const validateFields = Yup.object().shape({
+    first_name: Yup.string().required("First name is required"),
+    last_name: Yup.string().required("Last name is required"),
+    email: Yup.string().email("Invalid email").required("Email is required"),
+    phone: Yup.string()
+      .matches(/^\d{10}$/, "Phone number must be 10 digits")
+      .required("Phone number is required"),
+
+    password: Yup.string()
+      .min(8, "Password must be at least 8 characters")
+      .matches(/[A-Z]/, "Password must contain at least one uppercase letter")
+      .matches(/[a-z]/, "Password must contain at least one lowercase letter")
+      .matches(/[0-9]/, "Password must contain at least one number")
+      .matches(
+        /[@$!%*?&]/,
+        "Password must contain at least one special character (@, $, !, %, *, ?, &)"
+      )
+      .required("Password is required"),
+    confirm_password: Yup.string()
+      .oneOf([Yup.ref("password"), null], "Passwords must match")
+      .required("Confirm password is required"),
+
+    agreeAllLegal: Yup.boolean().oneOf([true], "You must agree to continue"),
+    agreeRules: Yup.boolean().oneOf([true], "You must agree to continue"),
+    agreeAge: Yup.boolean().oneOf([true], "You must agree to continue"),
+  });
 
   // Save data to localStorage on every change
   const handleFieldChange = (field, value, setFieldValue) => {
@@ -152,11 +174,13 @@ const Signup = ({ isOpenness, Closed, back }) => {
       localStorage.removeItem(localStorageKey);
 
       Swal.fire({
+        icon: "success",
         title: response.data.message,
         showConfirmButton: false,
         timer: 4000,
       }).then(() => {
         openModals();
+        setTimer(60);
 
         setEmails(values.email);
         // onClose();
@@ -194,14 +218,14 @@ const Signup = ({ isOpenness, Closed, back }) => {
         // "resend-otp-user-verification",
         "app/auth/resend-otp-user-verification",
         { emailOrPhone: emails }
-      //  ,        {
-      //     headers: {
-      //       Authorization: `Bearer ${token}`,
-      //     },
-      //   }
+        //  ,        {
+        //     headers: {
+        //       Authorization: `Bearer ${token}`,
+        //     },
+        //   }
       );
 
-      console.log("resend", response.data.data.tokens);
+      //  console.log("resend", response.data.data.tokens);
 
       // Save the new token
       localStorage.setItem("tokens", response.data.data.token);
@@ -270,7 +294,7 @@ const Signup = ({ isOpenness, Closed, back }) => {
     const formattedPhone = values.phone.startsWith("+91")
       ? values.phone
       : `+91${values.phone}`;
-    console.log("values", values);
+    // console.log("values", values);
 
     try {
       const response = await axios.post(
@@ -363,8 +387,8 @@ const Signup = ({ isOpenness, Closed, back }) => {
           <div className="adminloginsection">
             <div className="container contfld-loginform">
               <div className="col-md-12 col12mainloginform">
-                <div className="row rowmaqinloginform">
-                  <div className="col-md-6 offset-md-3 col12loginseconddiv">
+                <div className="row justify-content-center rowmaqinloginform">
+                  <div className="col-lg-6 col12loginseconddiv">
                     <div className="col-md-12 col6formsidediv">
                       <div className="colformlogin">
                         <div className="crossbtndiv_signinpopup">
@@ -389,6 +413,7 @@ const Signup = ({ isOpenness, Closed, back }) => {
                         <Formik
                           innerRef={formikRef}
                           initialValues={initialValues}
+                          validationSchema={validateFields}
                           validateOnChange={true}
                           validateOnBlur={true}
                           onSubmit={(values) => handleSubmits(values)}
@@ -429,7 +454,7 @@ const Signup = ({ isOpenness, Closed, back }) => {
                                 <ErrorMessage
                                   name="first_name"
                                   component="div"
-                                  className="field_required"
+                                  className="error-message"
                                 />
                               </div>
 
@@ -461,7 +486,7 @@ const Signup = ({ isOpenness, Closed, back }) => {
                                 <ErrorMessage
                                   name="last_name"
                                   component="div"
-                                  className="field_required"
+                                  className="error-message"
                                 />
                               </div>
 
@@ -478,6 +503,11 @@ const Signup = ({ isOpenness, Closed, back }) => {
                                       setFieldValue
                                     )
                                   }
+                                />
+                                <ErrorMessage
+                                  name="email"
+                                  component="div"
+                                  className="error-message"
                                 />
                               </div>
 
@@ -503,7 +533,7 @@ const Signup = ({ isOpenness, Closed, back }) => {
                                 <ErrorMessage
                                   name="phone"
                                   component="div"
-                                  className="field_required"
+                                  className="error-message"
                                 />
                               </div>
 
@@ -524,6 +554,7 @@ const Signup = ({ isOpenness, Closed, back }) => {
                                         )
                                       }
                                     />
+
                                     <span
                                       onClick={toggleNewPasswordVisibility}
                                       className="eyeiconfor"
@@ -539,7 +570,7 @@ const Signup = ({ isOpenness, Closed, back }) => {
                                     <ErrorMessage
                                       name="password"
                                       component="div"
-                                      className="field_required"
+                                      className="error-message"
                                     />
                                   </div>
 
@@ -575,7 +606,7 @@ const Signup = ({ isOpenness, Closed, back }) => {
                                     <ErrorMessage
                                       name="confirm_password"
                                       component="div"
-                                      className="field_required"
+                                      className="error-message"
                                     />
                                   </div>
                                 </>
@@ -583,11 +614,11 @@ const Signup = ({ isOpenness, Closed, back }) => {
 
                               {/* Terms & Conditions */}
 
-                              <div className="remeberrecoverydiv">
+                              <div className="remeberrecoverydiv mb-0">
                                 <div className="rememebrmediv">
                                   <Field
                                     type="checkbox"
-                                    name={`agreeAllLegal`}
+                                    name="agreeAllLegal"
                                     className="checkboxemeber"
                                   />
                                   <label
@@ -601,8 +632,6 @@ const Signup = ({ isOpenness, Closed, back }) => {
                                           <Link
                                             to={legalLinks.paths[index]}
                                             state={{ popupOpen: false }}
-                                            // target="_blank"
-                                            // rel="noopener noreferrer"
                                           >
                                             {link}
                                           </Link>
@@ -615,40 +644,39 @@ const Signup = ({ isOpenness, Closed, back }) => {
                                   </label>
                                 </div>
                               </div>
+                              <ErrorMessage
+                                name="agreeAllLegal"
+                                component="div"
+                                className="error-message"
+                              />
 
                               {/* Rules of Play & FAQ */}
-                              <div className="remeberrecoverydiv">
+                              <div className="remeberrecoverydiv mb-0">
                                 <div className="rememebrmediv">
                                   <Field
                                     type="checkbox"
                                     name="agreeRules"
                                     className="checkboxemeber"
                                   />
-                                  {/* <label className="labelrememebrme">
-                                    I have read & agree with{" "}
-                                    <Link
-                                      to="/rules"
-                                      state={{ popupOpen: false }}
-                                     
-                                    >
-                                      Rules of Play & FAQ's
-                                    </Link>
-                                  </label> */}
+
                                   <label className="labelrememebrme">
                                     I have read & agree with{" "}
                                     <Link
                                       to="/rules"
                                       state={{ popupOpen: false }}
-                                      onClick={() =>
-                                        console.log("popupOpen:", false)
-                                      }
                                     >
                                       Rules of Play & FAQ's
                                     </Link>
                                   </label>
                                 </div>
                               </div>
-                              <div className="remeberrecoverydiv">
+                              <ErrorMessage
+                                name="agreeRules"
+                                component="div"
+                                className="error-message"
+                              />
+
+                              <div className="remeberrecoverydiv mb-0">
                                 <div className="rememebrmediv">
                                   <Field
                                     type="checkbox"
@@ -662,6 +690,11 @@ const Signup = ({ isOpenness, Closed, back }) => {
                                   </label>
                                 </div>
                               </div>
+                              <ErrorMessage
+                                name="agreeAge"
+                                component="div"
+                                className="error-message"
+                              />
 
                               {/* Submit Button */}
                               <div className="form-control loginformctrl">
@@ -680,12 +713,18 @@ const Signup = ({ isOpenness, Closed, back }) => {
                                     <li>
                                       <a
                                         onClick={() => {
-                                          setIsSocialSignup(true);
-                                          handleGoogleSignup(
-                                            setFieldValue,
-                                            "google"
-                                          );
+                                          Closed();
+                                          LoginWithGoogle();
                                         }}
+                                        // onClick={() => {
+                                        //   Closed()
+                                        //   setIsSocialSignup(true);
+
+                                        //   handleGoogleSignup(
+                                        //     setFieldValue,
+                                        //     "google"
+                                        //   );
+                                        // }}
                                         style={{ cursor: "pointer" }}
                                       >
                                         <img
@@ -696,12 +735,17 @@ const Signup = ({ isOpenness, Closed, back }) => {
                                     </li>
                                     <li>
                                       <a
+                                        // onClick={() => {
+                                        //   Closed()
+                                        //   setIsSocialSignup(true);
+                                        //   handleFacebookSignup(
+                                        //     setFieldValue,
+                                        //     "facebook"
+                                        //   );
+                                        // }}
                                         onClick={() => {
-                                          setIsSocialSignup(true);
-                                          handleFacebookSignup(
-                                            setFieldValue,
-                                            "facebook"
-                                          );
+                                          Closed();
+                                          LoginWithFacebook();
                                         }}
                                         style={{ cursor: "pointer" }}
                                       >
@@ -711,9 +755,10 @@ const Signup = ({ isOpenness, Closed, back }) => {
                                         />
                                       </a>
                                     </li>
-                                    <li>
+                                    {/* <li>
                                       <a
                                         onClick={() => {
+                                          Closed()
                                           setIsSocialSignup(true);
                                           handleTwitterSignup(
                                             setFieldValue,
@@ -727,7 +772,7 @@ const Signup = ({ isOpenness, Closed, back }) => {
                                           alt="Twitter"
                                         />
                                       </a>
-                                    </li>
+                                    </li> */}
                                     {/* <li>
                                       <a>
                                         <img
@@ -756,10 +801,10 @@ const Signup = ({ isOpenness, Closed, back }) => {
                                     className="showsigninbtn_div"
                                     // onClick={handleLogin}
                                     onClick={() => {
-                                      setLoginPopup(!isLoginPopup);
+                                      // setLoginPopup(!isLoginPopup);
                                       localStorage.removeItem("showSignup");
 
-                                      // Closed();
+                                      back();
                                     }}
                                   >
                                     Sign In
@@ -778,7 +823,13 @@ const Signup = ({ isOpenness, Closed, back }) => {
           </div>
         </div>
       </div>
-      {isLoginPopup && <Login isVisible={isLoginPopup} onClose={ClosePopup} />}
+      {isLoginPopup && (
+        <Login
+          isVisible={isLoginPopup}
+          setLoginOpen={true}
+          onClose={ClosePopup}
+        />
+      )}
 
       <div
         className={`signinpopup_main ${isModals ? "show" : ""}`}
@@ -788,8 +839,8 @@ const Signup = ({ isOpenness, Closed, back }) => {
           <div className="adminloginsection">
             <div className="container contfld-loginform">
               <div className="col-md-12 col12mainloginform">
-                <div className="row rowmaqinloginform">
-                  <div className="col-md-6 offset-md-3 col12loginseconddiv">
+                <div className="row justify-content-center rowmaqinloginform">
+                  <div className="col-lg-6 col12loginseconddiv">
                     <div className="col-md-12 col6formsidediv">
                       <div className="colformlogin">
                         <div className="crossbtndiv_signinpopup">

@@ -30,13 +30,13 @@ function PopupCheckout() {
             }
           );
 
-          console.log(
-            "Order Status Response:",
-            response.data.data.transaction_status
-          );
+          // console.log(
+          //   "Order Status Response:",
+          //   response.data.data.transaction_status
+          // );
           setPaymentStatus(response.data?.data?.transaction_status || ""); // Default to pending
         } catch (error) {
-          console.error("Error fetching payment status:", error);
+         // console.error("Error fetching payment status:", error);
           setErrorMessage("Failed to fetch payment status. Please try again.");
         }
       };
@@ -70,7 +70,7 @@ function PopupCheckout() {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      console.log("PDF URL:", response.data.data.pdf);
+     // console.log("PDF URL:", response.data.data.pdf);
       const pdfUrl = response.data.data.pdf;
       if (pdfUrl) {
         window.open(pdfUrl, "_blank");

@@ -193,7 +193,13 @@ const GeolocationPopup = ({ Area, onClose }) => {
             `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=AIzaSyA8pM5yXTJ3LM8zBF-EkZHEyxlPXSttsl0`
           );
 
+          if (response.data.status !== "OK") {
+            console.error("Geocode API Error:", response.data.status);
+            return;
+          }
           const results = response.data.results;
+          console.log("result", results);
+
           if (!results || results.length === 0) {
             console.error("No results found in geocode response.");
             onClose && onClose(); // Ensure onClose exists
@@ -231,10 +237,10 @@ const GeolocationPopup = ({ Area, onClose }) => {
               icon: "error",
               confirmButtonText: "OK",
             });
-          localStorage.setItem(
-            "restrictedArea",
-            JSON.stringify({ stateName, countryName })
-          );
+            localStorage.setItem(
+              "restrictedArea",
+              JSON.stringify({ stateName, countryName })
+            );
 
             setIsUnavailablePopupVisible(true); // Trigger the unavailable popup
             return;
@@ -246,18 +252,17 @@ const GeolocationPopup = ({ Area, onClose }) => {
               restrictedState.toLowerCase() === stateName.toLowerCase()
           );
 
-            if (isRestrictedState) {
-              Swal.fire({
-                title: "Area Restricted",
-                text: `Access is restricted in the state: ${stateName}`,
-                icon: "error",
-                confirmButtonText: "OK",
-              });
-                      localStorage.setItem(
-                        "restrictedArea",
-                        JSON.stringify({ stateName, countryName })
-                      );
-
+          if (isRestrictedState) {
+            Swal.fire({
+              title: "Area Restricted",
+              text: `Access is restricted in the state: ${stateName}`,
+              icon: "error",
+              confirmButtonText: "OK",
+            });
+            localStorage.setItem(
+              "restrictedArea",
+              JSON.stringify({ stateName, countryName })
+            );
 
             setIsUnavailablePopupVisible(true); // Trigger the unavailable popup
             return;

@@ -20,9 +20,10 @@ import {
 
 import { GoogleLogin } from "@react-oauth/google";
 
-function Login({ isVisible, onClose }) {
+function Login({ isVisible, setLoginOpen, onClose }) {
   // console.log("logincomponent");
   const [timer, setTimer] = useState(0); // Timer state for resend OTP
+  const [open, setOpen] = useState(isVisible);
   const [otp, setOtp] = useState(["", "", "", ""]);
   const [isModals, setIsModals] = useState("");
   const [emails, setEmails] = useState("");
@@ -44,6 +45,33 @@ function Login({ isVisible, onClose }) {
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
+
+  const validateFields = Yup.object().shape({
+    emailOrPhone: Yup.string()
+      .required("Email or Mobile Number is required")
+      .test("emailOrPhone", "Invalid Email or Phone Number", (value) => {
+        // Debug: Uncomment to see value on each validation
+        // console.log("Validating emailOrPhone:", value);
+        return (
+          /^[\w.-]+@[\w.-]+\.\w{2,4}$/.test(value) || /^\d{10,15}$/.test(value)
+        );
+      }),
+
+    password: Yup.string()
+      .min(8, "Password must be at least 8 characters")
+      .matches(/[A-Z]/, "Password must contain at least one uppercase letter")
+      .matches(/[a-z]/, "Password must contain at least one lowercase letter")
+      .matches(/[0-9]/, "Password must contain at least one number")
+      .matches(
+        /[@$!%*?&]/,
+        "Password must contain at least one special character (@, $, !, %, *, ?, &)"
+      )
+      .required("Password is required"),
+
+    agreeAllLegal: Yup.boolean().oneOf([true], "You must agree to continue"),
+    agreeRules: Yup.boolean().oneOf([true], "You must agree to continue"),
+    agreeAge: Yup.boolean().oneOf([true], "You must agree to continue"),
+  });
 
   const [isSocialSignup, setIsSocialSignup] = useState(false);
   useEffect(() => {
@@ -79,6 +107,19 @@ function Login({ isVisible, onClose }) {
     password: "",
   };
 
+  const LoginSchema = Yup.object().shape({
+    emailOrPhone: Yup.string()
+      .required("Email or Mobile Number is required")
+      .test(
+        "emailOrPhone",
+        "Invalid Email or Phone Number",
+        (value) =>
+          /^[\w.-]+@[\w.-]+\.\w{2,4}$/.test(value) || /^\d{10,15}$/.test(value)
+      ),
+    password: Yup.string()
+      .required("Password is required")
+      .min(6, "Password must be at least 6 characters"),
+  });
   // const Login = async (values) => {
   //   console.log("Attempting to login with values:", values);
 
@@ -169,11 +210,6 @@ function Login({ isVisible, onClose }) {
   // };
 
   const Login = async (values) => {
-    const isPhoneNumber = /^[6-9]\d{9}$/.test(values.emailOrPhone);
-    if (isPhoneNumber) {
-      values.emailOrPhone = `+91${values.emailOrPhone}`;
-    }
-
     setIsLoading(true);
 
     const device_token = localStorage.getItem("device_token");
@@ -181,32 +217,36 @@ function Login({ isVisible, onClose }) {
     if (!device_token) {
       console.warn("Device token not found.");
 
-      if (values) {
-        Swal.fire({
-          title: "Please allow notifications",
-          html: `
-          <div class="notification_settingdiv">
-            <h2>Notification Setting</h2> 
-            <p>Open Chrome.</p>
-            <p>At the top right, select More <span><i class="fa fa-ellipsis-v" aria-hidden="true"></i> <i class="fa fa-chevron-right" aria-hidden="true"></i></span> <b>Settings</b> <span><i class="fa fa-chevron-right" aria-hidden="true"></i></span> Privacy and security.</p>
-            <p>Select <b>Site settings</b>.</p>
-            <p>Under “Permissions,” select <b>Notification</b>.</p>
-          </div>
-        `,
-          imageUrl: `${process.env.PUBLIC_URL}/images/notificationImg.jpg`,
-          imageWidth: 300,
-          imageHeight: 200,
-          imageAlt: "Custom image",
-          confirmButtonText: "OK",
-          allowOutsideClick: false,
-        });
-      }
+      Swal.fire({
+        title: "Please allow notifications",
+        html: `
+            <div class="notification_settingdiv">
+                <h2>Notification Setting</h2>
+                <p>Open Chrome.</p>
+                <p>At the top right, select More <span><i class="fa fa-ellipsis-v" aria-hidden="true"></i> <i class="fa fa-chevron-right" aria-hidden="true"></i></span> <b>Settings</b> <span><i class="fa fa-chevron-right" aria-hidden="true"></i></span> Privacy and security.</p>
+                <p>Select <b>Site settings</b>.</p>
+                <p>Under “Permissions,” select <b>Notification</b>.</p>
+            </div>
+            `,
+        imageUrl: `${process.env.PUBLIC_URL}/images/notificationImg.jpg`,
+        imageWidth: 300,
+        imageHeight: 200,
+        imageAlt: "Custom image",
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
+      });
 
       setIsLoading(false);
       return;
     }
 
-    console.log("Device token:", device_token);
+    // console.log("Device token:", device_token);
+
+    // Check if emailOrPhone is a phone number and doesn't already start with +91
+    const isPhoneNumber = /^[6-9]\d{9}$/.test(values.emailOrPhone);
+    if (isPhoneNumber && !values.emailOrPhone.startsWith("+91")) {
+      values.emailOrPhone = `+91${values.emailOrPhone}`;
+    }
 
     try {
       const response = await axios.post("app/auth/login", {
@@ -215,7 +255,7 @@ function Login({ isVisible, onClose }) {
         device_type: "website",
       });
 
-      console.log("Login successful! Response:", response.data.data);
+      // console.log("Login successful! Response:", response.data.data);
 
       if (!response.data.data.is_verified_user) {
         openModals();
@@ -254,6 +294,95 @@ function Login({ isVisible, onClose }) {
     }
   };
 
+  // const Login = async (values) => {
+  //   const isPhoneNumber = /^[6-9]\d{9}$/.test(values.emailOrPhone);
+  //   if (isPhoneNumber) {
+  //     values.emailOrPhone = `+91${values.emailOrPhone}`;
+  //   }
+
+  //   setIsLoading(true);
+
+  //   let device_token = localStorage.getItem("device_token");
+
+  //   if (!device_token) {
+  //     console.warn("Device token not found.");
+
+  //     Swal.fire({
+  //       title: "Please allow notifications",
+  //       html: `
+  //       <div class="notification_settingdiv">
+  //         <h2>Notification Setting</h2>
+  //         <p>Open Chrome.</p>
+  //         <p>At the top right, select More <span><i class="fa fa-ellipsis-v"></i> <i class="fa fa-chevron-right"></i></span> <b>Settings</b> <span><i class="fa fa-chevron-right"></i></span> Privacy and security.</p>
+  //         <p>Select <b>Site settings</b>.</p>
+  //         <p>Under “Permissions,” select <b>Notification</b>.</p>
+  //       </div>
+  //     `,
+  //       imageUrl: `${process.env.PUBLIC_URL}/images/notificationImg.jpg`,
+  //       imageWidth: 300,
+  //       imageHeight: 200,
+  //       imageAlt: "Custom image",
+  //       confirmButtonText: "OK",
+  //       allowOutsideClick: false,
+  //     });
+
+  //     setIsLoading(false);
+  //     return;
+  //   }
+
+  //   console.log("Device token:", device_token);
+
+  //   try {
+  //     // Get the latest device token
+  //     device_token = await getToken(messaging, {
+  //       vapidKey:
+  //         "BC1L5qE6WKJSgEU46nuptM9bCKtljihEjAikiBrpzRIomSiw6Dd9Wq6jmM4CfIHJokkhmqblgU5qbVaqizNlmeo",
+  //     });
+
+  //     const response = await axios.post("app/auth/login", {
+  //       ...values,
+  //       device_token,
+  //       device_type: "website",
+  //     });
+
+  //     console.log("Login successful! Response:", response.data.data);
+
+  //     if (!response.data.data.is_verified_user) {
+  //       openModals();
+  //       setEmails(response.data.data.email);
+  //       localStorage.setItem("tokens", response.data.data.token);
+  //     } else {
+  //       localStorage.setItem("Web-token", response.data.data.token);
+
+  //       Swal.fire({
+  //         icon: "success",
+  //         title: response.data.message,
+  //         allowOutsideClick: false,
+  //         showConfirmButton: false,
+  //         timer: 1000,
+  //       });
+
+  //       navigate("/");
+  //       onClose();
+  //     }
+  //   } catch (error) {
+  //     console.error(
+  //       "Login failed:",
+  //       error.response ? error.response.data : error.message
+  //     );
+
+  //     Swal.fire({
+  //       icon: "error",
+  //       title: "Login Failed",
+  //       text: error.response ? error.response.data.message : error.message,
+  //       confirmButtonText: "OK",
+  //       allowOutsideClick: false,
+  //     });
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
   const handleSocialSignup = () => {
     setIsSocialSignup(true);
     onClose(); // Ensure onClose is defined
@@ -271,7 +400,8 @@ function Login({ isVisible, onClose }) {
   };
   const handlebackSignup = () => {
     setShowSignup(false);
-    isVisible();
+    setOpen(true);
+    setLoginOpen(true);
   };
 
   const handleForgotPassword = () => {
@@ -342,7 +472,7 @@ function Login({ isVisible, onClose }) {
         }
       );
 
-      console.log("resend", response.data.data.tokens);
+      // console.log("resend", response.data.data.tokens);
 
       // Save the new token
       localStorage.setItem("tokens", response.data.data.token);
@@ -417,8 +547,8 @@ function Login({ isVisible, onClose }) {
           <div className="adminloginsection">
             <div className="container contfld-loginform">
               <div className="col-md-12 col12mainloginform">
-                <div className="row rowmaqinloginform">
-                  <div className="col-md-6 offset-md-3 col12loginseconddiv">
+                <div className="row justify-content-center  rowmaqinloginform">
+                  <div className="col-lg-6 col12loginseconddiv">
                     <div className="col-md-12 col6formsidediv">
                       <div className="colformlogin">
                         <div className="crossbtndiv_signinpopup">
@@ -441,6 +571,7 @@ function Login({ isVisible, onClose }) {
                         <Formik
                           innerRef={formikRef}
                           initialValues={LoginValues}
+                          validationSchema={validateFields}
                           onSubmit={Login}
                           validateOnChange={true}
                           validateOnBlur={true}
@@ -462,8 +593,8 @@ function Login({ isVisible, onClose }) {
                                   />
                                   <ErrorMessage
                                     name="emailOrPhone"
-                                    component="span"
-                                    className="field_required"
+                                    component="div"
+                                    className="error-message"
                                   />
                                 </div>
 
@@ -476,9 +607,19 @@ function Login({ isVisible, onClose }) {
                                       id="createpass_inp"
                                       placeholder="Password"
                                       aria-label="Password"
+                                      autoComplete="new-password"
+                                      onFocus={(e) => {
+                                        e.target.removeAttribute("readonly");
+                                      }}
+                                      readOnly
                                     />
                                     <span
-                                      onClick={togglePasswordVisibility}
+                                      onClick={() => {
+                                        setShowPassword(!showPassword);
+                                        document
+                                          .getElementById("createpass_inp")
+                                          .focus(); // Refocus to apply changes
+                                      }}
                                       className="password-toggle"
                                     >
                                       <i
@@ -492,8 +633,8 @@ function Login({ isVisible, onClose }) {
                                   </div>
                                   <ErrorMessage
                                     name="password"
-                                    component="span"
-                                    className="field_required"
+                                    component="div"
+                                    className="error-message"
                                   />
                                 </div>
 
@@ -540,6 +681,7 @@ function Login({ isVisible, onClose }) {
                                         <a
                                           onClick={() => {
                                             // setIsSocialSignup(true);
+                                            onClose();
                                             LoginWithGoogle();
                                           }}
                                           style={{ cursor: "pointer" }}
@@ -554,6 +696,7 @@ function Login({ isVisible, onClose }) {
                                         <a
                                           onClick={() => {
                                             // setIsSocialSignup(true);
+                                            onClose();
                                             LoginWithFacebook();
                                           }}
                                           style={{ cursor: "pointer" }}
@@ -564,10 +707,11 @@ function Login({ isVisible, onClose }) {
                                           />
                                         </a>
                                       </li>
-                                      <li>
+                                      {/* <li>
                                         <a
                                           onClick={() => {
                                             // setIsSocialSignup(true);
+                                            onClose();
                                             LoginWithTwitter();
                                           }}
                                           style={{ cursor: "pointer" }}
@@ -577,7 +721,7 @@ function Login({ isVisible, onClose }) {
                                             alt="Twitter"
                                           />
                                         </a>
-                                      </li>
+                                      </li> */}
                                       {/* <li>
                                         <a
                                           onClick={() => {
@@ -635,6 +779,7 @@ function Login({ isVisible, onClose }) {
           isOpenness={handleSignup}
           Closed={() => {
             localStorage.removeItem("showSignup");
+            localStorage.removeItem("signupFormData");
             setShowSignup(false);
           }}
         />
@@ -647,8 +792,8 @@ function Login({ isVisible, onClose }) {
           <div className="adminloginsection">
             <div className="container contfld-loginform">
               <div className="col-md-12 col12mainloginform">
-                <div className="row rowmaqinloginform">
-                  <div className="col-md-6 offset-md-3 col12loginseconddiv">
+                <div className="row justify-content-center rowmaqinloginform">
+                  <div className="col-lg-6 col12loginseconddiv">
                     <div className="col-md-12 col6formsidediv">
                       <div className="colformlogin">
                         <div className="crossbtndiv_signinpopup">

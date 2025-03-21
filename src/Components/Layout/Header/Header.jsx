@@ -14,6 +14,7 @@ function Header() {
   const [profile, setProfile] = useState({});
 
   const [isMenuVisible, setIsMenuVisible] = useState(false);
+  const [islang, setIsLang] = useState(false);
   const [isLogout, setIsLogout] = useState("");
   const [loginPopup, setLoginPopup] = useState(false);
   const [isNot, setIsNot] = useState(false);
@@ -67,6 +68,9 @@ function Header() {
   const toggleMenu = () => {
     setIsMenuVisible((prevState) => !prevState); // Toggle the state
   };
+  const toggleMenulang = () => {
+    setIsLang((prevState) => !prevState); // Toggle the state
+  };
   const OpenLogout = () => {
     setIsLogout(true);
   };
@@ -113,10 +117,11 @@ function Header() {
     };
   }, []);
   const isHomePage = location.pathname === "/";
+
   const handleScroll = () => {
     const currentScrollY = window.scrollY;
 
-    if (currentScrollY > lastScrollY) {
+    if (currentScrollY > 0) {
       setHeaderClass(
         isHomePage ? "headerfixed" : "innerheader_new headerfixed"
       );
@@ -126,7 +131,7 @@ function Header() {
 
     setLastScrollY(currentScrollY);
 
-    setIsNot(false);
+    // setIsNot(false);
     setIsMenuVisible(false);
   };
 
@@ -468,7 +473,7 @@ function Header() {
                         </a>
                       </div>
                     </div> */}
-                    <div className="d-flex gap-5  justify-content-between align-items-center">
+                    {/* <div className="d-flex gap-5  justify-content-between align-items-center">
                       <div className="d-flex gap-3 align-items-start">
                         <img
                           src={`${process.env.PUBLIC_URL}/images/favicon.png`}
@@ -491,10 +496,11 @@ function Header() {
                           Download APK
                         </a>
                       </div>
-                    </div>
+                    </div> */}
 
                     <div
                       className="navbar-brand navbarlogodiv"
+                      style={{ cursor: "pointer" }}
                       onClick={handleLogoClick}
                     >
                       <img
@@ -506,6 +512,56 @@ function Header() {
                     {token ? (
                       <div className="navbar-collapse newnavbarleft">
                         <ul className="navbar navbar_afterlogin">
+                          {/* <li className="nav-item afterlogin_icons_nav lang_icons">
+                            <a
+                              className="itmelink_menus "
+                              onClick={toggleMenulang}
+                            >
+                              <img
+                                src={`${process.env.PUBLIC_URL}/images/language_icon.png`}
+                                alt="language-icon"
+                              />
+                            </a>
+                            <div
+                              id="menu-list"
+                              className="menulist_divmanin"
+                              style={{
+                                display: islang ? "block" : "none",
+                              }}
+                            >
+                              <ul className="menubar_list_ul">
+                                {["Hindi", "Tamil", "Telugu"].map(
+                                  (language, index) => (
+                                    <li key={index} className="mainmenulist">
+                                      <a>
+                                        <div className="menubar_divmain">
+                                          <div className="menuname_withicon">
+                                            <div className="menuiconimgdiv">
+                                              <img
+                                                src={`${process.env.PUBLIC_URL}/images/icon_who_we_are.png`}
+                                                alt={`${language}-icon`}
+                                              />
+                                            </div>
+                                            <div className="menuname">
+                                              <h4>{language}</h4>
+                                            </div>
+                                          </div>
+                                          <div className="arrowicondiv">
+                                            <img
+                                              src={`${process.env.PUBLIC_URL}/images/menu_arrow_icon.png`}
+                                              className="arrowicon_menu"
+                                              alt="arrow-icon"
+                                            />
+                                          </div>
+                                        </div>
+                                      </a>
+                                    </li>
+                                  )
+                                )}
+                              </ul>
+                            </div>
+                          </li> */}
+
                           <li className="nav-item afterlogin_icons_nav notificationclick">
                             <a className="itmelink_menus">
                               <img
@@ -541,7 +597,8 @@ function Header() {
                                         <a className="notifylinkdiv">
                                           <div className="notify-icondiv">
                                             <img
-                                              src={`${process.env.PUBLIC_URL}/images/get_notify_icon_.png`}
+                                              className="notification_img"
+                                              src={`${process.env.PUBLIC_URL}/images/favicon.png`}
                                               alt="notification"
                                             />
                                           </div>
@@ -584,7 +641,7 @@ function Header() {
                               <img
                                 src={`${process.env.PUBLIC_URL}/images/cart_icon.png`}
                               />
-                              {/* <span className="cartcount">1</span> */}
+                              {/* <span className="cartcount">.</span> */}
                             </Link>
                           </li>
                           <li className="nav-item afterlogin_icons_nav userprofilediv_new">

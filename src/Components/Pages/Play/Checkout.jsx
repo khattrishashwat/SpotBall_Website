@@ -4,7 +4,6 @@ import { useNavigate, useLocation } from "react-router-dom";
 import Loader from "../../Loader/Loader";
 import Swal from "sweetalert2";
 import { load } from "@cashfreepayments/cashfree-js";
-import { IconBase } from "react-icons";
 
 function Checkout() {
   const navigate = useNavigate();
@@ -13,17 +12,21 @@ function Checkout() {
   const [carts, setCarts] = useState("");
   const [calculatedCarts, setCalculatedCarts] = useState([]);
   const [alertShown, setAlertShown] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState(""); // Store payment status
+  const [viewPopup, setViewPopup] = useState(false);
 
   const [isEntrysActive, setIsEntrysActive] = useState(false);
   const [isImageRotated, setIsImageRotated] = useState(false);
   const [promoCode, setPromoCode] = useState("");
   const [discounts, setDiscounts] = useState([]);
+  const [isOrder, setIsOrder] = useState("");
 
   const [promoApplied, setPromoApplied] = useState(false); // Tracks if the promo is successfully applied
   const [promoMessage, setPromoMessage] = useState("");
   const [selectedPromoCode, setSelectedPromoCode] = useState({});
   const [promoCodes, setPromoCodes] = useState([]);
   const [appliedPromoCode, setAppliedPromoCode] = useState(null);
+  const [reloadData, setReloadData] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -36,7 +39,9 @@ function Checkout() {
   const fetchData = async () => {
     if (isFetched.current) return; // Ensure API is only called once
     isFetched.current = true;
+
     const token = localStorage.getItem("Web-token");
+
     try {
       const response = await axios.get("app/contest/get-all-cart-items", {
         headers: { Authorization: `Bearer ${token}` },
@@ -85,12 +90,21 @@ function Checkout() {
           gstOnPlatformFee: gstOnPlatformFee.toFixed(2),
           totalRazorpayFee: totalRazorpayFee.toFixed(2),
           totalPayment: totalPayment.toFixed(2),
-          promoCode: cart.promocodeApplied || null, // Use promocodeApplied if present
+          promoCode: cart.promocodeApplied || null, // Store applied promo code
           discount: null,
         };
 
-        // Apply discount logic only if promocode is not present
-        if (!cart.promocodeApplied) {
+        // Apply the same formula for both promo code and regular discount
+        if (cart.promocodeApplied) {
+          const appliedPromo = cart.promocodeApplied; // Use applied promo
+
+          initialCart.discount = {
+            name: appliedPromo.name, // Promo code name
+            discountPercentage: appliedPromo.amount, // Treat amount as a percentage
+            amount: (totalTicketPrice * appliedPromo.amount) / 100, // Apply discount formula
+          };
+        } else {
+          // Apply regular discount logic if no promo code is applied
           const applicableDiscount = discounts.find(
             (discount) =>
               ticketsCount >= discount.minTickets &&
@@ -103,7 +117,7 @@ function Checkout() {
               discountPercentage: applicableDiscount.discountPercentage,
               amount:
                 (totalTicketPrice * applicableDiscount.discountPercentage) /
-                100,
+                100, // Apply same formula
             };
           }
         }
@@ -123,144 +137,58 @@ function Checkout() {
   };
 
   useEffect(() => {
-    fetchData(); // Call API only once when component mounts
-  }, []);
-
-  // const fetchData = async () => {
-  //   const token = localStorage.getItem("Web-token");
-  //   try {
-  //     const response = await axios.get("app/contest/get-all-cart-items", {
-  //       headers: { Authorization: `Bearer ${token}` },
-  //     });
-
-  //     const { cartItems, discounts, promocodes } = response.data.data;
-
-  //     if (cartItems.length === 0 && !alertShown) {
-  //       setAlertShown(true); // Set alert shown to true to prevent multiple alerts
-
-  //       Swal.fire({
-  //         icon: "info",
-  //         text: "No game has been played yet.",
-  //         confirmButtonText: "OK",
-  //         allowOutsideClick: false,
-  //       }).then((result) => {
-  //         if (result.isConfirmed) navigate("/");
-  //       });
-  //     }
-
-  //     setCarts(cartItems);
-
-  //     const calculated = cartItems.map((cart) => {
-  //       const {
-  //         ticket_price: ticketPrice,
-  //         gstRate,
-  //         platformFeeRate,
-  //         gstOnPlatformFeeRate,
-  //       } = cart.contest_id;
-
-  //       const ticketsCount = cart.tickets_count;
-
-  //       const totalTicketPrice = ticketPrice * ticketsCount;
-  //       const gstAmount = totalTicketPrice * (gstRate / 100);
-  //       const subtotal = totalTicketPrice + gstAmount;
-  //       const platformFee = subtotal * (platformFeeRate / 100);
-  //       const gstOnPlatformFee = platformFee * (gstOnPlatformFeeRate / 100);
-  //       const totalRazorpayFee = platformFee + gstOnPlatformFee;
-  //       const totalPayment = subtotal + totalRazorpayFee;
-
-  //       const initialCart = {
-  //         ...cart,
-  //         totalTicketPrice: totalTicketPrice.toFixed(2),
-  //         gstAmount: gstAmount.toFixed(2),
-  //         subtotal: subtotal.toFixed(2),
-  //         platformFee: platformFee.toFixed(2),
-  //         gstOnPlatformFee: gstOnPlatformFee.toFixed(2),
-  //         totalRazorpayFee: totalRazorpayFee.toFixed(2),
-  //         totalPayment: totalPayment.toFixed(2),
-  //         promoCode: cart.promocodeApplied || null, // Use promocodeApplied if present
-  //         discount: null,
-  //       };
-
-  //       // Apply discount logic only if promocode is not present
-  //       if (!cart.promocodeApplied) {
-  //         const applicableDiscount = discounts.find(
-  //           (discount) =>
-  //             ticketsCount >= discount.minTickets &&
-  //             ticketsCount <= discount.maxTickets
-  //         );
-
-  //         if (applicableDiscount) {
-  //           initialCart.discount = {
-  //             name: applicableDiscount.name,
-  //             discountPercentage: applicableDiscount.discountPercentage,
-  //             amount:
-  //               (totalTicketPrice * applicableDiscount.discountPercentage) /
-  //               100,
-  //           };
-  //         }
-  //       }
-
-  //       return initialCart;
-  //     });
-
-  //     setCalculatedCarts(calculated);
-  //     setDiscounts(discounts || []);
-  //     setPromoCodes(promocodes || []);
-  //   } catch (error) {
-  //     console.error(
-  //       "Error fetching cart data:",
-  //       error.response?.data?.message || error.message
-  //     );
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   fetchData();
-  // }, []);
+    fetchData();
+  }, [reloadData]);
 
   const totalBeforeDiscount = calculatedCarts.reduce((total, cart) => {
-    if (cart.promoCode) {
-      return total + parseFloat(cart.totalPayment);
-    } else if (cart.discount) {
-      const discountedTotalTicketPrice = Math.max(
-        parseFloat(cart.totalTicketPrice) - cart.discount.amount,
+    let discountedTotalTicketPrice = parseFloat(cart.totalTicketPrice);
+
+    if (cart.promocodeApplied) {
+      // Promo Code Apply Hai -> Discount Ko Ignore Karo
+      cart.discount = null;
+      discountedTotalTicketPrice = Math.max(
+        discountedTotalTicketPrice -
+          (discountedTotalTicketPrice * cart.promocodeApplied.amount) / 100,
         0
       );
-
-      const discountedGstAmount =
-        discountedTotalTicketPrice * ((cart.contest_id?.gstRate || 0) / 100);
-      const discountedSubtotal =
-        discountedTotalTicketPrice + discountedGstAmount;
-      const discountedPlatformFee =
-        discountedSubtotal * ((cart.contest_id?.platformFeeRate || 0) / 100);
-      const discountedGstOnPlatformFee =
-        discountedPlatformFee *
-        ((cart.contest_id?.gstOnPlatformFeeRate || 0) / 100);
-      const discountedGrandTotal =
-        discountedSubtotal + discountedPlatformFee + discountedGstOnPlatformFee;
-
-      return total + discountedGrandTotal;
-    } else {
-      return total + parseFloat(cart.totalPayment);
+    } else if (cart.discount) {
+      // Discount Apply Hai -> Promo Code Ko Ignore Karo
+      cart.promocodeApplied = null;
+      discountedTotalTicketPrice = Math.max(
+        discountedTotalTicketPrice -
+          (discountedTotalTicketPrice * cart.discount.discountPercentage) / 100,
+        0
+      );
     }
+
+    // Normal Calculation (GST, Platform Fee, etc.)
+    const discountedGstAmount =
+      discountedTotalTicketPrice * ((cart.contest_id?.gstRate || 0) / 100);
+    const discountedSubtotal = discountedTotalTicketPrice + discountedGstAmount;
+    const discountedPlatformFee =
+      discountedSubtotal * ((cart.contest_id?.platformFeeRate || 0) / 100);
+    const discountedGstOnPlatformFee =
+      discountedPlatformFee *
+      ((cart.contest_id?.gstOnPlatformFeeRate || 0) / 100);
+    const discountedGrandTotal =
+      discountedSubtotal + discountedPlatformFee + discountedGstOnPlatformFee;
+
+    return total + discountedGrandTotal;
   }, 0);
 
   const handleApplyPromoCode = async () => {
     if (!promoCode.trim()) {
       Swal.fire({
         icon: "warning",
-        title: "Promo Code Required",
         text: "Please enter a promo code before applying.",
       });
       return;
     }
 
-    // Check if a promo code has already been applied
     if (appliedPromoCode && appliedPromoCode.name === promoCode) {
       Swal.fire({
         icon: "info",
-        title: "Promo Code Already Applied",
-        text: `The promo code "${promoCode}" has already been applied.`,
+        title: "Promo Code Already Applied.",
       });
       return;
     }
@@ -268,85 +196,88 @@ function Checkout() {
     const promo = promoCodes.find((code) => code.name === promoCode);
 
     if (promo) {
-      const updatedCarts = calculatedCarts.map((cart) => {
-        const promoDiscountAmount = Math.min(
-          promo.amount,
-          parseFloat(cart.totalPayment)
-        );
-        const discountedTotalPayment = Math.max(
-          parseFloat(cart.totalPayment) - promoDiscountAmount,
-          0
-        );
-
-        return {
-          ...cart,
-          discount: null,
-          promoCode: {
-            name: promo.name,
-            amount: promoDiscountAmount,
-          },
-          totalPayment: discountedTotalPayment.toFixed(2),
-        };
-      });
-
-      setCalculatedCarts(updatedCarts);
-      setSelectedPromoCode(promoCode);
-      setAppliedPromoCode(promo); // Set applied promo code
-
-      Swal.fire({
-        icon: "success",
-        title: "Promo Code Applied!",
-        text: `Promo code "${promo.name}" applied. Discount: ₹${promo.amount}`,
-      });
-
-      // POST API call
-      const payload = {
-        contest_id: calculatedCarts[0]?.contest_id?._id, // Replace with actual contest ID
-        tickets_count: calculatedCarts[0]?.tickets_count, // Example: total tickets count
-        user_coordinates: calculatedCarts[0]?.user_coordinates, // Replace with actual coordinates
+      const updatedCarts = calculatedCarts.map((cart) => ({
+        ...cart,
+        discount: null, // Remove any existing discount
         promocodeApplied: {
           name: promo.name,
           amount: promo.amount,
         },
-      };
+      }));
 
-      const token = localStorage.getItem("Web-token");
+      setCalculatedCarts(updatedCarts);
+      setAppliedPromoCode(promo);
+      setSelectedPromoCode(selectedPromoCode);
+
+      Swal.fire({
+        icon: "success",
+        text: `Promo code "${promo.name}" applied. Discount: ${promo.amount}%.`,
+      });
+
       try {
-        const response = await axios.post("app/contest/add-to-cart", payload, {
-          headers: {
-            Authorization: `Bearer ${token}`,
+        const updatedCart = updatedCarts[0];
+        if (!updatedCart) return;
+
+        const payload = {
+          contest_id: updatedCart?.contest_id?._id,
+          tickets_count: updatedCart?.tickets_count,
+          user_coordinates: updatedCart?.user_coordinates,
+          promocodeApplied: {
+            name: promo.name,
+            amount: promo.amount,
           },
+        };
+
+        const token = localStorage.getItem("Web-token");
+        await axios.post("app/contest/add-to-cart", payload, {
+          headers: { Authorization: `Bearer ${token}` },
         });
+
+        setReloadData((prev) => !prev);
+
         Swal.fire({
           icon: "success",
-          title: "Promo Code Applied Successfully",
-          text: `Discount applied and data sent successfully.`,
+          title: "Promo Code Applied Successfully.",
         });
       } catch (error) {
         console.error("API Error:", error);
         Swal.fire({
           icon: "error",
-          title: "Failed to Apply Promo Code",
-          text: "There was an error applying the promo code. Please try again.",
+          title: "Failed to Apply Promo Code.",
         });
       }
     } else {
       Swal.fire({
         icon: "error",
-        title: "Invalid Promo Code",
-        text: "The promo code you entered is not valid.",
+        title: "Invalid Promo Code.",
       });
     }
   };
 
   const calculateDiscounts = (cart) => {
-    const promoDiscountName = cart.promoCode ? cart.promoCode.name : 0;
-    const promoDiscountAmount = cart.promoCode ? cart.promoCode.amount : 0;
-    const PerDiscount = cart.discount ? cart.discount.discountPercentage : 0;
-    const discountPerCart = cart.discount ? cart.discount.amount : "0.00";
+    const promoDiscountName = cart.promocodeApplied
+      ? cart.promocodeApplied.name
+      : null;
+    const PromoAmount = cart.promocodeApplied
+      ? cart.promocodeApplied.amount
+      : 0;
+    const promoDiscountAmount = cart.promocodeApplied
+      ? (cart.totalTicketPrice * cart.promocodeApplied.amount) / 100
+      : 0;
+
+    const discountPercentage = cart.discount
+      ? cart.discount.discountPercentage
+      : 0;
+    const discountAmount = !cart.contest_id.promocodeApplied
+      ? (cart.totalTicketPrice * discountPercentage) / 100
+      : 0;
+
+    console.log("Promo Amount:", PromoAmount);
+    console.log("Promo Discount:", promoDiscountAmount);
+    console.log("Regular Discount:", discountAmount);
 
     const discountedTotalTicketPrice = Math.max(
-      cart.totalTicketPrice - discountPerCart - promoDiscountAmount,
+      cart.totalTicketPrice - promoDiscountAmount - discountAmount,
       0
     ).toFixed(2);
 
@@ -377,24 +308,14 @@ function Checkout() {
       parseFloat(discountedSubtotal) + parseFloat(discountedTotalRazorpayFee)
     ).toFixed(2);
 
-    // console.log("new", {
-    //   promoDiscountAmount,
-    //   PerDiscount,
-    //   discountPerCart,
-    //   discountedTotalTicketPrice,
-    //   discountedGstAmount,
-    //   discountedSubtotal,
-    //   discountedPlatformFee,
-    //   discountedGstOnPlatformFee,
-    //   discountedTotalRazorpayFee,
-    //   discountedGrandTotal,
-    // });
-
+    console.log("new pee", discountPercentage);
+    console.log("new ", discountAmount);
     return {
       promoDiscountName,
+      PromoAmount,
       promoDiscountAmount,
-      PerDiscount,
-      discountPerCart,
+      discountPercentage,
+      discountAmount,
       discountedTotalTicketPrice,
       discountedGstAmount,
       discountedSubtotal,
@@ -411,7 +332,7 @@ function Checkout() {
 
     Swal.fire({
       title: "Are you sure?",
-      text: "Do you really w  ant to delete this item?",
+      text: "Do you really want to delete this item?",
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Yes, delete it!",
@@ -462,266 +383,64 @@ function Checkout() {
       }
     });
   };
-  // const Money = async () => {
-  //   const token = localStorage.getItem("Web-token");
-  //   if (!token) {
-  //     Swal.fire({
-  //       icon: "error",
-  //       title: "Error!",
-  //       text: "You are not authenticated. Please log in.",
-  //     });
-  //     return;
-  //   }
-  //   console.log("new", totalBeforeDiscount);
 
+  // const Money = async () => {
   //   try {
+  //     const token = localStorage.getItem("Web-token");
+  //     const order_amount = totalBeforeDiscount.toFixed(2);
+
+  //     console.log("Total Before Discount:", order_amount);
+
   //     // Step 1: Call Money API to get paymentSessionId
   //     const response = await axios.post(
   //       "app/cashfree/create-order",
-  //       { order_amount: Math.round(totalBeforeDiscount) }, // Ensure totalBeforeDiscount is defined
+  //       { order_amount },
   //       {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //         },
-  //       }
-  //     );
-
-  //     // Log the full response for debugging
-  //     console.log("API Response:", response.data);
-
-  //     // Extract payment session ID from the response
-  //     const paymentOrderId = response.data?.data?.order_id;
-  //     const paymentSessionId = response.data?.data?.payment_session_id;
-
-  //     // Ensure paymentSessionId is present
-  //     if (!paymentSessionId) {
-  //       Swal.fire({
-  //         icon: "error",
-  //         title: "Error!",
-  //         text: "Payment session ID is missing. Unable to proceed with payment.",
-  //       });
-  //       return;
-  //     }
-
-  //     console.log("Payment Session ID:", paymentSessionId);
-
-  //     // Step 2: Initialize Cashfree SDK in production mode
-  //     let cashfree;
-  //     try {
-  //       cashfree = await load({
-  //         mode: "production",
-  //         environment: "production",
-
-  //         // mode: "PRODUCTION",
-  //         // environment: "PRODUCTION", // Always use production mode
-  //       });
-  //       console.log("Cashfree SDK initialized successfully.");
-  //     } catch (sdkError) {
-  //       Swal.fire({
-  //         icon: "error",
-  //         title: "SDK Initialization Error",
-  //         text: "Failed to initialize Cashfree SDK. Please try again later.",
-  //       });
-  //       console.error("SDK Initialization Error:", sdkError);
-  //       return;
-  //     }
-
-  //     // Step 3: Configure Cashfree Checkout for production mode
-  //     const checkoutOptions = {
-  //       paymentSessionId,
-  //       // mode: "PRODUCTION", // Always use production mode
-  //       mode: "production", // Always use production mode
-  //       callback_url: `https://www.spotsball.com/spotsball/web/popupCheckout?order_id={paymentOrderId}`,
-  //     };
-
-  //     // Handle checkout and payment result
-  //     cashfree.checkout(checkoutOptions).then(async (result) => {
-  //       if (result.error) {
-  //         Swal.fire({
-  //           icon: "error",
-  //           title: "Payment Error!",
-  //           text: result.error.data || result.error.message,
-  //         });
-  //         console.error("Checkout Error:", result.error);
-  //       } else if (result.paymentDetails) {
-  //         Swal.fire({
-  //           icon: "success",
-  //           title: "Payment Successful!",
-  //           text:
-  //             result.paymentDetails.paymentMessage ||
-  //             result.paymentDetails.paymentMessage,
-  //         });
-
-  //         // Prepare payment data
-  //         const paymentData = preparePaymentData(paymentOrderId);
-
-  //         // Call Pay function to process the payment data
-  //         Pay(paymentData);
-
-  //         // Update order status
-  //         await OrderStatus(paymentOrderId);
-  //       } else if (result.redirect) {
-  //         console.log(
-  //           "Payment will be redirected to a new page.",
-  //           result.redirect
-  //         );
-  //       }
-  //     });
-  //   } catch (error) {
-  //     Swal.fire({
-  //       icon: "error",
-  //       title: "Error!",
-  //       text: error.data || error.message,
-  //     });
-  //     console.error("Money API Error:", error);
-  //   }
-  // };
-
-  // const Money = async () => {
-  //   const token = localStorage.getItem("Web-token");
-  //   console.log("total", totalBeforeDiscount);
-
-  //   if (!token) {
-  //     Swal.fire({
-  //       icon: "error",
-  //       title: "Error!",
-  //       text: "You are not authenticated. Please log in.",
-  //     });
-  //     return;
-  //   }
-
-  //   try {
-  //     // Step 1: Call Money API to get paymentSessionId
-  //     const response = await axios.post(
-  //       "app/cashfree/create-order",
-  //       // { order_amount: Math.round(totalBeforeDiscount) },
-  //       { order_amount: 1 },
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //         },
+  //         headers: { Authorization: `Bearer ${token}` },
   //       }
   //     );
 
   //     // Extract payment session ID and order ID from the response
   //     const paymentOrderId = response.data?.data?.order_id;
   //     const paymentSessionId = response.data?.data?.payment_session_id;
-
-  //     if (!paymentSessionId) {
-  //       Swal.fire({
-  //         icon: "error",
-  //         title: "Error!",
-  //         text: "Payment session ID is missing. Unable to proceed with payment.",
-  //       });
-  //       return;
-  //     }
-
-  //     console.log("Payment Session ID:", paymentSessionId);
-
-  //     // Step 2: Prepare payment data
-  //     // const paymentData = preparePaymentData(paymentOrderId);
-  //     // // Call Pay function to process the payment data
-  //     // Pay(paymentData);
-
-  //     // Step 2: Initialize Cashfree SDK in production mode
-  //     let cashfree;
-  //     try {
-  //       cashfree = await load({ mode: "production" });
-  //       console.log("Cashfree SDK initialized successfully.");
-  //     } catch (sdkError) {
-  //       Swal.fire({
-  //         icon: "error",
-  //         title: "SDK Initialization Error",
-  //         text: "Failed to initialize Cashfree SDK. Please try again later.",
-  //       });
-  //       console.error("SDK Initialization Error:", sdkError);
-  //       return;
-  //     }
-
-  //     // Step 3: Configure Cashfree Checkout
-  //     const checkoutOptions = {
-  //       paymentSessionId,
-  //       redirectTarget: "_self", // Opens the checkout as a popup
-  //       callback_url: `https://www.spotsball.com/spotsball/web/popupCheckout?order_id=${paymentOrderId}`,
-  //     };
-
-  //     // Step 4: Process Payment
-  //     cashfree.checkout(checkoutOptions).then(async (result) => {
-  //       if (result.error) {
-  //         Swal.fire({
-  //           icon: "error",
-  //           title: "Payment Error!",
-  //           text: result.error.data || result.error.message,
-  //         });
-  //         console.error("Checkout Error:", result.error);
-  //       } else if (result.paymentDetails) {
-  //         console.log("Payment Details Response:", result.paymentDetails);
-  //         console.log("Payment Message:", result.paymentDetails.paymentMessage);
-
-  //         Swal.fire({
-  //           icon: "success",
-  //           title: "Payment Successful!",
-  //           text: result.paymentDetails.paymentMessage,
-  //         });
-
-  //         // Update order status if necessary
-  //         // await OrderStatus(paymentOrderId);
-  //       } else {
-  //         console.log("Unhandled Checkout Result:", result);
-  //       }
-  //     });
-  //   } catch (error) {
-  //     Swal.fire({
-  //       icon: "error",
-  //       title: "Error!",
-  //       text: error.response?.data?.message || error.message,
-  //     });
-  //     console.error("Money API Error:", error);
-  //   }
-  // };
-
-  // const Money = async () => {
-  //   const token = localStorage.getItem("Web-token");
-  //   console.log("total", totalBeforeDiscount);
-
-  //   if (!token) {
-  //     console.error("Error: You are not authenticated. Please log in.");
-  //     return;
-  //   }
-
-  //   try {
-  //     // Step 1: Call Money API to get paymentSessionId
-  //     const response = await axios.post(
-  //       "app/cashfree/create-order",
-  //       // { order_amount: Math.round(totalBeforeDiscount) },
-  //       { order_amount: 1 },
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //         },
-  //       }
-  //     );
-
-  //     // Extract payment session ID and order ID from the response
-  //     const paymentOrderId = response.data?.data?.order_id;
-  //     const paymentSessionId = response.data?.data?.payment_session_id;
-
+  //     setIsOrder(paymentOrderId);
   //     if (!paymentSessionId) {
   //       console.error(
   //         "Error: Payment session ID is missing. Unable to proceed."
   //       );
+  //       Swal.fire({
+  //         icon: "error",
+  //         title: "Payment Error",
+  //         text: "Payment session ID is missing. Please try again.",
+  //       });
   //       return;
   //     }
+  //     const paymentData = preparePaymentData(paymentOrderId);
 
-  //     console.log("Payment Session ID:", paymentSessionId);
+  //     Pay(paymentData);
 
-  //     // Step 2: Initialize Cashfree SDK in production mode
+  //     // If order_amount is 0, skip Cashfree SDK and process as successful payment
+  //     if (order_amount === 0) {
+  //       const paymentData = preparePaymentData(paymentOrderId);
+
+  //       Pay(paymentData);
+  //       return; // Exit function as payment is already marked as successful
+  //     }
+
+  //     // Step 2: Initialize Cashfree SDK (Only if order_amount > 0)
   //     let cashfree;
   //     try {
+  //       // cashfree = await load({ mode: "sandbox" });
   //       cashfree = await load({ mode: "production" });
+
   //       console.log("Cashfree SDK initialized successfully.");
   //     } catch (sdkError) {
   //       console.error("SDK Initialization Error:", sdkError);
+  //       Swal.fire({
+  //         icon: "error",
+  //         title: "SDK Error",
+  //         text: "Failed to initialize payment gateway. Please try again.",
+  //       });
   //       return;
   //     }
 
@@ -729,87 +448,133 @@ function Checkout() {
   //     const checkoutOptions = {
   //       paymentSessionId,
   //       redirectTarget: "_modal",
-  //       callback_url: `https://www.spotsball.com/spotsball/web/popupCheckout?order_id=${paymentOrderId}`,
+  //       callback_url: `https://www.spotsball.com/popupCheckout?order_id=${paymentOrderId}`,
   //     };
 
   //     // Step 4: Process Payment
-  //     cashfree.checkout(checkoutOptions).then(async (result) => {
-  //       if (result.error) {
-  //         console.error("Payment Failed Error:", result.error);
-  //         window.history.back(); // Redirect back after error
-  //       } else if (result.paymentDetails) {
-  //         console.log("Payment Details:", result.paymentDetails);
-  //         const paymentStatus = result.paymentDetails.paymentStatus;
+  //     cashfree
+  //       .checkout(checkoutOptions)
+  //       .then(async (result) => {
+  //         if (result.error) {
+  //           console.error("Payment Failed Error:", result.error);
+  //           Swal.fire({
+  //             icon: "error",
+  //             title: "Payment Failed",
+  //             text: result.error,
+  //           });
+  //         } else if (result.paymentDetails) {
+  //           console.log("Payment Details:", result.paymentDetails);
+  //           const paymentStatus = result.paymentDetails.paymentStatus;
+  //           console.log("paymentStatus", result.paymentDetails.paymentStatus);
+  //           await OrderStatus(paymentOrderId);
 
-  //         if (paymentStatus === "SUCCESS") {
-  //           console.log("Payment Successful!");
-  //           window.location.href = `https://www.spotsball.com/spotsball/web/popupCheckout?order_id=${paymentOrderId}`;
-  //         } else if (paymentStatus === "FAILED") {
-  //           console.error("Transaction Failed!");
-  //           window.history.back();
-  //         } else if (paymentStatus === "PENDING") {
-  //           console.log("Payment Pending. Redirecting...");
-  //           window.location.href = `https://www.spotsball.com/spotsball/web/popupCheckout?order_id=${paymentOrderId}`;
+  //           if (paymentStatus === "SUCCESS") {
+  //             console.log("Payment Successful!");
+  //             await OrderStatus(paymentOrderId);
+  //             window.location.href = `https://www.spotsball.com/popupCheckout?order_id=${paymentOrderId}`;
+  //           } else if (paymentStatus === "FAILED") {
+  //             console.error("Transaction Failed!");
+  //             Swal.fire({
+  //               icon: "error",
+  //               title: "Transaction Failed",
+  //               text: "Your payment could not be processed. Please try again later.",
+  //             });
+  //           } else if (paymentStatus === "PENDING") {
+  //             await OrderStatus(paymentOrderId);
+  //             console.log("Payment Pending. Redirecting...");
+  //             window.location.href = `https://www.spotsball.com/popupCheckout?order_id=${paymentOrderId}`;
+  //           }
+  //         } else {
+  //           console.log("User closed the payment window.");
+  //           Swal.fire({
+  //             icon: "info",
+  //             title: "Payment Cancelled",
+  //             text: "You have closed the payment window.",
+  //           });
   //         }
-  //       } else {
-  //         console.log("User closed the payment window.");
-  //         window.history.back(); // Redirect back when user cancels payment
-  //       }
-  //     });
+  //       })
+  //       .catch((checkoutError) => {
+  //         console.error("Checkout Error:", checkoutError);
+  //         Swal.fire({
+  //           icon: "error",
+  //           title: "Checkout Error",
+  //           text: "An error occurred during checkout. Please try again.",
+  //         });
+  //       });
   //   } catch (error) {
   //     console.error(
   //       "Money API Error:",
   //       error.response?.data?.message || error.message
   //     );
+  //     Swal.fire({
+  //       icon: "error",
+  //       title: "Payment Error",
+  //       text: error.response?.data?.message,
+  //     });
   //   }
   // };
 
   const Money = async () => {
-    const token = localStorage.getItem("Web-token");
-    console.log("total", totalBeforeDiscount);
-
-    if (!token) {
-      console.error("Error: You are not authenticated. Please log in.");
-      return;
-    }
-
     try {
+      const token = localStorage.getItem("Web-token");
+      const order_amount = totalBeforeDiscount.toFixed(2);
+
+      console.log("Total Before Discount:", order_amount);
+
       // Step 1: Call Money API to get paymentSessionId
       const response = await axios.post(
         "app/cashfree/create-order",
-        { order_amount: 1 },
+        { order_amount },
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
 
-      // Extract payment session ID and order ID from the response
+      // Extract payment order ID and payment session ID from the response
       const paymentOrderId = response.data?.data?.order_id;
       const paymentSessionId = response.data?.data?.payment_session_id;
+      setIsOrder(paymentOrderId);
 
-      if (!paymentSessionId) {
-        console.error(
-          "Error: Payment session ID is missing. Unable to proceed."
-        );
+      if (!paymentOrderId) {
+        console.error("Error: Payment order ID is missing.");
+        Swal.fire({
+          icon: "error",
+          title: "Payment Error",
+          text: "Payment order ID is missing. Please try again.",
+        });
         return;
       }
 
-      console.log("Payment Session ID:", paymentSessionId);
-
-      //         // Prepare payment data
+      // Call preparePaymentData and Pay function
       const paymentData = preparePaymentData(paymentOrderId);
-
-      //         // Call Pay function to process the payment data
       Pay(paymentData);
-      // Step 2: Initialize Cashfree SDK in production mode
+
+      // ✅ If order_amount === 0, do NOT open Cashfree, just navigate to home
+      if (parseFloat(order_amount) === 0) {
+        console.log("Order amount is zero, skipping Cashfree payment.");
+        Swal.fire({
+          icon: "success",
+          title: "Payment Successful",
+          text: "Your order has been placed successfully.",
+        }).then(() => {
+          navigate("/"); // Navigate to home
+        });
+        return; // Exit function
+      }
+
+      // ✅ If order_amount > 0, initialize Cashfree SDK
       let cashfree;
       try {
+        // cashfree = await load({ mode: "sandbox" });
         cashfree = await load({ mode: "production" });
         console.log("Cashfree SDK initialized successfully.");
       } catch (sdkError) {
         console.error("SDK Initialization Error:", sdkError);
+        Swal.fire({
+          icon: "error",
+          title: "SDK Error",
+          text: "Failed to initialize payment gateway. Please try again.",
+        });
         return;
       }
 
@@ -817,51 +582,71 @@ function Checkout() {
       const checkoutOptions = {
         paymentSessionId,
         redirectTarget: "_modal",
-        // callback_url: `https://www.spotsball.com/spotsball/web/popupCheckout?order_id=${paymentOrderId}`,
+        callback_url: `https://www.spotsball.com/popupCheckout?order_id=${paymentOrderId}`,
       };
 
       // Step 4: Process Payment
-      cashfree.checkout(checkoutOptions).then(async (result) => {
-        if (result.error) {
-          console.error("Payment Failed Error:", result.error);
-          Swal.fire({
-            icon: "error",
-            title: "Payment Failed",
-            text: result.error,
-          });
-          
-        } else if (result.paymentDetails) {
-          console.log("Payment Details:", result.paymentDetails);
-          const paymentStatus = result.paymentDetails.paymentStatus;
-
-          if (paymentStatus === "SUCCESS") {
-            console.log("Payment Successful!");
-            window.location.href = `https://www.spotsball.com/spotsball/web/popupCheckout?order_id=${paymentOrderId}`;
-          } else if (paymentStatus === "FAILED") {
-            console.error("Transaction Failed!");
+      cashfree
+        .checkout(checkoutOptions)
+        .then(async (result) => {
+          if (result.error) {
+            console.error("Payment Failed Error:", result.error);
             Swal.fire({
               icon: "error",
-              title: "Transaction Failed",
-              text: "Your payment could not be processed. Please try again later.",
+              title: "Payment Failed",
+              text: result.error,
             });
-          } else if (paymentStatus === "PENDING") {
-            console.log("Payment Pending. Redirecting...");
-            window.location.href = `https://www.spotsball.com/spotsball/web/popupCheckout?order_id=${paymentOrderId}`;
+          } else if (result.paymentDetails) {
+            console.log("Payment Details:", result.paymentDetails);
+            const paymentStatus = result.paymentDetails.paymentStatus;
+
+            await OrderStatus(paymentOrderId);
+
+            if (paymentStatus === "SUCCESS") {
+              console.log("Payment Successful!");
+              await OrderStatus(paymentOrderId);
+              window.location.href = `https://www.spotsball.com/popupCheckout?order_id=${paymentOrderId}`;
+            } else if (paymentStatus === "FAILED") {
+              console.error("Transaction Failed!");
+              Swal.fire({
+                icon: "error",
+                title: "Transaction Failed",
+                text: "Your payment could not be processed. Please try again later.",
+              });
+            } else if (paymentStatus === "PENDING") {
+              await OrderStatus(paymentOrderId);
+              console.log("Payment Pending. Redirecting...");
+              window.location.href = `https://www.spotsball.com/popupCheckout?order_id=${paymentOrderId}`;
+            }
+          } else {
+            console.log("User closed the payment window.");
+            Swal.fire({
+              icon: "info",
+              title: "Payment Cancelled",
+              text: "You have closed the payment window.",
+            });
           }
-        } else {
-          console.log("User closed the payment window.");
+        })
+        .catch((checkoutError) => {
+          console.error("Checkout Error:", checkoutError);
           Swal.fire({
-            icon: "info",
-            title: "Payment Cancelled",
-            text: "You have closed the payment window.",
+            icon: "error",
+            title: "Checkout Error",
+            text: "An error occurred during checkout. Please try again.",
           });
-        }
-      });
+        });
     } catch (error) {
       console.error(
         "Money API Error:",
         error.response?.data?.message || error.message
       );
+      Swal.fire({
+        icon: "error",
+        title: "Payment Error",
+        text:
+          error.response?.data?.message ||
+          "An unexpected error occurred. Please try again.",
+      });
     }
   };
 
@@ -923,14 +708,14 @@ function Checkout() {
       paymentId: paymentOrderId,
       coordinates,
       tickets,
-      promocodeApplied: {
-        name: promoName,
-        amount: promoAmount,
-      },
       discountApplied: {
-        name: discount.name || "",
-        discountPercentage,
+        name: promoName || discount?.name,
+        discountPercentage: discountPercentage || promoAmount,
       },
+      // discountApplied: {
+      //   name: discount.name || "",
+      //   discountPercentage,
+      // },
       ticketAmount,
       discountAmount,
       afterDiscountAmount,
@@ -947,38 +732,69 @@ function Checkout() {
   };
 
   // const OrderStatus = async (paymentOrderId) => {
-  //   const token = localStorage.getItem("Web-token");
-  //   let order_id = paymentOrderId;
   //   try {
-  //     const response = await axios.post(
-  //       `app/cashfree/update-order-status?order_id=${order_id}`,
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //         },
+  //     const token = localStorage.getItem("Web-token");
+  //     //    console.log("token", token); // Verify token is being retrieved correctly
+  //     if (token) {
+  //       const response = await axios.post(
+  //         `app/cashfree/update-order-status?order_id=${paymentOrderId}`,
+  //         {}, // Body (optional, empty here)
+  //         {
+  //           headers: {
+  //             Authorization: `Bearer ${token}`,
+  //           },
+  //         }
+  //       );
+  //       const status = response.data?.data?.transaction_status || "";
+  //       console.log("status", status);
+  //       setPaymentStatus(status);
+  //       if (
+  //         status === "SUCCESS" ||
+  //         status === "PENDING" ||
+  //         status === "FAILED" ||
+  //         status === "Unknown"
+  //       ) {
+  //         setViewPopup(true);
   //       }
-  //     );
-  //   } catch (error) {}
+  //     }
+  //   } catch (error) {
+  //     console.error(error.response?.data || error.message); // Handle the error appropriately
+  //   }
   // };
 
   const OrderStatus = async (paymentOrderId) => {
     try {
       const token = localStorage.getItem("Web-token");
-      console.log("token", token); // Verify token is being retrieved correctly
       if (token) {
         const response = await axios.post(
           `app/cashfree/update-order-status?order_id=${paymentOrderId}`,
-          {}, // Body (optional, empty here)
+          {},
           {
             headers: {
               Authorization: `Bearer ${token}`,
             },
           }
         );
-        console.log(response.data); // Handle response as needed
+
+        const status = response.data?.data?.transaction_status || "";
+        console.log("status", status);
+        setPaymentStatus(status);
+
+        // Show success message
+        Swal.fire({
+          title: "Thank You!",
+          text: "Thank you for participating.",
+        }).then(() => {
+          navigate("/payments");
+        }, 1000);
       }
     } catch (error) {
-      console.error(error.response?.data || error.message); // Handle the error appropriately
+      console.error(error.response?.data || error.message);
+      Swal.fire({
+        text: error.response?.data || error.message,
+      }).then(() => {
+        navigate("/");
+      }, 1000);
     }
   };
 
@@ -997,15 +813,6 @@ function Checkout() {
       );
 
       if (response) {
-        Swal.fire(
-          "Payment recorded!",
-          "Your payment has been recorded successfully.",
-          "success"
-        ).then(() => {
-          setTimeout(() => {
-            navigate("/");
-          }, 1000);
-        });
       }
     } catch (error) {}
   };
@@ -1031,7 +838,7 @@ function Checkout() {
           <div className="container contrighttabbingpage">
             <div className="col-md-12">
               <div className="row rowtabbingpage">
-                <div className="col-md-5 coltabbingdiv">
+                <div className="col-lg-5 coltabbingdiv">
                   <div className="cartwithcordinatetables">
                     {carts.length > 0 &&
                       carts.map((cart) => (
@@ -1112,8 +919,9 @@ function Checkout() {
                                 {calculatedCarts.map((cart, index) => {
                                   const {
                                     promoDiscountAmount,
-                                    PerDiscount,
-                                    discountPerCart,
+                                    PromoAmount,
+                                    discountPercentage,
+                                    discountAmount,
                                     discountedTotalTicketPrice,
                                     discountedGstAmount,
                                     discountedSubtotal,
@@ -1135,8 +943,11 @@ function Checkout() {
                                       {cart.promoCode && (
                                         <>
                                           <p>
-                                            <strong>Promo Applied:</strong> -₹
-                                            {promoDiscountAmount}
+                                            <strong>
+                                              Promo Applied({PromoAmount}
+                                              %):
+                                            </strong>{" "}
+                                            ₹{promoDiscountAmount}
                                           </p>
                                           <p>
                                             <strong>After: </strong>₹
@@ -1148,9 +959,9 @@ function Checkout() {
                                         <>
                                           <p className="discount-line">
                                             <strong>
-                                              Discount ({PerDiscount}%):
+                                              Discount ({discountPercentage}%):
                                             </strong>{" "}
-                                            ₹{discountPerCart}
+                                            ₹{discountAmount}
                                           </p>
                                           <p>
                                             <strong>After: </strong>₹
@@ -1233,7 +1044,7 @@ function Checkout() {
                   </div>
                 </div>
 
-                <div className="col-md-7 coltabdata_righttext">
+                <div className="col-lg-7 coltabdata_righttext">
                   <div className="tabingrighttextdiv checkoutcards_section">
                     <div className="payment_methoddiv cartmaindivforpaym_new">
                       <div className="promotionalinput_cart">
@@ -1262,14 +1073,14 @@ function Checkout() {
                         </div>
                       )}
 
-                      <div className="methodsdivnew mt-4">
+                      <div
+                        className="methodsdivnew mt-4"
+                        onClick={handlePaymentClick}
+                        style={{ cursor: "pointer" }}
+                      >
                         <div className="cardpay">
                           <div className="creditpays">
-                            <div
-                              className="cardpayment"
-                              onClick={handlePaymentClick}
-                              style={{ cursor: "pointer" }}
-                            >
+                            <div className="cardpayment">
                               <p>Pay Now</p>
                             </div>
                           </div>

@@ -58,6 +58,8 @@ function PastPayment() {
     }
   };
 
+  console.log("payments", payments);
+
   return (
     <div className="payment_methoddiv pastpay_detailmaindiv_new">
       <div className="cartwithcordinatetables">
@@ -84,7 +86,17 @@ function PastPayment() {
                       Jackpot
                     </h3>
                     <span>
-                      {new Date(payment?.createdAt).toLocaleDateString()}
+                      {new Date(payment?.createdAt)
+                        .toLocaleString("en-GB", {
+                          weekday: "short",
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          hour12: true,
+                        })
+                        .replace(",", "")}
                     </span>
                     <h4>{payment?.tickets} Tickets</h4>
                   </div>
@@ -93,7 +105,7 @@ function PastPayment() {
                   <div className="pastpay_invoicediv">
                     <a
                       className="downloadinvoice_hreftag"
-                      onClick={(e) => handleDownload(e, payment._id)}
+                      onClick={(e) => handleDownload(e, payment?.paymentId)}
                     >
                       <img
                         src={`${process.env.PUBLIC_URL}/images/download_invoice.png`}
@@ -105,24 +117,41 @@ function PastPayment() {
                   </div>
                   <p>Txn. Id.: {payment?.paymentId}</p>
                   <h3>₹{payment?.amount?.toFixed(2)}</h3>
-
-                  <div className="pastpay_dropdownicon">
-                    <button
-                      type="button"
-                      className="dropbtn_pastpy"
-                      onClick={() => toggleDropdown(payment._id)}
+                </div>
+              </div>
+              <div className="transaction-sec d-flex justify-content-between">
+                <div className="payment-option">
+                  <h4>
+                    Transaction Status:{" "}
+                    <span
+                      className={`text-${
+                        payment?.transaction_status === "SUCCESS"
+                          ? "success"
+                          : payment?.transaction_status === "Pending"
+                          ? "warning"
+                          : "danger"
+                      }`}
                     >
-                      <img
-                        src={`${process.env.PUBLIC_URL}/images/arrow_icon_payment.png`}
-                        className={
-                          dropdownStates[payment._id]
-                            ? ""
-                            : "rotate_pastpayicon"
-                        }
-                        alt="Toggle"
-                      />
-                    </button>
-                  </div>
+                      {payment?.transaction_status
+                        ? payment?.transaction_status.toLowerCase()
+                        : "cancelled"}
+                    </span>
+                  </h4>
+                </div>
+                <div className="pastpay_dropdownicon">
+                  <button
+                    type="button"
+                    className="dropbtn_pastpy"
+                    onClick={() => toggleDropdown(payment._id)}
+                  >
+                    <img
+                      src={`${process.env.PUBLIC_URL}/images/arrow_icon_payment.png`}
+                      className={
+                        dropdownStates[payment._id] ? "" : "rotate_pastpayicon"
+                      }
+                      alt="Toggle"
+                    />
+                  </button>
                 </div>
               </div>
               {dropdownStates[payment._id] && (

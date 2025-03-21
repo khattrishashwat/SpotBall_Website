@@ -198,10 +198,10 @@ function Account() {
                     }
                   }}
                 />
-                <img
+                {/* <img
                   src={`${process.env.PUBLIC_URL}/images/edit_pro.png`}
                   className="editicon_input"
-                />
+                /> */}
                 <ErrorMessage
                   name="first_name"
                   component="div"
@@ -222,10 +222,10 @@ function Account() {
                     }
                   }}
                 />
-                <img
+                {/* <img
                   src={`${process.env.PUBLIC_URL}/images/edit_pro.png`}
                   className="editicon_input"
-                />
+                /> */}
                 <ErrorMessage
                   name="last_name"
                   component="div"

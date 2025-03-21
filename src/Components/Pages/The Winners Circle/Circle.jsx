@@ -80,7 +80,7 @@ function Circle() {
               {/* Year Filter */}
               <div className="dropdownfilter yearlyfilte">
                 <select value={year} onChange={(e) => setYear(e.target.value)}>
-                  {Array.from({ length: 3 }, (_, index) => {
+                  {Array.from({ length: 1 }, (_, index) => {
                     const currentYear = new Date().getFullYear();
                     return (
                       <option key={index} value={currentYear - index}>
@@ -115,149 +115,10 @@ function Circle() {
             </div>
           </div>
         </div>
-        {/* <div className="row winnercirlce_timeline_row">
-          <div id="winner_circle-timeline">
-            <div className="winner_circle-center-line"></div>
-            <div className="winner_circle-timeline-content">
-              {Object.keys(groupedLinks).length > 0 ? (
-                Object.entries(groupedLinks).map(
-                  ([monthYear, items], index) => (
-                    <div
-                      className={`timeline-article ${
-                        index === 0 ? "onlyforfisrtchild" : ""
-                      }`}
-                      key={monthYear}
-                    >
-                      <div
-                        className={
-                          index % 2 === 0
-                            ? "content-left-container"
-                            : "content-right-container"
-                        }
-                      >
-                        <div className="row rowforwinner_boxes">
-                          {items.map((item, i) => {
-                            const winnerName =
-                              `${item.userId.first_name} ${item.userId.last_name}`.toUpperCase();
-                            const formattedDate = formatDate(item.createdAt);
-                            const formattedPrize =
-                              item.prize.toLocaleString("en-IN");
-                            const closestCoordinate = `X: ${item.closestCoordinate.x}, Y: ${item.closestCoordinate.y}`;
-                            const winningCoordinates = `X: ${item.contestId.winning_coordinates.x}, Y: ${item.contestId.winning_coordinates.y}`;
 
-                            return (
-                              <div
-                               className="col-md-12 colmainwinnerbox"
-                              >
-                                <div className="jackpotwinner_div">
-                                  <div className="winnercrclimg">
-                                    <img
-                                      src={
-                                        item.userId.profile_url ||
-                                        `${process.env.PUBLIC_URL}/images/winner_img.png`
-                                      }
-                                      alt={`${winnerName}'s profile`}
-                                    />
-                                  </div>
-                                  <div className="winnerabouttext">
-                                    <h3>{winnerName}</h3>
-                                    <p>Jackpot {formattedDate}</p>
-                                    <p>
-                                      Winning Coordinates: {winningCoordinates}
-                                    </p>
-                                    <p>
-                                      Closest Coordinate: {closestCoordinate}
-                                    </p>
-                                    <h4>₹{formattedPrize}</h4>
-                                  </div>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                        <div className="monthwithyear_text">{monthYear}</div>
-                      </div>
-                      <div className="meta-date"></div>
-                    </div>
-                  )
-                )
-              ) : (
-                <p>No data available for the selected filters.</p>
-              )}
-            </div>
-          </div>
-        </div> */}
-        {/* <div className="row winnercirlce_timeline_row">
-          <div id="winner_circle-timeline">
-            <div className="winner_circle-center-line" />
-            <div className="winner_circle-timeline-content">
-              {Object.keys(groupedLinks).map((monthYear) => (
-                <div key={monthYear}>
-                  {groupedLinks[monthYear].map((item, index) => {
-                    const isFirstChild = index === 0;
-                    return (
-                      <div
-                        className={`timeline-article ${
-                          isFirstChild ? "onlyforfisrtchild" : ""
-                        }`}
-                        key={item.id}
-                      >
-                        <div
-                          className={
-                            index % 2 === 0
-                              ? "content-left-container"
-                              : "content-right-container"
-                          }
-                        >
-                          <div className="row rowforwinner_boxes">
-                            <div className="col-md-12 colmainwinnerbox">
-                              <div className="jackpotwinner_div">
-                                <div className="winnercrclimg">
-                                  <img
-                                    src={
-                                      item.userId.profile_url ||
-                                      `${process.env.PUBLIC_URL}/images/winner_img.png`
-                                    }
-                                    // alt={`${winnerName}'s profile`}
-                                  />
-                                </div>
-                                <div className="winnerabouttext">
-                                  <h3>
-                                    {`${item.userId.first_name} ${item.userId.last_name}`.toUpperCase()}
-                                  </h3>
-
-                                  <p>{`Jackpot ${formatDate(
-                                    item.createdAt
-                                  )}`}</p>
-                                  <p>
-                                    Winning Coordinates:{" "}
-                                    {`X: ${item.contestId.winning_coordinates.x}, Y: ${item.contestId.winning_coordinates.y}`}
-                                  </p>
-                                  <p>
-                                    Closest Coordinate:{" "}
-                                    {`X: ${item.closestCoordinate.x}, Y: ${item.closestCoordinate.y}`}
-                                  </p>
-                                  <h4>{`₹${item.prize.toLocaleString(
-                                    "en-IN"
-                                  )}`}</h4>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="monthwithyear_text">{monthYear}</div>
-                        </div>
-                        <div className="meta-date" />
-                      </div>
-                    );
-                  })}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div> */}
         <div className="row winnercirlce_timeline_row">
           <div id="winner_circle-timeline">
-            {Object.keys(groupedLinks).length === 0 ? (
+            {Object.keys(groupedLinks)?.length === 0 ? (
               <div
                 className="no-data-message"
                 data-aos="fade-up"
@@ -305,29 +166,29 @@ function Circle() {
                                     <div className="winnercrclimg">
                                       <img
                                         src={
-                                          item.userId.profile_url ||
+                                          item?.userId?.profile_url ||
                                           `${process.env.PUBLIC_URL}/images/winner_img.png`
                                         }
-                                        alt={`${item.userId.first_name} ${item.userId.last_name}`}
+                                        alt={`${item?.userId?.first_name} ${item.userId?.last_name}`}
                                         data-aos="flip-left"
                                       />
                                     </div>
                                     <div className="winnerabouttext">
                                       <h3>
-                                        {`${item.userId.first_name} ${item.userId.last_name}`.toUpperCase()}
+                                        {`${item?.userId?.first_name} ${item?.userId?.last_name}`.toUpperCase()}
                                       </h3>
                                       <p>{`Jackpot ${formatDate(
-                                        item.createdAt
+                                        item?.createdAt
                                       )}`}</p>
                                       <p>
                                         Winning Coordinates:{" "}
-                                        {`X: ${item.contestId.winning_coordinates.x}, Y: ${item.contestId.winning_coordinates.y}`}
+                                        {`X: ${item?.contestId?.winning_coordinates?.x}, Y: ${item?.contestId?.winning_coordinates?.y}`}
                                       </p>
                                       <p>
                                         Closest Coordinate:{" "}
-                                        {`X: ${item.closestCoordinate.x}, Y: ${item.closestCoordinate.y}`}
+                                        {`X: ${item?.closestCoordinate?.x}, Y: ${item?.closestCoordinate?.y}`}
                                       </p>
-                                      <h4>{`₹${item.prize.toLocaleString(
+                                      <h4>{`₹${item?.prize.toLocaleString(
                                         "en-IN"
                                       )}`}</h4>
                                     </div>

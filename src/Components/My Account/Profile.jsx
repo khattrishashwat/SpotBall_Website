@@ -9,6 +9,7 @@ import Swal from "sweetalert2";
 
 function Profile() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [activeTab, setActiveTab] = useState("update_profile");
   const [isDeactivate, setIsDeactivate] = useState(false);
@@ -29,6 +30,11 @@ function Profile() {
     setActiveTab(tabId);
     resetForm(tabId); // Reset form when tab is changed
   };
+  useEffect(() => {
+    if (location.state?.activeTab) {
+      setActiveTab(location.state.activeTab);
+    }
+  }, [location.state]);
 
   useEffect(() => {
     resetForm(activeTab); // Reset on initial load or tab change
@@ -64,33 +70,56 @@ function Profile() {
         },
       });
 
-      if (response) {
-        // Clear token and navigate to homepage
-        localStorage.removeItem("Web-token");
+      if (response.status === 200) {
         Swal.fire({
-          title: response.data.message,
+          icon: "success",
+          title: "Your account has been successfully deactivated",
           confirmButtonText: "OK",
-          allowOutsideClick: false,
         }).then(() => {
           navigate("/");
-        });
-      } else {
-        Swal.fire({
-          title: response.data.message,
-          confirmButtonText: "OK",
-          allowOutsideClick: false,
+          localStorage.removeItem("Web-token");
         });
       }
     } catch (error) {
+      console.error("Error:", error);
       Swal.fire({
-        text: error.response ? error.response.data.message : error.message,
+        icon: "error",
+        title: "Account Deactivation Failed",
+        text: error.response?.data?.message,
         confirmButtonText: "OK",
-        allowOutsideClick: false,
       });
     } finally {
       setIsLoading(false);
     }
   };
+
+  // const fetchDeactive = async () => {
+  //   const token = localStorage.getItem("Web-token");
+  //   try {
+  //     setIsLoading(true);
+  //     const response = await axios.get(`app/profile/active-inactive`, {
+  //       headers: {
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //     });
+
+  //     if (response) {
+  //       // Clear token and navigate to homepage
+  //       localStorage.removeItem("Web-token");
+  //       Swal.fire({
+  //         title: response.data.message,
+  //         confirmButtonText: "OK",
+  //         allowOutsideClick: false,
+  //       }).then(() => {
+  //         navigate("/");
+  //       },10000);
+  //     }
+  //   } catch (error) {
+  //     console.log("err",error)
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
   const fetchDelete = async () => {
     const token = localStorage.getItem("Web-token");
     try {
@@ -101,28 +130,24 @@ function Profile() {
         },
       });
 
-      if (response) {
-        // Clear token and navigate to homepage
-        localStorage.removeItem("Web-token");
+      if (response.status === 200) {
         Swal.fire({
-          title: response.data.message,
+          title: "Your account has been deleted successfully.",
+          text: "To reactivate, please contact support at support.in@spotsball.com.",
           confirmButtonText: "OK",
           allowOutsideClick: false,
         }).then(() => {
-          window.location.reload();
-        });
-      } else {
-        Swal.fire({
-          title: response.data.message,
-          confirmButtonText: "OK",
-          allowOutsideClick: false,
+          navigate("/");
+          localStorage.removeItem("Web-token");
         });
       }
     } catch (error) {
+      console.error("Error deleting account:", error);
       Swal.fire({
-        text: error.response ? error.response.data.message : error.message,
+        icon: "error",
+        title: "Account Deletion Failed",
+        text: error.response?.data?.message,
         confirmButtonText: "OK",
-        allowOutsideClick: false,
       });
     } finally {
       setIsLoading(false);
@@ -173,7 +198,7 @@ function Profile() {
             <div className="container contrighttabbingpage">
               <div className="col-md-10 offset-md-1">
                 <div className="row rowtabbingpage">
-                  <div className="col-md-4 coltabbingdiv">
+                  <div className="col-lg-4 coltabbingdiv">
                     <div className="navtabdiv">
                       <ul className="nav nav-tabs">
                         <li className="nav-item">
@@ -277,7 +302,7 @@ function Profile() {
                       </ul>
                     </div>
                   </div>
-                  <div className="col-md-8 coltabdata_righttext">
+                  <div className="col-lg-8 coltabdata_righttext">
                     <div className="tabingrighttextdiv checkoutcards_section">
                       <div className="tab-content">
                         <div
@@ -327,7 +352,7 @@ function Profile() {
         id="deactivate_account_modal"
         role="dialog"
         style={{
-          paddingRight: isDeactivate ? 17 : "",
+          // paddingRight: isDeactivate ? 17 : "",
           display: isDeactivate ? "block" : "none",
           backgroundColor: isDeactivate ? "#303030a3" : "",
         }}
@@ -390,7 +415,7 @@ function Profile() {
         className={`modal fade deleteacc_mainpopup_mdl ${isDel ? "show" : ""}`}
         id="delete_account_modal"
         style={{
-          paddingRight: isDel ? 17 : "",
+          // paddingRight: isDel ? 17 : "",
           display: isDel ? "block" : "none",
           backgroundColor: isDel ? "#303030a3" : "",
         }}
@@ -414,11 +439,10 @@ function Profile() {
               <div className="deleteacc_text_data">
                 <h2>Delete Account</h2>
                 <p>
-                  If you delete or terminate your access to the SpotsBall app or
-                  website, your ID and passwords will no longer work. To rejoin,
-                  you'll need to sign up as a new user. However, for legacy,
-                  archiving, and audit purposes, your profile and data will be
-                  retained for up to 180 days from the date of deletion.
+                  You chose to temporarily opt out of playing SpotsBall, so we
+                  have put your account in deleted state. If you wish to
+                  reactivate your deleted account, you can send an email to
+                  support.in@spotsball.com.
                 </p>
               </div>
             </div>

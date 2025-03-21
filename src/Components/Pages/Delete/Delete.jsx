@@ -19,7 +19,7 @@ function Delete() {
       return;
     }
 
-    console.log("Email/Mobile Input:", emailOrMobile);
+   // console.log("Email/Mobile Input:", emailOrMobile);
 
     try {
       // Make API request to send OTP
@@ -101,7 +101,7 @@ function Delete() {
 
         // Redirect to the home page after 10 seconds
         setTimeout(() => {
-          window.location.href = "/spotsball/web/";
+          window.location.href = "/";
         }, 5000);
       } else {
         Swal.fire({

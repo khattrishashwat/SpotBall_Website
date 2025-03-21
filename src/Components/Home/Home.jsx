@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useContext } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import Login from "../Auth/Login";
@@ -9,7 +9,6 @@ import GameUnavailablePopup from "../Location/GameUnavailablePopup";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
-import { useTranslation } from "react-i18next";
 
 function Home() {
   const navigate = useNavigate();
@@ -18,7 +17,6 @@ function Home() {
   const [loginPopup, setLoginPopup] = useState(false);
 
   // Toggle sign-in popup visibility
-  const { t } = useTranslation();
 
   const [loading, setLoading] = useState(false);
   const [leftticket, setLeftticket] = useState("");
@@ -224,8 +222,12 @@ function Home() {
         text: "Please login to participate in this contest!",
         confirmButtonText: "OK",
         allowOutsideClick: false,
+      }).then((result) => {
+        if (result.isConfirmed) {
+          setLoginPopup(true);
+        }
       });
-      return; // Stop execution if no token
+      return;
     }
 
     if (restrictedArea) {
@@ -237,7 +239,7 @@ function Home() {
     if (location) {
       handleBuyTicketClick(contests[0], discounts);
     } else {
-      console.log("Location not found in localStorage");
+      //   console.log("Location not found in localStorage");
     }
   };
 
@@ -671,40 +673,79 @@ const handleAskToPlay = () => {
       responseData: selectedContest,
     };
 
+    localStorage.setItem(
+      "quantity",
+      quantity > ticketsLeft ? ticketsLeft : quantity
+    );
+
     navigate("/play_screen", { state: { payload } });
   };
 
+  // useEffect(() => {
+  //   const checkGeolocation = () => {
+  //     const location = JSON.parse(localStorage.getItem("location"));
+  //     const restrictedArea = JSON.parse(localStorage.getItem("restrictedArea"));
+
+  //     if (token) {
+  //       if (
+  //         (location && Object.keys(location).length > 0) ||
+  //         (restrictedArea && Object.keys(restrictedArea).length > 0)
+  //       ) {
+  //         setGeolocationPopupVisible(false);
+  //       } else {
+  //         setGeolocationPopupVisible(true);
+  //       }
+  //     } else {
+  //       if (
+  //         !location ||
+  //         Object.keys(location).length === 0 ||
+  //         !restrictedArea ||
+  //         Object.keys(restrictedArea).length === 0
+  //       ) {
+  //         setGeolocationPopupVisible(false);
+  //       } else {
+  //         setGeolocationPopupVisible(true);
+  //       }
+  //     }
+  //   };
+
+  //   checkGeolocation();
+
+  //   // Add event listener for storage changes
+  //   const handleStorageChange = (event) => {
+  //     if (event.key === "location" || event.key === "restrictedArea") {
+  //       checkGeolocation();
+  //     }
+  //   };
+
+  //   window.addEventListener("storage", handleStorageChange);
+
+  //   return () => {
+  //     window.removeEventListener("storage", handleStorageChange);
+  //   };
+  // }, [token]);
+
   useEffect(() => {
     const checkGeolocation = () => {
-      const location = JSON.parse(localStorage.getItem("location"));
-      const restrictedArea = JSON.parse(localStorage.getItem("restrictedArea"));
+      const location = JSON.parse(localStorage.getItem("location") || "null");
+      const restrictedArea = JSON.parse(
+        localStorage.getItem("restrictedArea") || "null"
+      );
+
+      const hasLocation = location && Object.keys(location).length > 0;
+      const hasRestrictedArea =
+        restrictedArea && Object.keys(restrictedArea).length > 0;
 
       if (token) {
-        if (
-          (location && Object.keys(location).length > 0) ||
-          (restrictedArea && Object.keys(restrictedArea).length > 0)
-        ) {
-          setGeolocationPopupVisible(false);
-        } else {
-          setGeolocationPopupVisible(true);
-        }
+        setGeolocationPopupVisible(!(hasLocation || hasRestrictedArea));
       } else {
-        if (
-          !location ||
-          Object.keys(location).length === 0 ||
-          !restrictedArea ||
-          Object.keys(restrictedArea).length === 0
-        ) {
-          setGeolocationPopupVisible(false);
-        } else {
-          setGeolocationPopupVisible(true);
-        }
+        setGeolocationPopupVisible(false);
       }
     };
 
     checkGeolocation();
 
-    // Add event listener for storage changes
+    // Listen for localStorage changes
     const handleStorageChange = (event) => {
       if (event.key === "location" || event.key === "restrictedArea") {
         checkGeolocation();
@@ -718,11 +759,21 @@ const handleAskToPlay = () => {
     };
   }, [token]);
 
+  useEffect(() => {
+      const value = localStorage.getItem("UIDNotFound");
+      if (!value || value === "undefined") {
+        localStorage.removeItem("UIDNotFound");
+      }
+    }, []);
   const handleUnavailableOk = () => {
     setIsUnavailablePopupVisible(false); // Close GameUnavailablePopup
   };
   const handleCloseGeolocationPopup = () => {
     setGeolocationPopupVisible(false);
+  };
+
+  const handleRightClick = (e) => {
+    e.preventDefault(); // Prevent the right-click menu from appearing
   };
 
   // console.log("live",links);
@@ -754,7 +805,7 @@ const handleAskToPlay = () => {
                 <div className="autoscroll_section">
                   <div className="marquee">
                     <div className="track">
-                      {/* <div className="srcolltext_div">
+                      <div className="srcolltext_div">
                         {corousal.map((text, index) => (
                           <React.Fragment key={index}>
                             <div
@@ -775,39 +826,6 @@ const handleAskToPlay = () => {
                             </div>
                           </React.Fragment>
                         ))}
-                      </div> */}
-                      <div className="srcolltext_div">
-                        {corousal.map((text, index) => {
-                          // Example to dynamically handle translation for specific parts
-                          let translatedText;
-
-                          if (text.includes("Weekly jackpot")) {
-                            translatedText =
-                              t("weeklyJackpot") + " " + text.split("₹")[1];
-                          } else if (text.includes("Guaranteed Winners")) {
-                            translatedText = t("guaranteedWinners");
-                          }
-
-                          return (
-                            <React.Fragment key={index}>
-                              <div
-                                className={
-                                  text.includes(t("weeklyJackpot"))
-                                    ? "jackpottext"
-                                    : "guranteewinnertext"
-                                }
-                              >
-                                {translatedText}
-                              </div>
-                              <div className="auto_scroll_staricon_cntr">
-                                <img
-                                  src={`${process.env.PUBLIC_URL}/images/star.png`}
-                                  alt="star icon"
-                                />
-                              </div>
-                            </React.Fragment>
-                          );
-                        })}
                       </div>
                     </div>
                   </div>
@@ -837,8 +855,8 @@ const handleAskToPlay = () => {
                         id="howtoplay_showonclick"
                         onClick={open}
                       >
-                        <i className="fa fa-play" aria-hidden="true" />{" "}
-                        {t("How to Play")}
+                        <i className="fa fa-play" aria-hidden="true" /> How to
+                        Play
                       </button>
                       {!token && (
                         <button
@@ -847,7 +865,7 @@ const handleAskToPlay = () => {
                           onClick={() => setLoginPopup(!loginPopup)}
                           // onClick={handleSigninPopup} // Open the sign-in popup
                         >
-                          {t("Sign in / Sign up")}
+                          Sign in / Sign up
                         </button>
                       )}
                     </div>
@@ -857,8 +875,8 @@ const handleAskToPlay = () => {
                       <div className="countheading_endsin">
                         <h2>
                           {countdownType === "starts"
-                            ? t("This Week's Game Starts In")
-                            : t("This Week's Game Ends In")}
+                            ? "This Week's Game Starts In"
+                            : "This Week's Game Ends In"}
                         </h2>
                       </div>
                       <div id="countdown" className="countdown">
@@ -866,28 +884,28 @@ const handleAskToPlay = () => {
                           <span className="days countdown-time">
                             {timeLeft.days}
                           </span>
-                          <span className="countdown-text">{t("Days")}</span>
+                          <span className="countdown-text">Days</span>
                         </div>
                         <div className="countdown_doubledots">:</div>
                         <div className="countdown-number">
                           <span className="hours countdown-time">
                             {timeLeft.hours}
                           </span>
-                          <span className="countdown-text">{t("Hours")}</span>
+                          <span className="countdown-text">Hours</span>
                         </div>
                         <div className="countdown_doubledots">:</div>
                         <div className="countdown-number">
                           <span className="minutes countdown-time">
                             {timeLeft.minutes}
                           </span>
-                          <span className="countdown-text">{t("Minutes")}</span>
+                          <span className="countdown-text">Minutes</span>
                         </div>
                         <div className="countdown_doubledots">:</div>
                         <div className="countdown-number">
                           <span className="seconds countdown-time">
                             {timeLeft.seconds}
                           </span>
-                          <span className="countdown-text">{t("Seconds")}</span>
+                          <span className="countdown-text">Seconds</span>
                         </div>
                       </div>
                     </div>
@@ -895,13 +913,13 @@ const handleAskToPlay = () => {
                     <div className="entriesdate_div">
                       <div className="entries_openclosediv">
                         <div className="entriesdiv_inner opendiv_entries">
-                          <h3>{t("Entries Open:")}</h3>
-                          <p>{t("Monday")}</p>
+                          <h3>Entries Open:</h3>
+                          <p>Monday</p>
                           <p>12:00 hrs</p>
                         </div>
                         <div className="entriesdiv_inner closediv_entries">
-                          <h3>{t("Entries Close:")}</h3>
-                          <p>{t("Sunday")}</p>
+                          <h3>Entries Close:</h3>
+                          <p>Sunday</p>
                           <p>23:59 hrs</p>
                         </div>
                       </div>
@@ -918,7 +936,7 @@ const handleAskToPlay = () => {
                   <div className="row rowcompititionsmaindiv">
                     <div className="upcomingame_div_fortext">
                       <h2>
-                        {t("Current")} <span>{t("contest")}</span>
+                        Current <span>contest</span>
                       </h2>
                     </div>
                     <div className="col-md-12 col3compitions">
@@ -929,9 +947,10 @@ const handleAskToPlay = () => {
                               src={contests[0]?.contest_banner?.file_url}
                               alt="Contest Banner"
                               className="play-img"
+                              onContextMenu={handleRightClick}
                             />
                             <p className="hidball">
-                              {t("Mark the hidden ball in the picture!")}
+                              Mark the hidden ball in the picture!
                             </p>
                           </div>
                         </div>
@@ -944,11 +963,11 @@ const handleAskToPlay = () => {
                                     src={`${process.env.PUBLIC_URL}/images/ball_icon.png`}
                                     alt="Ball Icon"
                                   />
-                                  <h4> {t("Weekly contest ends")} </h4>
+                                  <h4> Weekly contest ends </h4>
                                 </div>
                                 <div className="contestrightdaysdate">
                                   <h4 className="contslist_span_inner">
-                                    {t("Sunday")}- 23:59hrs
+                                    Sunday- 23:59hrs
                                   </h4>
                                 </div>
                               </div>
@@ -960,21 +979,19 @@ const handleAskToPlay = () => {
                                   />
                                   <h4>
                                     {" "}
-                                    {t(
-                                      "Live streaming of “Weekly Winner Show”"
-                                    )}{" "}
+                                    Live streaming of “Weekly Winner Show”{" "}
                                   </h4>
                                 </div>
                                 <div className="contestrightdaysdate">
                                   <h4 className="contslist_span_inner">
-                                    {t("Monday")}- 21:00hrs
+                                    Monday- 21:00hrs
                                   </h4>
                                 </div>
                               </div>
                             </div>
                             <div className="everyweek_livewatchdiv">
                               <div className="watchondiv">
-                                <h4>{t("Watch On")}</h4>
+                                <h4>Watch On</h4>
                                 {links?.Facebook_Streaming && (
                                   <a
                                     href={links.Facebook_Streaming}
@@ -1004,7 +1021,7 @@ const handleAskToPlay = () => {
                             <div className="jackpotpricewithpayment">
                               <div className="gamejackpotdiv">
                                 <h4>
-                                  {t("Game Jackpot")}: ₹
+                                  Game Jackpot: ₹
                                   {contests[0]?.jackpot_price.toLocaleString()}
                                 </h4>
                                 {/* <h4>
@@ -1019,8 +1036,7 @@ const handleAskToPlay = () => {
                               </div>
                               <div className="gamejackpotdiv">
                                 <h4>
-                                  {t("Ticket Price")}: ₹
-                                  {contests[0]?.ticket_price}
+                                  Ticket Price: ₹{contests[0]?.ticket_price}
                                 </h4>
                               </div>
                             </div>
@@ -1034,7 +1050,7 @@ const handleAskToPlay = () => {
                                   // }
                                   onClick={handleAskToPaly}
                                 >
-                                  {t("Buy Tickets to Play")}
+                                  Buy Tickets to Play
                                 </button>
                               </div>
                             </div>
@@ -1061,7 +1077,11 @@ const handleAskToPlay = () => {
           )}
         </>
       )}
-      <Login isVisible={loginPopup} onClose={ClosePopup} />
+      <Login
+        isVisible={loginPopup}
+        setLoginOpen={setLoginPopup}
+        onClose={ClosePopup}
+      />
       {isGeolocationPopupVisible && (
         <GeolocationPopup
           onClose={handleCloseGeolocationPopup}
@@ -1143,8 +1163,8 @@ const handleAskToPlay = () => {
             <div className="contest_maindiv_popup_inner">
               <div className="contestheading text-center">
                 <h2>
-                  <i className="fa fa-gamepad" aria-hidden="true"></i>{" "}
-                  {t("Game Play Closed!")}
+                  <i className="fa fa-gamepad" aria-hidden="true"></i> Game Play
+                  Closed!
                 </h2>
               </div>
               {/* <div className="contesttickeprice">
@@ -1158,12 +1178,11 @@ const handleAskToPlay = () => {
               </div> */}
               <div className="quantity_contest text-center mt-3">
                 <h3 className="text-white">
-                  {t("The current gameplay has been closed.")}
+                  The current gameplay has been closed.
                 </h3>
                 <h4 className="text-white">
-                  {t(
-                    "But don't worry, a new competition launches this Monday at 12:00 HRS!"
-                  )}
+                  But don't worry, a new competition launches this Monday at
+                  12:00 HRS!
                 </h4>
                 {/* <div className="quantity">
                   <button
@@ -1211,7 +1230,7 @@ const handleAskToPlay = () => {
                     }}
                   ></i>{" "}
                   <h2 className="text-white ">
-                    {t("Mark your calendars and get ready to join the fun!")}
+                    Mark your calendars and get ready to join the fun!
                   </h2>
                 </div>
                 <div className="addcart_contst_textinfo">
@@ -1243,7 +1262,7 @@ const handleAskToPlay = () => {
                 </div>
               </div>
               <div className="everyweek_livewatchdiv text-center">
-                <h4 className="text-white">{t("Watch On Live Streams")}</h4>
+                <h4 className="text-white">Watch On Live Streams</h4>
                 <div className="watchondiv justify-content-center">
                   {links?.Facebook_Streaming && (
                     <a
@@ -1274,7 +1293,7 @@ const handleAskToPlay = () => {
 
               <div className="addtocart_btn_popup_div">
                 <button className="addcartbtn_inpopup" onClick={ClosedCarts}>
-                  {t("Close")}
+                  Close
                 </button>
               </div>
             </div>
@@ -1308,12 +1327,12 @@ const handleAskToPlay = () => {
                   {selectedContest?.jackpot_price
                     ? Number(selectedContest.jackpot_price).toLocaleString()
                     : "0"}{" "}
-                  {t("Jackpot Prize")}
+                  Jackpot Prize
                 </h2>
               </div>
               <div className="contesttickeprice">
                 <p>
-                  {t("Ticket Price")}:{" "}
+                  Ticket Price:{" "}
                   <span>
                     <i className="fa fa-inr" aria-hidden="true" />{" "}
                     {selectedContest?.ticket_price}
@@ -1321,7 +1340,7 @@ const handleAskToPlay = () => {
                 </p>
               </div>
               <div className="quantity_contest">
-                <h4>{t("Quantity")}</h4>
+                <h4>Quantity</h4>
                 <div className="quantity">
                   <button
                     className="minus"
@@ -1353,9 +1372,8 @@ const handleAskToPlay = () => {
                     alt="Icon"
                   />
                   <h2>
-                    {t(
-                      "Use Add and subtract buttons to increase or decrease your tickets"
-                    )}
+                    Use Add and subtract buttons to increase or decrease your
+                    tickets
                   </h2>
                 </div>
                 <div className="addcart_contst_textinfo">
@@ -1364,14 +1382,11 @@ const handleAskToPlay = () => {
                     // src="images/ball_icon.png"
                     alt="Icon"
                   />
-                  <h2>
-                    {t("Max")} {selectedContest?.maxTickets}{" "}
-                    {"tickets per person"}
-                  </h2>
+                  <h2>Max {selectedContest?.maxTickets} tickets per person</h2>
                 </div>
               </div>
               <div className="discount_cousal">
-                <h5>{t("Discount")}</h5>
+                <h5>Discount</h5>
                 <Slider {...settings}>
                   {Array.isArray(selectedDiscount) &&
                     selectedDiscount.map((discount) => (
@@ -1381,19 +1396,16 @@ const handleAskToPlay = () => {
                         />
                         {/* <h6>{discount.name}</h6> */}
                         <p>
-                          {t("Tickets")}: {discount.minTickets} -{" "}
-                          {discount.maxTickets}
+                          Tickets: {discount.minTickets} - {discount.maxTickets}
                         </p>
-                        <p>
-                          {t("Discount")}: {discount.discountPercentage}%
-                        </p>
+                        <p>Discount: {discount.discountPercentage}%</p>
                       </div>
                     ))}
                 </Slider>
               </div>
               <div className="bulkticketdiv">
                 <div className="buybulkticket_heaidng">
-                  <h2 className="bulkticketheading">{t("Buy Bulk Tickets")}</h2>
+                  <h2 className="bulkticketheading">Buy Bulk Tickets</h2>
                 </div>
                 <div className="chooseforinputsdiv_bulkticket">
                   {(selectedContest?.quantities || []).map((value) => (
@@ -1416,7 +1428,7 @@ const handleAskToPlay = () => {
               </div>
               <div className="addtocart_btn_popup_div">
                 <button className="addcartbtn_inpopup" onClick={handlePlayNow}>
-                  {t("Play Now")}
+                  Play Now
                 </button>
               </div>
             </div>

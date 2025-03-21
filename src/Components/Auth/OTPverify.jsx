@@ -6,7 +6,7 @@ import NewPassword from "./NewPassword";
 function OTPverify({ onClosedss, emailOrPhone }) {
   const [otp, setOtp] = useState(["", "", "", ""]);
   const [showNewPassword, setShowNewPassword] = useState(false);
-  const [timer, setTimer] = useState(0); // Timer state for resend OTP
+  const [timer, setTimer] = useState(60); // Timer state for resend OTP
   const inputRefs = useRef([]);
 
   useEffect(() => {
@@ -174,7 +174,7 @@ function OTPverify({ onClosedss, emailOrPhone }) {
                               {otp.map((digit, index) => (
                                 <input
                                   key={index}
-                                  type="text"
+                                  type="number"
                                   className="otp__digit"
                                   value={digit}
                                   onChange={(e) =>

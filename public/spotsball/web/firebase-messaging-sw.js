@@ -24,10 +24,10 @@ if (firebase.messaging.isSupported()) {
   const messaging = firebase.messaging();
 
   messaging.onBackgroundMessage((payload) => {
-    console.log(
-      "[firebase-messaging-sw.js] Received background message ",
-      payload
-    );
+    // console.log(
+    //   "[firebase-messaging-sw.js] Received background message ",
+    //   payload
+    // );
     const notificationTitle = payload.notification.title;
     const notificationOptions = {
       body: payload.notification.body,
@@ -37,9 +37,9 @@ if (firebase.messaging.isSupported()) {
     self.registration.showNotification(notificationTitle, notificationOptions);
   });
 } else {
-  console.log("Firebase Messaging is not supported in this browser.");
+  //console.log("Firebase Messaging is not supported in this browser.");
 }
 
-self.addEventListener("message", (e) => {
-  console.log("Message received in service worker:", e.data);
-});
+// self.addEventListener("message", (e) => {
+//   console.log("Message received in service worker:", e.data);
+// });
