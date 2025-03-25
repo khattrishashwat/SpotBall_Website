@@ -137,6 +137,7 @@ function Rules() {
                   <div id="rulesplay" className="tab-pane active">
                     <div className="legaltermsdata_div">
                       <div
+                        className="innerlegal_heaidngwithpara"
                         dangerouslySetInnerHTML={{
                           __html: rules,
                         }}

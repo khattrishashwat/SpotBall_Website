@@ -4,7 +4,7 @@ import axios from "axios";
 import Loader from "../../Loader/Loader";
 
 function Privacy() {
-    const [isCookies, setIsCookies] = useState("");
+  const [isCookies, setIsCookies] = useState("");
   const [isLoading, setIsLoading] = useState("");
 
   const fetchCondition = async () => {
@@ -33,9 +33,9 @@ function Privacy() {
     fetchCondition();
   }, []);
 
-   useEffect(() => {
-      window.scrollTo(0, 0);
-    }, []);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <div>
@@ -118,18 +118,19 @@ function Privacy() {
                   <div id="cookiepolicy" className="tab-pane active">
                     <div className="legaltermsdata_div">
                       {/* <div className="innerlegal_heaidngwithpara"> */}
-                        
-                          <div
-                            dangerouslySetInnerHTML={{ __html: isCookies }}
-                          />
-                          {/* {isLoading ? (
+
+                      <div
+                        className="innerlegal_heaidngwithpara"
+                        dangerouslySetInnerHTML={{ __html: isCookies }}
+                      />
+                      {/* {isLoading ? (
                             <Loader /> // Correctly render the Loader component
                           ) : (
                             <div
                               dangerouslySetInnerHTML={{ __html: isCookies }}
                             />
                           )} */}
-                        
+
                       {/* </div> */}
                     </div>
                   </div>

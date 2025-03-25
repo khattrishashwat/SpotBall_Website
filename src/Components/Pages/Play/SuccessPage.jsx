@@ -140,9 +140,7 @@ function SucessPage() {
                               </p> */}
                               <p>
                                 <span className="bold">Total Amount</span>
-                                <span className="bold">
-                                  ₹{payments.amount.toFixed(2)}
-                                </span>
+                                <span className="bold">₹{payments.amount}</span>
                               </p>
                             </div>
                             <div className="paybtn_card">

@@ -760,11 +760,11 @@ const handleAskToPlay = () => {
   }, [token]);
 
   useEffect(() => {
-      const value = localStorage.getItem("UIDNotFound");
-      if (!value || value === "undefined") {
-        localStorage.removeItem("UIDNotFound");
-      }
-    }, []);
+    const value = localStorage.getItem("UIDNotFound");
+    if (!value || value === "undefined") {
+      localStorage.removeItem("UIDNotFound");
+    }
+  }, []);
   const handleUnavailableOk = () => {
     setIsUnavailablePopupVisible(false); // Close GameUnavailablePopup
   };

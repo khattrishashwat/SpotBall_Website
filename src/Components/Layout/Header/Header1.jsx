@@ -238,7 +238,7 @@ function Header() {
     hours: "00",
     minutes: "00",
     seconds: "00",
-    isCompetitionStart: false, // Tracks if competition is starting or ending
+    isCompetitionStart: false, 
   });
 
   const getTargetTime = () => {

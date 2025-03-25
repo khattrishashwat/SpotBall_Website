@@ -113,9 +113,10 @@ function Privacy() {
                 <div className="tab-content">
                   <div id="pricvacypolicy" className="tab-pane active">
                     <div className="legaltermsdata_div">
-                          <div
-                            dangerouslySetInnerHTML={{ __html: isPrivacy }}
-                          />
+                      <div
+                        className="innerlegal_heaidngwithpara"
+                        dangerouslySetInnerHTML={{ __html: isPrivacy }}
+                      />
                       {/* <div className="innerlegal_heaidngwithpara">
                     
 
@@ -126,7 +127,7 @@ function Privacy() {
                               dangerouslySetInnerHTML={{ __html: isPrivacy }}
                             />
                           )} */}
-                        
+
                       {/* </div> */}
                     </div>
                   </div>

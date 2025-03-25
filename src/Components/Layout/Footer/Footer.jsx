@@ -1,110 +1,209 @@
-import React from 'react'
+import React, { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
+import axios from "axios";
 
 function Footer() {
+  const [footer, setFooter] = useState(""); // Footer content
+  const [links, setLinks] = useState([]); // Initialize as an array
+  const [androidLink, setAndroidLink] = useState(null);
+  const location = useLocation(); // useLocation to get current path
+
+  const fetchFooter = async () => {
+    try {
+      const response = await axios.get(
+        "app/static-content/get-all-static-content/footer"
+      );
+      setLinks(response.data.data?.liveLinks || []); // Ensure links is always an array
+    } catch (error) {
+      console.error("Error fetching footer data:", error);
+    }
+  };
+
+  const fetchAndroidLink = async () => {
+    try {
+      const response = await axios.get("app/apk-links");
+      setAndroidLink(response.data.data?.android_build || null);
+    } catch (error) {
+      console.error("Error fetching Android data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchFooter();
+    fetchAndroidLink();
+  }, []);
+
+  const iconClass = {
+    facebook: "fab fa-facebook-f",
+    instagram: "fab fa-instagram",
+    twitter: "fa-brands fa-x-twitter",
+    threads: "fa-brands fa-threads",
+    youtube: "fa-brands fa-youtube",
+  };
+
   return (
-    <>
-      <footer className="footer">
-        <div className="min-footer">
-          <div className="container">
-            <div className="row align-items-center justify-content-between mb-4 mb-md-5">
-              <div className="col-md-12 col-lg-4 mb-4 mb-lg-0">
-                <h5 className="title mb-3 d-block follow">Follow Us </h5>
-                <div className="footer-social justify-content-center justify-content-lg-start">
-                  <ul>
-                    <li>
-                      <a href="javascript:void(0)">
-                        <i className="fab fa-facebook-f" />
-                      </a>
-                    </li>
-                    <li>
-                      <a href="javascript:void(0)">
-                        <i className="fab fa-instagram" />
-                      </a>
-                    </li>
-                    <li>
-                      <a href="javascript:void(0)">
-                        <i className="fa-brands fa-x-twitter" />
-                      </a>
-                    </li>
-                    <li>
-                      <a href="javascript:void(0)">
-                        <i className="fa-brands fa-threads" />
-                      </a>
-                    </li>
-                    <li className="mr-0">
-                      <a href="javascript:void(0)">
-                        <i className="fa-brands fa-youtube" />
-                      </a>
-                    </li>
-                  </ul>
-                </div>
+    <footer className="footer">
+      <div className="min-footer">
+        <div className="container">
+          <div className="row align-items-center justify-content-between mb-4 mb-md-5">
+            {/* Social Media Section */}
+            <div className="col-md-12 col-lg-4 mb-4 mb-lg-0">
+              <h5 className="title mb-3 d-block follow">Follow Us </h5>
+              <div className="footer-social justify-content-center justify-content-lg-start">
+                {/* <ul>
+                  {links.map((item, index) => {
+                    const { url, name } = item || {};
+                    return (
+                      url &&
+                      name && (
+                        <li key={index}>
+                          <a
+                            href={url}
+                            title={name}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <i
+                              className={
+                                iconClass[name.toLowerCase()] ||
+                                "fa-solid fa-link"
+                              }
+                            />
+                          </a>
+                        </li>
+                      )
+                    );
+                  })}
+                </ul> */}
+
+                <ul>
+                  {[
+                    {
+                      icon: "fab fa-facebook-f",
+                      name: "Facebook_Social_Link",
+                    },
+                    {
+                      icon: "fab fa-instagram",
+                      name: "Instagram_Social_Link",
+                    },
+                    { icon: "fa-brands fa-x-twitter", name: "X_Social_Link" },
+                    {
+                      icon: "fa-brands fa-threads",
+                      name: "Threads_Social_Link",
+                    },
+                    {
+                      icon: "fa-brands fa-youtube",
+                      name: "Youtube_Social_Link",
+                    },
+                  ].map((item, i) => {
+                    const { icon, name } = item;
+                    const capitalizedName =
+                      name.split("_")[0].charAt(0).toUpperCase() +
+                      name.split("_")[0].slice(1); // Capitalize only the first letter
+                    const link = links ? links[name] : ""; // Dynamically fetch the link based on the name from liveLinks
+
+                    return (
+                      <li key={i}>
+                        {link ? (
+                          <a
+                            href={link}
+                            title={capitalizedName}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <i className={icon[name.toLowerCase()] || icon} />
+                          </a>
+                        ) : (
+                          <span>{capitalizedName} link not available</span>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
               </div>
-              <div className="col-md-12 col-lg-4 text-center mb-4 mb-lg-0">
-                <a href="javascript:void(0)" className="footer-logo">
-                  <img
-                    className="logo img-fluid"
-                    src="images/logo.png"
-                    alt="logo"
-                  />
-                </a>
-              </div>
-              <div className="col-md-12 col-lg-4">
-                <div className="download-app  align-items-center justify-content-center justify-content-lg-start text-center">
-                  <h5 className="title mb-3 d-block download">Download App</h5>
-                  <a href="javascript:void(0)">
+            </div>
+
+            {/* Logo Section */}
+            <div className="col-md-12 col-lg-4 text-center mb-4 mb-lg-0">
+              <Link to="" className="footer-logo">
+                <img
+                  className="logo img-fluid"
+                  src="images/logo.png"
+                  alt="logo"
+                />
+              </Link>
+            </div>
+
+            {/* Download App Section */}
+            <div className="col-md-12 col-lg-4">
+              <div className="download-app align-items-center justify-content-center justify-content-lg-start text-center">
+                <h5 className="title mb-3 d-block download">Download App</h5>
+                {androidLink && (
+                  <a
+                    href={androidLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     <img
                       className="img-fluid"
-                      src="images/android-download.png"
-                      alt="androidplay"
+                      src={`${process.env.PUBLIC_URL}/images/android-download.png`}
+                      alt="Play Store"
                     />
                   </a>
-                  <a href="javascript:void(0)">
+                )}
+                {links?.Apple_Store && (
+                  <a
+                    href={links.Apple_Store}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     <img
                       className="img-fluid"
-                      src="images/appleapp.svg"
-                      alt="appleapp"
+                      src={`${process.env.PUBLIC_URL}/images/appleapp.svg`}
+                      alt="Apple Store"
                     />
                   </a>
-                </div>
+                )}
               </div>
             </div>
           </div>
         </div>
-        <div className="footer-bottom">
-          <div className="container">
-            <div className="row align-items-center copyright">
-              <div className="col-12 col-md-6 text-center text-md-start">
-                <div className="copyright-menu footer-menu">
-                  <ul className="mb-0 justify-content-center justify-content-md-start list-unstyled">
-                    <li>
-                      <a href="javascript:void(0)">Terms &amp; Conditions</a>
-                    </li>
-                    <li>
-                      <a href="javascript:void(0)">Privacy Policy</a>
-                    </li>
-                    <li>
-                      <a href="javascript:void(0)">Cookie Policy</a>
-                    </li>
-                    <li>
-                      <a href="javascript:void(0)">Rules Of Play &amp; FAQs</a>
-                    </li>
-                  </ul>
-                </div>
+      </div>
+
+      {/* Footer Bottom */}
+      <div className="footer-bottom">
+        <div className="container">
+          <div className="row align-items-center copyright">
+            <div className="col-12 col-md-6 text-center text-md-start">
+              <div className="copyright-menu footer-menu">
+                <ul className="mb-0 justify-content-center justify-content-md-start list-unstyled">
+                  <li>
+                    <Link to="/terms">Terms &amp; Conditions</Link>
+                  </li>
+                  <li>
+                    <Link to="/privacy">Privacy Policy</Link>
+                  </li>
+                  <li>
+                    <Link to="/cookies">Cookie Policy</Link>
+                  </li>
+                  <li>
+                    <Link to="/rules">Rules Of Play &amp; FAQs</Link>
+                  </li>
+                </ul>
               </div>
-              <div className="col-12 col-md-6 text-center text-md-end mt-2 mt-md-0">
-                <p className="mb-0">
-                  {" "}
-                  © Copyright <span id="copyright"> 2025</span>{" "}
-                  <a href="index.html"> SpotsBall Global PVT. LTD. </a> All
-                  Rights Reserved
-                </p>
-              </div>
+            </div>
+            <div className="col-12 col-md-6 text-center text-md-end mt-2 mt-md-0">
+              <p className="mb-0">
+                © Copyright <span id="copyright"> 2025</span>{" "}
+                <Link to="/"> SpotsBall Global PVT. LTD. </Link> All Rights
+                Reserved
+              </p>
             </div>
           </div>
         </div>
-      </footer>
-    </>
+      </div>
+    </footer>
   );
 }
 
-export default Footer
+export default Footer;
