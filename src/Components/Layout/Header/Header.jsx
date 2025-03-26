@@ -47,46 +47,46 @@ function Header() {
     setIsMenuVisible((prevState) => !prevState); // Toggle the state
   };
 
-  const handleClickOutside = (event) => {
-    // Menu elements
-    const menuButton = document.querySelector(".menubaricons");
-    const menuList = document.querySelector(".menulist_divmanin");
+  // const handleClickOutside = (event) => {
+  //   // Menu elements
+  //   const menuButton = document.querySelector(".menubaricons");
+  //   const menuList = document.querySelector(".menulist_divmanin");
 
-    // Notification elements
-    const notificationButton = document.querySelector(
-      ".notificationclick .itmelink_menus"
-    );
-    const notificationList = document.querySelector(".notificationdiv_popup");
+  //   // Notification elements
+  //   const notificationButton = document.querySelector(
+  //     ".notificationclick .itmelink_menus"
+  //   );
+  //   const notificationList = document.querySelector(".notificationdiv_popup");
 
-    // Close menu if clicked outside
-    if (
-      menuButton &&
-      menuList &&
-      !menuButton.contains(event.target) &&
-      !menuList.contains(event.target)
-    ) {
-      setIsMenuVisible(false); // Hide the menu
-    }
+  //   // Close menu if clicked outside
+  //   if (
+  //     menuButton &&
+  //     menuList &&
+  //     !menuButton.contains(event.target) &&
+  //     !menuList.contains(event.target)
+  //   ) {
+  //     setIsMenuVisible(false); // Hide the menu
+  //   }
 
-    // Close notification dropdown if clicked outside
-    if (
-      notificationButton &&
-      notificationList &&
-      !notificationButton.contains(event.target) &&
-      !notificationList.contains(event.target)
-    ) {
-      setIsNot(false); // Hide the notifications
-    }
-  };
+  //   // Close notification dropdown if clicked outside
+  //   if (
+  //     notificationButton &&
+  //     notificationList &&
+  //     !notificationButton.contains(event.target) &&
+  //     !notificationList.contains(event.target)
+  //   ) {
+  //     setIsNot(false); // Hide the notifications
+  //   }
+  // };
 
   // const isHomePage = location.pathname === "/";
 
-  useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+  // useEffect(() => {
+  //   document.addEventListener("mousedown", handleClickOutside);
+  //   return () => {
+  //     document.removeEventListener("mousedown", handleClickOutside);
+  //   };
+  // }, []);
   const isHomePage = location.pathname === "/";
   const token = localStorage.getItem("Web-token");
 
@@ -164,7 +164,9 @@ function Header() {
     setIsNot((prev) => !prev);
     updateNotifications();
   };
-
+  const NotificationClose = () => {
+    setIsNot(false);
+  };
   const [timeLeft, setTimeLeft] = useState({
     days: "00",
     hours: "00",
@@ -399,63 +401,68 @@ function Header() {
                       </a>
 
                       {/* Notification Popup */}
-                      {isNot && (
+                      <div
+                        className={`notificationdiv_popup ${
+                          isNot ? "" : ""
+                        }`}
+                        id="notificationPopup"
+                        style={{ display: isNot ? "block" : "none" }}
+                      >
                         <div
-                          className="notificationdiv_popup show"
-                          id="notificationPopup"
+                          className="topnoticationdiv_main"
+                          id="popupContent"
                         >
-                          <div
-                            className="topnoticationdiv_main"
-                            id="popupContent"
-                          >
-                            <div className="notificationheading">
-                              <h2>Notifications</h2>
-                            </div>
-                            <div className="notifi_innerdiv">
-                              {notification.length > 0 ? (
-                                notification.map((item) => (
-                                  <div className="notifystrip" key={item._id}>
-                                    <Link
-                                      to={`/notification/${item._id}`}
-                                      className="notifylinkdiv"
-                                    >
-                                      <div className="notify-icondiv">
-                                        <img
-                                          className="notification_img"
-                                          src="/image/favicon.png"
-                                          alt="notification"
-                                        />
+                          <div className="notificationheading">
+                            <h2>Notifications</h2>
+                          </div>
+                          <div className="notifi_innerdiv">
+                            {notification.length > 0 ? (
+                              notification.map((item) => (
+                                <div className="notifystrip" key={item._id}>
+                                  <Link
+                                    to={`/notification/${item._id}`}
+                                    className="notifylinkdiv"
+                                  >
+                                    <div className="notify-icondiv">
+                                      <img
+                                        className="notification_img"
+                                        src="/image/favicon.png"
+                                        alt="notification"
+                                      />
+                                    </div>
+                                    <div className="notificationtext_heading">
+                                      <h2>{item.title}</h2>
+                                      <p>{item.body}</p>
+                                      <div className="notif_timedate">
+                                        <p>
+                                          {moment(item.createdAt).format(
+                                            "ddd, D MMM, h:mm a"
+                                          )}
+                                        </p>
                                       </div>
-                                      <div className="notificationtext_heading">
-                                        <h2>{item.title}</h2>
-                                        <p>{item.body}</p>
-                                        <div className="notif_timedate">
-                                          <p>
-                                            {moment(item.createdAt).format(
-                                              "ddd, D MMM, h:mm a"
-                                            )}
-                                          </p>
-                                        </div>
-                                      </div>
-                                    </Link>
-                                  </div>
-                                ))
-                              ) : (
-                                <p>No notifications available.</p>
-                              )}
-                            </div>
-
+                                    </div>
+                                  </Link>
+                                </div>
+                              ))
+                            ) : (
+                              <p>No notifications available.</p>
+                            )}
+                          </div>
+                          <div className="crossicondiv">
                             {/* Close Button */}
                             <button
                               type="button"
                               className="crossbtn_notification"
                               onClick={() => setIsNot(false)}
                             >
-                              <img src="/image/cross_icon.png" alt="Close" />
+                              <img
+                                src={`${process.env.PUBLIC_URL}/image/cross_icon.png`}
+                                alt="close"
+                              />{" "}
                             </button>
                           </div>
                         </div>
-                      )}
+                      </div>
                     </li>
 
                     {/* Cart Icon */}

@@ -42,8 +42,8 @@ function Weekly() {
             <div className="col-md-4 weeklywinner_boxcol4">
               <div className="winnerbox_live_imgdiv">
                 <img
-                  src={`${process.env.PUBLIC_URL}/images/weekly_winner.png`}
-                  // src="images/weekly_winner.png"
+                  src={`${process.env.PUBLIC_URL}/image/weekly_winner.png`}
+                  // src="image/weekly_winner.png"
                 />
               </div>
             </div>
@@ -53,8 +53,8 @@ function Weekly() {
                   <h3>Every Sunday</h3>
                   <div className="gamewinnertimingdiv">
                     <img
-                      src={`${process.env.PUBLIC_URL}/images/ball_icon.png`}
-                      // src="images/ball_icon.png"
+                      src={`${process.env.PUBLIC_URL}/image/ball_icon.png`}
+                      // src="image/ball_icon.png"
                     />
                     <h4>
                       entry deadline for last week’s contest{" "}
@@ -66,8 +66,8 @@ function Weekly() {
                   <h3>Every Monday</h3>
                   <div className="gamewinnertimingdiv">
                     <img
-                      src={`${process.env.PUBLIC_URL}/images/ball_icon.png`}
-                      // src="images/ball_icon.png"
+                      src={`${process.env.PUBLIC_URL}/image/ball_icon.png`}
+                      // src="image/ball_icon.png"
                     />
                     <h4>
                       new weekly games begins&nbsp;<span>- 12:00hrs</span>
@@ -75,8 +75,8 @@ function Weekly() {
                   </div>
                   <div className="gamewinnertimingdiv">
                     <img
-                      src={`${process.env.PUBLIC_URL}/images/ball_icon.png`}
-                      // src="images/ball_icon.png"
+                      src={`${process.env.PUBLIC_URL}/image/ball_icon.png`}
+                      // src="image/ball_icon.png"
                     />
                     <h4>
                       live Facebook and YouTube stream of “The SpotsBall Weekly
@@ -95,7 +95,7 @@ function Weekly() {
                           rel="noopener noreferrer"
                         >
                           <img
-                            src={`${process.env.PUBLIC_URL}/images/face.png`}
+                            src={`${process.env.PUBLIC_URL}/image/face.png`}
                             alt="Facebook Live"
                           />
                         </a>
@@ -107,7 +107,7 @@ function Weekly() {
                           rel="noopener noreferrer"
                         >
                           <img
-                            src={`${process.env.PUBLIC_URL}/images/you.png`}
+                            src={`${process.env.PUBLIC_URL}/image/you.png`}
                             alt="YouTube Live"
                           />
                         </a>

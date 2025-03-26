@@ -10,11 +10,14 @@ import Swal from "sweetalert2";
 function Home() {
   const [restrictedStates, setRestrictedStates] = useState([]);
   const [apk, setApk] = useState([]);
+  const [banner, setBanner] = useState([]);
   const [faqs, setFaqs] = useState([]);
   const [news, setNews] = useState([]);
   const [livs, setLivs] = useState([]);
   const [contests, setContests] = useState([]);
   const [discounts, setDiscounts] = useState([]);
+  const [howItWorks, setHowItWorks] = useState([]);
+  const [bannerGIFS, setBannerGIFS] = useState([]);
 
   const [isGeolocationPopupVisible, setGeolocationPopupVisible] =
     useState(false);
@@ -40,6 +43,9 @@ function Home() {
           setFaqs(response.data.data.faqs || []);
           setNews(response.data.data.press || []);
           setApk(response.data.data.apkLinks || []);
+          setBanner(response.data.data.banner_details || []);
+          setHowItWorks(response.data.data.howItWorks || []);
+          setBannerGIFS(response.data.data.bannerGifs || []);
         }
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
@@ -159,7 +165,7 @@ function Home() {
 
   return (
     <>
-      <Banner data={{ livs, contests, discounts }} />
+      <Banner data={{ livs, howItWorks, banner, contests, discounts }} />
       {news.length > 0 && <News data={{ news }} />}
       {faqs.length > 0 && <Faqs data={{ apk, faqs }} />}
       {isGeolocationPopupVisible && (

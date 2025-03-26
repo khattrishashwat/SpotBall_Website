@@ -56,7 +56,7 @@ function Privacy() {
                       <div className="tabbingiconbgdiv">
                         {" "}
                         <img
-                          src={`${process.env.PUBLIC_URL}/images/legal_terms_icons.png`}
+                          src={`${process.env.PUBLIC_URL}/image/legal_terms_icons.png`}
                           alt="Terms"
                         />{" "}
                       </div>{" "}
@@ -72,7 +72,7 @@ function Privacy() {
                       <div className="tabbingiconbgdiv">
                         {" "}
                         <img
-                          src={`${process.env.PUBLIC_URL}/images/legal_terms_icons.png`}
+                          src={`${process.env.PUBLIC_URL}/image/legal_terms_icons.png`}
                           alt="Privacy"
                         />{" "}
                       </div>
@@ -84,7 +84,7 @@ function Privacy() {
                       <div className="tabbingiconbgdiv">
                         {" "}
                         <img
-                          src={`${process.env.PUBLIC_URL}/images/legal_terms_icons.png`}
+                          src={`${process.env.PUBLIC_URL}/image/legal_terms_icons.png`}
                           alt="Rules"
                         />{" "}
                       </div>
@@ -98,7 +98,7 @@ function Privacy() {
                       <div className="tabbingiconbgdiv">
                         {" "}
                         <img
-                          src={`${process.env.PUBLIC_URL}/images/legal_terms_icons.png`}
+                          src={`${process.env.PUBLIC_URL}/image/legal_terms_icons.png`}
                           alt="Cookies"
                         />{" "}
                       </div>{" "}

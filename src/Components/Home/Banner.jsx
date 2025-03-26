@@ -7,11 +7,10 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
 function Banner({ data }) {
-  const { livs, contests, discounts } = data || {};
+  const { banner, livs, contests, discounts } = data || {};
   const navigate = useNavigate();
 
   const [leftticket, setLeftticket] = useState("");
-
 
   const [quantity, setQuantity] = useState(3);
 
@@ -100,7 +99,6 @@ function Banner({ data }) {
     return () => clearInterval(interval);
   }, []);
 
-
   // useEffect(() => {
   //   const checkGeolocation = () => {
   //     const location = localStorage.getItem("location");
@@ -169,7 +167,6 @@ function Banner({ data }) {
     //   //   console.log("Location not found in localStorage");
     // }
   };
-
 
   const handleBuyTicketClick = (contest, discount) => {
     const token = localStorage.getItem("Web-token"); // Replace with your token retrieval method
@@ -364,24 +361,32 @@ function Banner({ data }) {
                   <div className="container-fluid">
                     <div className="row">
                       <div className="col-12 col-lg-7 position-relative">
-                        <h1
-                          className=" text-start"
-                          data-swiper-animation="fadeInUp"
-                          data-duration="1.5s"
-                          data-delay="1.0s"
-                        >
-                          Every week a{" "}
-                          <span className="fs-1 fw-800">₹50,000</span> jackpot!
-                        </h1>
-                        <h2
-                          className=" text-start"
-                          data-swiper-animation="fadeInUp"
-                          data-duration="1.5s"
-                          data-delay="1.0s"
-                        >
-                          Think you've got cricket skills? <br />
-                          Mark the hidden ball in the picture!
-                        </h2>
+                        {banner.length > 0 && (
+                          <>
+                            <h1
+                              className="text-start"
+                              data-swiper-animation="fadeInUp"
+                              data-duration="1.5s"
+                              data-delay="1.0s"
+                            >
+                              {banner[0].sub_title.split("₹")[0]}{" "}
+                              <span className="fs-1 fw-800">
+                                ₹{banner[0].sub_title.match(/[\d,]+/)[0]}
+                              </span>{" "}
+                              jackpot!
+                            </h1>
+                            <h2
+                              className="text-start"
+                              data-swiper-animation="fadeInUp"
+                              data-duration="1.5s"
+                              data-delay="1.0s"
+                            >
+                              {banner[0].title.split("?")[0]}? <br />
+                              {banner[0].title.split("?")[1]}
+                            </h2>
+                          </>
+                        )}
+
                         <div className="d-flex align-items-center gap-2">
                           <a
                             href="javascript:void(0)"
@@ -402,12 +407,13 @@ function Banner({ data }) {
                             How To Play
                           </a>
                         </div>
-                        <div className="btn_tdy p-3 px-3">
-                          <span>
-                            <a href="javascript:void(0)"> Sign Up </a>Today,
-                            Play and Win the game
-                          </span>
-                        </div>
+                        {!token && (
+                          <div className="btn_tdy p-3 px-3">
+                            <span>
+                              <a> Sign Up </a> Today, Play and Win the game
+                            </span>
+                          </div>
+                        )}
                       </div>
                       <div className="col-12 col-lg-5 d-none d-lg-flex justify-content-center">
                         <div className="banner-img">
@@ -1227,7 +1233,6 @@ function Banner({ data }) {
           </div>
         </div>
       </div>
-     
     </>
   );
 }
