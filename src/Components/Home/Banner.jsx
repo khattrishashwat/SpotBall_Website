@@ -1,6 +1,311 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import axios from "axios";
+import Swal from "sweetalert2";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
-function Banner() {
+function Banner({ data }) {
+  const { livs, contests, discounts } = data || {};
+  const navigate = useNavigate();
+
+  const [leftticket, setLeftticket] = useState("");
+
+
+  const [quantity, setQuantity] = useState(3);
+
+  const [onCloseComptition, setOnCloseComptition] = useState("");
+  const [selectedContest, setSelectedContest] = useState("");
+  const [onCarts, setOnCarts] = useState("");
+  const [selectedDiscount, setSelectedDiscount] = useState("");
+
+  const [countdownType, setCountdownType] = useState("ends"); // "starts" or "ends"
+  const token = localStorage.getItem("Web-token");
+
+  const [timeLeft, setTimeLeft] = useState({
+    days: "00",
+    hours: "00",
+    minutes: "00",
+    seconds: "00",
+  });
+
+  // Function to get the next countdown time
+  const getTargetTime = () => {
+    const now = new Date();
+    const dayOfWeek = now.getDay(); // Sunday = 0, Monday = 1, ..., Saturday = 6
+    const currentHours = now.getHours();
+    const currentMinutes = now.getMinutes();
+
+    const nextMondayNoon = new Date(now);
+    nextMondayNoon.setDate(now.getDate() + ((7 - dayOfWeek + 1) % 7)); // Get the next Monday
+    nextMondayNoon.setHours(12, 0, 0, 0); // Monday 12:00 PM
+
+    const nextSundayEnd = new Date(now);
+    nextSundayEnd.setDate(now.getDate() + ((7 - dayOfWeek) % 7)); // Get the next Sunday
+    nextSundayEnd.setHours(23, 59, 59, 999); // Sunday 23:59
+
+    const mondayMorning = new Date(nextMondayNoon);
+    mondayMorning.setHours(0, 5, 0, 0); // Monday 00:05 AM
+
+    if (dayOfWeek === 0) {
+      // **Sunday**
+      if (currentHours >= 0 && currentHours < 12) {
+        setCountdownType("starts");
+        return nextMondayNoon.getTime(); // Countdown to Monday 12:00 PM
+      } else {
+        setCountdownType("ends");
+        return nextSundayEnd.getTime(); // Countdown to Sunday 23:59
+      }
+    } else if (dayOfWeek === 1 && currentHours >= 0 && currentHours < 12) {
+      // **Monday before 12:00 PM**
+      setCountdownType("starts");
+      return nextMondayNoon.getTime(); // Countdown to Monday 12:00 PM
+    } else {
+      // **Monday 12:00 PM - Sunday 23:59**
+      setCountdownType("ends");
+      return nextSundayEnd.getTime(); // Countdown to Sunday 23:59
+    }
+  };
+
+  useEffect(() => {
+    let countDownDate = getTargetTime();
+
+    const updateCountdown = () => {
+      const now = new Date().getTime();
+      const distance = countDownDate - now;
+
+      if (distance < 0) {
+        countDownDate = getTargetTime();
+      }
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor(
+        (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+      );
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      setTimeLeft({
+        days: String(days).padStart(2, "0"),
+        hours: String(hours).padStart(2, "0"),
+        minutes: String(minutes).padStart(2, "0"),
+        seconds: String(seconds).padStart(2, "0"),
+      });
+    };
+
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+
+  // useEffect(() => {
+  //   const checkGeolocation = () => {
+  //     const location = localStorage.getItem("location");
+  //     const restrictedArea = localStorage.getItem("restrictedArea");
+  //     // const location = JSON.parse(localStorage.getItem("location"));
+  //     // const restrictedArea = JSON.parse(localStorage.getItem("restrictedArea"));
+  //     const token = localStorage.getItem("Web-token");
+
+  //     const hasLocation = location && Object.keys(location).length > 0;
+  //     const hasRestrictedArea =
+  //       restrictedArea && Object.keys(restrictedArea).length > 0;
+
+  //     if (token) {
+  //       setGeolocationPopupVisible(!(hasLocation || hasRestrictedArea));
+  //     } else {
+  //       setGeolocationPopupVisible(false);
+  //     }
+  //   };
+
+  //   checkGeolocation();
+
+  //   // Listen for localStorage changes
+  //   const handleStorageChange = (event) => {
+  //     if (event.key === "location" || event.key === "restrictedArea") {
+  //       checkGeolocation();
+  //     }
+  //   };
+
+  //   window.addEventListener("storage", handleStorageChange);
+
+  //   return () => {
+  //     window.removeEventListener("storage", handleStorageChange);
+  //   };
+  // }, [token]);
+
+  const handleAskToPaly = () => {
+    const restrictedArea = localStorage.getItem("restrictedArea");
+    const location = localStorage.getItem("location");
+    const token = localStorage.getItem("Web-token");
+
+    // if (!token) {
+    //   Swal.fire({
+    //     icon: "info",
+    //     title: "Login Required",
+    //     text: "Please login to participate in this contest!",
+    //     confirmButtonText: "OK",
+    //     allowOutsideClick: false,
+    //   }).then((result) => {
+    //     if (result.isConfirmed) {
+    //       // setLoginPopup(true);
+    //     }
+    //   });
+    //   return;
+    // }
+
+    // if (restrictedArea) {
+    //   setGeolocationPopupVisible(false);
+    //   setIsUnavailablePopupVisible(true);
+    //   return;
+    // }
+
+    handleBuyTicketClick(contests[0], discounts);
+    // if (location) {
+    //   handleBuyTicketClick(contests[0], discounts);
+    // } else {
+    //   //   console.log("Location not found in localStorage");
+    // }
+  };
+
+
+  const handleBuyTicketClick = (contest, discount) => {
+    const token = localStorage.getItem("Web-token"); // Replace with your token retrieval method
+
+    // if (!token) {
+    //   Swal.fire({
+    //     icon: "info",
+    //     title: "Login Required",
+    //     text: "Please login to participate in this contest!",
+    //     confirmButtonText: "OK",
+    //     allowOutsideClick: false,
+    //   });
+    //   return;
+    // }
+
+    if (contest.totalTickets === 75) {
+      Swal.fire({
+        icon: "error",
+        title: "No More Tickets",
+        text: "You have already participated in this contest! You have chosen all the tickets.",
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
+      });
+      return;
+    }
+
+    if (!contest.is_active) {
+      // setOnCarts(false);
+      setOnCloseComptition(true);
+      return;
+    }
+
+    // If contest is active, proceed with normal flow
+    setSelectedContest(contest);
+    setOnCarts(true);
+    setSelectedDiscount(discount);
+  };
+
+  const settings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 2,
+    slidesToScroll: 1,
+    autoplay: true,
+    CenterPadding: 10,
+  };
+  const handleIncrease = () => {
+    const ticketsLeft =
+      selectedContest.maxTickets - selectedContest.totalTickets;
+    setLeftticket(ticketsLeft);
+
+    if (quantity < selectedContest?.maxTickets && quantity < ticketsLeft) {
+      setQuantity((prev) => prev + 1);
+    } else {
+      Swal.fire({
+        icon: "warning",
+        title: "Max Ticket Limit Reached",
+        text: `You can only purchase a maximum of ${selectedContest?.maxTickets} tickets per person, but you have already bought ${selectedContest?.totalTickets} tickets. You have only ${ticketsLeft} ticket(s) left to purchase.`,
+        allowOutsideClick: false,
+        confirmButtonText: "OK",
+      });
+    }
+  };
+
+  const handleDecrease = () => {
+    if (quantity > 1) {
+      setQuantity((prev) => prev - 1);
+    }
+  };
+
+  const handleBulkSelect = (value) => {
+    const ticketsLeft =
+      selectedContest.maxTickets - selectedContest.totalTickets;
+    setLeftticket(ticketsLeft);
+    // If the selected value exceeds the available tickets, show an error
+    if (value > ticketsLeft) {
+      Swal.fire({
+        icon: "error",
+        title: "Ticket Limit Exceeded",
+        text: `You can only purchase a maximum of ${selectedContest?.maxTickets} tickets per person, but you have already bought ${selectedContest?.totalTickets} tickets. You have only ${ticketsLeft} ticket(s) left to purchase.`,
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
+      });
+      return; // Stop execution if the selection is invalid
+    }
+    setQuantity(value);
+  };
+
+  const handlePlayNow = () => {
+    const ticketsLeft =
+      selectedContest.maxTickets - selectedContest.totalTickets;
+    setLeftticket(ticketsLeft);
+
+    // Ensure the default quantity (3) doesn't exceed available tickets
+    if (ticketsLeft === 0) {
+      Swal.fire({
+        icon: "error",
+        title: "No Tickets Available",
+        text: "There are no tickets left for this contest.",
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
+      });
+      return;
+    }
+
+    if (quantity > ticketsLeft) {
+      Swal.fire({
+        icon: "error",
+        title: "Not Enough Tickets Available",
+        text: `Only ${ticketsLeft} tickets are available. Please select a valid quantity.`,
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
+      });
+      return;
+    }
+
+    const payload = {
+      leftticket: ticketsLeft,
+      quantity: quantity > ticketsLeft ? ticketsLeft : quantity, // Ensure quantity does not exceed available tickets
+      responseData: selectedContest,
+    };
+
+    localStorage.setItem(
+      "quantity",
+      quantity > ticketsLeft ? ticketsLeft : quantity
+    );
+
+    navigate("/play_screen", { state: { payload } });
+  };
+  const ClosedCarts = async () => {
+    setOnCarts(false);
+    setOnCloseComptition(false);
+    setQuantity(3);
+  };
+
   return (
     <>
       <div className="color-container">
@@ -20,15 +325,15 @@ function Banner() {
             backgroundSize: "cover",
             position: "relative",
             padding: "50px 0",
-            paddingTop: "100px",
-            paddingBottom: "150px",
+            paddingTop: 150,
+            paddingBottom: 150,
             top: "-65px",
           }}
         >
           <div className="container">
-            <div id="main-slider" className="swiper-container">
-              <div className="swiper-wrapper">
-                <div className="swiper-slide align-items-center d-flex slide-01 header-position">
+            <div id="main-slider1" className="swiper-container">
+              <div className="swiper-wrapper1">
+                <div className="swiper-slide1 align-items-center d-flex slide-01 header-position">
                   <div
                     className="pattern-01"
                     data-swiper-animation="fadeIn"
@@ -69,7 +374,7 @@ function Banner() {
                           <span className="fs-1 fw-800">₹50,000</span> jackpot!
                         </h1>
                         <h2
-                          className="text-start"
+                          className=" text-start"
                           data-swiper-animation="fadeInUp"
                           data-duration="1.5s"
                           data-delay="1.0s"
@@ -77,7 +382,6 @@ function Banner() {
                           Think you've got cricket skills? <br />
                           Mark the hidden ball in the picture!
                         </h2>
-
                         <div className="d-flex align-items-center gap-2">
                           <a
                             href="javascript:void(0)"
@@ -98,25 +402,11 @@ function Banner() {
                             How To Play
                           </a>
                         </div>
-
                         <div className="btn_tdy p-3 px-3">
                           <span>
                             <a href="javascript:void(0)"> Sign Up </a>Today,
                             Play and Win the game
                           </span>
-                        </div>
-
-                        <div
-                          className="pattern-02"
-                          data-swiper-animation="fadeIn"
-                          data-duration="5.5s"
-                          data-delay="1.0s"
-                        >
-                          <img
-                            className="custom-animation img-fluid"
-                            src="images/home-01/pattern-02.png"
-                            alt=""
-                          />
                         </div>
                       </div>
                       <div className="col-12 col-lg-5 d-none d-lg-flex justify-content-center">
@@ -355,7 +645,7 @@ function Banner() {
                     </div>
                     <div className="entriesdiv_inner opendiv_entries">
                       <h3>Entries Open</h3>
-                      {/* <p>Monday: 12:00 hrs</p> */}
+                      <p>Monday: 12:00 hrs</p>
                     </div>
                   </div>
                   <div className="live-match-block">
@@ -371,16 +661,16 @@ function Banner() {
                       <div className="counter-box">
                         <ul className="unstyled countdown-left">
                           <li>
-                            <h2 id="days"></h2>
+                            <h2 id="days">{timeLeft.days}D:</h2>
                           </li>
                           <li>
-                            <h2 id="hours"></h2>
+                            <h2 id="hours">{timeLeft.hours}H:</h2>
                           </li>
                           <li>
-                            <h2 id="minutes"></h2>
+                            <h2 id="minutes">{timeLeft.minutes}M:</h2>
                           </li>
                           <li>
-                            <h2 id="seconds"></h2>
+                            <h2 id="seconds">{timeLeft.seconds}S</h2>
                           </li>
                         </ul>
                       </div>
@@ -427,11 +717,17 @@ function Banner() {
             >
               <div className="Current-contest-1 main img">
                 <img className="side-curve" src="images/golfer-1.png" />
-                <img className="main-pic" src="images/C8A0066.jpg" />
+                {contests?.length > 0 &&
+                  contests[0]?.contest_banner?.file_url && (
+                    <img
+                      className="main-pic"
+                      src={contests[0].contest_banner.file_url}
+                      alt="Contest Banner"
+                    />
+                  )}{" "}
                 <span className="mark-text ">
                   Mark the hidden ball in the picture!
                 </span>
-
                 <div
                   className="pattern-03 banner1"
                   data-swiper-animation="fadeIn"
@@ -486,7 +782,10 @@ function Banner() {
                         <span className="line-img ">
                           <img src="images/calendar.png" />
                         </span>
-                        {/* <h4>Every Week Live Stream <br> SpotsBall’s “Weekly Winner Show”</h4> */}
+                        <h4>
+                          Every Week Live Stream <br /> SpotsBall’s “Weekly
+                          Winner Show”
+                        </h4>
                       </div>
                       <div className="contestrightdaysdate contest_newtiming_strip mb-0">
                         <span className="line-img calendar">
@@ -506,18 +805,30 @@ function Banner() {
                       }}
                     >
                       <div className="watchondiv">
-                        <a href="javascript:void(0)">
-                          <span className="fb">
-                            <i className="fa-brands fa-facebook"></i> Watch on
-                            Facebook
-                          </span>
-                        </a>
-                        <a href="javascript:void(0)">
-                          <span className="yt">
-                            <i className="fa-brands fa-youtube"></i>Watch on
-                            Youtube
-                          </span>
-                        </a>
+                        {livs?.Facebook_Streaming && (
+                          <a
+                            href={livs.Facebook_Streaming}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <span className="fb">
+                              <i className="fa-brands fa-facebook"></i> Watch on
+                              Facebook
+                            </span>
+                          </a>
+                        )}
+                        {livs?.Youtube_Streaming && (
+                          <a
+                            href={livs.Youtube_Streaming}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <span className="yt">
+                              <i className="fa-brands fa-youtube"></i> Watch on
+                              YouTube
+                            </span>
+                          </a>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -531,50 +842,29 @@ function Banner() {
                   <h2 className="title">Discounts Available</h2>
                 </div>
                 <div className="discount-coupons">
-                  <div className="card first">
-                    <div className="main">
-                      <div className="co-img">
-                        <img src="images/target.png" alt="" />
-                      </div>
-                      <div className="vertical"></div>
-                      <div className="content">
-                        <h2>Tickets: 10-25</h2>
-                        <h1>
-                          5% <span>Discount</span>
-                        </h1>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="card second">
-                    <div className="main">
-                      <div className="co-img">
-                        <img src="images/target.png" alt="" />
-                      </div>
-                      <div className="vertical"></div>
-                      <div className="content">
-                        <h2>Tickets: 26-40</h2>
-                        <h1>
-                          10% <span>Discount</span>
-                        </h1>
+                  {discounts?.map((discount, index) => (
+                    <div
+                      className={`card ${
+                        index === 0 ? "first" : index === 1 ? "second" : "third"
+                      }`}
+                      key={discount._id}
+                    >
+                      <div className="main">
+                        <div className="co-img">
+                          <img src="images/target.png" alt="Discount" />
+                        </div>
+                        <div className="vertical"></div>
+                        <div className="content">
+                          <h2>
+                            Tickets: {discount.minTickets}-{discount.maxTickets}
+                          </h2>
+                          <h1>
+                            {discount.discountPercentage}% <span>Discount</span>
+                          </h1>
+                        </div>
                       </div>
                     </div>
-                  </div>
-
-                  <div className="card third">
-                    <div className="main">
-                      <div className="co-img">
-                        <img src="images/target.png" alt="" />
-                      </div>
-                      <div className="vertical"></div>
-                      <div className="content">
-                        <h2>Tickets: 41-75</h2>
-                        <h1>
-                          15% <span>Discount</span>
-                        </h1>
-                      </div>
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -619,7 +909,8 @@ function Banner() {
                     <div className="contest_maindiv_popup_inner">
                       <div className="contestheading">
                         <h2>
-                          <span>For</span> ₹50,000 <span>Jackpot Prize</span>
+                          <span>For</span> ₹{contests[0]?.jackpot_price}{" "}
+                          <span>Jackpot Prize</span>
                         </h2>
                       </div>
 
@@ -628,8 +919,8 @@ function Banner() {
                           {" "}
                           Ticket :
                           <span>
-                            <i className="fa fa-inr" aria-hidden="true"></i>{" "}
-                            49/-
+                            <i className="fa fa-inr" aria-hidden="true"></i>
+                            {contests[0]?.ticket_price}
                           </span>{" "}
                         </p>
                       </div>
@@ -650,7 +941,7 @@ function Banner() {
 
                       <div className="d-flex flex-wrap gap-16 align-items-center mt-3 ">
                         <a
-                          href="javascript:void(0)"
+                          onClick={handleAskToPaly}
                           className="btn btn-primary text-uppercase rounded-2"
                         >
                           buy Now
@@ -695,6 +986,248 @@ function Banner() {
           </div>
         </section>
       </div>
+      <div
+        className={`cartpopup_main cartpopupfor_contest ${
+          onCloseComptition ? "show" : ""
+        }`}
+        style={{ display: onCloseComptition ? "block" : "none" }}
+      >
+        <div className="addtocart_newpopup">
+          <div className="addtocart_content_popup">
+            <div className="contest_maindiv_popup_inner">
+              <div className="contestheading text-center">
+                <h2>
+                  <i className="fa fa-gamepad" aria-hidden="true"></i> Game Play
+                  Closed!
+                </h2>
+              </div>
+
+              <div className="quantity_contest text-center mt-3">
+                <h3 className="text-white">
+                  The current gameplay has been closed.
+                </h3>
+                <h4 className="text-white">
+                  But don't worry, a new competition launches this Monday at
+                  12:00 HRS!
+                </h4>
+              </div>
+              <div className="contest_quantity_para_div">
+                <div className="addcart_contst_textinfo">
+                  <i
+                    className="fa fa-calendar"
+                    style={{
+                      background: "aliceblue",
+                      color: "#000",
+                      width: "30px",
+                      height: "30px",
+                      fontSize: "15px",
+                      padding: "0px",
+                      lineHeight: "30px",
+                      textAlign: "center",
+                      borderRadius: "50%",
+                    }}
+                  ></i>{" "}
+                  <h2 className="text-white ">
+                    Mark your calendars and get ready to join the fun!
+                  </h2>
+                </div>
+                <div className="addcart_contst_textinfo">
+                  <i
+                    className="fa fa-television"
+                    style={{
+                      background: "aliceblue",
+                      color: "#000",
+                      width: "42px",
+                      height: "30px",
+                      fontSize: "15px",
+                      padding: "0px",
+                      lineHeight: "30px",
+                      textAlign: "center",
+                      borderRadius: "50%",
+                    }}
+                  ></i>
+                  <h2 className="text-white">
+                    Don’t forget to tune in to our live streaming every Monday
+                    at 21:00 HRS to catch all the excitement.
+                  </h2>
+                </div>
+              </div>
+              <div className="everyweek_livewatchdiv text-center">
+                <h4 className="text-white">Watch On Live Streams</h4>
+                <div className="watchondiv justify-content-center">
+                  {livs?.Facebook_Streaming && (
+                    <a
+                      href={livs.Facebook_Streaming}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <img
+                        src={`${process.env.PUBLIC_URL}/images/face.png`}
+                        alt="Facebook Live"
+                      />
+                    </a>
+                  )}
+                  {livs?.Youtube_Streaming && (
+                    <a
+                      href={livs.Youtube_Streaming}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <img
+                        src={`${process.env.PUBLIC_URL}/images/you.png`}
+                        alt="YouTube Live"
+                      />
+                    </a>
+                  )}
+                </div>
+              </div>
+
+              <div className="addtocart_btn_popup_div">
+                <button className="addcartbtn_inpopup" onClick={ClosedCarts}>
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        className={`cartpopup_main cartpopupfor_contest ${
+          onCarts ? "show" : ""
+        }`}
+        style={{ display: onCarts ? "block" : "none" }}
+      >
+        <div className="addtocart_newpopup">
+          <div className="addtocart_content_popup">
+            <div className="contest_maindiv_popup_inner">
+              <div className="contestheading">
+                <h2>
+                  Weekly ₹
+                  {selectedContest?.jackpot_price
+                    ? Number(selectedContest.jackpot_price).toLocaleString()
+                    : "0"}{" "}
+                  Jackpot Prize
+                </h2>
+              </div>
+              <div className="contesttickeprice">
+                <p>
+                  Ticket Price:{" "}
+                  <span>
+                    <i className="fa fa-inr" aria-hidden="true" />{" "}
+                    {selectedContest?.ticket_price}
+                  </span>
+                </p>
+              </div>
+              <div className="quantity_contest">
+                <h4>Quantity</h4>
+                <div className="quantity">
+                  <button
+                    className="minus"
+                    onClick={handleDecrease}
+                    aria-label="Decrease"
+                  >
+                    −
+                  </button>
+                  <input
+                    type="number"
+                    className="quantity_input-box"
+                    value={quantity}
+                    readOnly
+                  />
+                  <button
+                    className="plus"
+                    onClick={handleIncrease}
+                    aria-label="Increase"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+              <div className="contest_quantity_para_div">
+                <div className="addcart_contst_textinfo">
+                  <img
+                    src={`${process.env.PUBLIC_URL}/images/ball_icon.png`}
+                    // src="images/ball_icon.png"
+                    alt="Icon"
+                  />
+                  <h2>
+                    Use Add and subtract buttons to increase or decrease your
+                    tickets
+                  </h2>
+                </div>
+                <div className="addcart_contst_textinfo">
+                  <img
+                    src={`${process.env.PUBLIC_URL}/images/ball_icon.png`}
+                    // src="images/ball_icon.png"
+                    alt="Icon"
+                  />
+                  <h2>Max {selectedContest?.maxTickets} tickets per person</h2>
+                </div>
+              </div>
+              <div className="discount_cousal">
+                <h5>Discount</h5>
+                <Slider {...settings}>
+                  {Array.isArray(selectedDiscount) &&
+                    selectedDiscount.map((discount) => (
+                      <div key={discount._id} className="discount_card">
+                        <img
+                          src={`${process.env.PUBLIC_URL}/image/discount_img.png`}
+                        />
+                        {/* <h6>{discount.name}</h6> */}
+                        <p>
+                          Tickets: {discount.minTickets} - {discount.maxTickets}
+                        </p>
+                        <p>Discount: {discount.discountPercentage}%</p>
+                      </div>
+                    ))}
+                </Slider>
+              </div>
+              <div className="bulkticketdiv">
+                <div className="buybulkticket_heaidng">
+                  <h2 className="bulkticketheading">Buy Bulk Tickets</h2>
+                </div>
+                <div className="chooseforinputsdiv_bulkticket">
+                  {(selectedContest?.quantities || []).map((value) => (
+                    <div className="choosefor_input action" key={value}>
+                      <label htmlFor={`choosefor-${value}`}>
+                        <input
+                          type="radio"
+                          id={`choosefor-${value}`}
+                          name="choosefor"
+                          className="radio-custom"
+                          onChange={() => handleBulkSelect(value)}
+                          checked={quantity === value}
+                        />
+                        <span className="radio-custom-dummy" />
+                        <span className="spanforcheck">{value} Tickets</span>
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="addtocart_btn_popup_div">
+                <button className="addcartbtn_inpopup" onClick={handlePlayNow}>
+                  Play Now
+                </button>
+              </div>
+            </div>
+            <div className="contestcrossbtndiv">
+              <button
+                type="button"
+                className="crossbtn_popupclose"
+                onClick={ClosedCarts}
+              >
+                <img
+                  src={`${process.env.PUBLIC_URL}/image/cross_icon.png`}
+                  // src="images/cross_icon.png"
+                  alt="Close"
+                />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+     
     </>
   );
 }

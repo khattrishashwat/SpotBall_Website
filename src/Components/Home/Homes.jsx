@@ -1167,15 +1167,7 @@ const handleAskToPlay = () => {
                   Closed!
                 </h2>
               </div>
-              {/* <div className="contesttickeprice">
-                <p>
-                  Ticket:{" "}
-                  <span>
-                    <i className="fa fa-inr" aria-hidden="true" />{" "}
-                    {selectedContest?.ticket_price}
-                  </span>
-                </p>
-              </div> */}
+              
               <div className="quantity_contest text-center mt-3">
                 <h3 className="text-white">
                   The current gameplay has been closed.
@@ -1184,36 +1176,11 @@ const handleAskToPlay = () => {
                   But don't worry, a new competition launches this Monday at
                   12:00 HRS!
                 </h4>
-                {/* <div className="quantity">
-                  <button
-                    className="minus"
-                    onClick={handleDecrease}
-                    aria-label="Decrease"
-                  >
-                    −
-                  </button>
-                  <input
-                    type="number"
-                    className="quantity_input-box"
-                    value={quantity}
-                    readOnly
-                  />
-                  <button
-                    className="plus"
-                    onClick={handleIncrease}
-                    aria-label="Increase"
-                  >
-                    +
-                  </button>
-                </div> */}
+                
               </div>
               <div className="contest_quantity_para_div">
                 <div className="addcart_contst_textinfo">
-                  {/* <img
-                    src={`${process.env.PUBLIC_URL}/images/ball_icon.png`}
-                    src="images/ball_icon.png"
-                    alt="Icon"
-                  /> */}
+                
                   <i
                     className="fa fa-calendar"
                     style={{
@@ -1226,7 +1193,6 @@ const handleAskToPlay = () => {
                       lineHeight: "30px",
                       textAlign: "center",
                       borderRadius: "50%",
-                      // marginRight: spacing + "em",
                     }}
                   ></i>{" "}
                   <h2 className="text-white ">
@@ -1234,12 +1200,7 @@ const handleAskToPlay = () => {
                   </h2>
                 </div>
                 <div className="addcart_contst_textinfo">
-                  {/* <img
-                    src={`${process.env.PUBLIC_URL}/images/ball_icon.png`}
-                    src="images/ball_icon.png"
-                    alt="Icon"
-                  /> */}
-
+                  
                   <i
                     className="fa fa-television"
                     style={{
@@ -1252,7 +1213,6 @@ const handleAskToPlay = () => {
                       lineHeight: "30px",
                       textAlign: "center",
                       borderRadius: "50%",
-                      // marginRight: spacing + "em",
                     }}
                   ></i>
                   <h2 className="text-white">
@@ -1297,19 +1257,7 @@ const handleAskToPlay = () => {
                 </button>
               </div>
             </div>
-            {/* <div className="contestcrossbtndiv">
-              <button
-                type="button"
-                className="crossbtn_popupclose"
-                onClick={ClosedCarts}
-              >
-                <img
-                  src={`${process.env.PUBLIC_URL}/images/cross_icon.png`}
-                  alt="Close"
-                />
-              </button>
-            </div> */}
-          </div>
+                      </div>
         </div>
       </div>
       <div

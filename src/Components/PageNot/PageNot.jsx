@@ -22,10 +22,7 @@ function PageNot() {
         <div className="comming-soon-inner">
           {/* Logo Start */}
           <div className="logo">
-            <img
-              src={`${process.env.PUBLIC_URL}/assest1/images/logo.png`}
-              alt="logo"
-            />
+            <img src={`${process.env.PUBLIC_URL}/images/logo.png`} alt="logo" />
           </div>
           {/* Logo End */}
           <div className="not-found-text">

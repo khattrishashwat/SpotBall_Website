@@ -885,7 +885,7 @@ function Checkout() {
                               onClick={() => handleCrossClick(cart)}
                             >
                               <img
-                                src={`${process.env.PUBLIC_URL}/images/cross_cart.png`}
+                                src={`${process.env.PUBLIC_URL}/image/cross_cart.png`}
                                 alt="Close"
                               />
                             </button>
@@ -895,7 +895,7 @@ function Checkout() {
                             <div className="detailes">
                               <div className="arrowicondiv">
                                 <img
-                                  src={`${process.env.PUBLIC_URL}/images/arrow_icon_payment.png`}
+                                  src={`${process.env.PUBLIC_URL}/image/arrow_icon_payment.png`}
                                   className={`showclick_icon ${
                                     isImageRotated ? "rotate" : ""
                                   }`}

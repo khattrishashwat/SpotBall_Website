@@ -167,7 +167,7 @@ function Circle() {
                                       <img
                                         src={
                                           item?.userId?.profile_url ||
-                                          `${process.env.PUBLIC_URL}/images/winner_img.png`
+                                          `${process.env.PUBLIC_URL}/image/winner_img.png`
                                         }
                                         alt={`${item?.userId?.first_name} ${item.userId?.last_name}`}
                                         data-aos="flip-left"

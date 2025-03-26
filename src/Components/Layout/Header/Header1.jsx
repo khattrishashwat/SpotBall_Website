@@ -512,55 +512,7 @@ function Header() {
                     {token ? (
                       <div className="navbar-collapse newnavbarleft">
                         <ul className="navbar navbar_afterlogin">
-                          {/* <li className="nav-item afterlogin_icons_nav lang_icons">
-                            <a
-                              className="itmelink_menus "
-                              onClick={toggleMenulang}
-                            >
-                              <img
-                                src={`${process.env.PUBLIC_URL}/images/language_icon.png`}
-                                alt="language-icon"
-                              />
-                            </a>
-                            <div
-                              id="menu-list"
-                              className="menulist_divmanin"
-                              style={{
-                                display: islang ? "block" : "none",
-                              }}
-                            >
-                              <ul className="menubar_list_ul">
-                                {["Hindi", "Tamil", "Telugu"].map(
-                                  (language, index) => (
-                                    <li key={index} className="mainmenulist">
-                                      <a>
-                                        <div className="menubar_divmain">
-                                          <div className="menuname_withicon">
-                                            <div className="menuiconimgdiv">
-                                              <img
-                                                src={`${process.env.PUBLIC_URL}/images/icon_who_we_are.png`}
-                                                alt={`${language}-icon`}
-                                              />
-                                            </div>
-                                            <div className="menuname">
-                                              <h4>{language}</h4>
-                                            </div>
-                                          </div>
-                                          <div className="arrowicondiv">
-                                            <img
-                                              src={`${process.env.PUBLIC_URL}/images/menu_arrow_icon.png`}
-                                              className="arrowicon_menu"
-                                              alt="arrow-icon"
-                                            />
-                                          </div>
-                                        </div>
-                                      </a>
-                                    </li>
-                                  )
-                                )}
-                              </ul>
-                            </div>
-                          </li> */}
+                        
 
                           <li className="nav-item afterlogin_icons_nav notificationclick">
                             <a className="itmelink_menus">

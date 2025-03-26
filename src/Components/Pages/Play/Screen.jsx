@@ -654,7 +654,7 @@ function Screen() {
                   >
                     <div className="the_icon">
                       <img
-                        src={`${process.env.PUBLIC_URL}/images/user_guide_icon.png`}
+                        src={`${process.env.PUBLIC_URL}/image/user_guide_icon.png`}
                       />
                     </div>
 
@@ -663,7 +663,7 @@ function Screen() {
                   <div className="threeicons_action" onClick={handleTicket}>
                     <div className="the_icon">
                       <img
-                        src={`${process.env.PUBLIC_URL}/images/ticket_icon.png`}
+                        src={`${process.env.PUBLIC_URL}/image/ticket_icon.png`}
                         alt="Add Ticket"
                       />
                     </div>
@@ -672,7 +672,7 @@ function Screen() {
                   <div className="threeicons_action" onClick={handleRefreshAll}>
                     <div className="the_icon">
                       <img
-                        src={`${process.env.PUBLIC_URL}/images/refresh_icon.png`}
+                        src={`${process.env.PUBLIC_URL}/image/refresh_icon.png`}
                         alt="Refresh"
                       />
                     </div>
@@ -711,7 +711,7 @@ function Screen() {
                               ticket.xCord > 0 &&
                               ticket.yCord > 0 ? (
                                 <img
-                                  src={`${process.env.PUBLIC_URL}/images/cord_check.png`}
+                                  src={`${process.env.PUBLIC_URL}/image/cord_check.png`}
                                   alt="Checked"
                                 />
                               ) : null}
@@ -731,7 +731,7 @@ function Screen() {
                               onClick={() => handleReply(ticket.id)}
                             >
                               <img
-                                src={`${process.env.PUBLIC_URL}/images/refresh_cord.png`}
+                                src={`${process.env.PUBLIC_URL}/image/refresh_cord.png`}
                               />
                             </div>
                             <p className="actionheading">Replay</p>
@@ -742,7 +742,7 @@ function Screen() {
                               onClick={handleAddTicket}
                             >
                               <img
-                                src={`${process.env.PUBLIC_URL}/images/add_cord.png`}
+                                src={`${process.env.PUBLIC_URL}/image/add_cord.png`}
                                 alt="Add"
                               />
                             </div>
@@ -754,7 +754,7 @@ function Screen() {
                               onClick={() => handleDeleteTicket(ticket.id)}
                             >
                               <img
-                                src={`${process.env.PUBLIC_URL}/images/delete_cord.png`}
+                                src={`${process.env.PUBLIC_URL}/image/delete_cord.png`}
                               />
                             </div>
                             <p className="actionheading">Delete</p>
@@ -798,7 +798,7 @@ function Screen() {
                     onClick={close}
                   >
                     <img
-                      src={`${process.env.PUBLIC_URL}/images/cross_icon.png`}
+                      src={`${process.env.PUBLIC_URL}/image/cross_icon.png`}
                       // src="images/cross_icon.png"
                       alt="Close"
                     />

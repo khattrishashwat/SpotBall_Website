@@ -4,6 +4,14 @@ import axios from "axios";
 import moment from "moment";
 import Swal from "sweetalert2";
 
+const locales = ["en-GB", "hi-IN", "ta-IN", "te-IN"];
+
+// function getFlagSrc(countryCode) {
+//   return /^[A-Z]{2}$/.test(countryCode)
+//     ? `https://flagsapi.com/${countryCode.toUpperCase()}/shiny/64.png`
+//     : "";
+// }
+
 function Header() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -12,6 +20,28 @@ function Header() {
   const [profile, setProfile] = useState({});
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const [isNot, setIsNot] = useState(false);
+  const [selectedLocale, setSelectedLocale] = useState(locales[0]);
+  const [islangOpen, setIslangOpen] = useState(false);
+
+  useEffect(() => {
+    const browserLang = new Intl.Locale(navigator.language).language;
+    const matchedLocale = locales.find(
+      (locale) => new Intl.Locale(locale).language === browserLang
+    );
+    if (matchedLocale) {
+      setSelectedLocale(matchedLocale);
+    }
+  }, []);
+
+  const handleSelectLocale = (locale) => {
+    setSelectedLocale(locale);
+    setIslangOpen(false);
+  };
+
+  const intlLocale = new Intl.Locale(selectedLocale);
+  const langName = new Intl.DisplayNames(["en"], { type: "language" }).of(
+    intlLocale.language
+  );
 
   const toggleMenu = () => {
     setIsMenuVisible((prevState) => !prevState); // Toggle the state
@@ -48,6 +78,8 @@ function Header() {
       setIsNot(false); // Hide the notifications
     }
   };
+
+  // const isHomePage = location.pathname === "/";
 
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
@@ -212,7 +244,11 @@ function Header() {
 
   return (
     <>
-      <header className="header header-sticky default header-style-02 innerheader_new">
+      <header
+        className={`header header-sticky default header-style-02 ${
+          !isHomePage ? "innerheader_new" : ""
+        }`}
+      >
         <div className="">
           <div className="topfirstbar">
             <div className="ends_compititionssiv_top">
@@ -222,10 +258,9 @@ function Header() {
                   <img src="images/instant-win.svg" />
                 </div>
                 <div className="endscompititions">
-                  Competition End :{" "}
-                  <span id="countdown1">
-                    3 days: 11 hours: 46 minutes: 7 seconds
-                  </span>
+                  {timeLeft.isCompetitionStart
+                    ? `Competition Start : ${timeLeft.days} days: ${timeLeft.hours} hours: ${timeLeft.minutes} minutes: ${timeLeft.seconds} seconds`
+                    : `Competition End : ${timeLeft.days} days: ${timeLeft.hours} hours: ${timeLeft.minutes} minutes: ${timeLeft.seconds} seconds`}
                 </div>
               </a>
             </div>
@@ -285,11 +320,36 @@ function Header() {
             </div>
           </div>
         </nav> */}
-        <nav className="navbar navbar-static-top navbar-expand-xl">
+        <nav className="navbar navbar-static-top navbar-expand-xl header3">
           <div className="container main-header position-relative">
-            <div className="dropdown" tab-index={0}>
-              <button id="dropdown-btn" />
-              <ul className="dropdown-content" id="dropdown-content" />
+            <div className="dropdown" tabIndex={0}>
+              <button
+                id="dropdown-btn"
+                onClick={() => setIslangOpen(!islangOpen)}
+              >
+                {langName} <span className="arrow-down"></span>
+              </button>
+              {islangOpen && (
+                <ul className="dropdown-content" id="dropdown-content">
+                  {locales
+                    .filter((locale) => locale !== selectedLocale)
+                    .map((otherLocale) => {
+                      const otherIntlLocale = new Intl.Locale(otherLocale);
+                      const otherLangName = new Intl.DisplayNames(["en"], {
+                        type: "language",
+                      }).of(otherIntlLocale.language);
+
+                      return (
+                        <li
+                          key={otherLocale}
+                          onMouseDown={() => handleSelectLocale(otherLocale)}
+                        >
+                          {otherLangName}
+                        </li>
+                      );
+                    })}
+                </ul>
+              )}
             </div>
             <Link to="/" className="navbar-brand d-flex d-xl-none">
               <img
@@ -303,6 +363,7 @@ function Header() {
                 alt="logo"
               />
             </Link>
+
             <div className="navbar-collapse collapse">
               <ul className="nav navbar-nav">
                 <li className="nav-item navbar-brand-item">
@@ -322,108 +383,113 @@ function Header() {
               </ul>
             </div>
             <div className="side-menu-flex">
-              <div className="navbar-collapse newnavbarleft">
-                <ul className="navbar navbar_afterlogin">
-                  <li className="nav-item afterlogin_icons_nav notificationclick">
-                    <a className="itmelink_menus">
-                      <img
-                        src={`${process.env.PUBLIC_URL}/image/bell_icon.png`}
-                        alt="bell"
+              {token && (
+                <div className="navbar-collapse newnavbarleft">
+                  <ul className="navbar navbar_afterlogin">
+                    {/* Notification Icon */}
+                    <li className="nav-item afterlogin_icons_nav notificationclick">
+                      <a
+                        className="itmelink_menus"
                         onClick={handleNotificationClick}
-                      />
-                      {unreadCount > 0 && (
-                        <span className="cartcount">{unreadCount}</span>
-                      )}
-                    </a>
-                    <div
-                      className={`notificationdiv_popup ${isNot ? "show" : ""}`}
-                      id="notificationPopup"
-                      style={{ display: isNot ? "block" : "none" }}
-                    >
-                      <div className="topnoticationdiv_main" id="popupContent">
-                        <div className="notificationheading">
-                          <h2>Notifications</h2>
-                        </div>
-                        <div className="notifi_innerdiv">
-                          {notification.length > 0 ? (
-                            notification.map((item) => (
-                              <div className="notifystrip" key={item._id}>
-                                <a className="notifylinkdiv">
-                                  <div className="notify-icondiv">
-                                    <img
-                                      className="notification_img"
-                                      src={`${process.env.PUBLIC_URL}/image/favicon.png`}
-                                      alt="notification"
-                                    />
-                                  </div>
-                                  <div className="notificationtext_heading">
-                                    <h2>{item.title}</h2>
-                                    <p>{item.body}</p>
-                                    <div className="notif_timedate">
-                                      <p>
-                                        {moment(item.createdAt).format(
-                                          "ddd, D MMM, h:mm a"
-                                        )}
-                                      </p>
-                                    </div>
-                                  </div>
-                                </a>
-                              </div>
-                            ))
-                          ) : (
-                            <p>No notifications available.</p>
-                          )}
-                        </div>
-                        <div className="crossicondiv">
-                          <button
-                            type="button"
-                            className="crossbtn_notification"
-                            id="closeNotificationPopup"
-                            onClick={() => setIsNot(false)}
-                          >
-                            <img
-                              src={`${process.env.PUBLIC_URL}/image/cross_icon.png`}
-                              alt="close"
-                            />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                  <li className="nav-item afterlogin_icons_nav">
-                    <Link to="/cart" className="itmelink_menus">
-                      <img
-                        src={`${process.env.PUBLIC_URL}/image/cart_icon.png`}
-                      />
-                    </Link>
-                  </li>
-                  <li className="nav-item afterlogin_icons_nav userprofilediv_new">
-                    <Link
-                      to="/my_account"
-                      className="itmelink_menus usermenulink"
-                    >
-                      <div className="userimgdiv">
-                        <img
-                          src={
-                            profile?.profile_url ||
-                            `${process.env.PUBLIC_URL}/image/user_image.png`
-                          }
-                          alt="user"
-                        />
-                      </div>
+                      >
+                        <img src="/images/bell_icon.png" alt="Notifications" />
+                        {unreadCount > 0 && (
+                          <span className="cartcount">{unreadCount}</span>
+                        )}
+                      </a>
 
-                      {profile?.is_verified_user && (
-                        <div className="userverifyimg">
+                      {/* Notification Popup */}
+                      {isNot && (
+                        <div
+                          className="notificationdiv_popup show"
+                          id="notificationPopup"
+                        >
+                          <div
+                            className="topnoticationdiv_main"
+                            id="popupContent"
+                          >
+                            <div className="notificationheading">
+                              <h2>Notifications</h2>
+                            </div>
+                            <div className="notifi_innerdiv">
+                              {notification.length > 0 ? (
+                                notification.map((item) => (
+                                  <div className="notifystrip" key={item._id}>
+                                    <Link
+                                      to={`/notification/${item._id}`}
+                                      className="notifylinkdiv"
+                                    >
+                                      <div className="notify-icondiv">
+                                        <img
+                                          className="notification_img"
+                                          src="/image/favicon.png"
+                                          alt="notification"
+                                        />
+                                      </div>
+                                      <div className="notificationtext_heading">
+                                        <h2>{item.title}</h2>
+                                        <p>{item.body}</p>
+                                        <div className="notif_timedate">
+                                          <p>
+                                            {moment(item.createdAt).format(
+                                              "ddd, D MMM, h:mm a"
+                                            )}
+                                          </p>
+                                        </div>
+                                      </div>
+                                    </Link>
+                                  </div>
+                                ))
+                              ) : (
+                                <p>No notifications available.</p>
+                              )}
+                            </div>
+
+                            {/* Close Button */}
+                            <button
+                              type="button"
+                              className="crossbtn_notification"
+                              onClick={() => setIsNot(false)}
+                            >
+                              <img src="/image/cross_icon.png" alt="Close" />
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </li>
+
+                    {/* Cart Icon */}
+                    <li className="nav-item afterlogin_icons_nav">
+                      <Link to="/cart" className="itmelink_menus">
+                        <img src="/image/cart_icon.png" alt="Cart" />
+                      </Link>
+                    </li>
+
+                    {/* User Profile */}
+                    <li className="nav-item afterlogin_icons_nav userprofilediv_new">
+                      <Link
+                        to="/my_account"
+                        className="itmelink_menus usermenulink"
+                      >
+                        <div className="userimgdiv">
                           <img
-                            src={`${process.env.PUBLIC_URL}/image/verify.png`}
-                            alt="verify"
+                            src={
+                              profile?.profile_url || "/image/user_image.png"
+                            }
+                            alt="User"
                           />
                         </div>
-                      )}
-                    </Link>
-                  </li>
-                </ul>
-              </div>
+                        {profile?.is_verified_user && (
+                          <div className="userverifyimg">
+                            <img src="/image/verify.png" alt="Verified User" />
+                          </div>
+                        )}
+                      </Link>
+                    </li>
+                  </ul>
+                </div>
+              )}
+
               <div className="add-listing">
                 <div className="side-menu">
                   <a

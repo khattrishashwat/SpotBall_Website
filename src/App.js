@@ -221,6 +221,7 @@ import Loader from "./Components/Loader/Loader";
 
 // Lazy loaded components
 const Home = lazy(() => import("./Components/Home/Home"));
+const Homes = lazy(() => import("./Components/Home/Homes"));
 const Contact = lazy(() => import("./Components/Pages/Contact Us/Contact"));
 const Press = lazy(() => import("./Components/Pages/In The Press/Press"));
 const PressDetails = lazy(() =>
@@ -300,6 +301,7 @@ const RoutesWithInterceptors = () => {
 
         {/* Public Routes */}
         <Route path="/" element={<WithLayout component={Home} />} />
+        <Route path="/home" element={<WithLayout component={Homes} />} />
         <Route
           path="/contact_us"
           element={<WithLayout component={Contact} />}

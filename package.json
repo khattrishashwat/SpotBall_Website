@@ -18,6 +18,8 @@
     "gsap": "^3.12.7",
     "i18next-browser-languagedetector": "^8.0.2",
     "i18next-http-backend": "^3.0.2",
+    "jquery": "^3.7.1",
+    "magnific-popup": "^1.2.0",
     "moment": "^2.30.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
