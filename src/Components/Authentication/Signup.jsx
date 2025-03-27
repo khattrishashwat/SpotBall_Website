@@ -428,7 +428,7 @@ function Signup() {
                       </p>
                     </div>
 
-                    <div className="signupwithsocial_div">
+                    {/* <div className="signupwithsocial_div">
                       <p>or Sign Up using</p>
                       <div className="signupsociallinks">
                         <ul>
@@ -450,7 +450,7 @@ function Signup() {
                           </li>
                         </ul>
                       </div>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </div>

@@ -509,6 +509,8 @@ function Banner({ data }) {
                         )}
 
                         <div className="d-flex align-items-center gap-2">
+                          {!token &&(
+
                           <Link
                             to="/login"
                             className="btn btn-white mt-3 mt-md-4"
@@ -518,6 +520,8 @@ function Banner({ data }) {
                           >
                             Sign In
                           </Link>
+                          )}
+
                           <a
                             href="https://youtu.be/n_Cn8eFo7u8"
                             className="btn btn-white color-green mt-3 mt-md-4 popup-youtube video-btn"
@@ -528,13 +532,12 @@ function Banner({ data }) {
                             How To Play
                           </a>
                         </div>
-                        {!token && (
-                          <div className="btn_tdy p-3 px-3">
-                            <span>
-                              <a> Sign Up </a> Today, Play and Win the game
-                            </span>
-                          </div>
-                        )}
+                        <div className="btn_tdy p-3 px-3">
+                          <span>
+                            {!token && <a> Sign Up </a>}
+                            Today, Play and Win the game
+                          </span>
+                        </div>
                       </div>
                       <div className="col-12 col-lg-5 d-none d-lg-flex justify-content-center">
                         <div className="banner-img">

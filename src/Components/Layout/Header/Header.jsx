@@ -627,6 +627,18 @@ function Header() {
                     Legal
                   </Link>
                 </li>
+                <li className="dropdown nav-item ">
+                  <Link
+                    to="/tht"
+                    onClick={() => setIsMenuVisible(false)}
+                    className="nav-link"
+                  >
+                    <img
+                      src={`${process.env.PUBLIC_URL}/images/icon_legal.png`}
+                    />
+                    THT
+                  </Link>
+                </li>
               </ul>
             </div>
           </div>
