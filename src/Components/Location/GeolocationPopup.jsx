@@ -312,7 +312,7 @@ const GeolocationPopup = ({ Area, onClose }) => {
           <div className="locationwantsdiv">
             <div className="locationicondiv">
               <img
-                src={`${process.env.PUBLIC_URL}/images/location_icon.png`}
+                src={`${process.env.PUBLIC_URL}/image/location_icon.png`}
                 // src="images/location_icon.png"
                 alt="Location Icon"
               />

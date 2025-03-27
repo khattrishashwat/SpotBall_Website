@@ -77,6 +77,8 @@
 ======================================
 [ End table content ]
 ======================================*/
+
+
 * {
   outline: none;
   font-family: "Nunito", sans-serif;
@@ -101,7 +103,7 @@
 }
 
 .text-white {
-  color: #ffffff;
+  color: #12111a !important;
 }
 
 .text-dark {
@@ -731,7 +733,7 @@ body {
   line-height: 1.5;
   color: #8d8c8c;
   overflow-x: hidden;
-  font-weight: 300;
+  font-weight: 500;
   /* background: #12111a;  */
 }
 
@@ -769,7 +771,7 @@ h5,
 h6 {
   font-family: "Nunito", sans-serif;
   font-weight: normal;
-  /* color: #ffffff; */
+  color: #ffffff;
   margin-top: 0px;
   font-weight: 400;
   margin-bottom: 0;
@@ -822,12 +824,12 @@ h6 {
 
 p {
   line-height: 1.5;
-  /* color: #ffffff; */
+  color: #ffffff;
 }
 
 *::-moz-selection {
   background: var(--pgs_primary_color);
-  /* color: #ffffff; */
+  color: #ffffff;
   text-shadow: none;
 }
 
@@ -11061,7 +11063,7 @@ header .footer-wave {
   border: 0;
   box-shadow: 120px 0px 150px rgba(80, 80, 80, 0.15),
     10px 0px 10px rgba(80, 80, 80, 0.02);
-  border-radius: 1000px;
+  border-radius: 50%;
   background: rgba(255, 255, 255, 0);
   background: -moz-linear-gradient(left,
       rgba(255, 255, 255, 0) 0%,
@@ -11571,7 +11573,7 @@ a.btn.btn-primary.text-uppercase.rounded-2 {
   height: 30px;
   line-height: 30px;
   background: none;
-  color: #fff;
+  color: #080808;
 }
 
 .quantity button {
@@ -11628,7 +11630,7 @@ a.btn.btn-primary.text-uppercase.rounded-2 {
 
 .choosefor_input {
   margin: 2px;
-  background-color: #a6c7b5;
+  background: #0b1874d6;
   border-radius: 4px;
   overflow: hidden;
   float: left;
@@ -11654,8 +11656,12 @@ a.btn.btn-primary.text-uppercase.rounded-2 {
 }
 
 .choosefor_input label input~.spanforcheck {
-  color: #252525;
+  color: #ffffff;
   cursor: pointer;
+}
+
+div#back-to-top a {
+  color: white;
 }
 
 .choosefor_input label .spanforcheck {
@@ -11939,6 +11945,7 @@ span.line-img.calendar {
   align-items: center;
   gap: 10px;
   /* margin-bottom: 15px; */
+  width: auto;
 }
 
 .contestrightdaysdate.contest_newtiming_strip {
@@ -12578,9 +12585,9 @@ span.mark-text {
 /* Style for the dropdown content items */
 .dropdown-content li {
   color: black;
-  padding: 0px 6px;
+  padding: 12px 16px;
   text-decoration: none;
-  justify-content: center;
+  justify-content: left;
   gap: 8px;
 }
 
@@ -12950,19 +12957,370 @@ section.banner.banner-01 {
 
 
 
+.adminloginsection {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: url(../images/home-4-banner-bg.jpg);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  position: relative;
+  padding: 50px 0;
+}
+
+.contfld-loginform .col12mainloginform {
+  margin-top: 0%;
+  margin-bottom: 0px;
+  /* background: #0C1975; */
+  border-radius: 10px;
+  /* box-shadow: 0px 5px 10px 0px rgb(0 0 0 / 50%); */
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  position: relative;
+}
+
+section.adminloginsection:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: #0b1874c2;
+  /* background:#000000d4; */
+  width: 100%;
+  height: 100%;
+}
+
+.rowmaqinloginform .col12loginseconddiv {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.contfld-loginform .col12mainloginform.colforsignupscreen_new {
+  margin-top: 7%;
+}
+
+.col6sliderdiv .login_left_img {
+  padding: 10px;
+  padding-right: 0px;
+  text-align: center;
+}
+
+.signupleftsideimgdiv {
+  padding: 50px 10px !important;
+}
+
+.col6sliderdiv .login_left_img img {
+  width: 72%;
+  opacity: 1;
+}
+
+.col6sliderdiv .login_left_img.banner.signup img {
+  width: 80%;
+  opacity: 1;
+}
+
+img.img-fluid.hori-move.login {
+  position: absolute;
+  width: 300px;
+  left: 190px;
+
+}
+
+.col12loginseconddiv .col6formsidediv {
+  /* Background:white; */
+  /* border: 1px solid white; */
+  /* border-radius:10px; */
+  background: none;
+  box-shadow: none;
+}
+
+.col6formsidediv .colformlogin {
+  padding: 10px 40px;
+  border: 2px solid #d4d4d4;
+  border-radius: 10px;
+}
+
+.loginologo img {
+  width: 280px;
+  margin-bottom: 17px;
+}
+
+.loginologo {
+  text-align: center;
+}
+
+.col6formsidediv .colformlogin img {
+  width: 250px;
+  display: block;
+  position: relative;
+  margin: 25px auto 0 auto;
+}
+
+.col6formsidediv .colformlogin h2 {
+  /* text-align: center; */
+  font-size: 26px;
+  font-weight: 800;
+  margin-bottom: 8px;
+  margin-top: 15px;
+  color: #fff;
+}
+
+.login-heading {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.signupheadingdivnew h2 {
+  margin-top: 20px !important;
+}
+
+.col6formsidediv .colformlogin .formstart {
+  width: 100%;
+  margin: 0 auto;
+  display: block;
+}
+
+.colformlogin .formstart .frmctrldiv {
+  position: relative;
+  border: none;
+  box-shadow: none;
+  margin-bottom: 22px;
+  padding: 0;
+  height: auto;
+  background: none;
+}
+
+.colformlogin .formstart .frmctrldiv.formrgnbtm0 {
+  margin-bottom: 0;
+}
+
+.colformlogin .formstart .frmctrldiv label {
+  position: unset !important;
+  top: 0;
+  left: 20px;
+  padding: 7px 0;
+  font-size: 15px;
+  pointer-events: none;
+  transition: .5s;
+  font-weight: 500;
+  margin-bottom: 0;
+  color: white;
+}
+
+.colformlogin .formstart .frmctrldiv input {
+  width: 100%;
+  height: 40px;
+  outline: none;
+  padding: 0 36px 0 20px;
+  color: #000;
+  font-size: 15px;
+  border-radius: 6px;
+  border: 1px solid #888;
+  position: relative;
+  background: #eaeaea;
+}
+
+.signupsociallinks ul li img {
+  width: 34px !important;
+}
+
+.remeberrecoverydiv .rememebrmediv .labelrememebrme a {
+  color: #ffffff !important;
+}
+
+
+.colformlogin .formstart .frmctrldiv i {
+  position: absolute;
+  right: 15px;
+  top: 12px;
+  font-size: 16px;
+  color: #009f52;
+  cursor: pointer;
+}
+
+.formstart .frmctrldiv input:focus {
+  border: 1px solid #009E49;
+}
+
+.formstart .frmctrldiv input:focus~i {
+  color: #009E49
+}
+
+.field_required {
+  color: #ce2424;
+  position: relative;
+  top: 5px;
+  visibility: hidden;
+  font-size: 14px;
+  display: none;
+}
+
+/* .frmctrldiv input.error{border: 1px solid #a71010;}
+.formstart .frmctrldiv input.error ~ i {color: #a71010}
+.formstart .frmctrldiv input.error:focus ~ label, .formstart .frmctrldiv input.error:valid ~ label {top: -10px;color: #a71010;font-size: 15px;background: #fff;padding: 0 10px;} */
+/* .formstart .frmctrldiv input:focus ~ label, .formstart .frmctrldiv input:valid ~ label { */
+/* top: -25px; */
+/* left:0; */
+/* color: #fff; */
+/* font-size: 15px; */
+/* background: none; */
+/* padding: 0 10px; */
+/* font-weight: 600; */
+/* } */
+
+.remeberrecoverydiv {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 15px;
+  margin-top: 12px;
+}
+
+.remeberrecoverydiv .rememebrmediv {
+  width: 100%;
+  font-size: 14px;
+  color: #fff;
+  font-weight: 500;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.remeberrecoverydiv .rememebrmediv .labelrememebrme {
+  font-weight: 500;
+}
+
+.remeberrecoverydiv .rememebrmediv .checkboxemeber {
+  margin-top: 0px;
+}
+
+.remeberrecoverydiv .rememebrmediv .labelrememebrme a {
+  text-decoration: underline !important;
+  text-underline-position: under;
+}
+
+.forgotpassword {
+  text-align: right;
+  width: 100%;
+  margin-top: 0px;
+}
+
+.forgotpassword .frgtbtn {
+  border: none;
+  background: none;
+  font-size: 14px;
+  color: #fff;
+  outline: none;
+  font-weight: 600;
+}
+
+.loginformctrl {
+  position: relative;
+  border: none;
+  box-shadow: none;
+  margin-bottom: 25px;
+  padding: 0;
+  height: 40px;
+  margin-top: 25px;
+  background: none;
+}
+
+.loginformctrl .loginbtn {
+  width: 100%;
+  height: 40px;
+  background: #009E49;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.registerdiv {
+  text-align: center;
+  margin-top: 30px;
+  margin-bottom: 15px;
+}
+
+.registerdiv p {
+  font-size: 16px;
+}
+
+.registerdiv p a {
+  color: #fff;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.signupwithsocial_div p {
+  text-align: center;
+  color: #fff;
+}
 
 
 
+.formstart.otp {
+  display: flex !important;
+  !i;
+  !;
+  /* grid-template-columns: repeat(4, 1fr); */
+  gap: 20px;
+  justify-content: center;
+}
 
+.formstart.otp .form-control.frmctrldiv {
+  width: 40px;
+  height: 40px;
+  /* padding: 2px; */
+}
 
+.formstart.otp .form-control.frmctrldiv input {
+  padding: 5px;
+  display: FLEX;
+  justify-content: center;
 
+}
 
+.login-heading a {
+  font-weight: 800;
+  color: white;
+}
 
+.formstart.signup {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
 
+.login_left_img.banner .pattern-03 {
+  position: absolute;
+  left: 49%;
+  top: 66%;
+  opacity: 0.8;
+  z-index: 9;
+  width: 9%;
+  transform: translate(-50%, -50%);
+}
 
+.login_left_img.banner .pattern-04 {
+  position: absolute;
+  left: 49%;
+  top: 61%;
+  opacity: 1;
+  z-index: 9;
+  width: 9%;
+  transform: translate(-50%, -50%);
+}
 
-
-
+.pattern-03.login img {
+  width: 100%;
+}
 
 
 
@@ -13134,6 +13492,44 @@ section.banner.banner-01 {
 
 
 @media (max-width: 991px) {
+
+  .col-md-7.col6sliderdiv {
+    display: none;
+  }
+
+  .col-lg-7.col6sliderdiv {
+    display: none;
+  }
+
+  .col-md-6.col6sliderdiv {
+    display: none;
+  }
+
+  .adminloginsection {
+    height: 100svh;
+  }
+
+  .rowmaqinloginform .col12loginseconddiv {
+    display: block;
+  }
+
+  .col6formsidediv .colformlogin {
+    padding: 10px 30px;
+  }
+
+  .col6formsidediv .colformlogin .formstart {
+    width: 100% !important;
+  }
+
+  .contfld-loginform .col12mainloginform {
+    width: 70%;
+    margin: 0 auto;
+  }
+
+  .col12loginseconddiv .col6formsidediv {
+    width: 100%;
+  }
+
   .banner .swiper-slide1 {
     height: 450px;
     padding-bottom: 80px;
@@ -13201,6 +13597,125 @@ section.banner.banner-01 {
 
 
 @media (max-width: 767px) {
+
+
+  .tickets-section .ticket-container {
+    flex-direction: column;
+  }
+
+  .tickets-section .ticket-container {
+    padding-right: 10px;
+    padding-left: 10px;
+  }
+
+  .tickets-section .ticket-container {
+    height: 100%;
+    min-height: 100%;
+    max-height: 100%;
+    align-items: stretch;
+    gap: 0;
+    background: none;
+    padding: 0;
+    justify-content: center;
+  }
+
+  .tickets-section .ticket-container .barcode-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: #FFFFFF;
+  }
+
+  .tickets-section .ticket-container .ticket-line {
+    display: flex;
+    flex-shrink: 0;
+    margin-left: -1px;
+    margin-top: -2px;
+  }
+
+  .tickets-section .ticket-container .barcode-box {
+    padding: 16px 0 0;
+    border-radius: 16px 16px 0 0;
+  }
+
+  .tickets-section .ticket-container .contest_maindiv_popup_inner {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .addcart_contst_textinfo img {
+    margin: 0;
+  }
+
+  .tickets-section .ticket-container .contest_maindiv_popup_inner {
+    flex-shrink: 0;
+    background: #FFFFFF;
+    justify-content: center;
+  }
+
+  .tickets-section .ticket-container .contest_maindiv_popup_inner {
+    padding: 0 16px 16px;
+    margin-top: -2px;
+    border-radius: 0 0 16px 16px;
+  }
+
+  .ticket-container .contest_maindiv_popup_inner {
+    width: 100%;
+  }
+
+  .barcode-box img {
+    width: 40%;
+  }
+
+  .ticket-line img {
+    width: 99%;
+  }
+
+  .contest_quantity_para_div {
+    margin-bottom: 0px;
+  }
+
+  .listar-feature-item.listar-feature-has-link~.listar-feature-fix-bottom-padding.listar-fix-feature-arrow-button-height {
+    display: none;
+  }
+
+  .text-label h5.white.text-uppercase {
+    line-height: 26px;
+  }
+
+  .loginologo img {
+    width: 250px;
+    margin-bottom: 20px;
+  }
+
+  .rowmaqinloginform .col12loginseconddiv {
+    display: block;
+  }
+
+  .col6formsidediv .colformlogin .formstart {
+    width: 100% !important;
+  }
+
+  .col-md-7.col6sliderdiv {
+    display: none;
+  }
+
+  .col-lg-7.col6sliderdiv {
+    display: none;
+  }
+
+  .col-md-6.col6sliderdiv {
+    display: none;
+  }
+
+  .adminloginsection {
+    height: 100svh;
+  }
+
+  .col6formsidediv .colformlogin {
+    padding: 10px 16px;
+  }
 
   .newnavbarleft .navbar_afterlogin {
     gap: 12px;
@@ -13292,12 +13807,12 @@ section.banner.banner-01 {
 
   .banner .swiper-slide1 .pattern-03 {
     right: 2px;
-    top: 23px;
+    top: 108px;
   }
 
   .banner .pattern-04 {
     right: 15px;
-    top: 15px;
+    top: 102px;
   }
 
 
@@ -13380,8 +13895,26 @@ section.banner.banner-01 {
   }
 
   .team-block {
-    margin-top: 30px;
-    margin-bottom: 30px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+
+  .entriesdiv_inner.closediv_entries {
+    padding: 0px;
+  }
+
+  .entriesdiv_inner.closediv_entries h3 {
+    font-size: 24px;
+    text-align: center;
+  }
+
+  .entriesdiv_inner.closediv_entries p {
+    font-size: 20px;
+  }
+
+  .entriesdiv_inner.opendiv_entries h3 {
+    font-size: 24px;
+    text-align: center;
   }
 
   .Current-contest-1.main.img .side-curve {
@@ -13430,11 +13963,29 @@ section.banner.banner-01 {
   }
 
   .content h1 {
-    font-size: 28px;
+    font-size: 26px;
   }
 
+  .card::after {
+    background-color: #eef2f0;
+  }
+
+  .card::before {
+    background-color: #eef2f0;
+  }
+
+  .min-footer .row.align-items-center.justify-content-between.mb-4.mb-md-5 {
+    display: block;
+    margin-bottom: 0 !important;
+  }
+
+  .footer-bottom .row.align-items-center.copyright {
+    display: block;
+  }
+
+
   .content h2 {
-    font-size: 17px;
+    font-size: 16px;
   }
 
   h2.text-start.fadeInUp.animated {
@@ -13568,6 +14119,13 @@ section.banner.banner-01 {
   .row.g-3.gallery-wrap {
     display: block;
     gap: 0px;
+    width: 90%;
+    margin: 0 auto;
+  }
+
+  .section-title {
+    width: 90%;
+    margin: 0 auto;
   }
 
   .banner-gallery .col:first-child {
@@ -13602,6 +14160,8 @@ section.banner.banner-01 {
 
 
 }
+
+
 
 @media (max-width: 575px) {
   .banner .swiper-slide1 {
@@ -13677,7 +14237,7 @@ section.banner.banner-01 {
   }
 
   .upcoming-matches .upcoming-matches-wrapper .live-match-block .live-box .counter-box {
-    width: 220px;
+    width: 230px;
   }
 
   .header.header-style-02 .navbar .main-header img {
@@ -13694,8 +14254,6 @@ section.banner.banner-01 {
 
 
 }
-
-
 
 
 

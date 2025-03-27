@@ -1,15 +1,26 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import GeolocationPopup from "../Location/GeolocationPopup";
+import GameUnavailablePopup from "../Location/GameUnavailablePopup";
 
 function Banner({ data }) {
-  const { banner, livs, contests, discounts } = data || {};
+  const {
+    livs,
+    restrictedStates,
+    howItWorks,
+    banner,
+    contests,
+    discounts,
+    bannerGIFS,
+  } = data || {};
   const navigate = useNavigate();
-
+  const title = howItWorks?.title || "";
+  const words = title.split(" ");
   const [leftticket, setLeftticket] = useState("");
 
   const [quantity, setQuantity] = useState(3);
@@ -18,7 +29,10 @@ function Banner({ data }) {
   const [selectedContest, setSelectedContest] = useState("");
   const [onCarts, setOnCarts] = useState("");
   const [selectedDiscount, setSelectedDiscount] = useState("");
-
+  const [isGeolocationPopupVisible, setGeolocationPopupVisible] =
+    useState(false);
+  const [isUnavailablePopupVisible, setIsUnavailablePopupVisible] =
+    useState(false);
   const [countdownType, setCountdownType] = useState("ends"); // "starts" or "ends"
   const token = localStorage.getItem("Web-token");
 
@@ -139,48 +153,37 @@ function Banner({ data }) {
     const location = localStorage.getItem("location");
     const token = localStorage.getItem("Web-token");
 
-    // if (!token) {
-    //   Swal.fire({
-    //     icon: "info",
-    //     title: "Login Required",
-    //     text: "Please login to participate in this contest!",
-    //     confirmButtonText: "OK",
-    //     allowOutsideClick: false,
-    //   }).then((result) => {
-    //     if (result.isConfirmed) {
-    //       // setLoginPopup(true);
-    //     }
-    //   });
-    //   return;
-    // }
+    if (!token) {
+      Swal.fire({
+        icon: "info",
+        title: "Login Required",
+        text: "Please login to participate in this contest!",
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate("/login");
+        }
+      });
+      return;
+    }
 
-    // if (restrictedArea) {
-    //   setGeolocationPopupVisible(false);
-    //   setIsUnavailablePopupVisible(true);
-    //   return;
-    // }
+    if (restrictedArea) {
+      setGeolocationPopupVisible(false);
+      setIsUnavailablePopupVisible(true);
+      return;
+    }
 
-    handleBuyTicketClick(contests[0], discounts);
-    // if (location) {
-    //   handleBuyTicketClick(contests[0], discounts);
-    // } else {
-    //   //   console.log("Location not found in localStorage");
-    // }
+    // handleBuyTicketClick(contests[0], discounts);
+    if (location) {
+      handleBuyTicketClick(contests[0], discounts);
+    } else {
+      //   console.log("Location not found in localStorage");
+    }
   };
 
   const handleBuyTicketClick = (contest, discount) => {
     const token = localStorage.getItem("Web-token"); // Replace with your token retrieval method
-
-    // if (!token) {
-    //   Swal.fire({
-    //     icon: "info",
-    //     title: "Login Required",
-    //     text: "Please login to participate in this contest!",
-    //     confirmButtonText: "OK",
-    //     allowOutsideClick: false,
-    //   });
-    //   return;
-    // }
 
     if (contest.totalTickets === 75) {
       Swal.fire({
@@ -193,8 +196,14 @@ function Banner({ data }) {
       return;
     }
 
-    if (!contest.is_active) {
-      // setOnCarts(false);
+    console.log(
+      "is_active value:",
+      contest.is_active,
+      typeof contest.is_active
+    );
+
+    if (contest.is_active === false) {
+      console.log("Contest is NOT active");
       setOnCloseComptition(true);
       return;
     }
@@ -211,7 +220,7 @@ function Banner({ data }) {
     speed: 500,
     slidesToShow: 2,
     slidesToScroll: 1,
-    autoplay: true,
+    autoplay: false,
     CenterPadding: 10,
   };
   const handleIncrease = () => {
@@ -303,6 +312,110 @@ function Banner({ data }) {
     setQuantity(3);
   };
 
+  useEffect(() => {
+    const fetchLocation = async () => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          async (position) => {
+            const { latitude, longitude } = position.coords;
+            console.log("Latitude:", latitude, "Longitude:", longitude);
+
+            try {
+              const response = await axios.get(
+                `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=AIzaSyA8pM5yXTJ3LM8zBF-EkZHEyxlPXSttsl0`
+              );
+
+              const results = response.data.results;
+              if (!results || results.length === 0) {
+                console.error("No results found in geocode response.");
+                return;
+              }
+
+              const addressComponents = results[0].address_components || [];
+              let stateName = "";
+              let countryName = "";
+
+              // Extract state and country from address components
+              addressComponents.forEach((component) => {
+                if (component.types.includes("administrative_area_level_1")) {
+                  stateName = component.long_name;
+                }
+                if (component.types.includes("country")) {
+                  countryName = component.long_name;
+                }
+              });
+
+              console.log(
+                "State Name:",
+                stateName,
+                "Country Name:",
+                countryName
+              );
+
+              // Ensure restrictedStates is not null or undefined
+              const restrictedAreaStates = restrictedStates || [];
+              // console.log("restrictedAreaStates", restrictedAreaStates);
+
+              // Check if the country is not India
+              if (countryName.toLowerCase() !== "india") {
+                Swal.fire({
+                  title: "Area Restricted",
+                  text: `Access is restricted outside India. Current location: ${stateName}, ${countryName}`,
+                  icon: "error",
+                  confirmButtonText: "OK",
+                });
+
+                localStorage.removeItem("location");
+                localStorage.setItem(
+                  "restrictedArea",
+                  JSON.stringify({ stateName, countryName })
+                );
+
+                setIsUnavailablePopupVisible(true);
+                return;
+              }
+
+              // Check if the state is restricted
+              const isRestrictedState = restrictedAreaStates.some(
+                (restrictedState) =>
+                  restrictedState.toLowerCase() === stateName.toLowerCase()
+              );
+
+              if (isRestrictedState) {
+                localStorage.removeItem("location");
+                localStorage.setItem(
+                  "restrictedArea",
+                  JSON.stringify({ stateName, countryName })
+                );
+
+                setIsUnavailablePopupVisible(true);
+                return;
+              }
+
+              // If not restricted, store location and remove restrictedArea
+              localStorage.removeItem("restrictedArea");
+              localStorage.setItem(
+                "location",
+                JSON.stringify({ stateName, countryName })
+              );
+
+              // console.log("Location saved:", { stateName, countryName });
+            } catch (err) {
+              console.error("Error fetching geocode data:", err);
+            }
+          },
+          (error) => {
+            console.error("Geolocation error:", error.message);
+          }
+        );
+      }
+    };
+    const token = localStorage.getItem("Web-token");
+    if (token) {
+      fetchLocation();
+    }
+  }, [restrictedStates]);
+
   return (
     <>
       <div className="color-container">
@@ -369,12 +482,20 @@ function Banner({ data }) {
                               data-duration="1.5s"
                               data-delay="1.0s"
                             >
-                              {banner[0].sub_title.split("₹")[0]}{" "}
-                              <span className="fs-1 fw-800">
-                                ₹{banner[0].sub_title.match(/[\d,]+/)[0]}
-                              </span>{" "}
-                              jackpot!
+                              {banner[0].sub_title
+                                .split(/(₹[\d,]+)/)
+                                .map((part, index) =>
+                                  part.match(/₹[\d,]+/) ? (
+                                    <span key={index} className="fs-1 fw-800">
+                                      {part}
+                                    </span>
+                                  ) : (
+                                    part
+                                  )
+                                )}
+                              !
                             </h1>
+
                             <h2
                               className="text-start"
                               data-swiper-animation="fadeInUp"
@@ -388,15 +509,15 @@ function Banner({ data }) {
                         )}
 
                         <div className="d-flex align-items-center gap-2">
-                          <a
-                            href="javascript:void(0)"
+                          <Link
+                            to="/login"
                             className="btn btn-white mt-3 mt-md-4"
                             data-swiper-animation="fadeInUp"
                             data-duration="1.5s"
                             data-delay="3.0s"
                           >
                             Sign In
-                          </a>
+                          </Link>
                           <a
                             href="https://youtu.be/n_Cn8eFo7u8"
                             className="btn btn-white color-green mt-3 mt-md-4 popup-youtube video-btn"
@@ -437,27 +558,18 @@ function Banner({ data }) {
 
         <div className="banner-gallery">
           <div className="container">
-            <div className="row g-3 gallery-wrap ">
-              <div className="col ">
-                <span className="gradient-border" id="box">
-                  <img className="img-fluid" src="images/1.gif" alt="Cricket" />{" "}
-                </span>
-              </div>
-              <div className="col">
-                <span className="gradient-border" id="box">
-                  <img className="img-fluid" src="images/2.gif" alt="Cricket" />{" "}
-                </span>
-              </div>
-              <div className="col">
-                <span className="gradient-border" id="box">
-                  <img className="img-fluid" src="images/3.gif" alt="Cricket" />{" "}
-                </span>
-              </div>
-              <div className="col">
-                <span className="gradient-border" id="box">
-                  <img className="img-fluid" src="images/4.gif" alt="Cricket" />{" "}
-                </span>
-              </div>
+            <div className="row g-3 gallery-wrap">
+              {bannerGIFS?.bannerGifs?.map((gif, index) => (
+                <div className="col" key={index}>
+                  <span className="gradient-border" id="box">
+                    <img
+                      className="img-fluid"
+                      src={gif}
+                      alt={`Banner ${index + 1}`}
+                    />
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -466,157 +578,55 @@ function Banner({ data }) {
           <div className="container">
             <div className="section-title">
               <h2 className="title">
-                How it <span>works</span>
+                {words.slice(0, -1).join(" ")}{" "}
+                {/* Join all words except the last one */}
+                <span> {words[words.length - 1]}</span>{" "}
+                {/* Wrap the last word in span */}
               </h2>
-              <h3 className="sub-title">
-                Here’s how you can be a part of SpotsBall and win the Jackpot!
-              </h3>
+              ;<h3 className="sub-title">{howItWorks.description}</h3>
             </div>
           </div>
 
           <div className="pset">
             <div className="container">
               <div className="row listar-feature-items">
-                <div
-                  className="col-xs-12 col-sm-6 col-md-4 listar-feature-item-wrapper listar-feature-with-image listar-height-changed"
-                  data-aos="fade-zoom-in"
-                  data-aos-group="features"
-                  data-line-height="25.2px"
-                >
-                  <div className="listar-feature-item listar-feature-has-link">
-                    <a href="javascript:void(0)" target="_blank"></a>
-
-                    <div className="listar-feature-item-inner">
-                      <div className="listar-feature-block-content-wrapper">
-                        <div className="listar-feature-icon-wrapper">
-                          <div className="listar-feature-icon-inner">
-                            <div>
-                              <img
-                                alt="Businesses"
-                                className="listar-image-icon"
-                                src="images/tickets.png"
-                              />
+                {howItWorks?.steps?.map((step, index) => (
+                  <div
+                    key={step._id}
+                    className="col-xs-12 col-sm-6 col-md-4 listar-feature-item-wrapper"
+                  >
+                    <div className="listar-feature-item listar-feature-has-link">
+                      <div className="listar-feature-item-inner">
+                        <div className="listar-feature-block-content-wrapper">
+                          <div className="listar-feature-icon-wrapper">
+                            <div className="listar-feature-icon-inner">
+                              <div>
+                                <img
+                                  alt={step.title}
+                                  className="listar-image-icon"
+                                  src={step.icon_image || "default-image.png"}
+                                />
+                              </div>
                             </div>
                           </div>
-                        </div>
-
-                        <div
-                          className="listar-feature-content-wrapper"
-                          style={{
-                            paddingTop: "0px",
-                          }}
-                        >
-                          <div className="listar-feature-item-title listar-feature-counter-added">
-                            <span>
-                              <span>01</span>
-                              Buy a Ticket{" "}
-                            </span>
-                          </div>
-
-                          <div className="listar-feature-item-excerpt">
-                            Get your ticket to enter the weekly challenge. More
-                            tickets, better chances!
+                          <div className="listar-feature-content-wrapper">
+                            <div className="listar-feature-item-title">
+                              <span>
+                                <span>
+                                  {String(index + 1).padStart(2, "0")}
+                                </span>{" "}
+                                {step.title}
+                              </span>
+                            </div>
+                            <div className="listar-feature-item-excerpt">
+                              {step.description || "No description available"}
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                  <div className="listar-feature-fix-bottom-padding listar-fix-feature-arrow-button-height"></div>
-                </div>
-
-                <div
-                  className="col-xs-12 col-sm-6 col-md-4 listar-feature-item-wrapper listar-feature-with-image listar-height-changed"
-                  data-aos="fade-zoom-in"
-                  data-aos-group="features"
-                  data-line-height="25.2px"
-                >
-                  <div className="listar-feature-item listar-feature-has-link">
-                    <a href="javascript:void(0)" target="_blank"></a>
-
-                    <div className="listar-feature-item-inner">
-                      <div className="listar-feature-block-content-wrapper">
-                        <div className="listar-feature-icon-wrapper">
-                          <div className="listar-feature-icon-inner">
-                            <div>
-                              <img
-                                alt="Customers"
-                                className="listar-image-icon"
-                                src="images/target.png"
-                              />
-                            </div>
-                          </div>
-                        </div>
-
-                        <div
-                          className="listar-feature-content-wrapper"
-                          style={{
-                            paddingTop: "0px",
-                          }}
-                        >
-                          <div className="listar-feature-item-title listar-feature-counter-added">
-                            <span>
-                              <span>02</span>
-                              Spot the Ball{" "}
-                            </span>
-                          </div>
-
-                          <div className="listar-feature-item-excerpt">
-                            Use your cricket skills to pinpoint the hidden ball
-                            and mark the coordinates.{" "}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="listar-feature-fix-bottom-padding listar-fix-feature-arrow-button-height"></div>
-                </div>
-
-                <div
-                  className="col-xs-12 col-sm-6 col-md-4 listar-feature-item-wrapper listar-feature-with-image listar-height-changed"
-                  data-aos="fade-zoom-in"
-                  data-aos-group="features"
-                  data-line-height="25.2px"
-                >
-                  <div className="listar-feature-item listar-feature-has-link last">
-                    <a href="javascript:void(0)" target="_blank"></a>
-
-                    <div className="listar-feature-item-inner">
-                      <div className="listar-feature-block-content-wrapper">
-                        <div className="listar-feature-icon-wrapper">
-                          <div className="listar-feature-icon-inner">
-                            <div>
-                              <img
-                                alt="Feedback"
-                                className="listar-image-icon"
-                                src="images/rupee.png"
-                              />
-                            </div>
-                          </div>
-                        </div>
-
-                        <div
-                          className="listar-feature-content-wrapper"
-                          style={{
-                            paddingTop: "0px",
-                          }}
-                        >
-                          <div className="listar-feature-item-title listar-feature-counter-added">
-                            <span>
-                              <span>03</span>
-                              Chance to win{" "}
-                            </span>
-                          </div>
-
-                          <div className="listar-feature-item-excerpt">
-                            Closest guess wins ₹50,000! Play smart, test your
-                            skills, and claim your prize.{" "}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="listar-feature-fix-bottom-padding listar-fix-feature-arrow-button-height"></div>
-                </div>
+                ))}
               </div>
             </div>
           </div>
@@ -916,7 +926,7 @@ function Banner({ data }) {
                       <div className="contestheading">
                         <h2>
                           <span>For</span> ₹{contests[0]?.jackpot_price}{" "}
-                          <span>Jackpot Prize</span>
+                          <span>Grand Prize</span>
                         </h2>
                       </div>
 
@@ -1068,7 +1078,7 @@ function Banner({ data }) {
                       rel="noopener noreferrer"
                     >
                       <img
-                        src={`${process.env.PUBLIC_URL}/images/face.png`}
+                        src={`${process.env.PUBLIC_URL}/image/face.png`}
                         alt="Facebook Live"
                       />
                     </a>
@@ -1080,7 +1090,7 @@ function Banner({ data }) {
                       rel="noopener noreferrer"
                     >
                       <img
-                        src={`${process.env.PUBLIC_URL}/images/you.png`}
+                        src={`${process.env.PUBLIC_URL}/image/you.png`}
                         alt="YouTube Live"
                       />
                     </a>
@@ -1170,20 +1180,43 @@ function Banner({ data }) {
                   <h2>Max {selectedContest?.maxTickets} tickets per person</h2>
                 </div>
               </div>
-              <div className="discount_cousal">
+              <div className="dis-pop">
                 <h5>Discount</h5>
-                <Slider {...settings}>
+                {/* <Slider {...settings}>
                   {Array.isArray(selectedDiscount) &&
                     selectedDiscount.map((discount) => (
-                      <div key={discount._id} className="discount_card">
+                      <div key={discount._id} className="card first">
                         <img
                           src={`${process.env.PUBLIC_URL}/image/discount_img.png`}
                         />
-                        {/* <h6>{discount.name}</h6> */}
+                     
                         <p>
                           Tickets: {discount.minTickets} - {discount.maxTickets}
                         </p>
                         <p>Discount: {discount.discountPercentage}%</p>
+                      </div>
+                    ))}
+                </Slider> */}
+                <Slider {...settings}>
+                  {Array.isArray(selectedDiscount) &&
+                    selectedDiscount.map((discount) => (
+                      <div key={discount._id} className="card first dis_card">
+                        <div className="main">
+                          <div className="co-img">
+                            <img src="images/target.png" alt="Discount" />
+                          </div>
+                          <div className="vertical" />
+                          <div className="content">
+                            <h2>
+                              Tickets: {discount.minTickets} -{" "}
+                              {discount.maxTickets}
+                            </h2>
+                            <h1>
+                              {discount.discountPercentage}%{" "}
+                              <span>Discount</span>
+                            </h1>
+                          </div>
+                        </div>
                       </div>
                     ))}
                 </Slider>
@@ -1233,6 +1266,17 @@ function Banner({ data }) {
           </div>
         </div>
       </div>
+      {isGeolocationPopupVisible && (
+        <GeolocationPopup
+          onClose={() => setGeolocationPopupVisible(false)}
+          Area={restrictedStates}
+        />
+      )}
+      {isUnavailablePopupVisible && (
+        <GameUnavailablePopup
+          onOk={() => setIsUnavailablePopupVisible(false)}
+        />
+      )}
     </>
   );
 }

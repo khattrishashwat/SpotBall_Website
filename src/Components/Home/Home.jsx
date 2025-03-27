@@ -3,9 +3,12 @@ import Banner from "./Banner";
 import News from "./News";
 import Faqs from "./Faqs";
 import axios from "axios";
-import GeolocationPopup from "../Location/GeolocationPopup";
-import GameUnavailablePopup from "../Location/GameUnavailablePopup";
 import Swal from "sweetalert2";
+import {
+  messaging,
+  getToken,
+  onMessage,
+} from "../FirebaseCofig/FirebaseConfig";
 
 function Home() {
   const [restrictedStates, setRestrictedStates] = useState([]);
@@ -19,21 +22,44 @@ function Home() {
   const [howItWorks, setHowItWorks] = useState([]);
   const [bannerGIFS, setBannerGIFS] = useState([]);
 
-  const [isGeolocationPopupVisible, setGeolocationPopupVisible] =
-    useState(false);
-  const [isUnavailablePopupVisible, setIsUnavailablePopupVisible] =
-    useState(false);
+  const requestFirebaseToken = async () => {
+    try {
+      const currentToken = await getToken(messaging, {
+        vapidKey:
+          "BC1L5qE6WKJSgEU46nuptM9bCKtljihEjAikiBrpzRIomSiw6Dd9Wq6jmM4CfIHJokkhmqblgU5qbVaqizNlmeo",
+      });
+
+      if (currentToken) {
+        // console.log("FCM Token:", currentToken);
+        localStorage.setItem("device_token", currentToken);
+
+        // Optionally, send the token to your backend for push notifications
+      } else {
+        console.log("No FCM token available. Request permission.");
+      }
+    } catch (error) {
+      console.error("FCM Token Error:", error);
+      localStorage.setItem("device_token", "currentToken");
+    }
+  };
 
   useEffect(() => {
-    let isMounted = true; // Prevents state update if unmounted
-    const fetchData = async () => {
-      const token = localStorage.getItem("Web-token");
-      if (!token) return;
+    let isMounted = true;
 
+    const fetchData = async () => {
       try {
-        const response = await axios.get("/app/dashboard/public", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const token = localStorage.getItem("Web-token");
+        let response;
+
+        if (token) {
+          response = await axios.get("/app/dashboard/authenticated", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+        } else {
+          response = await axios.get("/app/dashboard/public");
+        }
 
         if (response?.data?.data && isMounted) {
           setRestrictedStates(response.data.data.restrictedStates || []);
@@ -53,132 +79,27 @@ function Home() {
     };
 
     fetchData();
+    requestFirebaseToken();
     return () => {
-      isMounted = false; // Cleanup function to prevent memory leaks
+      isMounted = false;
     };
   }, []);
 
-  useEffect(() => {
-    const fetchLocation = async () => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          async (position) => {
-            const { latitude, longitude } = position.coords;
-            console.log("Latitude:", latitude, "Longitude:", longitude);
-
-            try {
-              const response = await axios.get(
-                `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=AIzaSyA8pM5yXTJ3LM8zBF-EkZHEyxlPXSttsl0`
-              );
-
-              const results = response.data.results;
-              if (!results || results.length === 0) {
-                console.error("No results found in geocode response.");
-                return;
-              }
-
-              const addressComponents = results[0].address_components || [];
-              let stateName = "";
-              let countryName = "";
-
-              // Extract state and country from address components
-              addressComponents.forEach((component) => {
-                if (component.types.includes("administrative_area_level_1")) {
-                  stateName = component.long_name;
-                }
-                if (component.types.includes("country")) {
-                  countryName = component.long_name;
-                }
-              });
-
-              console.log(
-                "State Name:",
-                stateName,
-                "Country Name:",
-                countryName
-              );
-
-              // Ensure restrictedStates is not null or undefined
-              const restrictedAreaStates = restrictedStates || [];
-              // console.log("restrictedAreaStates", restrictedAreaStates);
-
-              // Check if the country is not India
-              if (countryName.toLowerCase() !== "india") {
-                Swal.fire({
-                  title: "Area Restricted",
-                  text: `Access is restricted outside India. Current location: ${stateName}, ${countryName}`,
-                  icon: "error",
-                  confirmButtonText: "OK",
-                });
-
-                localStorage.removeItem("location");
-                localStorage.setItem(
-                  "restrictedArea",
-                  JSON.stringify({ stateName, countryName })
-                );
-
-                setIsUnavailablePopupVisible(true);
-                return;
-              }
-
-              // Check if the state is restricted
-              const isRestrictedState = restrictedAreaStates.some(
-                (restrictedState) =>
-                  restrictedState.toLowerCase() === stateName.toLowerCase()
-              );
-
-              if (isRestrictedState) {
-                localStorage.removeItem("location");
-                localStorage.setItem(
-                  "restrictedArea",
-                  JSON.stringify({ stateName, countryName })
-                );
-
-                setIsUnavailablePopupVisible(true);
-                return;
-              }
-
-              // If not restricted, store location and remove restrictedArea
-              localStorage.removeItem("restrictedArea");
-              localStorage.setItem(
-                "location",
-                JSON.stringify({ stateName, countryName })
-              );
-
-              // console.log("Location saved:", { stateName, countryName });
-            } catch (err) {
-              console.error("Error fetching geocode data:", err);
-            }
-          },
-          (error) => {
-            console.error("Geolocation error:", error.message);
-          }
-        );
-      }
-    };
-    const token = localStorage.getItem("Web-token");
-    if (token) {
-      fetchLocation();
-    }
-    // fetchLocation();
-  }, [restrictedStates]);
-
   return (
     <>
-      <Banner data={{ livs, howItWorks, banner, contests, discounts }} />
+      <Banner
+        data={{
+          restrictedStates,
+          livs,
+          howItWorks,
+          banner,
+          contests,
+          discounts,
+          bannerGIFS,
+        }}
+      />
       {news.length > 0 && <News data={{ news }} />}
       {faqs.length > 0 && <Faqs data={{ apk, faqs }} />}
-      {isGeolocationPopupVisible && (
-        <GeolocationPopup
-          onClose={() => setGeolocationPopupVisible(false)}
-          Area={restrictedStates}
-        />
-      )}
-      {isUnavailablePopupVisible && (
-        <GameUnavailablePopup
-          onOk={() => setIsUnavailablePopupVisible(false)}
-        />
-      )}
     </>
   );
 }

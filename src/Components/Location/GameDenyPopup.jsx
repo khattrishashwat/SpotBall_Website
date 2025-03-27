@@ -24,7 +24,7 @@ const GameDenyPopup = ({ onCancel }) => {
             <div className="locationwantsdiv">
               <div className="locationicondiv">
                 <img
-                  src={`${process.env.PUBLIC_URL}/images/unvailable_icon.png`}
+                  src={`${process.env.PUBLIC_URL}/image/unvailable_icon.png`}
                   // src="images/unvailable_icon.png"
                   alt="Unavailable Icon"
                 />

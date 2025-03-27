@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 
 const GameUnavailablePopup = ({ onOk }) => {
   return (
@@ -10,7 +10,7 @@ const GameUnavailablePopup = ({ onOk }) => {
         <div className="locationwantsdiv">
           <div className="locationicondiv">
             <img
-              src={`${process.env.PUBLIC_URL}/images/unvailable_icon.png`}
+              src={`${process.env.PUBLIC_URL}/image/unvailable_icon.png`}
               // src="images/unvailable_icon.png"
               alt="Unavailable Icon"
             />
@@ -39,4 +39,4 @@ const GameUnavailablePopup = ({ onOk }) => {
   );
 };
 
-export default GameUnavailablePopup
+export default GameUnavailablePopup;

@@ -10,7 +10,7 @@ function Account() {
   const [isVerified, setIsVerified] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [profileImagePreview, setProfileImagePreview] = useState(
-    "images/user_image.png"
+    "image/user_image.png"
   );
 
   const [initialValues, setInitialValues] = useState({
@@ -64,7 +64,7 @@ function Account() {
           phone: data.phone || "",
           profile: data.profile_url || "",
         });
-        setProfileImagePreview(data.profile_url || "images/user_image.png");
+        setProfileImagePreview(data.profile_url || "image/user_image.png");
         setIsVerified(data.is_verified_user || false);
 
         setPro(data);
@@ -164,14 +164,14 @@ function Account() {
                         <img
                           src={
                             profileImagePreview ||
-                            `${process.env.PUBLIC_URL}/images/user_image.png`
+                            `${process.env.PUBLIC_URL}/image/user_image.png`
                           }
                           alt="Profile"
                         />
                       </div>
                     </div>
                     <img
-                      src={`${process.env.PUBLIC_URL}/images/verify.png`}
+                      src={`${process.env.PUBLIC_URL}/image/verify.png`}
                       className="verifyicon"
                       alt="Verified"
                     />

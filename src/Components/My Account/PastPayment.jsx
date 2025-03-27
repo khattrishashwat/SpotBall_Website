@@ -108,7 +108,7 @@ function PastPayment() {
                       onClick={(e) => handleDownload(e, payment?.paymentId)}
                     >
                       <img
-                        src={`${process.env.PUBLIC_URL}/images/download_invoice.png`}
+                        src={`${process.env.PUBLIC_URL}/image/download_invoice.png`}
                         alt="Download Invoice"
                         style={{ cursor: "pointer" }}
                       />
@@ -145,7 +145,7 @@ function PastPayment() {
                     onClick={() => toggleDropdown(payment._id)}
                   >
                     <img
-                      src={`${process.env.PUBLIC_URL}/images/arrow_icon_payment.png`}
+                      src={`${process.env.PUBLIC_URL}/image/arrow_icon_payment.png`}
                       className={
                         dropdownStates[payment._id] ? "" : "rotate_pastpayicon"
                       }

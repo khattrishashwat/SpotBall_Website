@@ -211,7 +211,7 @@ function Profile() {
                             <div className="tabbingiconbgdiv">
                               {" "}
                               <img
-                                src={`${process.env.PUBLIC_URL}/images/profile_icon.png`}
+                                src={`${process.env.PUBLIC_URL}/image/profile_icon.png`}
                               />{" "}
                             </div>
                             <span className="navlinkname">Update Profile</span>{" "}
@@ -227,7 +227,7 @@ function Profile() {
                             <div className="tabbingiconbgdiv">
                               {" "}
                               <img
-                                src={`${process.env.PUBLIC_URL}/images/change_pass_icon.png`}
+                                src={`${process.env.PUBLIC_URL}/image/change_pass_icon.png`}
                               />{" "}
                             </div>
                             <span className="navlinkname">Change Password</span>
@@ -243,7 +243,7 @@ function Profile() {
                             <div className="tabbingiconbgdiv">
                               {" "}
                               <img
-                                src={`${process.env.PUBLIC_URL}/images/payment_icon.png`}
+                                src={`${process.env.PUBLIC_URL}/image/payment_icon.png`}
                               />{" "}
                             </div>
                             <span className="navlinkname">Past Payments</span>
@@ -259,7 +259,7 @@ function Profile() {
                             <div className="tabbingiconbgdiv">
                               {" "}
                               <img
-                                src={`${process.env.PUBLIC_URL}/images/deactivate_acc_icon.png`}
+                                src={`${process.env.PUBLIC_URL}/image/deactivate_acc_icon.png`}
                               />{" "}
                             </div>
                             <span className="navlinkname">
@@ -277,7 +277,7 @@ function Profile() {
                             <div className="tabbingiconbgdiv">
                               {" "}
                               <img
-                                src={`${process.env.PUBLIC_URL}/images/delete_acc_icon.png`}
+                                src={`${process.env.PUBLIC_URL}/image/delete_acc_icon.png`}
                               />{" "}
                             </div>
                             <span className="navlinkname">Delete Account</span>
@@ -293,7 +293,7 @@ function Profile() {
                             <div className="tabbingiconbgdiv">
                               {" "}
                               <img
-                                src={`${process.env.PUBLIC_URL}/images/logout_icon.png`}
+                                src={`${process.env.PUBLIC_URL}/image/logout_icon.png`}
                               />{" "}
                             </div>
                             <span className="navlinkname">Logout</span>
@@ -367,7 +367,7 @@ function Profile() {
               onClick={DeccloseModal}
             >
               <img
-                src={`${process.env.PUBLIC_URL}/images/cross_icon.png`}
+                src={`${process.env.PUBLIC_URL}/image/cross_icon.png`}
                 alt="close"
               />
             </button>
@@ -431,8 +431,8 @@ function Profile() {
             >
               {" "}
               <img
-                src={`${process.env.PUBLIC_URL}/images/cross_icon.png`}
-                // src="images/cross_icon.png"
+                src={`${process.env.PUBLIC_URL}/image/cross_icon.png`}
+                // src="image/cross_icon.png"
               />{" "}
             </button>
             <div className="modal-body mdlbdy_delete_account">
@@ -492,7 +492,7 @@ function Profile() {
               onClick={CloseLogout}
             >
               <img
-                src={`${process.env.PUBLIC_URL}/images/cross_icon.png`}
+                src={`${process.env.PUBLIC_URL}/image/cross_icon.png`}
                 alt="Close"
               />
             </button>

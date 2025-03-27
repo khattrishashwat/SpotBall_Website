@@ -48,18 +48,18 @@ function Faqs({ data }) {
                     data-animation-duration={1}
                   >
                     <h2 className="title ">
-                      The Ultimate SpotsBall Experience
-                      <span>on Your Mobile Device.</span>
+                      Test Your Cricket Skills, Spot the Ball and
+                      <span>Stand a Chance to Win</span>
                     </h2>
                     <p>
                       SpotsBall is the ultimate cricket challenge app where you
                       can put your cricket skills to the test. At SpotsBall, we
-                      bring the thrill of cricket right to your fingertips.
-                      Every week, we host an exciting contest where you simply
-                      have to spot the hidden ball in the game. Think you have
-                      got sharp eyes and cricket instincts? Find the ball, mark
-                      the exact coordinates, and you'll have a chance to win the
-                      weekly jackpot of ₹50,000.
+                      bring the thrill of cricket right to your fingertips. We
+                      host a weekly exciting contest where you simply have to
+                      spot the hidden ball in the game. Think you have got sharp
+                      eyes and cricket instincts? Find the ball, mark the exact
+                      coordinates, and stand a chance to win the grand prize,
+                      every week.
                     </p>
                     <div
                       className=" animated animated-media-none"

@@ -168,7 +168,6 @@ if ("serviceWorker" in navigator) {
           console.error("Error getting token:", err);
           localStorage.setItem("device_token", "currentToken");
 
-          // Check if it's a permission blocked error
         });
 
       onMessage(messaging, (payload) => {

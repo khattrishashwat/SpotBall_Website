@@ -356,12 +356,14 @@ function Header() {
             <Link to="/" className="navbar-brand d-flex d-xl-none">
               <img
                 className="logo img-fluid"
-                src="images/logo.png"
+                src={`${process.env.PUBLIC_URL}/images/logo.png`}
+                // src="images/logo.png"
                 alt="logo"
               />
               <img
                 className="sticky-logo img-fluid"
-                src="images/logo.png"
+                src={`${process.env.PUBLIC_URL}/images/logo.png`}
+                // src="images/logo.png"
                 alt="logo"
               />
             </Link>
@@ -402,9 +404,7 @@ function Header() {
 
                       {/* Notification Popup */}
                       <div
-                        className={`notificationdiv_popup ${
-                          isNot ? "" : ""
-                        }`}
+                        className={`notificationdiv_popup ${isNot ? "" : ""}`}
                         id="notificationPopup"
                         style={{ display: isNot ? "block" : "none" }}
                       >

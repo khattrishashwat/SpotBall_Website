@@ -218,10 +218,14 @@ import Swal from "sweetalert2";
 import PageNot from "./Components/PageNot/PageNot";
 import TawkScriptLoader from "./TawkScriptLoader";
 import Loader from "./Components/Loader/Loader";
+import Signup from "./Components/Authentication/Signup";
+import Forget from "./Components/Authentication/Forget";
+import OTp from "./Components/Authentication/OTp";
+import CreateNewPassword from "./Components/Authentication/CreateNewPassword";
+import Otps from "./Components/Authentication/Otps";
 
 // Lazy loaded components
 const Home = lazy(() => import("./Components/Home/Home"));
-const Homes = lazy(() => import("./Components/Home/Homes"));
 const Contact = lazy(() => import("./Components/Pages/Contact Us/Contact"));
 const Press = lazy(() => import("./Components/Pages/In The Press/Press"));
 const PressDetails = lazy(() =>
@@ -247,9 +251,11 @@ const Circle = lazy(() =>
   import("./Components/Pages/The Winners Circle/Circle")
 );
 
+const Login = lazy(() => import("./Components/Authentication/Login"));
+
 // Axios base URL
-axios.defaults.baseURL = "https://www.spotsball.com/spotsball/api/v1/";
-// axios.defaults.baseURL = "https://webmobrildemo.com/spotsball/api/v1/";
+// axios.defaults.baseURL = "https://www.spotsball.com/spotsball/api/v1/";
+axios.defaults.baseURL = "https://webmobrildemo.com/spotsball/api/v1/";
 
 // **Protected Route Component**
 const ProtectedRoute = () => {
@@ -302,7 +308,7 @@ const RoutesWithInterceptors = () => {
 
         {/* Public Routes */}
         <Route path="/" element={<WithLayout component={Home} />} />
-        <Route path="/home" element={<WithLayout component={Homes} />} />
+        {/* <Route path="/home" element={<WithLayout component={Homes} />} /> */}
         <Route
           path="/contact_us"
           element={<WithLayout component={Contact} />}
@@ -337,6 +343,12 @@ const RoutesWithInterceptors = () => {
           path="/my_account_delete"
           element={<WithLayout component={Delete} />}
         />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/forgot" element={<Forget />} />
+        <Route path="/otp" element={<OTp />} />
+        <Route path="/otps" element={<Otps />} />
+        <Route path="/createpassword" element={<CreateNewPassword />} />
         <Route path="*" element={<PageNot />} />
       </Routes>
     </Suspense>

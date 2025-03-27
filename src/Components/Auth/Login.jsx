@@ -50,8 +50,6 @@ function Login({ isVisible, setLoginOpen, onClose }) {
     emailOrPhone: Yup.string()
       .required("Email or Mobile Number is required")
       .test("emailOrPhone", "Invalid Email or Phone Number", (value) => {
-        // Debug: Uncomment to see value on each validation
-        // console.log("Validating emailOrPhone:", value);
         return (
           /^[\w.-]+@[\w.-]+\.\w{2,4}$/.test(value) || /^\d{10,15}$/.test(value)
         );
