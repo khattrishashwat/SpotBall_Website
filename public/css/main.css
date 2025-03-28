@@ -1510,7 +1510,7 @@ ul.list-inline li a:hover {
   height: 30px;
   line-height: 30px;
   background: none;
-  color: #fff;
+  color: #000 !important;
 }
 
 .quantity_input-box::-webkit-inner-spin-button,
@@ -2804,6 +2804,8 @@ ul.list-inline li a:hover {
   display: block;
   width: 70%;
 }
+
+
 
 .forgot_screen .colforgotpassdivmain h2 {
   text-align: center;
@@ -4517,7 +4519,7 @@ ul.list-inline li a:hover {
   padding: 6px;
   vertical-align: baseline;
   line-height: 35px;
-  width: 35px !important;
+  /* width: 35px !important; */
   height: 35px;
 }
 
@@ -7353,4 +7355,98 @@ section.maincont_section.liv_Weekly {
 a.resend-btn {
   color: green !important;
   font-size: 18px;
+}
+
+.tht-section-breadcrum {
+  width: 100%;
+  position: relative;
+  height: 300px;
+  object-fit: cover;
+  background: url(../images/tht.jpg);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.tht-heading h3 {
+  color: #ffffff !important;
+  font-size: 30px !important;
+  font-weight: 700;
+  margin-bottom: 0px !important;
+  position: relative;
+  line-height: 45px;
+  text-align: center;
+}
+
+.tht-head h3 {
+  color: #000 !important;
+  font-size: 26px !important;
+  font-weight: 700;
+  margin-bottom: 30px;
+  position: relative;
+  line-height: 36px;
+}
+
+.back-to-top a {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  bottom: 50px;
+  right: 40px;
+  width: 50px;
+  height: 50px;
+  margin: 0px;
+  color: #ffffff !important;
+  font-size: 18px;
+  background: var(--pgs_primary_color);
+  transition: all 0.3s ease-in-out;
+  z-index: 999;
+}
+
+.login_left_img.banner .pattern-03 {
+  position: absolute;
+  left: 49%;
+  top: 66%;
+  opacity: 0.8;
+  z-index: 9;
+  width: 9%;
+  transform: translate(-50%, -50%);
+}
+
+.login_left_img.banner .pattern-04 {
+  position: absolute;
+  left: 49%;
+  top: 61%;
+  opacity: 1;
+  z-index: 9;
+  width: 9%;
+  transform: translate(-50%, -50%);
+}
+
+.listar-feature-item-wrapper:last-child .listar-feature-item.listar-feature-has-link:before {
+  display: none;
+}
+
+@media (max-width: 575px) {
+  .header.header-style-02 .navbar .main-header {
+    padding-top: 0px !important;
+    padding-bottom: 10px;
+  }
+}
+
+
+.location_settingdiv h2 {
+  color: black;
+}
+
+.location_settingdiv h3 {
+  color: black;
+}
+
+.location_settingdiv p {
+  color: black;
 }

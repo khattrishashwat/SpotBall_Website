@@ -481,6 +481,7 @@ function Profile() {
           paddingRight: isLogout ? 17 : "",
           display: isLogout ? "block" : "none",
           backgroundColor: isLogout ? "#303030a3" : "",
+          width: "105%",
         }}
         aria-modal="true"
       >

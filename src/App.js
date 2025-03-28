@@ -1,198 +1,3 @@
-// import React, { useState, useRef, lazy, Suspense, useEffect } from "react";
-// import {
-//   BrowserRouter as Router,
-//   Routes,
-//   Route,
-//   Navigate,
-//   Outlet,
-//   useLocation,
-//   useNavigate,
-// } from "react-router-dom";
-// import axios from "axios";
-// import { Helmet } from "react-helmet";
-// import Swal from "sweetalert2";
-
-// // Import components
-// import PageNot from "./Components/PageNot/PageNot";
-// import TawkScriptLoader from "./TawkScriptLoader";
-// import Loader from "./Components/Loader/Loader";
-
-// // Lazy loaded components
-// const Home = lazy(() => import("./Components/Home/Home"));
-// const Contact = lazy(() => import("./Components/Pages/Contact Us/Contact"));
-// const Press = lazy(() => import("./Components/Pages/In The Press/Press"));
-// const PressDetails = lazy(() =>
-//   import("./Components/Pages/In The Press/PressDetails")
-// );
-// const Profile = lazy(() => import("./Components/My Account/Profile"));
-// const Checkout = lazy(() => import("./Components/Pages/Play/Checkout"));
-// const Screen = lazy(() => import("./Components/Pages/Play/Screen"));
-// const PlayVedio = lazy(() => import("./Components/Pages/HowToPlay/PalyVedio"));
-// const Delete = lazy(() => import("./Components/Pages/Delete/Delete"));
-// const SucessPage = lazy(() => import("./Components/Pages/Play/SuccessPage"));
-// const Header = lazy(() => import("./Components/Layout/Header/Header"));
-// const Footer = lazy(() => import("./Components/Layout/Footer/Footer"));
-// const Tearms = lazy(() => import("./Components/Pages/Legal Terms/Tearms"));
-// const Privacy = lazy(() => import("./Components/Pages/Legal Terms/Privacy"));
-// const Rules = lazy(() => import("./Components/Pages/Legal Terms/Rules"));
-// const Cookies = lazy(() => import("./Components/Pages/Legal Terms/Cookies"));
-// const Are = lazy(() => import("./Components/Pages/Who we are/Are"));
-// const Weekly = lazy(() =>
-//   import("./Components/Pages/Live Weekly Winner/Weekly")
-// );
-// const Circle = lazy(() =>
-//   import("./Components/Pages/The Winners Circle/Circle")
-// );
-// // Axios configuration
-// // axios.defaults.baseURL = "https://webmobrildemo.com/spotsball/api/v1/";
-
-// axios.defaults.baseURL = "https://www.spotsball.com/spotsball/api/v1/";
-
-// // **Protected Route Component**
-// const ProtectedRoute = () => {
-//   const isAuthenticated = localStorage.getItem("Web-token");
-//   return isAuthenticated ? <Outlet /> : <Navigate to="/" />;
-// };
-
-// const App = () => {
-//   const [loading, setLoading] = useState(true);
-//   const timeoutRef = useRef(null);
-
-//   useEffect(() => {
-//     const handleLoad = () => setLoading(false);
-//     window.addEventListener("load", handleLoad);
-//     return () => window.removeEventListener("load", handleLoad);
-//   }, []);
-
-//   return (
-//     <>
-//       <Helmet>
-//         <title>{loading ? "Loading..." : "SpotsBall"}</title>
-//       </Helmet>
-//       {/* <Router basename="/spotsball/staging/"> */}
-//       <Router basename="/">
-//         <TawkScriptLoader />
-//         <AxiosInterceptor />
-//         <Suspense fallback={<Loader />}>
-//           <Routes>
-//             {/* Protected Routes */}
-//             <Route element={<ProtectedRoute />}>
-//               <Route
-//                 path="/my_account"
-//                 element={<WithLayout component={Profile} />}
-//               />
-//               <Route
-//                 path="/play_screen"
-//                 element={<WithLayout component={Screen} />}
-//               />
-//               <Route
-//                 path="/cart"
-//                 element={<WithLayout component={Checkout} />}
-//               />
-//             </Route>
-
-//             {/* Public Routes */}
-//             <Route path="/" element={<WithLayout component={Home} />} />
-//             <Route
-//               path="/contact_us"
-//               element={<WithLayout component={Contact} />}
-//             />
-//             <Route path="/terms" element={<WithLayout component={Tearms} />} />
-//             <Route
-//               path="/privacy"
-//               element={<WithLayout component={Privacy} />}
-//             />
-//             <Route path="/rules" element={<WithLayout component={Rules} />} />
-//             <Route
-//               path="/cookies"
-//               element={<WithLayout component={Cookies} />}
-//             />
-//             <Route
-//               path="/playss"
-//               element={<WithLayout component={PlayVedio} />}
-//             />
-//             <Route
-//               path="/in_the_press"
-//               element={<WithLayout component={Press} />}
-//             />
-//             <Route
-//               path="/press-details/:id/:title"
-//               element={<WithLayout component={PressDetails} />}
-//             />
-//             <Route
-//               path="/payments"
-//               element={<WithLayout component={SucessPage} />}
-//             />
-//             <Route
-//               path="/who_we_are"
-//               element={<WithLayout component={Are} />}
-//             />
-//             <Route
-//               path="/live_weekly_winner"
-//               element={<WithLayout component={Weekly} />}
-//             />
-//             <Route
-//               path="/the_winners_circle"
-//               element={<WithLayout component={Circle} />}
-//             />
-//             <Route
-//               path="/my_account_delete"
-//               element={<WithLayout component={Delete} />}
-//             />
-//             <Route path="*" element={<PageNot />} />
-//           </Routes>
-//         </Suspense>
-//       </Router>
-//     </>
-//   );
-// };
-
-// // **Axios Interceptor Component**
-// const AxiosInterceptor = () => {
-//   const navigate = useNavigate();
-//   const location = useLocation();
-
-//   useEffect(() => {
-//     const interceptor = axios.interceptors.response.use(
-//       (response) => response,
-//       (error) => {
-//         if (error.response?.status === 401) {
-//           localStorage.removeItem("Web-token");
-//           Swal.fire({
-//             icon: "error",
-//             title: "Something went wrong! Connect to Admin",
-//             allowOutsideClick: false,
-//             showConfirmButton: true,
-//             confirmButtonText: "OK",
-//           }).then(() => {
-//             if (location.pathname === "/") {
-//               window.location.reload();
-//             } else {
-//               navigate("/");
-//             }
-//           });
-//         }
-//         return Promise.reject(error);
-//       }
-//     );
-
-//     return () => axios.interceptors.response.eject(interceptor);
-//   }, [navigate, location]);
-
-//   return null;
-// };
-
-// // **Wrapper to include Header & Footer**
-// const WithLayout = ({ component: Component }) => (
-//   <>
-//     <Header />
-//     <Component />
-//     <Footer />
-//   </>
-// );
-
-// export default App;
-
 import React, {
   useState,
   useRef,
@@ -218,11 +23,6 @@ import Swal from "sweetalert2";
 import PageNot from "./Components/PageNot/PageNot";
 import TawkScriptLoader from "./TawkScriptLoader";
 import Loader from "./Components/Loader/Loader";
-import Signup from "./Components/Authentication/Signup";
-import Forget from "./Components/Authentication/Forget";
-import OTp from "./Components/Authentication/OTp";
-import CreateNewPassword from "./Components/Authentication/CreateNewPassword";
-import Otps from "./Components/Authentication/Otps";
 
 // Lazy loaded components
 const Home = lazy(() => import("./Components/Home/Home"));
@@ -252,6 +52,14 @@ const Circle = lazy(() =>
 );
 
 const Login = lazy(() => import("./Components/Authentication/Login"));
+const Signup = lazy(() => import("./Components/Authentication/Signup"));
+const Forget = lazy(() => import("./Components/Authentication/Forget"));
+const OTp = lazy(() => import("./Components/Authentication/OTp"));
+const CreateNewPassword = lazy(() =>
+  import("./Components/Authentication/CreateNewPassword")
+);
+const Otps = lazy(() => import("./Components/Authentication/Otps"));
+const Tht = lazy(() => import("./Components/Pages/Legal Terms/Tht"));
 
 // Axios base URL
 // axios.defaults.baseURL = "https://www.spotsball.com/spotsball/api/v1/";
@@ -277,7 +85,7 @@ const App = () => {
       <Helmet>
         <title>{loading ? "Loading..." : "SpotsBall"}</title>
       </Helmet>
-      <Router basename="/">
+      <Router basename="/landing">
         <TawkScriptLoader />
         <RoutesWithInterceptors />
       </Router>
@@ -317,6 +125,8 @@ const RoutesWithInterceptors = () => {
         <Route path="/privacy" element={<WithLayout component={Privacy} />} />
         <Route path="/rules" element={<WithLayout component={Rules} />} />
         <Route path="/cookies" element={<WithLayout component={Cookies} />} />
+        <Route path="/tht" element={<WithLayout component={Tht} />} />
+
         <Route path="/playss" element={<WithLayout component={PlayVedio} />} />
         <Route
           path="/in_the_press"

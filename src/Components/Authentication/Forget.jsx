@@ -101,7 +101,9 @@ function Forget() {
                 </div>
                 <div className="col-md-5 col6formsidediv">
                   <div className="loginologo">
-                    <img src="images/logo.png" />
+                    <img
+                      src={`${process.env.PUBLIC_URL}/images/logo.png`}
+                    />
                   </div>
                   <div className="colformlogin">
                     <div className="login-heading">

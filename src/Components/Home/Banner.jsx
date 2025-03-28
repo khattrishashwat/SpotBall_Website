@@ -7,10 +7,13 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import GeolocationPopup from "../Location/GeolocationPopup";
 import GameUnavailablePopup from "../Location/GameUnavailablePopup";
+import { Dialog, DialogContent, IconButton, Button } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 
 function Banner({ data }) {
   const {
     livs,
+    movies,
     restrictedStates,
     howItWorks,
     banner,
@@ -35,6 +38,7 @@ function Banner({ data }) {
     useState(false);
   const [countdownType, setCountdownType] = useState("ends"); // "starts" or "ends"
   const token = localStorage.getItem("Web-token");
+  const [open, setOpen] = useState(false);
 
   const [timeLeft, setTimeLeft] = useState({
     days: "00",
@@ -416,6 +420,40 @@ function Banner({ data }) {
     }
   }, [restrictedStates]);
 
+
+    useEffect(() => {
+      const checkGeolocation = () => {
+        const location = JSON.parse(localStorage.getItem("location") || "null");
+        const restrictedArea = JSON.parse(
+          localStorage.getItem("restrictedArea") || "null"
+        );
+  
+        const hasLocation = location && Object.keys(location).length > 0;
+        const hasRestrictedArea =
+          restrictedArea && Object.keys(restrictedArea).length > 0;
+  
+        if (token) {
+          setGeolocationPopupVisible(!(hasLocation || hasRestrictedArea));
+        } else {
+          setGeolocationPopupVisible(false);
+        }
+      };
+  
+      checkGeolocation();
+  
+      // Listen for localStorage changes
+      const handleStorageChange = (event) => {
+        if (event.key === "location" || event.key === "restrictedArea") {
+          checkGeolocation();
+        }
+      };
+  
+      window.addEventListener("storage", handleStorageChange);
+  
+      return () => {
+        window.removeEventListener("storage", handleStorageChange);
+      };
+    }, [token]);
   return (
     <>
       <div className="color-container">
@@ -509,32 +547,80 @@ function Banner({ data }) {
                         )}
 
                         <div className="d-flex align-items-center gap-2">
-                          {!token &&(
-
-                          <Link
-                            to="/login"
-                            className="btn btn-white mt-3 mt-md-4"
-                            data-swiper-animation="fadeInUp"
-                            data-duration="1.5s"
-                            data-delay="3.0s"
-                          >
-                            Sign In
-                          </Link>
+                          {!token && (
+                            <Link
+                              to="/login"
+                              className="btn btn-white mt-3 mt-md-4"
+                              data-swiper-animation="fadeInUp"
+                              data-duration="1.5s"
+                              data-delay="3.0s"
+                            >
+                              Sign In
+                            </Link>
                           )}
 
                           <a
-                            href="https://youtu.be/n_Cn8eFo7u8"
                             className="btn btn-white color-green mt-3 mt-md-4 popup-youtube video-btn"
                             data-swiper-animation="fadeInUp"
                             data-duration="1.5s"
                             data-delay="3.0s"
+                            onClick={(e) => {
+                              e.preventDefault(); // Prevent default link behavior
+                              setOpen(true);
+                            }}
                           >
                             How To Play
                           </a>
+
+                          <Dialog
+                            open={open}
+                            onClose={() => setOpen(false)}
+                            maxWidth="md"
+                            fullWidth
+                          >
+                            <DialogContent
+                              style={{ position: "relative", padding: "16px" }}
+                            >
+                              {/* Close Button (X) */}
+                              <IconButton
+                                style={{
+                                  position: "absolute",
+                                  right: "10px",
+                                  top: "10px",
+                                }}
+                                onClick={() => setOpen(false)}
+                              >
+                                <CloseIcon />
+                              </IconButton>
+
+                              {/* Embedded YouTube Video */}
+                              <div
+                                style={{
+                                  position: "relative",
+                                  paddingBottom: "56.25%",
+                                  height: 0,
+                                }}
+                              >
+                                <iframe
+                                  width="100%"
+                                  height="100%"
+                                  style={{
+                                    position: "absolute",
+                                    top: 0,
+                                    left: 0,
+                                  }}
+                                  src={movies.video_url}
+                                  title="YouTube video"
+                                  frameBorder="0"
+                                  allowFullScreen
+                                ></iframe>
+                              </div>
+                            </DialogContent>
+                          </Dialog>
                         </div>
                         <div className="btn_tdy p-3 px-3">
                           <span>
-                            {!token && <a> Sign Up </a>}
+                            {!token && <Link to="/signup"> Sign Up </Link>}
                             Today, Play and Win the game
                           </span>
                         </div>
@@ -928,7 +1014,8 @@ function Banner({ data }) {
                     <div className="contest_maindiv_popup_inner">
                       <div className="contestheading">
                         <h2>
-                          <span>For</span> ₹{contests[0]?.jackpot_price}{" "}
+                          <span>For</span> ₹
+                          {contests[0]?.jackpot_price?.toLocaleString()}{" "}
                           <span>Grand Prize</span>
                         </h2>
                       </div>
@@ -939,7 +1026,7 @@ function Banner({ data }) {
                           Ticket :
                           <span>
                             <i className="fa fa-inr" aria-hidden="true"></i>
-                            {contests[0]?.ticket_price}
+                            {contests[0]?.ticket_price}/-
                           </span>{" "}
                         </p>
                       </div>
@@ -971,7 +1058,7 @@ function Banner({ data }) {
                 </div>
               </div>
 
-              <div className="col-lg-6">
+              {/* <div className="col-lg-6">
                 <section
                   className="video-section-02"
                   style={{
@@ -1000,6 +1087,83 @@ function Banner({ data }) {
                     </div>
                   </div>
                 </section>
+              </div> */}
+              <div className="col-lg-6">
+                <section
+                  className="video-section-02"
+                  style={{
+                    backgroundImage: "url(images/home-4-banner-bg.jpg)",
+                    backgroundRepeat: "no-repeat",
+                    backgroundSize: "100% 100%",
+                    position: "relative",
+                    zIndex: 1,
+                    height: "266px",
+                    borderRadius: "10px",
+                  }}
+                >
+                  <div className="container">
+                    <div className="row justify-content-center">
+                      <div className="col-md-10 col-lg-9 col-xl-7">
+                        <div className="video-style-04">
+                          {/* Play Button to Open Popup */}
+                          <a
+                            href="#"
+                            className="play-btn circle b-round popup-youtube video-btn"
+                            onClick={(e) => {
+                              e.preventDefault(); // Prevent default link behavior
+                              setOpen(true);
+                            }}
+                          >
+                            <i className="fa-solid fa-play"></i>
+                          </a>
+                          <h2>How To Play</h2>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                {/* Material-UI Dialog (Popup) */}
+                <Dialog
+                  open={open}
+                  onClose={() => setOpen(false)}
+                  maxWidth="md"
+                  fullWidth
+                >
+                  <DialogContent
+                    style={{ position: "relative", padding: "16px" }}
+                  >
+                    {/* Close Button (X) */}
+                    <IconButton
+                      style={{
+                        position: "absolute",
+                        right: "10px",
+                        top: "10px",
+                      }}
+                      onClick={() => setOpen(false)}
+                    >
+                      <CloseIcon />
+                    </IconButton>
+
+                    {/* Embedded YouTube Video */}
+                    <div
+                      style={{
+                        position: "relative",
+                        paddingBottom: "56.25%",
+                        height: 0,
+                      }}
+                    >
+                      <iframe
+                        width="100%"
+                        height="100%"
+                        style={{ position: "absolute", top: 0, left: 0 }}
+                        src={movies.video_url}
+                        frameBorder="0"
+                        allowFullScreen
+                      ></iframe>
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </div>
             </div>
           </div>

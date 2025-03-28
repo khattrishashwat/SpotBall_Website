@@ -22,6 +22,7 @@ function Header() {
   const [isNot, setIsNot] = useState(false);
   const [selectedLocale, setSelectedLocale] = useState(locales[0]);
   const [islangOpen, setIslangOpen] = useState(false);
+  const [isLogout, setIsLogout] = useState("");
 
   useEffect(() => {
     const browserLang = new Intl.Locale(navigator.language).language;
@@ -36,6 +37,12 @@ function Header() {
   const handleSelectLocale = (locale) => {
     setSelectedLocale(locale);
     setIslangOpen(false);
+  };
+  const OpenLogout = () => {
+    setIsLogout(true);
+  };
+  const CloseLogout = () => {
+    setIsLogout(false);
   };
 
   const intlLocale = new Intl.Locale(selectedLocale);
@@ -243,6 +250,21 @@ function Header() {
 
     return () => clearInterval(interval);
   }, []);
+
+  const Logout = async () => {
+    localStorage.removeItem("Web-token");
+
+    await Swal.fire({
+      icon: "success",
+      title: "Logout Successful",
+      text: "You have been logged out successfully.",
+      timer: 2000,
+      showConfirmButton: false,
+    });
+
+    navigate("/");
+    setIsLogout(false);
+  };
 
   return (
     <>
@@ -634,12 +656,85 @@ function Header() {
                     className="nav-link"
                   >
                     <img
-                      src={`${process.env.PUBLIC_URL}/images/icon_legal.png`}
+                      src={`${process.env.PUBLIC_URL}/images/icon_trust.png`}
                     />
-                    THT
+                    Trust Honestly Transparency (THT).
                   </Link>
                 </li>
+                {token && (
+                  <li className="dropdown nav-item ">
+                    <a
+                      onClick={() => {
+                        OpenLogout();
+                        setIsMenuVisible(false);
+                      }}
+                      className="nav-link"
+                      style={{ cursor: "pointer" }}
+                    >
+                      <img
+                        src={`${process.env.PUBLIC_URL}/image/icon_logout.png`}
+                        alt="Logout Icon"
+                      />
+                      Logout
+                    </a>
+                  </li>
+                )}
               </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        className={`modal fade deleteacc_mainpopup_mdl ${
+          isLogout ? "show" : ""
+        }`}
+        id="logout_account_modal"
+        role="dialog"
+        style={{
+          paddingRight: isLogout ? 17 : "",
+          display: isLogout ? "block" : "none",
+          backgroundColor: isLogout ? "#303030a3" : "",
+          width: "105%",
+        }}
+        aria-modal="true"
+      >
+        <div className="modal-dialog deleteacc_mdldlg dlgdlg_logoutpopup">
+          <div className="modal-content mdlcnt_deleteacc">
+            <button
+              type="button"
+              className="logoutpopup_crossicon"
+              onClick={CloseLogout}
+            >
+              <img
+                src={`${process.env.PUBLIC_URL}/image/cross_icon.png`}
+                alt="Close"
+              />
+            </button>
+            <div className="modal-body mdlbdy_delete_account logoutaccount_divmain">
+              <div className="deleteacc_text_data logoutdatamain">
+                <h2>Logout</h2>
+                <p>Are you sure you want to logout?</p>
+              </div>
+            </div>
+            <div className="mdlftr_delete_acc_actionbtn">
+              <div className="actionbtn_delete">
+                <button
+                  type="button"
+                  className="cncle_btn_delete actionbtnmain"
+                  onClick={CloseLogout}
+                >
+                  Cancel
+                </button>
+              </div>
+              <div className="actionbtn_delete">
+                <button
+                  type="button"
+                  className="delete_btn_delete actionbtnmain"
+                  onClick={Logout}
+                >
+                  Logout
+                </button>
+              </div>
             </div>
           </div>
         </div>

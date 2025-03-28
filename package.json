@@ -1,11 +1,15 @@
 {
   "name": "spotsball",
   "version": "0.1.0",
-  "homepage": "/",
+  "homepage": "/landing",
   "private": true,
   "dependencies": {
     "@cashfreepayments/cashfree-js": "^1.0.5",
     "@cashfreepayments/cashfree-sdk": "^0.1.7",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/icons-material": "^7.0.0",
+    "@mui/material": "^7.0.0",
     "@react-oauth/google": "^0.12.1",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",

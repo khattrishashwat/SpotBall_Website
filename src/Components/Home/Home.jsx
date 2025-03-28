@@ -21,6 +21,7 @@ function Home() {
   const [discounts, setDiscounts] = useState([]);
   const [howItWorks, setHowItWorks] = useState([]);
   const [bannerGIFS, setBannerGIFS] = useState([]);
+  const [movies, setMovies] = useState("");
 
   const requestFirebaseToken = async () => {
     try {
@@ -85,10 +86,33 @@ function Home() {
     };
   }, []);
 
+  const fetchVideoData = async () => {
+    const token = localStorage.getItem("Web-token");
+    try {
+      const response = await axios.get("app/how-to-play/get-how-to-play", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response?.data?.data) {
+        setMovies(response.data.data[0]);
+        console.log("new", response.data.data[0]);
+      }
+    } catch (error) {
+      console.error("Error fetching video data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchVideoData();
+  }, []);
+
   return (
     <>
       <Banner
         data={{
+          movies,
           restrictedStates,
           livs,
           howItWorks,
