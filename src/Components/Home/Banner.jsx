@@ -603,49 +603,7 @@ function Banner({ data }) {
                             How To Play
                           </a>
 
-                          <Dialog
-                            open={open}
-                            onClose={() => setOpen(false)}
-                            maxWidth="md"
-                            fullWidth
-                          >
-                            <DialogContent
-                              style={{
-                                position: "relative",
-                                padding: "16px",
-                              }}
-                            >
-                              {/* Close Button (X)
-                              // <IconButton
-                              //   className="custom-close-btn"
-                              //   onClick={() => setOpen(false)}
-                              // >
-                              //   <CloseIcon />
-                              // </IconButton> */}
-
-                              <div
-                                style={{
-                                  position: "relative",
-                                  paddingBottom: "56.25%",
-                                  height: 0,
-                                }}
-                              >
-                                <iframe
-                                  width="100%"
-                                  height="100%"
-                                  style={{
-                                    position: "absolute",
-                                    top: 0,
-                                    left: 0,
-                                  }}
-                                  src={movies.video_url}
-                                  title="video"
-                                  frameBorder="0"
-                                  allowFullScreen
-                                ></iframe>
-                              </div>
-                            </DialogContent>
-                          </Dialog>
+                        
                         </div>
                         <div className="btn_tdy p-3 px-3">
                           <span>
@@ -1186,7 +1144,7 @@ function Banner({ data }) {
                   >
                     {/* Close Button (X) */}
                     <IconButton
-                      style={{ position: "absolute", right: "10", top: "10" }}
+                      // style={{ position: "absolute", right: "20", top: "10" }}
                       className="custom-close-btn"
                       onClick={() => setOpen(false)}
                     >
@@ -1204,7 +1162,7 @@ function Banner({ data }) {
                       <iframe
                         width="100%"
                         height="100%"
-                        style={{ position: "absolute", top: 0, left: 0 }}
+                        style={{ position: "absolute", top: 0, right: 0 }}
                         src={movies.video_url}
                         frameBorder="0"
                         allowFullScreen
