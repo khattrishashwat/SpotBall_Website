@@ -32,9 +32,18 @@ function Faqs({ data }) {
                 height: "auto",
               }}
             >
-              <source src="images/Untitled design (25).mp4" type="video/mp4" />
-              <source src="images/flight.webm" type="video/webm" />
-              <source src="images/flight.ogv" type="video/ogg" />
+              <source
+                src={`${process.env.PUBLIC_URL}/images/Untitled design (25).mp4`}
+                type="video/mp4"
+              />
+              <source
+                src={`${process.env.PUBLIC_URL}/images/flight.webm`}
+                type="video/webm"
+              />
+              <source
+                src={`${process.env.PUBLIC_URL}/images/flight.ogv`}
+                type="video/ogg"
+              />
             </video>
           </div>
           <div className="container">
@@ -76,7 +85,10 @@ function Faqs({ data }) {
                               rel="noopener noreferrer"
                               className="thm-btn we-fly__btn-one btn btn-curve"
                             >
-                              <img src="images/apple.svg" alt="App Store" />
+                              <img
+                                src={`${process.env.PUBLIC_URL}/images/apple.svg`}
+                                alt="App Store"
+                              />
                               App Store
                             </a>
                           </div>
@@ -91,7 +103,10 @@ function Faqs({ data }) {
                               rel="noopener noreferrer"
                               className="thm-btn we-fly__btn-two btn btn-curve white-btn"
                             >
-                              <img src="images/android.svg" alt="Android App" />
+                              <img
+                                src={`${process.env.PUBLIC_URL}/images/android.svg`}
+                                alt="Android App"
+                              />
                               Android App
                             </a>
                           </div>
@@ -113,7 +128,7 @@ function Faqs({ data }) {
                     <div className="image ">
                       <div className="circle b-round" />
                       <img
-                        src="images/Frame-1 (2).png"
+                        src={`${process.env.PUBLIC_URL}/images/Frame-1 (2).png`}
                         alt=""
                         className="img-fluid blur-up lazyloaded"
                       />
@@ -206,7 +221,7 @@ function Faqs({ data }) {
                       data-bs-parent="#accordionFlushExample"
                     >
                       <div className="accordion-body">
-                        <p>{item.answer}</p>
+                        <p dangerouslySetInnerHTML={{ __html: item.answer }} />
                       </div>
                     </div>
                   </div>

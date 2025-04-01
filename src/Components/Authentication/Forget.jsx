@@ -58,7 +58,9 @@ function Forget() {
       setIsSubmitting(false);
     }
   };
-
+ const handleLogin = () => {
+   navigate("/");
+ };
   return (
     <>
       <section className="adminloginsection" style={{ height: "100svh" }}>
@@ -103,6 +105,7 @@ function Forget() {
                   <div className="loginologo">
                     <img
                       src={`${process.env.PUBLIC_URL}/images/logo.png`}
+                      onClick={handleLogin}
                     />
                   </div>
                   <div className="colformlogin">

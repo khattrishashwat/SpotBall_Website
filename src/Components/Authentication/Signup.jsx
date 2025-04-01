@@ -112,10 +112,13 @@ function Signup() {
       setIsLoading(false);
     }
   };
+  const handleLogin = () => {
+    navigate("/");
+  };
 
   return (
     <>
-      <section className="adminloginsection">
+      <section className="adminloginsection" style={{ height: "100svh" }}>
         <div className="container contfld-loginform">
           <div className="col-md-12 col12mainloginform">
             <div className="row rowmaqinloginform">
@@ -155,7 +158,10 @@ function Signup() {
                 </div>
                 <div className="col-md-5 col6formsidediv">
                   <div className="loginologo">
-                    <img src={`${process.env.PUBLIC_URL}/images/logo.png`} />
+                    <img
+                      src={`${process.env.PUBLIC_URL}/images/logo.png`}
+                      onClick={handleLogin}
+                    />
                   </div>
                   <div className="colformlogin">
                     <Formik
@@ -264,7 +270,7 @@ function Signup() {
                               <Field
                                 type="text"
                                 name="phone"
-                                placeholder="Mobile number"
+                                placeholder="Mobile no."
                                 onChange={(e) => {
                                   const numericValue = handleNumericInput(
                                     e.target.value
@@ -316,7 +322,7 @@ function Signup() {
                               <Field
                                 type={showConfirmPassword ? "text" : "password"}
                                 name="confirm_password"
-                                placeholder="Confirm Password"
+                                placeholder="Confirm Pass"
                                 onChange={(e) =>
                                   handleFieldChange(
                                     "confirm_password",
@@ -428,7 +434,7 @@ function Signup() {
                       </p>
                     </div>
 
-                    {/* <div className="signupwithsocial_div">
+                    <div className="signupwithsocial_div">
                       <p>or Sign Up using</p>
                       <div className="signupsociallinks">
                         <ul>
@@ -450,7 +456,7 @@ function Signup() {
                           </li>
                         </ul>
                       </div>
-                    </div> */}
+                    </div>
                   </div>
                 </div>
               </div>

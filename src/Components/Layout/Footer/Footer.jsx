@@ -3,18 +3,18 @@ import { Link, useLocation } from "react-router-dom";
 import axios from "axios";
 
 function Footer() {
-  const [footer, setFooter] = useState(""); 
-  const [links, setLinks] = useState([]); 
+  const [footer, setFooter] = useState("");
+  const [links, setLinks] = useState([]);
   const [androidLink, setAndroidLink] = useState(null);
-  const location = useLocation(); 
-  const [showBackToTop, setShowBackToTop] = useState(false); 
+  const location = useLocation();
+  const [showBackToTop, setShowBackToTop] = useState(false);
 
   const fetchFooter = async () => {
     try {
       const response = await axios.get(
         "app/static-content/get-all-static-content/footer"
       );
-      setLinks(response.data.data?.liveLinks || []); 
+      setLinks(response.data.data?.liveLinks || []);
     } catch (error) {
       console.error("Error fetching footer data:", error);
     }
@@ -231,11 +231,12 @@ function Footer() {
           bottom: "20px",
           right: "20px",
           cursor: "pointer",
+          zIndex: "99",
         }}
         onClick={scrollToTop}
       >
-        <a >
-          <i className="fa-solid fa-arrow-up"  />
+        <a>
+          <i className="fa-solid fa-arrow-up" />
         </a>
       </div>
     </>

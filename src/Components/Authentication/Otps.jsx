@@ -119,6 +119,9 @@ function Otps() {
       });
     }
   };
+   const handleLogin = () => {
+     navigate("/");
+   };
 
   return (
     <>
@@ -156,7 +159,7 @@ function Otps() {
                   <div className="loginologo">
                     <img
                       src={`${process.env.PUBLIC_URL}/images/logo.png`}
-                      alt="Logo"
+                      onClick={handleLogin}
                     />
                   </div>
                   <div className="colformlogin">

@@ -265,7 +265,18 @@ function Header() {
     navigate("/");
     setIsLogout(false);
   };
+  useEffect(() => {
+    if (isMenuVisible) {
+      document.body.style.overflow = "hidden"; // Disable background scrolling
+    } else {
+      document.body.style.overflow = "auto"; // Enable background scrolling
+    }
 
+    // Cleanup on component unmount or modal close
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [isMenuVisible]);
   return (
     <>
       <header
@@ -279,7 +290,9 @@ function Header() {
               <a className="topmainbar">
                 <div className="newbtn_top">New</div>
                 <div className="instantimgdiv">
-                  <img src="images/instant-win.svg" />
+                  <img
+                    src={`${process.env.PUBLIC_URL}/images/instant-win.svg`}
+                  />
                 </div>
                 <div className="endscompititions">
                   {timeLeft.isCompetitionStart
@@ -346,7 +359,7 @@ function Header() {
         </nav> */}
         <nav className="navbar navbar-static-top navbar-expand-xl header3">
           <div className="container main-header position-relative">
-            <div className="dropdown" tabIndex={0}>
+            <div className="dropdown mobile" tabIndex={0}>
               <button
                 id="dropdown-btn"
                 onClick={() => setIslangOpen(!islangOpen)}
@@ -389,6 +402,35 @@ function Header() {
                 alt="logo"
               />
             </Link>
+            <div className="dropdown dekstop-none" tabIndex={0}>
+              <button
+                id="dropdown-btn"
+                onClick={() => setIslangOpen(!islangOpen)}
+              >
+                {langName} <span className="arrow-down"></span>
+              </button>
+              {islangOpen && (
+                <ul className="dropdown-content" id="dropdown-content">
+                  {locales
+                    .filter((locale) => locale !== selectedLocale)
+                    .map((otherLocale) => {
+                      const otherIntlLocale = new Intl.Locale(otherLocale);
+                      const otherLangName = new Intl.DisplayNames(["en"], {
+                        type: "language",
+                      }).of(otherIntlLocale.language);
+
+                      return (
+                        <li
+                          key={otherLocale}
+                          onMouseDown={() => handleSelectLocale(otherLocale)}
+                        >
+                          {otherLangName}
+                        </li>
+                      );
+                    })}
+                </ul>
+              )}
+            </div>
 
             <div className="navbar-collapse collapse">
               <ul className="nav navbar-nav">
@@ -396,12 +438,12 @@ function Header() {
                   <Link to="/" className="navbar-brand">
                     <img
                       className="logo img-fluid"
-                      src="images/logo.png"
+                      src={`${process.env.PUBLIC_URL}/images/logo.png`}
                       alt="logo"
                     />
                     <img
                       className="sticky-logo img-fluid"
-                      src="images/logo.png"
+                      src={`${process.env.PUBLIC_URL}/images/logo.png`}
                       alt="logo"
                     />
                   </Link>
@@ -418,7 +460,10 @@ function Header() {
                         className="itmelink_menus"
                         onClick={handleNotificationClick}
                       >
-                        <img src="/images/bell_icon.png" alt="Notifications" />
+                        <img
+                          src={`${process.env.PUBLIC_URL}/images/bell_icon.png`}
+                          alt="Notifications"
+                        />
                         {unreadCount > 0 && (
                           <span className="cartcount">{unreadCount}</span>
                         )}
@@ -448,7 +493,7 @@ function Header() {
                                     <div className="notify-icondiv">
                                       <img
                                         className="notification_img"
-                                        src="/image/favicon.png"
+                                        src={`${process.env.PUBLIC_URL}/image/favicon.png`}
                                         alt="notification"
                                       />
                                     </div>
@@ -490,7 +535,11 @@ function Header() {
                     {/* Cart Icon */}
                     <li className="nav-item afterlogin_icons_nav">
                       <Link to="/cart" className="itmelink_menus">
-                        <img src="/image/cart_icon.png" alt="Cart" />
+                        <img
+                          src={`${process.env.PUBLIC_URL}/image/cart_icon.png`}
+                          // src="/image/cart_icon.png"
+                          alt="Cart"
+                        />
                       </Link>
                     </li>
 
@@ -502,15 +551,18 @@ function Header() {
                       >
                         <div className="userimgdiv">
                           <img
-                            src={
+                            src={`${process.env.PUBLIC_URL}${
                               profile?.profile_url || "/image/user_image.png"
-                            }
+                            }`}
                             alt="User"
                           />
                         </div>
                         {profile?.is_verified_user && (
                           <div className="userverifyimg">
-                            <img src="/image/verify.png" alt="Verified User" />
+                            <img
+                              src={`${process.env.PUBLIC_URL}//image/verify.png`}
+                              alt="Verified User"
+                            />
                           </div>
                         )}
                       </Link>
@@ -569,7 +621,7 @@ function Header() {
               <Link to="/">
                 <img
                   className="logo img-fluid"
-                  src="images/logo.png"
+                  src={`${process.env.PUBLIC_URL}/images/logo.png`}
                   alt="logo"
                 />
               </Link>

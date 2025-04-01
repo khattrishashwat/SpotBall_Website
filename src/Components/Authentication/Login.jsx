@@ -4,6 +4,10 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import Swal from "sweetalert2";
 import * as Yup from "yup";
 import axios from "axios";
+import {
+  LoginWithGoogle,
+  LoginWithFacebook,
+} from "../FirebaseCofig/FirebaseConfig";
 
 function Login() {
   const formikRef = useRef(null);
@@ -19,6 +23,9 @@ function Login() {
 
   const handleForgotPassword = () => {
     navigate("/forgot");
+  };
+  const handleLogin = () => {
+    navigate("/");
   };
 
   const LoginValues = {
@@ -175,6 +182,7 @@ function Login() {
                   <div className="loginologo">
                     <img
                       src={`${process.env.PUBLIC_URL}/images/logo.png`}
+                      onClick={handleLogin}
                     />
                   </div>
 
@@ -260,12 +268,17 @@ function Login() {
                             <Link to="/signup">Sign Up</Link>{" "}
                           </p>
                         </div>
-                        {/* <div className="signupwithsocial_div">
+                        <div className="signupwithsocial_div">
                           <p>or Sign In using</p>
                           <div className="signupsociallinks">
                             <ul>
                               <li>
-                                <a style={{ cursor: "pointer" }}>
+                                <a
+                                  onClick={() => {
+                                    LoginWithGoogle();
+                                  }}
+                                  style={{ cursor: "pointer" }}
+                                >
                                   <img
                                     src={`${process.env.PUBLIC_URL}/image/google_icon.png`}
                                     alt="Google"
@@ -282,7 +295,7 @@ function Login() {
                               </li>
                             </ul>
                           </div>
-                        </div> */}
+                        </div>
                       </div>
                     </Form>
                   </Formik>

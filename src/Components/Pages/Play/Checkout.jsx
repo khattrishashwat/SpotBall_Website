@@ -565,8 +565,8 @@ function Checkout() {
       // ✅ If order_amount > 0, initialize Cashfree SDK
       let cashfree;
       try {
-        // cashfree = await load({ mode: "sandbox" });
-        cashfree = await load({ mode: "production" });
+        cashfree = await load({ mode: "sandbox" });
+        // cashfree = await load({ mode: "production" });
         console.log("Cashfree SDK initialized successfully.");
       } catch (sdkError) {
         console.error("SDK Initialization Error:", sdkError);

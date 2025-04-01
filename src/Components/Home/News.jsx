@@ -10,7 +10,11 @@ function News({ data }) {
 
   return (
     <section className="space-ptb latest-news-players-rank">
-      <img className="pattern-4" src="images/home-04/pattern-04.png" alt="" />
+      <img
+        className="pattern-4"
+        src={`${process.env.PUBLIC_URL}/images/home-04/pattern-04.png`}
+        alt=""
+      />
       <div className="container">
         <div className="row">
           <div className="col-12">

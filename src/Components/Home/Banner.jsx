@@ -420,40 +420,39 @@ function Banner({ data }) {
     }
   }, [restrictedStates]);
 
+  useEffect(() => {
+    const checkGeolocation = () => {
+      const location = JSON.parse(localStorage.getItem("location") || "null");
+      const restrictedArea = JSON.parse(
+        localStorage.getItem("restrictedArea") || "null"
+      );
 
-    useEffect(() => {
-      const checkGeolocation = () => {
-        const location = JSON.parse(localStorage.getItem("location") || "null");
-        const restrictedArea = JSON.parse(
-          localStorage.getItem("restrictedArea") || "null"
-        );
-  
-        const hasLocation = location && Object.keys(location).length > 0;
-        const hasRestrictedArea =
-          restrictedArea && Object.keys(restrictedArea).length > 0;
-  
-        if (token) {
-          setGeolocationPopupVisible(!(hasLocation || hasRestrictedArea));
-        } else {
-          setGeolocationPopupVisible(false);
-        }
-      };
-  
-      checkGeolocation();
-  
-      // Listen for localStorage changes
-      const handleStorageChange = (event) => {
-        if (event.key === "location" || event.key === "restrictedArea") {
-          checkGeolocation();
-        }
-      };
-  
-      window.addEventListener("storage", handleStorageChange);
-  
-      return () => {
-        window.removeEventListener("storage", handleStorageChange);
-      };
-    }, [token]);
+      const hasLocation = location && Object.keys(location).length > 0;
+      const hasRestrictedArea =
+        restrictedArea && Object.keys(restrictedArea).length > 0;
+
+      if (token) {
+        setGeolocationPopupVisible(!(hasLocation || hasRestrictedArea));
+      } else {
+        setGeolocationPopupVisible(false);
+      }
+    };
+
+    checkGeolocation();
+
+    // Listen for localStorage changes
+    const handleStorageChange = (event) => {
+      if (event.key === "location" || event.key === "restrictedArea") {
+        checkGeolocation();
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, [token]);
   return (
     <>
       <div className="color-container">
@@ -490,7 +489,7 @@ function Banner({ data }) {
                   >
                     <img
                       className="img-fluid vert-move"
-                      src="images/home-01/pattern-01.png"
+                      src={`${process.env.PUBLIC_URL}/images/home-01/pattern-01.png`}
                       alt=""
                     />
                   </div>
@@ -502,12 +501,16 @@ function Banner({ data }) {
                   >
                     <img
                       className="img-fluid vert-move"
-                      src="images/target.png"
+                      src={`${process.env.PUBLIC_URL}/images/target.png`}
                       alt=""
                     />
                   </div>
                   <div className="pattern-04">
-                    <img className="" src="images/Artboard 2@4x.png" alt="" />
+                    <img
+                      className=""
+                      src={`${process.env.PUBLIC_URL}/images/Artboard 2@4x.png`}
+                      alt=""
+                    />
                   </div>
                   <div className="container-fluid">
                     <div className="row">
@@ -579,21 +582,19 @@ function Banner({ data }) {
                             fullWidth
                           >
                             <DialogContent
-                              style={{ position: "relative", padding: "16px" }}
+                              style={{
+                                position: "relative",
+                                padding: "16px",
+                              }}
                             >
-                              {/* Close Button (X) */}
-                              <IconButton
-                                style={{
-                                  position: "absolute",
-                                  right: "10px",
-                                  top: "10px",
-                                }}
-                                onClick={() => setOpen(false)}
-                              >
-                                <CloseIcon />
-                              </IconButton>
+                              {/* Close Button (X)
+                              // <IconButton
+                              //   className="custom-close-btn"
+                              //   onClick={() => setOpen(false)}
+                              // >
+                              //   <CloseIcon />
+                              // </IconButton> */}
 
-                              {/* Embedded YouTube Video */}
                               <div
                                 style={{
                                   position: "relative",
@@ -610,7 +611,7 @@ function Banner({ data }) {
                                     left: 0,
                                   }}
                                   src={movies.video_url}
-                                  title="YouTube video"
+                                  title="video"
                                   frameBorder="0"
                                   allowFullScreen
                                 ></iframe>
@@ -629,7 +630,7 @@ function Banner({ data }) {
                         <div className="banner-img">
                           <img
                             className="img-fluid hori-move"
-                            src="images/aaa.png"
+                            src={`${process.env.PUBLIC_URL}/images/aaa.png`}
                             data-swiper-animation="fadeIn"
                             data-duration="5.0s"
                             data-delay="1.0s"
@@ -744,7 +745,7 @@ function Banner({ data }) {
                     >
                       <img
                         className="img-fluid vert-move side-pattern-height"
-                        src="images/batsman.png"
+                        src={`${process.env.PUBLIC_URL}/images/batsman.png`}
                         alt=""
                       />
                     </div>
@@ -759,7 +760,7 @@ function Banner({ data }) {
                     </div>
                     <div className="live-box">
                       <img
-                        src="images/live-text.png"
+                        src={`${process.env.PUBLIC_URL}/images/live-text.png`}
                         alt=""
                         className="live-image"
                       />
@@ -795,7 +796,7 @@ function Banner({ data }) {
                     >
                       <img
                         className="img-fluid vert-move side-pattern-height we"
-                        src="images/bowler.png"
+                        src={`${process.env.PUBLIC_URL}/images/bowler.png`}
                         alt=""
                       />
                     </div>
@@ -821,7 +822,10 @@ function Banner({ data }) {
               }}
             >
               <div className="Current-contest-1 main img">
-                <img className="side-curve" src="images/golfer-1.png" />
+                <img
+                  className="side-curve"
+                  src={`${process.env.PUBLIC_URL}/images/golfer-1.png`}
+                />
                 {contests?.length > 0 &&
                   contests[0]?.contest_banner?.file_url && (
                     <img
@@ -841,12 +845,16 @@ function Banner({ data }) {
                 >
                   <img
                     className="img-fluid vert-move"
-                    src="images/target.png"
+                    src={`${process.env.PUBLIC_URL}/images/target.png`}
                     alt=""
                   />
                 </div>
                 <div className="pattern-04 banner1">
-                  <img className="" src="images/Artboard 2@4x.png" alt="" />
+                  <img
+                    className=""
+                    src={`${process.env.PUBLIC_URL}/images/Artboard 2@4x.png`}
+                    alt=""
+                  />
                 </div>
               </div>
 
@@ -859,7 +867,7 @@ function Banner({ data }) {
                 <div className="pattern-05 banner1">
                   <img
                     className="img-fluid vert-move"
-                    src="images/Artboard 2@4x.png"
+                    src={`${process.env.PUBLIC_URL}/images/Artboard 2@4x.png`}
                     alt=""
                   />
                 </div>
@@ -869,13 +877,17 @@ function Banner({ data }) {
                     <div className="contesteveryweekdiv">
                       <div className="contest_newtiming_strip">
                         <span className="line-img">
-                          <img src="images/calendar.png" />
+                          <img
+                            src={`${process.env.PUBLIC_URL}/images/calendar.png`}
+                          />
                         </span>
                         <h4>Every Week’s Contest Ends</h4>
                       </div>
                       <div className="contestrightdaysdate contest_newtiming_strip mb-0">
                         <span className="line-img calendar">
-                          <img src="images/wall-clock.png" />
+                          <img
+                            src={`${process.env.PUBLIC_URL}/images/wall-clock.png`}
+                          />
                         </span>
                         <h4 className="contslist_span_inner">
                           Sunday- 23:59hrs
@@ -885,7 +897,9 @@ function Banner({ data }) {
                     <div className="contesteveryweekdiv">
                       <div className="contest_newtiming_strip">
                         <span className="line-img ">
-                          <img src="images/calendar.png" />
+                          <img
+                            src={`${process.env.PUBLIC_URL}/images/calendar.png`}
+                          />
                         </span>
                         <h4>
                           Every Week Live Stream <br /> SpotsBall’s “Weekly
@@ -894,7 +908,9 @@ function Banner({ data }) {
                       </div>
                       <div className="contestrightdaysdate contest_newtiming_strip mb-0">
                         <span className="line-img calendar">
-                          <img src="images/wall-clock.png" />
+                          <img
+                            src={`${process.env.PUBLIC_URL}/images/wall-clock.png`}
+                          />
                         </span>
                         <h4 className="contslist_span_inner">
                           Monday- 21:00hrs
@@ -956,7 +972,10 @@ function Banner({ data }) {
                     >
                       <div className="main">
                         <div className="co-img">
-                          <img src="images/target.png" alt="Discount" />
+                          <img
+                            src={`${process.env.PUBLIC_URL}/images/target.png`}
+                            alt="Discount"
+                          />
                         </div>
                         <div className="vertical"></div>
                         <div className="content">
@@ -977,9 +996,9 @@ function Banner({ data }) {
         </div>
 
         <section
-          className="tickets-section bg-primary py-80"
+          className="tickets-section  py-80"
           style={{
-            backgroundImage: "url(images/home-4-banner-bg.jpg)",
+            backgroundImage: "url(./images/home-4-banner-bg.jpg)",
             backgroundRepeat: "no-repeat",
             backgroundSize: "cover",
             position: "relative",
@@ -1001,12 +1020,12 @@ function Banner({ data }) {
                   <div className="ticket-container">
                     <div className="barcode-box">
                       <img
-                        src="images/barcode-1.png"
+                        src={`${process.env.PUBLIC_URL}/images/barcode-1.png`}
                         alt=""
                         className="d-sm-flex d-none"
                       />
                       <img
-                        src="images/barcode-2.png"
+                        src={`${process.env.PUBLIC_URL}/images/barcode-2.png`}
                         alt=""
                         className="d-sm-none d-block"
                       />
@@ -1033,14 +1052,18 @@ function Banner({ data }) {
 
                       <div className="contest_quantity_para_div">
                         <div className="addcart_contst_textinfo">
-                          <img src="images/ball_icon.png" />
+                          <img
+                            src={`${process.env.PUBLIC_URL}/images/ball_icon.png`}
+                          />
                           <h2>
                             Use Add and subtract button for increase and
                             decrease your tickets
                           </h2>
                         </div>
                         <div className="addcart_contst_textinfo">
-                          <img src="images/ball_icon.png" />
+                          <img
+                            src={`${process.env.PUBLIC_URL}/images/ball_icon.png`}
+                          />
                           <h2>Max 75 tickets per person</h2>
                         </div>
                       </div>
@@ -1059,35 +1082,35 @@ function Banner({ data }) {
               </div>
 
               {/* <div className="col-lg-6">
-                <section
-                  className="video-section-02"
-                  style={{
-                    backgroundImage: "url(images/home-4-banner-bg.jpg)",
-                    backgroundRepeat: "no-repeat",
-                    backgroundSize: "100% 100%",
-                    position: "relative",
-                    zIndex: 1,
-                    height: "266px",
-                    borderRadius: "10px",
-                  }}
-                >
-                  <div className="container">
-                    <div className="row justify-content-center">
-                      <div className="col-md-10 col-lg-9 col-xl-7">
-                        <div className="video-style-04">
-                          <a
-                            href="https://youtu.be/n_Cn8eFo7u8"
-                            className="play-btn circle b-round popup-youtube video-btn"
-                          >
-                            <i className="fa-solid fa-play"></i>
-                          </a>
-                          <h2>How To Play</h2>
+                  <section
+                    className="video-section-02"
+                    style={{
+                      backgroundImage: "url(images/home-4-banner-bg.jpg)",
+                      backgroundRepeat: "no-repeat",
+                      backgroundSize: "100% 100%",
+                      position: "relative",
+                      zIndex: 1,
+                      height: "266px",
+                      borderRadius: "10px",
+                    }}
+                  >
+                    <div className="container">
+                      <div className="row justify-content-center">
+                        <div className="col-md-10 col-lg-9 col-xl-7">
+                          <div className="video-style-04">
+                            <a
+                              href="https://youtu.be/n_Cn8eFo7u8"
+                              className="play-btn circle b-round popup-youtube video-btn"
+                            >
+                              <i className="fa-solid fa-play"></i>
+                            </a>
+                            <h2>How To Play</h2>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                </section>
-              </div> */}
+                  </section>
+                </div> */}
               <div className="col-lg-6">
                 <section
                   className="video-section-02"
@@ -1135,11 +1158,8 @@ function Banner({ data }) {
                   >
                     {/* Close Button (X) */}
                     <IconButton
-                      style={{
-                        position: "absolute",
-                        right: "10px",
-                        top: "10px",
-                      }}
+                      style={{ position: "absolute", right: "10", top: "10" }}
+                      className="custom-close-btn"
                       onClick={() => setOpen(false)}
                     >
                       <CloseIcon />
@@ -1350,27 +1370,30 @@ function Banner({ data }) {
               <div className="dis-pop">
                 <h5>Discount</h5>
                 {/* <Slider {...settings}>
-                  {Array.isArray(selectedDiscount) &&
-                    selectedDiscount.map((discount) => (
-                      <div key={discount._id} className="card first">
-                        <img
-                          src={`${process.env.PUBLIC_URL}/image/discount_img.png`}
-                        />
-                     
-                        <p>
-                          Tickets: {discount.minTickets} - {discount.maxTickets}
-                        </p>
-                        <p>Discount: {discount.discountPercentage}%</p>
-                      </div>
-                    ))}
-                </Slider> */}
+                    {Array.isArray(selectedDiscount) &&
+                      selectedDiscount.map((discount) => (
+                        <div key={discount._id} className="card first">
+                          <img
+                            src={`${process.env.PUBLIC_URL}/image/discount_img.png`}
+                          />
+                      
+                          <p>
+                            Tickets: {discount.minTickets} - {discount.maxTickets}
+                          </p>
+                          <p>Discount: {discount.discountPercentage}%</p>
+                        </div>
+                      ))}
+                  </Slider> */}
                 <Slider {...settings}>
                   {Array.isArray(selectedDiscount) &&
                     selectedDiscount.map((discount) => (
                       <div key={discount._id} className="card first dis_card">
                         <div className="main">
                           <div className="co-img">
-                            <img src="images/target.png" alt="Discount" />
+                            <img
+                              src={`${process.env.PUBLIC_URL}/images/target.png`}
+                              alt="Discount"
+                            />
                           </div>
                           <div className="vertical" />
                           <div className="content">

@@ -23,6 +23,7 @@ import Swal from "sweetalert2";
 import PageNot from "./Components/PageNot/PageNot";
 import TawkScriptLoader from "./TawkScriptLoader";
 import Loader from "./Components/Loader/Loader";
+import Socialsignup from "./Components/Authentication/Socialsignup";
 
 // Lazy loaded components
 const Home = lazy(() => import("./Components/Home/Home"));
@@ -85,7 +86,7 @@ const App = () => {
       <Helmet>
         <title>{loading ? "Loading..." : "SpotsBall"}</title>
       </Helmet>
-      <Router basename="/landing">
+      <Router basename="/spotsball/landing/">
         <TawkScriptLoader />
         <RoutesWithInterceptors />
       </Router>
@@ -159,6 +160,7 @@ const RoutesWithInterceptors = () => {
         <Route path="/otp" element={<OTp />} />
         <Route path="/otps" element={<Otps />} />
         <Route path="/createpassword" element={<CreateNewPassword />} />
+        <Route path="/socialsignup" element={<Socialsignup />} />
         <Route path="*" element={<PageNot />} />
       </Routes>
     </Suspense>

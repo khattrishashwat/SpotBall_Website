@@ -20,6 +20,9 @@ function CreateNewPassword() {
   const toggleConfirmPasswordVisibility = () => {
     setSeePassword(!seePassword);
   };
+   const handleLogin = () => {
+     navigate("/");
+   };
 
   const initialValues = {
     emailOrPhone: emailOrPhone || "",
@@ -116,7 +119,7 @@ function CreateNewPassword() {
                   <div className="loginologo">
                     <img
                       src={`${process.env.PUBLIC_URL}/images/logo.png`}
-                      //   src="images/logo.png"
+                      onClick={handleLogin}
                     />
                   </div>
                   <div className="colformlogin">

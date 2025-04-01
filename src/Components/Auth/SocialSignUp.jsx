@@ -37,20 +37,12 @@ const SocialSignUP = ({ onSocial, closeSocial }) => {
       const parsed = JSON.parse(value);
       return { ...defaultValues, ...parsed };
     } catch (err) {
-      localStorage.removeItem("UIDNotFound"); // Ensure corrupted data is removed
+      localStorage.removeItem("UIDNotFound"); 
       return null;
     }
   })();
 
   const initialValues = storedValues || defaultValues;
-
-  // useEffect(() => {
-  //   if (location?.state?.popupOpen === false) {
-  //     onSocial(false);
-  //   } else if (location?.state?.popupOpen === true) {
-  //     onSocial(true);
-  //   }
-  // }, [location.state]);
 
   useEffect(() => {
     console.log("Location state changed:", location.state);
