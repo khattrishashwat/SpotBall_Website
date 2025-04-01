@@ -21,7 +21,6 @@ function Privacy() {
         }
       );
       setIsCookies(response.data.data[0]?.description);
-      // console.log("ye",response.data.data);
     } catch (error) {
       console.error("Error data:", error);
     } finally {
@@ -117,21 +116,18 @@ function Privacy() {
                 <div className="tab-content">
                   <div id="cookiepolicy" className="tab-pane active">
                     <div className="legaltermsdata_div">
-                      {/* <div className="innerlegal_heaidngwithpara"> */}
-
-                      <div
+                      {isLoading ? (
+                        <Loader /> // This shows a spinner while loading
+                      ) : (
+                        <div
+                          className="innerlegal_heaidngwithpara"
+                          dangerouslySetInnerHTML={{ __html: isCookies }}
+                        />
+                      )}
+                      {/* <div
                         className="innerlegal_heaidngwithpara"
                         dangerouslySetInnerHTML={{ __html: isCookies }}
-                      />
-                      {/* {isLoading ? (
-                            <Loader /> // Correctly render the Loader component
-                          ) : (
-                            <div
-                              dangerouslySetInnerHTML={{ __html: isCookies }}
-                            />
-                          )} */}
-
-                      {/* </div> */}
+                      /> */}
                     </div>
                   </div>
                 </div>

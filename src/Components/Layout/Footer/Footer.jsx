@@ -65,7 +65,7 @@ function Footer() {
           <div className="container">
             <div className="row align-items-center justify-content-between mb-4 mb-md-5">
               {/* Social Media Section */}
-              <div className="col-md-12 col-lg-4 mb-4 mb-lg-0">
+              <div className="col-md-4 col-lg-4 mb-4 mb-lg-0">
                 <h5 className="title mb-3 d-block follow">Follow Us </h5>
                 <div className="footer-social justify-content-center justify-content-lg-start">
                   {/* <ul>
@@ -142,8 +142,8 @@ function Footer() {
               </div>
 
               {/* Logo Section */}
-              <div className="col-md-12 col-lg-4 text-center mb-4 mb-lg-0">
-                <Link to="" className="footer-logo">
+              <div className="col-md-4 col-lg-4 text-center mb-4 mb-lg-0">
+                <Link to="/" className="footer-logo">
                   <img
                     className="logo img-fluid"
                     src="images/logo.png"
@@ -153,35 +153,38 @@ function Footer() {
               </div>
 
               {/* Download App Section */}
-              <div className="col-md-12 col-lg-4">
+              <div className="col-md-4 col-lg-4">
                 <div className="download-app align-items-center justify-content-center justify-content-lg-start text-center">
                   <h5 className="title mb-3 d-block download">Download App</h5>
-                  {androidLink && (
-                    <a
-                      href={androidLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <img
-                        className="img-fluid"
-                        src={`${process.env.PUBLIC_URL}/images/android-download.png`}
-                        alt="Play Store"
-                      />
-                    </a>
-                  )}
-                  {links?.Apple_Store && (
-                    <a
-                      href={links.Apple_Store}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <img
-                        className="img-fluid"
-                        src={`${process.env.PUBLIC_URL}/images/appleapp.svg`}
-                        alt="Apple Store"
-                      />
-                    </a>
-                  )}
+                  <div className="app_icons">
+                    {androidLink && (
+                      <a
+                        href={androidLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <img
+                          className="img-fluid"
+                          src={`${process.env.PUBLIC_URL}/images/android-download.png`}
+                          alt="Play Store"
+                        />
+                      </a>
+                    )}
+
+                    {links?.Apple_Store && (
+                      <a
+                        href={links.Apple_Store}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <img
+                          className="img-fluid"
+                          src={`${process.env.PUBLIC_URL}/images/appleapp.svg`}
+                          alt="Apple Store"
+                        />
+                      </a>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

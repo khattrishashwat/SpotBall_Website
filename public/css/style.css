@@ -732,8 +732,11 @@ body {
   font-size: 16px;
   line-height: 1.5;
   color: #8d8c8c;
-  overflow-x: hidden;
+  /* overflow-x: hidden; */
   font-weight: 500;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden !important;
   /* background: #12111a;  */
 }
 
@@ -824,7 +827,7 @@ h6 {
 
 p {
   line-height: 1.5;
-  color: #ffffff;
+  /* color: #ffff ff; */
 }
 
 *::-moz-selection {
@@ -4742,7 +4745,7 @@ header.header.header-sticky.is-sticky .navbar .add-listing .side-menu .menu-dark
 
   .header.header-style-02 .navbar .main-header {
     padding: 0 28px;
-    padding-top: 25px;
+    /* padding-top: 25px; */
     padding-bottom: 25px;
     justify-content: space-between;
   }
@@ -4953,7 +4956,7 @@ header.header.header-sticky.is-sticky .navbar .add-listing .side-menu .menu-dark
   right: -22%;
   top: 13%;
   opacity: 0.3;
-  z-index: -2;
+  z-index: 0;
   transform: translate(-50%, -50%);
 }
 
@@ -10022,10 +10025,13 @@ img.hori-move {
   margin: 0 clamp(10px, 0.625vw, 24px);
   gap: 30px;
   padding-right: 32px;
-  padding-left: 18px;
+  padding-left: 16px;
 }
 
-.barcode-box img {}
+
+.barcode-box img {
+  width: 100px;
+}
 
 .tickets-section .ticket-container .ticket-line {
   display: none;
@@ -12194,9 +12200,9 @@ h5.title.mb-3.d-block.download {
   margin-bottom: 18px;
 }
 
-a.nav-link img {
+/* a.nav-link img {
   width: 26px !important;
-}
+} */
 
 
 #box {
@@ -12305,7 +12311,7 @@ a.nav-link img {
   border-radius: 40px;
   z-index: 1;
   top: 27px;
-  background-color: #e2eee8;
+  background-color: #ebebeb;
   width: 30px;
 }
 
@@ -12317,7 +12323,7 @@ a.nav-link img {
   border-radius: 40px;
   z-index: 1;
   top: 27px;
-  background-color: #e2eee8;
+  background-color: #ebebeb;
   width: 30px;
 }
 
@@ -12440,9 +12446,8 @@ span.mark-text {
 /**** new-css ****/
 
 .dropdown button {
-  background-color: #253849;
-  background: #ffffff14;
-  backdrop-filter: blur(10px);
+  background: #ffffff14 !important;
+  backdrop-filter: blur(10px) !important;
   /* min-width: 130px; */
   width: max-content;
   height: 40px;
@@ -13191,9 +13196,7 @@ img.img-fluid.hori-move.login {
 
 .formstart.otp {
   display: flex !important;
-  !i;
-  !;
-  /* grid-template-columns: repeat(4, 1fr); */
+
   gap: 20px;
   justify-content: center;
 }
@@ -13205,7 +13208,7 @@ img.img-fluid.hori-move.login {
 }
 
 .formstart.otp .form-control.frmctrldiv input {
-  padding: 5px;
+  padding: 15px;
   display: FLEX;
   justify-content: center;
 
@@ -13327,6 +13330,20 @@ header.header.header-sticky.default.header-style-02.bg-blue {
   justify-content: center;
 }
 
+.app_icons {
+  display: flex;
+  align-items: center;
+  justify-content: right;
+}
+
+.working-process.ct {
+  background: #ebebeb;
+}
+
+.compitiontextinfodivmain {
+  position: relative;
+  z-index: 1;
+}
 
 @media (max-width: 1800px) {
   .banner .swiper-slide1 {
@@ -13515,9 +13532,41 @@ header.header.header-sticky.default.header-style-02.bg-blue {
 
 @media (min-width:767px) and (max-width: 991px) {
 
+
+  .faq_content .panel-group .panel .panel-heading h4 a {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  h5.title.mb-3.d-block.follow {
+    padding-left: 48px;
+  }
+
+  .btn-white {
+    margin-top: 0 !important;
+  }
+
+  .banner-gallery .col {
+    margin-top: -8px;
+  }
+
+  .banner-img {
+    width: 100%;
+  }
+
+  .swiper-wrapper1 .col-md-5.col-lg-5.d-none.d-lg-flex.justify-content-center {
+    display: flex !important;
+  }
+
+  .banner-img img {
+    width: 300px !important;
+    max-width: 800px !important;
+  }
+
   .header.header-style-02 .navbar .main-header {
     padding: 0 18px;
-    padding-top: 12px;
+    /* padding-top: 12px; */
     padding-bottom: 12px;
   }
 
@@ -13564,9 +13613,69 @@ header.header.header-sticky.default.header-style-02.bg-blue {
     top: -12%;
     right: 2%;
     height: 320px;
+    left: unset;
   }
 
+  .Current-contest {
+    display: block;
+    margin-top: 50px;
+  }
 
+  .Current-contest-1.main.img {
+    justify-content: center;
+    margin-bottom: 50px;
+  }
+
+  .discount-coupons {
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: 1fr 1fr;
+    grid-gap: 40px;
+  }
+
+  .card {
+    grid-column-end: span 2;
+  }
+
+  .card.third {
+    grid-column-start: 2;
+  }
+
+  .tickets-section .ticket-container {
+    padding-right: 32px;
+    padding-left: 45px;
+  }
+
+  .video-style-04 h2 {
+    margin-top: 90px;
+  }
+
+  a.play-btn.circle.b-round.popup-youtube.video-btn {
+    top: 10%;
+  }
+
+  .app-section video {
+    height: 100% !important;
+    object-fit: cover;
+  }
+
+  h5.title.mb-3.d-block.download {
+    padding-right: 30px;
+  }
+
+  .space-ptb.latest-news-players-rank .col-xl-4.col-lg-6.col-md-6.mb-4.mb-xl-0:last-child {
+    width: 100%;
+    display: flex;
+    gap: 24px;
+    margin-top: -52px;
+  }
+
+  .Current-contest-1.main.img .side-curve {
+    left: 120px;
+  }
+
+  span.mark-text {
+    left: 23%;
+  }
 
   .entriesdiv_inner.closediv_entries p {
     font-size: 20px;
@@ -13627,6 +13736,28 @@ header.header.header-sticky.default.header-style-02.bg-blue {
   section.banner.banner-01 {
     height: 100%;
     top: -106px !important;
+    padding-bottom: 125px !important;
+  }
+
+  .banner-img {
+    width: 100%;
+    display: flex;
+    align-content: flex-end;
+  }
+
+  .banner .swiper-slide1 {
+    padding: 0px 0px;
+  }
+
+  .banner .pattern-03 {
+    right: 60px;
+    top: 250px;
+  }
+
+  .banner .pattern-04 {
+    right: 72px;
+    top: 245px;
+    z-index: 7;
   }
 
   .dropdown.mobile {
@@ -13650,7 +13781,7 @@ header.header.header-sticky.default.header-style-02.bg-blue {
   }
 
   .adminloginsection {
-    height: 100svh;
+    height: 100svh !important;
   }
 
   .rowmaqinloginform .col12loginseconddiv {
@@ -13672,11 +13803,12 @@ header.header.header-sticky.default.header-style-02.bg-blue {
 
   .col12loginseconddiv .col6formsidediv {
     width: 100%;
+    max-width: 100%;
   }
 
   .banner .swiper-slide1 {
     height: 450px;
-    padding-bottom: 80px;
+    padding-bottom: 0px;
   }
 
   .banner.banner-01 .pagination-button .swiper-button-next {
@@ -13741,6 +13873,22 @@ header.header.header-sticky.default.header-style-02.bg-blue {
 
 
 @media (max-width: 767px) {
+
+  .app_icons {
+
+    justify-content: center;
+  }
+
+  .container,
+  .container-md,
+  .container-sm {
+    max-width: 740px !important;
+  }
+
+  .choosefor_input label {
+    width: fit-content;
+    padding: 0 2px;
+  }
 
   .listar-feature-icon-wrapper {
     height: auto;
@@ -14185,13 +14333,7 @@ header.header.header-sticky.default.header-style-02.bg-blue {
     font-size: 26px;
   }
 
-  .card::after {
-    background-color: #eef2f0;
-  }
 
-  .card::before {
-    background-color: #eef2f0;
-  }
 
   .min-footer .row.align-items-center.justify-content-between.mb-4.mb-md-5 {
     display: block;
@@ -14333,6 +14475,7 @@ header.header.header-sticky.default.header-style-02.bg-blue {
     height: 25px;
     font-size: 12px;
     line-height: 15px;
+    padding: 6px 8px;
   }
 
   .row.g-3.gallery-wrap {
@@ -14510,5 +14653,9 @@ header.header.header-sticky.default.header-style-02.bg-blue {
 @media (max-width: 400px) {
   .header.header-style-02 .navbar .main-header img {
     height: 18px;
+  }
+
+  .adminloginsection {
+    height: 100svh;
   }
 }

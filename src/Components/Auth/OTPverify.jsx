@@ -78,7 +78,7 @@ function OTPverify({ onClosedss, emailOrPhone }) {
       } else {
         Swal.fire({
           icon: "error",
-          text: response.data.message ,
+          text: response.data.message,
         });
         setOtp(["", "", "", ""]);
       }
@@ -95,7 +95,7 @@ function OTPverify({ onClosedss, emailOrPhone }) {
 
   const resendOtp = async () => {
     if (timer > 0) return; // Prevent resending if timer is active
-  setTimer(60); 
+    setTimer(60);
 
     let token = localStorage.getItem("tokens");
 
@@ -123,7 +123,7 @@ function OTPverify({ onClosedss, emailOrPhone }) {
       // Start the timer
       // setTimer(60);
     } catch (error) {
-          setTimer(0); 
+      setTimer(0);
 
       Swal.fire({
         icon: "error",

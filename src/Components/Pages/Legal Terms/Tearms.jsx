@@ -117,18 +117,18 @@ function Tearms() {
                 <div className="tab-content">
                   <div id="terms_conditions" className="tab-pane active">
                     <div className="legaltermsdata_div">
-                      <div
+                      {/* <div
                         className="innerlegal_heaidngwithpara"
                         dangerouslySetInnerHTML={{ __html: terms }}
-                      />
-                      {/* <div className="innerlegal_heaidngwithpara"> */}
-
-                      {/* {isLoading ? (
-                          <Loader /> // Correctly render the Loader component
-                        ) : (
-                          <div dangerouslySetInnerHTML={{ __html: terms }} />
-                        )} */}
-                      {/* </div> */}
+                      /> */}
+                      {isLoading ? (
+                        <Loader /> // This shows a spinner while loading
+                      ) : (
+                        <div
+                          className="innerlegal_heaidngwithpara"
+                          dangerouslySetInnerHTML={{ __html: terms }}
+                        />
+                      )}
                     </div>
                   </div>
                 </div>

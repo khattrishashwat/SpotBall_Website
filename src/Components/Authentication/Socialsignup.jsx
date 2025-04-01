@@ -115,215 +115,217 @@ function Socialsignup() {
       <div className="container contfld-loginform">
         <div className="col-md-12 col12mainloginform">
           <div className="row rowmaqinloginform">
-            <div className="col-lg-7 col6sliderdiv">
-              <div className="login_left_img banner">
-                <div className="banner-img">
-                  <img
-                    className="img-fluid hori-move"
-                    src={`${process.env.PUBLIC_URL}/images/aaa.png`}
-                    data-swiper-animation="fadeIn"
-                    data-duration="5.0s"
-                    data-delay="1.0s"
-                    alt=""
-                  />
-                  <div className="pattern-04">
+            <div className="col-md-12 col12loginseconddiv">
+              <div className="col-lg-7 col6sliderdiv">
+                <div className="login_left_img banner">
+                  <div className="banner-img">
                     <img
-                      className=""
-                      src={`${process.env.PUBLIC_URL}/images/Artboard 2@4x.png`}
+                      className="img-fluid hori-move"
+                      src={`${process.env.PUBLIC_URL}/images/aaa.png`}
+                      data-swiper-animation="fadeIn"
+                      data-duration="5.0s"
+                      data-delay="1.0s"
                       alt=""
                     />
-                  </div>
-                  <div
-                    className="pattern-03 login"
-                    data-swiper-animation="fadeIn"
-                    data-duration="1.5s"
-                    data-delay="1.0s"
-                  >
-                    <img
-                      className="img-fluid vert-move"
-                      src={`${process.env.PUBLIC_URL}/images/target.png`}
-                      alt=""
-                    />
+                    <div className="pattern-04">
+                      <img
+                        className=""
+                        src={`${process.env.PUBLIC_URL}/images/Artboard 2@4x.png`}
+                        alt=""
+                      />
+                    </div>
+                    <div
+                      className="pattern-03 login"
+                      data-swiper-animation="fadeIn"
+                      data-duration="1.5s"
+                      data-delay="1.0s"
+                    >
+                      <img
+                        className="img-fluid vert-move"
+                        src={`${process.env.PUBLIC_URL}/images/target.png`}
+                        alt=""
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-            <div className="col-md-5 col6formsidediv">
-              <div className="loginologo">
-                <img
-                  src={`${process.env.PUBLIC_URL}/images/logo.png`}
-                  onClick={handleLogin}
-                />
-              </div>
-              <div className="colformlogin">
-                <Formik
-                  innerRef={formikRef}
-                  initialValues={storedValues}
-                  validationSchema={validationSchema}
-                  validateOnChange
-                  validateOnBlur
-                  onSubmit={handleSocialSignup}
-                >
-                  {({ isSubmitting, setFieldValue, values }) => (
-                    <Form>
-                      <div className="login-heading">
-                        <h2>Social Sign Up</h2>
-                      </div>
-                      <div className="formstart signup">
-                        <div className="form-control frmctrldiv">
-                          <Field
-                            type="text"
-                            name="first_name"
-                            placeholder="First Name"
-                            onChange={(e) =>
-                              handleFieldChange(
-                                "first_name",
-                                e.target.value,
-                                setFieldValue,
-                                values
-                              )
-                            }
-                          />
-                          <ErrorMessage
-                            name="first_name"
-                            component="div"
-                            className="error-message"
-                          />
+              <div className="col-md-5 col6formsidediv">
+                <div className="loginologo">
+                  <img
+                    src={`${process.env.PUBLIC_URL}/images/logo.png`}
+                    onClick={handleLogin}
+                  />
+                </div>
+                <div className="colformlogin">
+                  <Formik
+                    innerRef={formikRef}
+                    initialValues={storedValues}
+                    validationSchema={validationSchema}
+                    validateOnChange
+                    validateOnBlur
+                    onSubmit={handleSocialSignup}
+                  >
+                    {({ isSubmitting, setFieldValue, values }) => (
+                      <Form>
+                        <div className="login-heading">
+                          <h2>Social Sign Up</h2>
                         </div>
-                        <div className="form-control frmctrldiv">
-                          <Field
-                            type="text"
-                            name="last_name"
-                            placeholder="Last Name"
-                            onChange={(e) =>
-                              handleFieldChange(
-                                "last_name",
-                                e.target.value,
-                                setFieldValue,
-                                values
-                              )
-                            }
-                          />
-                          <ErrorMessage
-                            name="last_name"
-                            component="div"
-                            className="error-message"
-                          />
+                        <div className="formstart signup">
+                          <div className="form-control frmctrldiv">
+                            <Field
+                              type="text"
+                              name="first_name"
+                              placeholder="First Name"
+                              onChange={(e) =>
+                                handleFieldChange(
+                                  "first_name",
+                                  e.target.value,
+                                  setFieldValue,
+                                  values
+                                )
+                              }
+                            />
+                            <ErrorMessage
+                              name="first_name"
+                              component="div"
+                              className="error-message"
+                            />
+                          </div>
+                          <div className="form-control frmctrldiv">
+                            <Field
+                              type="text"
+                              name="last_name"
+                              placeholder="Last Name"
+                              onChange={(e) =>
+                                handleFieldChange(
+                                  "last_name",
+                                  e.target.value,
+                                  setFieldValue,
+                                  values
+                                )
+                              }
+                            />
+                            <ErrorMessage
+                              name="last_name"
+                              component="div"
+                              className="error-message"
+                            />
+                          </div>
+                          <div className="form-control frmctrldiv">
+                            <Field
+                              type="email"
+                              name="email"
+                              placeholder="Email"
+                              onChange={(e) =>
+                                handleFieldChange(
+                                  "email",
+                                  e.target.value,
+                                  setFieldValue,
+                                  values
+                                )
+                              }
+                            />
+                            <ErrorMessage
+                              name="email"
+                              component="div"
+                              className="error-message"
+                            />
+                          </div>
+                          <div className="form-control frmctrldiv">
+                            <Field
+                              type="text"
+                              name="phone"
+                              placeholder="Mobile number"
+                              onChange={(e) =>
+                                handleNumericInput(e, setFieldValue, values)
+                              }
+                            />
+                            <ErrorMessage
+                              name="phone"
+                              component="div"
+                              className="error-message"
+                            />
+                          </div>
                         </div>
-                        <div className="form-control frmctrldiv">
-                          <Field
-                            type="email"
-                            name="email"
-                            placeholder="Email"
-                            onChange={(e) =>
-                              handleFieldChange(
-                                "email",
-                                e.target.value,
-                                setFieldValue,
-                                values
-                              )
-                            }
-                          />
-                          <ErrorMessage
-                            name="email"
-                            component="div"
-                            className="error-message"
-                          />
+                        <div className="remeberrecoverydiv">
+                          <div className="rememebrmediv">
+                            <Field
+                              type="checkbox"
+                              name="agreeAllLegal"
+                              className="checkboxemeber"
+                            />
+                            <label
+                              htmlFor="rememebrbtn"
+                              className="labelrememebrme"
+                            >
+                              I have read & agree with{" "}
+                              <Link to="/terms">Terms & Conditions</Link>,{" "}
+                              <Link to="/privacy">Privacy Policy</Link>, and{" "}
+                              <Link to="/cookies">Cookie Policy</Link>.
+                            </label>
+                            <ErrorMessage
+                              name="agreeAllLegal"
+                              component="div"
+                              className="error-message"
+                            />
+                          </div>
                         </div>
-                        <div className="form-control frmctrldiv">
-                          <Field
-                            type="text"
-                            name="phone"
-                            placeholder="Mobile number"
-                            onChange={(e) =>
-                              handleNumericInput(e, setFieldValue, values)
-                            }
-                          />
-                          <ErrorMessage
-                            name="phone"
-                            component="div"
-                            className="error-message"
-                          />
+                        <div className="remeberrecoverydiv">
+                          <div className="rememebrmediv">
+                            <Field
+                              type="checkbox"
+                              name="agreeRules"
+                              className="checkboxemeber"
+                            />
+                            <label
+                              htmlFor="rememebrbtn2"
+                              className="labelrememebrme"
+                            >
+                              I have read &amp; agree with{" "}
+                              <Link to="/rules">Rules of Play &amp; FAQ's</Link>
+                            </label>
+                            <ErrorMessage
+                              name="agreeRules"
+                              component="div"
+                              className="error-message"
+                            />
+                          </div>
                         </div>
-                      </div>
-                      <div className="remeberrecoverydiv">
-                        <div className="rememebrmediv">
-                          <Field
-                            type="checkbox"
-                            name="agreeAllLegal"
-                            className="checkboxemeber"
-                          />
-                          <label
-                            htmlFor="rememebrbtn"
-                            className="labelrememebrme"
+                        <div className="remeberrecoverydiv">
+                          <div className="rememebrmediv">
+                            <Field
+                              type="checkbox"
+                              name="agreeAge"
+                              className="checkboxemeber"
+                            />
+                            <label
+                              htmlFor="rememebrbtn2"
+                              className="labelrememebrme"
+                            >
+                              I hereby confirm and acknowledge that I am not a
+                              minor, and that I am least 18 years old as of
+                              today’s date.
+                            </label>
+                            <ErrorMessage
+                              name="agreeAge"
+                              component="div"
+                              className="error-message"
+                            />
+                          </div>
+                        </div>
+                        <div className="form-control loginformctrl">
+                          <button
+                            type="submit"
+                            className="loginbtn"
+                            disabled={isSubmitting || isLoading}
                           >
-                            I have read & agree with{" "}
-                            <Link to="/terms">Terms & Conditions</Link>,{" "}
-                            <Link to="/privacy">Privacy Policy</Link>, and{" "}
-                            <Link to="/cookies">Cookie Policy</Link>.
-                          </label>
-                          <ErrorMessage
-                            name="agreeAllLegal"
-                            component="div"
-                            className="error-message"
-                          />
+                            {isLoading ? "Loading..." : "Social Sign Up"}
+                          </button>
                         </div>
-                      </div>
-                      <div className="remeberrecoverydiv">
-                        <div className="rememebrmediv">
-                          <Field
-                            type="checkbox"
-                            name="agreeRules"
-                            className="checkboxemeber"
-                          />
-                          <label
-                            htmlFor="rememebrbtn2"
-                            className="labelrememebrme"
-                          >
-                            I have read &amp; agree with{" "}
-                            <Link to="/rules">Rules of Play &amp; FAQ's</Link>
-                          </label>
-                          <ErrorMessage
-                            name="agreeRules"
-                            component="div"
-                            className="error-message"
-                          />
-                        </div>
-                      </div>
-                      <div className="remeberrecoverydiv">
-                        <div className="rememebrmediv">
-                          <Field
-                            type="checkbox"
-                            name="agreeAge"
-                            className="checkboxemeber"
-                          />
-                          <label
-                            htmlFor="rememebrbtn2"
-                            className="labelrememebrme"
-                          >
-                            I hereby confirm and acknowledge that I am not a
-                            minor, and that I am least 18 years old as of
-                            today’s date.
-                          </label>
-                          <ErrorMessage
-                            name="agreeAge"
-                            component="div"
-                            className="error-message"
-                          />
-                        </div>
-                      </div>
-                      <div className="form-control loginformctrl">
-                        <button
-                          type="submit"
-                          className="loginbtn"
-                          disabled={isSubmitting || isLoading}
-                        >
-                          {isLoading ? "Loading..." : "Social Sign Up"}
-                        </button>
-                      </div>
-                    </Form>
-                  )}
-                </Formik>
+                      </Form>
+                    )}
+                  </Formik>
+                </div>
               </div>
             </div>
           </div>

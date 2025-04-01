@@ -5,6 +5,8 @@ import Swal from "sweetalert2";
 import * as Yup from "yup";
 import axios from "axios";
 import {
+  messaging,
+  getToken,
   LoginWithGoogle,
   LoginWithFacebook,
 } from "../FirebaseCofig/FirebaseConfig";
@@ -137,6 +139,29 @@ function Login() {
     }
   };
 
+  const requestFirebaseToken = async () => {
+    try {
+      const currentToken = await getToken(messaging, {
+        vapidKey:
+          "BC1L5qE6WKJSgEU46nuptM9bCKtljihEjAikiBrpzRIomSiw6Dd9Wq6jmM4CfIHJokkhmqblgU5qbVaqizNlmeo",
+      });
+
+      if (currentToken) {
+        // console.log("FCM Token:", currentToken);
+        localStorage.setItem("device_token", currentToken);
+
+        // Optionally, send the token to your backend for push notifications
+      } else {
+        console.log("No FCM token available. Request permission.");
+      }
+    } catch (error) {
+      console.error("FCM Token Error:", error);
+      localStorage.setItem("device_token", "currentToken");
+    }
+  };
+  useEffect(() => {
+    requestFirebaseToken();
+  }, []);
   return (
     <>
       <section className="adminloginsection" style={{ height: "100svh" }}>
@@ -286,7 +311,12 @@ function Login() {
                                 </a>
                               </li>
                               <li>
-                                <a style={{ cursor: "pointer" }}>
+                                <a
+                                  style={{ cursor: "pointer" }}
+                                  onClick={() => {
+                                    LoginWithFacebook();
+                                  }}
+                                >
                                   <img
                                     src={`${process.env.PUBLIC_URL}/image/facebook_icon.png`}
                                     alt="Facebook"

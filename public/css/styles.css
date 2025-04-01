@@ -518,5 +518,5 @@
 }
 
 .row.rowtabbingpage {
-  flex-wrap: nowrap;
+  /* flex-wrap: nowrap; */
 }

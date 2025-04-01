@@ -5,6 +5,7 @@ import Swal from "sweetalert2";
 function PastPayment() {
   const [payments, setPayments] = useState([]);
   const [dropdownStates, setDropdownStates] = useState({});
+  const [loading, setLoading] = useState(true); // Added loading state
 
   const toggleDropdown = (id) => {
     setDropdownStates((prevState) => ({
@@ -15,6 +16,7 @@ function PastPayment() {
 
   useEffect(() => {
     const fetchPayments = async () => {
+      setLoading(true); // Start loading
       const token = localStorage.getItem("Web-token");
 
       try {
@@ -32,6 +34,8 @@ function PastPayment() {
           confirmButtonText: "OK",
           allowOutsideClick: false,
         });
+      } finally {
+        setLoading(false); // Stop loading
       }
     };
 
@@ -46,7 +50,6 @@ function PastPayment() {
       const response = await axios.get(`app/payments/get-bill/${paymentId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      console.log("pdf", response.data.data.pdf);
       const pdfUrl = response.data.data.pdf;
       if (pdfUrl) {
         window.open(pdfUrl, "_blank");
@@ -58,12 +61,17 @@ function PastPayment() {
     }
   };
 
-  console.log("payments", payments);
-
   return (
     <div className="payment_methoddiv pastpay_detailmaindiv_new">
       <div className="cartwithcordinatetables">
-        {payments.length > 0 ? (
+        {loading ? (
+          // <h2 style={{ color: "white" }}>Loading...<
+          // /h2>
+          <img
+            src={`${process.env.PUBLIC_URL}/images/LoaderGif.gif`}
+            alt="Loader"
+          />
+        ) : payments.length > 0 ? (
           payments.map((payment) => (
             <div key={payment._id} className="cartstripe pastpaydetail_maindiv">
               <div className="checkout_cartdiv">

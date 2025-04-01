@@ -225,7 +225,23 @@ function Banner({ data }) {
     slidesToShow: 2,
     slidesToScroll: 1,
     autoplay: false,
-    CenterPadding: 10,
+    centerPadding: 10,
+    responsive: [
+      {
+        breakpoint: 768, // For mobile devices
+        settings: {
+          slidesToShow: 1, // Show 1 slide on mobile
+          slidesToScroll: 1, // Scroll 1 slide on mobile
+        },
+      },
+      {
+        breakpoint: 1024, // For tablets
+        settings: {
+          slidesToShow: 2, // Show 2 slides on tablets
+          slidesToScroll: 1,
+        },
+      },
+    ],
   };
   const handleIncrease = () => {
     const ticketsLeft =
@@ -453,6 +469,18 @@ function Banner({ data }) {
       window.removeEventListener("storage", handleStorageChange);
     };
   }, [token]);
+
+  useEffect(() => {
+    if (onCarts || onCloseComptition) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [onCarts, onCloseComptition]);
   return (
     <>
       <div className="color-container">
@@ -514,7 +542,7 @@ function Banner({ data }) {
                   </div>
                   <div className="container-fluid">
                     <div className="row">
-                      <div className="col-12 col-lg-7 position-relative">
+                      <div className="col-md-7 col-lg-7 position-relative">
                         {banner.length > 0 && (
                           <>
                             <h1
@@ -626,7 +654,7 @@ function Banner({ data }) {
                           </span>
                         </div>
                       </div>
-                      <div className="col-12 col-lg-5 d-none d-lg-flex justify-content-center">
+                      <div className="col-md-5 col-lg-5 d-none d-lg-flex justify-content-center">
                         <div className="banner-img">
                           <img
                             className="img-fluid hori-move"
@@ -807,7 +835,7 @@ function Banner({ data }) {
           </div>
         </section>
 
-        <div className="working-process  pb-0">
+        <div className="working-process ct  pb-0">
           <div className="container">
             <div className="section-title mb-4 text-center">
               <h2 className="title">
@@ -1309,7 +1337,7 @@ function Banner({ data }) {
                   {selectedContest?.jackpot_price
                     ? Number(selectedContest.jackpot_price).toLocaleString()
                     : "0"}{" "}
-                  Jackpot Prize
+                  Grand Prize
                 </h2>
               </div>
               <div className="contesttickeprice">
@@ -1369,21 +1397,7 @@ function Banner({ data }) {
               </div>
               <div className="dis-pop">
                 <h5>Discount</h5>
-                {/* <Slider {...settings}>
-                    {Array.isArray(selectedDiscount) &&
-                      selectedDiscount.map((discount) => (
-                        <div key={discount._id} className="card first">
-                          <img
-                            src={`${process.env.PUBLIC_URL}/image/discount_img.png`}
-                          />
-                      
-                          <p>
-                            Tickets: {discount.minTickets} - {discount.maxTickets}
-                          </p>
-                          <p>Discount: {discount.discountPercentage}%</p>
-                        </div>
-                      ))}
-                  </Slider> */}
+
                 <Slider {...settings}>
                   {Array.isArray(selectedDiscount) &&
                     selectedDiscount.map((discount) => (

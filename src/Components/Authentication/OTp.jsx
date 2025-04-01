@@ -11,6 +11,7 @@ function Otp() {
   const [otp, setOtp] = useState(["", "", "", ""]);
   const inputRefs = useRef([]);
   const [timer, setTimer] = useState(60);
+  const [isResending, setIsResending] = useState(false);
 
   // Countdown timer
   useEffect(() => {
@@ -85,7 +86,9 @@ function Otp() {
 
   // Resend OTP
   const resendOtp = async () => {
-    if (timer > 0) return; // Prevent multiple clicks
+    if (timer > 0 || isResending) return;
+
+    setIsResending(true);
 
     let token = localStorage.getItem("tokens");
 
@@ -107,10 +110,10 @@ function Otp() {
         allowOutsideClick: false,
       });
 
-      setOtp(["", "", "", ""]); // Clear input fields
+      setOtp(["", "", "", ""]); // OTP input clear
       inputRefs.current[0]?.focus();
 
-      setTimer(60); // Start timer only after success
+      setTimer(60); // Timer reset
     } catch (error) {
       Swal.fire({
         icon: "error",
@@ -118,11 +121,13 @@ function Otp() {
         confirmButtonText: "OK",
         allowOutsideClick: false,
       });
+    } finally {
+      setIsResending(false); // Button ko phir enable kar diya
     }
   };
-   const handleLogin = () => {
-     navigate("/");
-   };
+  const handleLogin = () => {
+    navigate("/");
+  };
 
   return (
     <>
@@ -204,9 +209,15 @@ function Otp() {
                         Didn't receive an OTP?{" "}
                         <a
                           onClick={resendOtp}
-                          disabled={timer > 0}
+                          disabled={timer > 0 || isResending}
                           className="resend-btn"
-                          style={{ cursor: "pointer" }}
+                          style={{
+                            cursor:
+                              timer > 0 || isResending
+                                ? "not-allowed"
+                                : "pointer",
+                            opacity: isResending ? 0.6 : 1,
+                          }}
                         >
                           Resend {timer > 0 ? `(${timer}s)` : ""}
                         </a>

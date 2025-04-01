@@ -136,21 +136,20 @@ function Rules() {
                 <div className="tab-content">
                   <div id="rulesplay" className="tab-pane active">
                     <div className="legaltermsdata_div">
-                      <div
+                      {/* <div
                         className="innerlegal_heaidngwithpara"
                         dangerouslySetInnerHTML={{
                           __html: rules,
                         }}
-                      />
-                      {/* {isLoading ? (
-                        <Loader />
+                      /> */}
+                      {isLoading ? (
+                        <Loader /> // This shows a spinner while loading
                       ) : (
                         <div
-                          dangerouslySetInnerHTML={{
-                            __html: rules,
-                          }}
+                          className="innerlegal_heaidngwithpara"
+                          dangerouslySetInnerHTML={{ __html: rules }}
                         />
-                      )} */}
+                      )}
                     </div>
                   </div>
                 </div>

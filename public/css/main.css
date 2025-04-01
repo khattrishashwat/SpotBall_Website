@@ -49,13 +49,6 @@ html body .m-t-10 {
   z-index: 20;
 }
 
-.header3 {
-  position: relative;
-  z-index: 10;
-  background-color: #00000047;
-  height: 55px;
-  line-height: 38px;
-}
 
 .po-relative {
   position: relative;
@@ -128,7 +121,7 @@ ul.list-inline li a:hover {
   position: relative;
   z-index: 10;
   background-color: #00000047;
-  height: 55px;
+  height: 60px;
   line-height: 38px;
 }
 
@@ -1847,7 +1840,7 @@ ul.list-inline li a:hover {
   color: #009e49;
   border: 2px solid #009e49;
   padding: 1px;
-  font-size: 17px;
+  font-size: 16px;
   width: 20px;
   height: 20px;
   line-height: 15px;
@@ -6231,7 +6224,7 @@ ul.list-inline li a:hover {
   }
 
   .header3 {
-    height: 48px;
+    /* height: 48px; */
     top: -1px;
   }
 }
@@ -7450,3 +7443,15 @@ a.resend-btn {
 .location_settingdiv p {
   color: black;
 }
+
+/* .main{
+
+}
+.discount-coupons {
+  display: grid;
+  grid-template-columns: 30% 30% 30%;
+  gap: 5%;
+}
+.card.first.dis_card .content h2 {
+    font-size: 14px;
+} */
