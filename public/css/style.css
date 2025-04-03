@@ -732,11 +732,9 @@ body {
   font-size: 16px;
   line-height: 1.5;
   color: #8d8c8c;
-  /* overflow-x: hidden; */
+  overflow-x: hidden;
   font-weight: 500;
-  width: 100%;
-  max-width: 100%;
-  overflow-x: hidden !important;
+
   /* background: #12111a;  */
 }
 
@@ -11557,13 +11555,16 @@ a.btn.btn-primary.text-uppercase.rounded-2 {
   width: 35px;
   text-align: center;
   border: none;
-  padding: 5px 5px;
+  padding: 0px 0px !important;
   font-size: 22px;
   outline: none;
-  height: 30px;
+  height: 32px !important;
   line-height: 30px;
   background: none;
   color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .quantity button {
@@ -11579,6 +11580,9 @@ a.btn.btn-primary.text-uppercase.rounded-2 {
   line-height: 31px;
   border-radius: 40px;
   font-weight: 600;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .contest_quantity_para_div {
@@ -12446,7 +12450,7 @@ span.mark-text {
 /**** new-css ****/
 
 .dropdown button {
-  background: #ffffff14 !important;
+  background-color: #ffffff14 !important;
   backdrop-filter: blur(10px) !important;
   /* min-width: 130px; */
   width: max-content;
@@ -13278,12 +13282,14 @@ img.img-fluid.hori-move.login {
   color: black;
   font-weight: 400;
   margin-bottom: 24px;
+  text-align: justify;
 }
 
 .tht-ul ul li {
   color: black;
   font-weight: 400;
   margin-bottom: 12px;
+  text-align: justify ;
 }
 
 .tht-ul ul {
@@ -13532,6 +13538,9 @@ header.header.header-sticky.default.header-style-02.bg-blue {
 
 @media (min-width:767px) and (max-width: 991px) {
 
+  .playgame_section {
+    padding: 70px;
+  }
 
   .faq_content .panel-group .panel .panel-heading h4 a {
     display: flex;

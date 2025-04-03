@@ -37,8 +37,8 @@ function Checkout() {
   };
   const isFetched = useRef(false);
   const fetchData = async () => {
-    if (isFetched.current) return; // Ensure API is only called once
-    isFetched.current = true;
+    // if (isFetched.current) return; // Ensure API is only called once
+    // isFetched.current = true;
 
     const token = localStorage.getItem("Web-token");
 
@@ -209,11 +209,6 @@ function Checkout() {
       setAppliedPromoCode(promo);
       setSelectedPromoCode(selectedPromoCode);
 
-      Swal.fire({
-        icon: "success",
-        text: `Promo code "${promo.name}" applied. Discount: ${promo.amount}%.`,
-      });
-
       try {
         const updatedCart = updatedCarts[0];
         if (!updatedCart) return;
@@ -234,7 +229,7 @@ function Checkout() {
         });
 
         setReloadData((prev) => !prev);
-
+        await fetchData();
         Swal.fire({
           icon: "success",
           title: "Promo Code Applied Successfully.",
@@ -253,6 +248,99 @@ function Checkout() {
       });
     }
   };
+
+  // const handleApplyPromoCode = async () => {
+  //   if (!promoCode.trim()) {
+  //     Swal.fire({
+  //       icon: "warning",
+  //       text: "Please enter a promo code before applying.",
+  //     });
+  //     return;
+  //   }
+
+  //   if (appliedPromoCode && appliedPromoCode.name === promoCode) {
+  //     Swal.fire({
+  //       icon: "info",
+  //       title: "Promo Code Already Applied.",
+  //     });
+  //     return;
+  //   }
+
+  //   const promo = promoCodes.find((code) => code.name === promoCode);
+
+  //   if (promo) {
+  //     const updatedCarts = calculatedCarts.map((cart) => ({
+  //       ...cart,
+  //       discount: null, // Remove any existing discount
+  //       promocodeApplied: {
+  //         name: promo.name,
+  //         amount: promo.amount,
+  //       },
+  //     }));
+
+  //     setCalculatedCarts(updatedCarts);
+  //     setAppliedPromoCode(promo);
+  //     setSelectedPromoCode(selectedPromoCode);
+
+  //     Swal.fire({
+  //       icon: "success",
+  //       text: `Promo code "${promo.name}" applied. Discount: ${promo.amount}%.`,
+  //     });
+
+  //     try {
+  //       const updatedCart = updatedCarts[0];
+  //       if (!updatedCart) return;
+
+  //       const payload = {
+  //         contest_id: updatedCart?.contest_id?._id,
+  //         tickets_count: updatedCart?.tickets_count,
+  //         user_coordinates: updatedCart?.user_coordinates,
+  //         promocodeApplied: {
+  //           name: promo.name,
+  //           amount: promo.amount,
+  //         },
+  //       };
+
+  //       const token = localStorage.getItem("Web-token");
+  //       await axios.post("app/contest/add-to-cart", payload, {
+  //         headers: { Authorization: `Bearer ${token}` },
+  //       });
+
+  //       setReloadData((prev) => !prev);
+
+  //       // Show loader before fetching new data
+  //       Swal.fire({
+  //         title: "Applying Promo Code...",
+  //         text: "Please wait while we update your cart.",
+  //         allowOutsideClick: false,
+  //         didOpen: () => {
+  //           Swal.showLoading();
+  //         },
+  //       });
+
+  //       // Simulate loading delay before fetching new data
+  //       setTimeout(async () => {
+  //         await fetchData(); // Fetch new data after applying promo code
+
+  //         Swal.fire({
+  //           icon: "success",
+  //           title: "Promo Code Applied Successfully.",
+  //         });
+  //       }, 10000); // Wait for 10 seconds before fetching data
+  //     } catch (error) {
+  //       console.error("API Error:", error);
+  //       Swal.fire({
+  //         icon: "error",
+  //         title: "Failed to Apply Promo Code.",
+  //       });
+  //     }
+  //   } else {
+  //     Swal.fire({
+  //       icon: "error",
+  //       title: "Invalid Promo Code.",
+  //     });
+  //   }
+  // };
 
   const calculateDiscounts = (cart) => {
     const promoDiscountName = cart.promocodeApplied
@@ -383,7 +471,6 @@ function Checkout() {
       }
     });
   };
-
 
   const Money = async () => {
     try {

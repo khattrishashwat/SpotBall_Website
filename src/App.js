@@ -89,7 +89,7 @@ const App = () => {
       <Router basename="/spotsball/landing/">
         <TawkScriptLoader />
         <RoutesWithInterceptors />
-      </Router> 
+      </Router>
     </>
   );
 };

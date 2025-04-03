@@ -377,7 +377,7 @@ export const LoginWithGoogle = async () => {
           timer: 2000,
         });
 
-        window.location.href = "/"; // Redirect after login
+        window.location.href = "/spotsball/landing/"; // Redirect after login
       }
     } catch (error) {
       if (error.response?.data?.message === "Uid Not Found") {
@@ -388,8 +388,7 @@ export const LoginWithGoogle = async () => {
         Swal.fire({
           icon: "error",
           title: "Login Failed",
-          text:
-            error.response?.data?.message || "An unexpected error occurred.",
+          text: error.response?.data?.message,
         });
       }
     }
@@ -471,10 +470,8 @@ export const signInWithFacebook = async (setFieldValue) => {
 //       last_name: lastName,
 //     };
 
-//     console.log("User Details to Store:", userData);
-
 //     try {
-//       // Check UID in database
+//       // Check if UID exists
 //       const checkUIDResponse = await axios.get(
 //         `app/auth/check-uid-exists/${uid}`
 //       );
@@ -485,11 +482,10 @@ export const signInWithFacebook = async (setFieldValue) => {
 //           signup_method: "facebook",
 //           uid,
 //           device_type: "website",
-//           device_token: localStorage.getItem("device_token"),
+//           device_token: localStorage.getItem("device_token") || "",
 //         });
 
-//         const token = response.data.data.token;
-//         localStorage.setItem("Web-token", token);
+//         localStorage.setItem("Web-token", response.data.data.token);
 
 //         Swal.fire({
 //           icon: "success",
@@ -498,20 +494,19 @@ export const signInWithFacebook = async (setFieldValue) => {
 //           timer: 2000,
 //         });
 
-//         // Reload or navigate as needed
-//         // window.location.reload();
+//         window.location.href = "/spotsball/landing/"; // Redirect after login
 //       }
 //     } catch (error) {
-//       if (error.response && error.response.data.message === "Uid Not Found") {
-//         // Store user details in localStorage for further processing
+//       if (error.response?.data?.message === "Uid Not Found") {
 //         localStorage.setItem("UIDNotFound", JSON.stringify(userData));
-//         window.location.reload();
+//         window.location.href = "/socialsignup"; // Redirect properly
 //       } else {
 //         console.error("API Error:", error);
 //         Swal.fire({
 //           icon: "error",
 //           title: "Login Failed",
-//           text: error.response?.data?.message,
+//           text:
+//             error.response?.data?.message || "An unexpected error occurred.",
 //         });
 //       }
 //     }
@@ -524,14 +519,23 @@ export const signInWithFacebook = async (setFieldValue) => {
 //     });
 //   }
 // };
+
 export const LoginWithFacebook = async () => {
   try {
     facebookProvider.addScope("email");
-    const result = await signInWithPopup(auth, facebookProvider);
+
+    let result;
+    try {
+      result = await signInWithPopup(auth, facebookProvider);
+    } catch (popupError) {
+      console.warn("Popup sign-in failed, trying redirect:", popupError);
+      await signInWithRedirect(auth, facebookProvider);
+      return;
+    }
+
     const user = result.user;
-
     if (!user) throw new Error("Facebook sign-in failed. No user data found.");
-
+    console.log("facebook", user);
     const { uid, displayName, email, photoURL } = user;
     const nameParts = displayName ? displayName.split(" ") : [];
     const firstName = nameParts[0] || "";
@@ -546,6 +550,8 @@ export const LoginWithFacebook = async () => {
       first_name: firstName,
       last_name: lastName,
     };
+
+    console.log("facebook user data", userData);
 
     try {
       // Check if UID exists
@@ -571,19 +577,19 @@ export const LoginWithFacebook = async () => {
           timer: 2000,
         });
 
-        window.location.href = "/"; // Redirect after login
+        window.location.href = "/spotsball/landing/";
       }
-    } catch (error) {
-      if (error.response?.data?.message === "Uid Not Found") {
+    } catch (apiError) {
+      if (apiError.response?.data?.message === "Uid Not Found") {
         localStorage.setItem("UIDNotFound", JSON.stringify(userData));
-        window.location.href = "/socialsignup"; // Redirect properly
+        window.location.href = "/socialsignup";
       } else {
-        console.error("API Error:", error);
+        console.error("API Error:", apiError);
         Swal.fire({
           icon: "error",
           title: "Login Failed",
           text:
-            error.response?.data?.message || "An unexpected error occurred.",
+            apiError.response?.data?.message || "An unexpected error occurred.",
         });
       }
     }
@@ -596,7 +602,6 @@ export const LoginWithFacebook = async () => {
     });
   }
 };
-
 {
   /*------Twitter--------*/
 }
