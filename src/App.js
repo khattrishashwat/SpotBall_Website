@@ -63,8 +63,8 @@ const Otps = lazy(() => import("./Components/Authentication/Otps"));
 const Tht = lazy(() => import("./Components/Pages/Legal Terms/Tht"));
 
 // Axios base URL
-axios.defaults.baseURL = "https://www.spotsball.com/spotsball/api/v1/";
-// axios.defaults.baseURL = "https://webmobrildemo.com/spotsball/api/v1/";
+// axios.defaults.baseURL = "https://www.spotsball.com/spotsball/api/v1/";
+axios.defaults.baseURL = "https://webmobrildemo.com/spotsball/api/v1/";
 
 // **Protected Route Component**
 const ProtectedRoute = () => {
