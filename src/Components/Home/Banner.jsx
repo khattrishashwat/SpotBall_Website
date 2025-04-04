@@ -602,8 +602,6 @@ function Banner({ data }) {
                           >
                             How To Play
                           </a>
-
-                        
                         </div>
                         <div className="btn_tdy p-3 px-3">
                           <span>
@@ -1016,6 +1014,19 @@ function Banner({ data }) {
                         className="d-sm-none d-block"
                       />
                     </div>
+                    <div className="ticket-line">
+                      <img
+                        src={`${process.env.PUBLIC_URL}/images/ticket-line.png`}
+                        alt=""
+                        className="d-sm-flex d-none"
+                      />
+                      <img
+                        src={`${process.env.PUBLIC_URL}/images/ticket-line-2.png`}
+                        alt=""
+                        className="d-sm-none d-block"
+                      />
+                    </div>
+
                     <div className="contest_maindiv_popup_inner">
                       <div className="contestheading">
                         <h2>

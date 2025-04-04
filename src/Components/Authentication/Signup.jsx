@@ -5,8 +5,8 @@ import Swal from "sweetalert2";
 import * as Yup from "yup";
 import axios from "axios";
 import {
-   messaging,
-    getToken,
+  messaging,
+  getToken,
   LoginWithGoogle,
   LoginWithFacebook,
 } from "../FirebaseCofig/FirebaseConfig";
@@ -122,26 +122,26 @@ function Signup() {
     navigate("/");
   };
   const requestFirebaseToken = async () => {
-      try {
-        const currentToken = await getToken(messaging, {
-          vapidKey:
-            "BC1L5qE6WKJSgEU46nuptM9bCKtljihEjAikiBrpzRIomSiw6Dd9Wq6jmM4CfIHJokkhmqblgU5qbVaqizNlmeo",
-        });
-  
-        if (currentToken) {
-          // console.log("FCM Token:", currentToken);
-          localStorage.setItem("device_token", currentToken);
-  
-          // Optionally, send the token to your backend for push notifications
-        } else {
-          console.log("No FCM token available. Request permission.");
-        }
-      } catch (error) {
-        console.error("FCM Token Error:", error);
-        localStorage.setItem("device_token", "currentToken");
+    try {
+      const currentToken = await getToken(messaging, {
+        vapidKey:
+          "BC1L5qE6WKJSgEU46nuptM9bCKtljihEjAikiBrpzRIomSiw6Dd9Wq6jmM4CfIHJokkhmqblgU5qbVaqizNlmeo",
+      });
+
+      if (currentToken) {
+        // console.log("FCM Token:", currentToken);
+        localStorage.setItem("device_token", currentToken);
+
+        // Optionally, send the token to your backend for push notifications
+      } else {
+        console.log("No FCM token available. Request permission.");
       }
-    };
-useEffect(() => {
+    } catch (error) {
+      console.error("FCM Token Error:", error);
+      localStorage.setItem("device_token", "currentToken");
+    }
+  };
+  useEffect(() => {
     requestFirebaseToken();
   }, []);
   return (
@@ -353,7 +353,7 @@ useEffect(() => {
                               <Field
                                 type={showConfirmPassword ? "text" : "password"}
                                 name="confirm_password"
-                                placeholder="Confirm Pass"
+                                placeholder="Confirm Password"
                                 onChange={(e) =>
                                   handleFieldChange(
                                     "confirm_password",
@@ -470,10 +470,12 @@ useEffect(() => {
                       <div className="signupsociallinks">
                         <ul>
                           <li>
-                            <a style={{ cursor: "pointer" }}
-                             onClick={() => {
-                                                                LoginWithGoogle();
-                                                              }}>
+                            <a
+                              style={{ cursor: "pointer" }}
+                              onClick={() => {
+                                LoginWithGoogle();
+                              }}
+                            >
                               <img
                                 src={`${process.env.PUBLIC_URL}/image/google_icon.png`}
                                 alt="Google"
@@ -481,10 +483,12 @@ useEffect(() => {
                             </a>
                           </li>
                           <li>
-                            <a style={{ cursor: "pointer" }}
-                             onClick={() => {
-                                                                LoginWithFacebook();
-                                                              }}>
+                            <a
+                              style={{ cursor: "pointer" }}
+                              onClick={() => {
+                                LoginWithFacebook();
+                              }}
+                            >
                               <img
                                 src={`${process.env.PUBLIC_URL}/image/facebook_icon.png`}
                                 alt="Facebook"

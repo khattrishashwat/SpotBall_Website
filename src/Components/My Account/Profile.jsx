@@ -73,7 +73,7 @@ function Profile() {
       if (response.status === 200) {
         Swal.fire({
           icon: "success",
-          // title: "Your account has been succe  ssfully deactivated",
+          title: "Your account has been succe  ssfully deactivated",
           confirmButtonText: "OK",
         }).then(() => {
           navigate("/");
