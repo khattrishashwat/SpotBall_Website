@@ -24,8 +24,7 @@ function Tearms() {
       // console.log("ye",response.data.data);
     } catch (error) {
       console.error("Error data:", error);
-    } 
-    finally {
+    } finally {
       setIsLoading(false);
     }
   };
@@ -34,9 +33,9 @@ function Tearms() {
     fetchCondition();
   }, []);
 
-   useEffect(() => {
-      window.scrollTo(0, 0);
-    }, []);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <div>
@@ -65,7 +64,7 @@ function Tearms() {
                       <div className="tabbingiconbgdiv">
                         {" "}
                         <img
-                          src={`${process.env.PUBLIC_URL}/images/legal_terms_icons.png`}
+                          src={`${process.env.PUBLIC_URL}/image/legal_terms_icons.png`}
                           alt="Terms"
                         />{" "}
                       </div>{" "}
@@ -77,7 +76,7 @@ function Tearms() {
                       <div className="tabbingiconbgdiv">
                         {" "}
                         <img
-                          src={`${process.env.PUBLIC_URL}/images/legal_terms_icons.png`}
+                          src={`${process.env.PUBLIC_URL}/image/legal_terms_icons.png`}
                           alt="Privacy"
                         />{" "}
                       </div>
@@ -89,7 +88,7 @@ function Tearms() {
                       <div className="tabbingiconbgdiv">
                         {" "}
                         <img
-                          src={`${process.env.PUBLIC_URL}/images/legal_terms_icons.png`}
+                          src={`${process.env.PUBLIC_URL}/image/legal_terms_icons.png`}
                           alt="Rules"
                         />{" "}
                       </div>
@@ -103,7 +102,7 @@ function Tearms() {
                       <div className="tabbingiconbgdiv">
                         {" "}
                         <img
-                          src={`${process.env.PUBLIC_URL}/images/legal_terms_icons.png`}
+                          src={`${process.env.PUBLIC_URL}/image/legal_terms_icons.png`}
                           alt="Cookies"
                         />{" "}
                       </div>{" "}
@@ -118,15 +117,18 @@ function Tearms() {
                 <div className="tab-content">
                   <div id="terms_conditions" className="tab-pane active">
                     <div className="legaltermsdata_div">
-                        <div dangerouslySetInnerHTML={{ __html: terms }} />
-                      {/* <div className="innerlegal_heaidngwithpara"> */}
-
-                        {/* {isLoading ? (
-                          <Loader /> // Correctly render the Loader component
-                        ) : (
-                          <div dangerouslySetInnerHTML={{ __html: terms }} />
-                        )} */}
-                      {/* </div> */}
+                      {/* <div
+                        className="innerlegal_heaidngwithpara"
+                        dangerouslySetInnerHTML={{ __html: terms }}
+                      /> */}
+                      {isLoading ? (
+                        <Loader /> // This shows a spinner while loading
+                      ) : (
+                        <div
+                          className="innerlegal_heaidngwithpara"
+                          dangerouslySetInnerHTML={{ __html: terms }}
+                        />
+                      )}
                     </div>
                   </div>
                 </div>

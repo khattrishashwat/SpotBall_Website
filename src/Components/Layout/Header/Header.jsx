@@ -1,72 +1,42 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import Login from "../../Auth/Login";
 import axios from "axios";
 import moment from "moment";
 import Swal from "sweetalert2";
+
+const locales = ["en-GB", "hi-IN", "ta-IN", "te-IN"];
+
+// function getFlagSrc(countryCode) {
+//   return /^[A-Z]{2}$/.test(countryCode)
+//     ? `https://flagsapi.com/${countryCode.toUpperCase()}/shiny/64.png`
+//     : "";
+// }
 
 function Header() {
   const navigate = useNavigate();
   const location = useLocation();
   const [headerClass, setHeaderClass] = useState("");
-  const [lastScrollY, setLastScrollY] = useState(0);
   const [notification, setNotification] = useState("");
   const [profile, setProfile] = useState({});
-
   const [isMenuVisible, setIsMenuVisible] = useState(false);
-  const [islang, setIsLang] = useState(false);
-  const [isLogout, setIsLogout] = useState("");
-  const [loginPopup, setLoginPopup] = useState(false);
   const [isNot, setIsNot] = useState(false);
-  const [notice, setNotice] = useState(false);
-  const [androidLink, setAndroidLink] = useState("");
-
-  const fetchAndroidLink = async () => {
-    try {
-      const response = await axios.get("app/apk-links");
-      if (response.data?.data?.android_build) {
-        setAndroidLink(response.data.data.android_build);
-      }
-    } catch (error) {
-      console.error("Error fetching Android data:", error);
-    }
-  };
+  const [selectedLocale, setSelectedLocale] = useState(locales[0]);
+  const [islangOpen, setIslangOpen] = useState(false);
+  const [isLogout, setIsLogout] = useState("");
 
   useEffect(() => {
-    fetchAndroidLink();
+    const browserLang = new Intl.Locale(navigator.language).language;
+    const matchedLocale = locales.find(
+      (locale) => new Intl.Locale(locale).language === browserLang
+    );
+    if (matchedLocale) {
+      setSelectedLocale(matchedLocale);
+    }
   }, []);
-  useEffect(() => {
-    if (location.pathname === "/") {
-      window.scrollTo(0, 0);
-    }
-  }, [location.pathname]);
-  const token = localStorage.getItem("Web-token");
 
-  const handleLogoClick = () => {
-    if (location.pathname === "/") {
-      window.location.reload(); // Reload the page if already on the homepage
-    } else {
-      // Otherwise, navigate to the homepage
-      navigate("/");
-    }
-  };
-  const NotificationOpen = () => {
-    setIsNot((prevState) => !prevState);
-  };
-
-  const NotificationClose = () => {
-    setIsNot(false);
-  };
-
-  const OpenSignIn = () => {
-    setLoginPopup(true);
-  };
-
-  const ClosePopup = () => {
-    setLoginPopup(false);
-  };
-  const toggleMenu = () => {
-    setIsMenuVisible((prevState) => !prevState); // Toggle the state
+  const handleSelectLocale = (locale) => {
+    setSelectedLocale(locale);
+    setIslangOpen(false);
   };
   const toggleMenulang = () => {
     setIsLang((prevState) => !prevState); // Toggle the state
@@ -78,85 +48,57 @@ function Header() {
     setIsLogout(false);
   };
 
-  const handleClickOutside = (event) => {
-    // Menu elements
-    const menuButton = document.querySelector(".menubaricons");
-    const menuList = document.querySelector(".menulist_divmanin");
+  const intlLocale = new Intl.Locale(selectedLocale);
+  const langName = new Intl.DisplayNames(["en"], { type: "language" }).of(
+    intlLocale.language
+  );
 
-    // Notification elements
-    const notificationButton = document.querySelector(
-      ".notificationclick .itmelink_menus"
-    );
-    const notificationList = document.querySelector(".notificationdiv_popup");
-
-    // Close menu if clicked outside
-    if (
-      menuButton &&
-      menuList &&
-      !menuButton.contains(event.target) &&
-      !menuList.contains(event.target)
-    ) {
-      setIsMenuVisible(false); // Hide the menu
-    }
-
-    // Close notification dropdown if clicked outside
-    if (
-      notificationButton &&
-      notificationList &&
-      !notificationButton.contains(event.target) &&
-      !notificationList.contains(event.target)
-    ) {
-      setIsNot(false); // Hide the notifications
-    }
+  const toggleMenu = () => {
+    setIsMenuVisible((prevState) => !prevState); // Toggle the state
   };
 
-  useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+  // const handleClickOutside = (event) => {
+  //   // Menu elements
+  //   const menuButton = document.querySelector(".menubaricons");
+  //   const menuList = document.querySelector(".menulist_divmanin");
+
+  //   // Notification elements
+  //   const notificationButton = document.querySelector(
+  //     ".notificationclick .itmelink_menus"
+  //   );
+  //   const notificationList = document.querySelector(".notificationdiv_popup");
+
+  //   // Close menu if clicked outside
+  //   if (
+  //     menuButton &&
+  //     menuList &&
+  //     !menuButton.contains(event.target) &&
+  //     !menuList.contains(event.target)
+  //   ) {
+  //     setIsMenuVisible(false); // Hide the menu
+  //   }
+
+  //   // Close notification dropdown if clicked outside
+  //   if (
+  //     notificationButton &&
+  //     notificationList &&
+  //     !notificationButton.contains(event.target) &&
+  //     !notificationList.contains(event.target)
+  //   ) {
+  //     setIsNot(false); // Hide the notifications
+  //   }
+  // };
+
+  // const isHomePage = location.pathname === "/";
+
+  // useEffect(() => {
+  //   document.addEventListener("mousedown", handleClickOutside);
+  //   return () => {
+  //     document.removeEventListener("mousedown", handleClickOutside);
+  //   };
+  // }, []);
   const isHomePage = location.pathname === "/";
-
-  const handleScroll = () => {
-    const currentScrollY = window.scrollY;
-
-    if (currentScrollY > 0) {
-      setHeaderClass(
-        isHomePage ? "headerfixed" : "innerheader_new headerfixed"
-      );
-    } else {
-      setHeaderClass(isHomePage ? "" : "innerheader_new");
-    }
-
-    setLastScrollY(currentScrollY);
-
-    setIsNot(false);
-    setIsMenuVisible(false);
-  };
-
-  useEffect(() => {
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, [lastScrollY, isHomePage]);
-
-  const handleLogout = () => {
-    setIsLogout(false);
-
-    localStorage.removeItem("Web-token");
-    Swal.fire({
-      icon: "success",
-      title: "Logout Successful",
-      text: "You have been logged out successfully.",
-
-      allowOutsideClick: false,
-      timer: 2000,
-      showConfirmButton: false,
-    });
-    navigate("/");
-  };
+  const token = localStorage.getItem("Web-token");
 
   const fetchProfile = async () => {
     try {
@@ -232,13 +174,15 @@ function Header() {
     setIsNot((prev) => !prev);
     updateNotifications();
   };
-
+  const NotificationClose = () => {
+    setIsNot(false);
+  };
   const [timeLeft, setTimeLeft] = useState({
     days: "00",
     hours: "00",
     minutes: "00",
     seconds: "00",
-    isCompetitionStart: false, // Tracks if competition is starting or ending
+    isCompetitionStart: false,
   });
 
   const getTargetTime = () => {
@@ -309,662 +253,492 @@ function Header() {
 
     return () => clearInterval(interval);
   }, []);
+
+  const Logout = async () => {
+    localStorage.removeItem("Web-token");
+
+    await Swal.fire({
+      icon: "success",
+      title: "Logout Successful",
+      text: "You have been logged out successfully.",
+      timer: 2000,
+      showConfirmButton: false,
+    });
+
+    navigate("/");
+    setIsLogout(false);
+  };
+  useEffect(() => {
+    if (isMenuVisible) {
+      document.body.style.overflow = "hidden"; // Disable background scrolling
+    } else {
+      document.body.style.overflow = "auto"; // Enable background scrolling
+    }
+
+    // Cleanup on component unmount or modal close
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [isMenuVisible]);
   return (
     <>
-      <header className={headerClass}>
-        <div className="topfirstbar">
-          <div className="ends_compititionssiv_top">
-            <a className="topmainbar">
-              <div className="newbtn_top">New</div>
-              <div className="instantimgdiv">
-                {" "}
-                <img
-                  src={`${process.env.PUBLIC_URL}/images/instant-win.svg`}
-                />{" "}
-              </div>
-              <div className="endscompititions">
-                {timeLeft.isCompetitionStart
-                  ? `Competition Start : ${timeLeft.days} days: ${timeLeft.hours} hours: ${timeLeft.minutes} minutes: ${timeLeft.seconds} seconds`
-                  : `Competition End : ${timeLeft.days} days: ${timeLeft.hours} hours: ${timeLeft.minutes} minutes: ${timeLeft.seconds} seconds`}
-              </div>
-              {/* <div className="endscompititions">
-                Competition Ends:{" "}
-                {`${timeLeft.days} days: ${timeLeft.hours} hours: ${timeLeft.minutes} minutes: ${timeLeft.seconds} seconds`}
-              </div> */}
-            </a>
+      <header
+        className={`header header-sticky default header-style-02 ${
+          !isHomePage ? "innerheader_new" : ""
+        }`}
+      >
+        <div className="">
+          <div className="topfirstbar">
+            <div className="ends_compititionssiv_top">
+              <a className="topmainbar">
+                <div className="newbtn_top">New</div>
+                <div className="instantimgdiv">
+                  <img
+                    src={`${process.env.PUBLIC_URL}/images/instant-win.svg`}
+                  />
+                </div>
+                <div className="endscompititions">
+                  {timeLeft.isCompetitionStart
+                    ? `Competition Start : ${timeLeft.days} days: ${timeLeft.hours} hours: ${timeLeft.minutes} minutes: ${timeLeft.seconds} seconds`
+                    : `Competition End : ${timeLeft.days} days: ${timeLeft.hours} hours: ${timeLeft.minutes} minutes: ${timeLeft.seconds} seconds`}
+                </div>
+              </a>
+            </div>
           </div>
         </div>
-        <div className="topbar">
-          <div className="header header3">
-            <div className="po-relative">
-              <div className="h3-navbar">
-                <div className="container contmainformob_newshi">
-                  <nav className="navbar navbar-expand-lg h3-nav navbar_mainnavdiv_shi">
-                    {/* <div className="download_app_icondiv">
-                      <div className="appstoreicondiv">
-                        <a
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          href="https://www.google.com/"
+        {/* <nav className="navbar navbar-static-top navbar-expand-xl header3">
+          <div className="container main-header position-relative">
+            <Link to="/" className="navbar-brand d-flex d-xl-none">
+              <img
+                className="logo img-fluid"
+                src="images/logo.png"
+                alt="logo"
+              />
+              <img
+                className="sticky-logo img-fluid"
+                src="images/logo.png"
+                alt="logo"
+              />
+            </Link>
+            <div className="navbar-collapse collapse">
+              <ul className="nav navbar-nav">
+                <li className="nav-item navbar-brand-item">
+                  <Link to="/" className="navbar-brand">
+                    <img
+                      className="logo img-fluid"
+                      src="images/logo.png"
+                      alt="logo"
+                    />
+                    <img
+                      className="sticky-logo img-fluid"
+                      src="images/logo.png"
+                      alt="logo"
+                    />
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div className="add-listing">
+              <div className="side-menu">
+                <a
+                  data-bs-toggle="offcanvas"
+                  data-bs-target="#offcanvasRight"
+                  aria-controls="offcanvasRight"
+                  onClick={toggleMenu}
+                >
+                  <img
+                    src={`${process.env.PUBLIC_URL}/images/svg/menu.svg`}
+                    // src="./images/svg/menu.svg"
+                  />
+                  <img
+                    className="menu-dark"
+                    src={`${process.env.PUBLIC_URL}/images/svg/menu.svg`}
+                    // src="./images/svg/menu.svg"
+                  />
+                </a>
+              </div>
+            </div>
+          </div>
+        </nav> */}
+        <nav className="navbar navbar-static-top navbar-expand-xl header3">
+          <div className="container main-header position-relative">
+            <div className="dropdown mobile" tabIndex={0}>
+              <button
+                id="dropdown-btn"
+                onClick={() => setIslangOpen(!islangOpen)}
+              >
+                {langName} <span className="arrow-down"></span>
+              </button>
+              {islangOpen && (
+                <ul className="dropdown-content" id="dropdown-content">
+                  {locales
+                    .filter((locale) => locale !== selectedLocale)
+                    .map((otherLocale) => {
+                      const otherIntlLocale = new Intl.Locale(otherLocale);
+                      const otherLangName = new Intl.DisplayNames(["en"], {
+                        type: "language",
+                      }).of(otherIntlLocale.language);
+
+                      return (
+                        <li
+                          key={otherLocale}
+                          onMouseDown={() => handleSelectLocale(otherLocale)}
                         >
-                          <img
-                            src={`${process.env.PUBLIC_URL}/images/google-play-store-badge.png`}
-                            alt="Google Play Store"
-                            className="w-100 mw-100"
-                            style={{ marginTop: "-2px" }}
-                          />
-                        </a>
-                      </div>
-                    </div> */}
+                          {otherLangName}
+                        </li>
+                      );
+                    })}
+                </ul>
+              )}
+            </div>
+            <Link to="/" className="navbar-brand d-flex d-xl-none">
+              <img
+                className="logo img-fluid"
+                src={`${process.env.PUBLIC_URL}/images/logo.png`}
+                // src="images/logo.png"
+                alt="logo"
+              />
+              <img
+                className="sticky-logo img-fluid"
+                src={`${process.env.PUBLIC_URL}/images/logo.png`}
+                // src="images/logo.png"
+                alt="logo"
+              />
+            </Link>
+            <div className="dropdown dekstop-none" tabIndex={0}>
+              <button
+                id="dropdown-btn"
+                onClick={() => setIslangOpen(!islangOpen)}
+              >
+                {langName} <span className="arrow-down"></span>
+              </button>
+              {islangOpen && (
+                <ul className="dropdown-content" id="dropdown-content">
+                  {locales
+                    .filter((locale) => locale !== selectedLocale)
+                    .map((otherLocale) => {
+                      const otherIntlLocale = new Intl.Locale(otherLocale);
+                      const otherLangName = new Intl.DisplayNames(["en"], {
+                        type: "language",
+                      }).of(otherIntlLocale.language);
 
-                    {/* <div className="download_app_icondiv">
-                      <div className="appstoreicondiv">
-                        <a
-                          className={`dl-button ${isActive ? "active" : ""} ${
-                            isDone ? "done" : ""
-                          }`}
-                          onClick={handleDownload}
+                      return (
+                        <li
+                          key={otherLocale}
+                          onMouseDown={() => handleSelectLocale(otherLocale)}
                         >
-                          <div>
-                            <div className="icon">
-                              <svg
-                                className="arrow"
-                                viewBox="0 0 20 18"
-                                fill="currentColor"
-                              >
-                                <polygon points="8 0 12 0 12 9 15 9 10 14 5 9 8 9" />
-                              </svg>
-                              <svg
-                                className="shape"
-                                viewBox="0 0 20 18"
-                                fill="currentColor"
-                              >
-                                <path d="M4.8,0 L15.2,0 C16,0 16.8,0.6 17.1,1.4 L19.7,10.4 C19.9,11 19.9,11.6 19.8,12.2 L19.2,16.3 C19,17.3 18.2,18 17.2,18 H2.8 C1.8,18 1,17.3 0.8,16.3 L0.1,12.2 C0.1,11.6 0.1,11 0.3,10.4 L2.9,1.4 C3.2,0.6 4,0 4.8,0 Z" />
-                              </svg>
-                            </div>
-                            <div className="label" ref={labelRef}>
-                              <div
-                                className={`show default ${
-                                  isDone ? "hide" : ""
-                                }`}
-                              >
-                                Download
-                              </div>
-                              <div className="state">
-                                <div className="counter" ref={counterRef}>
-                                  <span>{progress}%</span>
-                                </div>
-                                {isDone && <span>Done</span>}
-                              </div>
-                            </div>
-                            <div
-                              className="progress"
-                              style={{ transform: `scaleY(${progress / 100})` }}
-                            ></div>
-                          </div>{" "}
-                         
-                        </a>
-                      </div>
-                    </div> */}
+                          {otherLangName}
+                        </li>
+                      );
+                    })}
+                </ul>
+              )}
+            </div>
 
-                    {/* <div className="download_app_icondiv">
-                      <div className="appstoreicondiv">
-                        <a
-                          className={`dl-button ${isActive ? "active" : ""} ${
-                            isDone ? "done" : ""
-                          }`}
-                          onClick={handleDownload}
-                        >
-                          <div>
-                            <div className="icon">
-                              <div>
-                                <svg
-                                  className="arrow"
-                                  viewBox="0 0 20 18"
-                                  fill="currentColor"
-                                >
-                                  <polygon points="8 0 12 0 12 9 15 9 10 14 5 9 8 9" />
-                                </svg>
-                                <svg
-                                  className="shape"
-                                  viewBox="0 0 20 18"
-                                  fill="currentColor"
-                                >
-                                  <path d="M4.82668561,0 L15.1733144,0 C16.0590479,0 16.8392841,0.582583769 17.0909106,1.43182334 L19.7391982,10.369794 C19.9108349,10.9490677 19.9490212,11.5596963 19.8508905,12.1558403 L19.1646343,16.3248465 C19.0055906,17.2910371 18.1703851,18 17.191192,18 L2.80880804,18 C1.82961488,18 0.994409401,17.2910371 0.835365676,16.3248465 L0.149109507,12.1558403 C0.0509788145,11.5596963 0.0891651114,10.9490677 0.260801785,10.369794 L2.90908938,1.43182334 C3.16071592,0.582583769 3.94095214,0 4.82668561,0 Z" />
-                                </svg>
-                              </div>
-                              <span />
-                            </div>
-                            <div className="label" ref={labelRef}>
-                              <div
-                                className={
-                                  isDownloading ? "default" : "show default"
-                                }
-                              >
-                                {isDone ? "Downloading apk..." : "Download Apk"}
-                              </div>
-
-                              <div
-                                className={`state ${
-                                  isDownloading ? "show" : ""
-                                } ${isDone ? "show" : ""}`}
-                              >
-                                <div
-                                  className={
-                                    isDownloading || isDone
-                                      ? "counter show"
-                                      : "counter "
-                                  }
-                                  ref={counterRef}
-                                >
-                                  {progress > 0 && !isDone && (
-                                    <span>{progress}%</span>
-                                  )}
-                                </div>
-                              </div>
-
-                              {isDone && <span>Download Done</span>}
-                            </div>
-                            <div
-                              className="progress"
-                              style={{ transform: `scaleY(${progress / 100})` }}
-                            ></div>
-                          </div>
-                        </a>
-                      </div>
-                    </div> */}
-                    {/* <div className="d-flex gap-5  justify-content-between align-items-center">
-                      <div className="d-flex gap-3 align-items-start">
+            <div className="navbar-collapse collapse">
+              <ul className="nav navbar-nav">
+                <li className="nav-item navbar-brand-item">
+                  <Link to="/" className="navbar-brand">
+                    <img
+                      className="logo img-fluid"
+                      src={`${process.env.PUBLIC_URL}/images/logo.png`}
+                      alt="logo"
+                    />
+                    <img
+                      className="sticky-logo img-fluid"
+                      src={`${process.env.PUBLIC_URL}/images/logo.png`}
+                      alt="logo"
+                    />
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div className="side-menu-flex">
+              {token && (
+                <div className="navbar-collapse newnavbarleft">
+                  <ul className="navbar navbar_afterlogin">
+                    {/* Notification Icon */}
+                    <li className="nav-item afterlogin_icons_nav notificationclick">
+                      <a
+                        className="itmelink_menus"
+                        onClick={handleNotificationClick}
+                      >
                         <img
-                          src={`${process.env.PUBLIC_URL}/images/favicon.png`}
+                          src={`${process.env.PUBLIC_URL}/images/bell_icon.png`}
+                          alt="Notifications"
                         />
-                        <p className="text-white mb-0">Install SpotsBall App</p>
-                      </div>
-                      <div className="btn btn-dark">
-                        <a
-                          href={androidLink}
-                          className="btn-download"
-                          download
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          {" "}
-                          <i
-                            className="fa fa-download"
-                            aria-hidden="true"
-                          />{" "}
-                          Download APK
-                        </a>
-                      </div>
-                    </div> */}
-
-                    <div
-                      className="navbar-brand navbarlogodiv"
-                      style={{ cursor: "pointer" }}
-                      onClick={handleLogoClick}
-                    >
-                      <img
-                        src={`${process.env.PUBLIC_URL}/images/logo.png`}
-                        alt="logo"
-                      />
-                    </div>
-
-                    {token ? (
-                      <div className="navbar-collapse newnavbarleft">
-                        <ul className="navbar navbar_afterlogin">
-                          {/* <li className="nav-item afterlogin_icons_nav lang_icons">
-                            <a
-                              className="itmelink_menus "
-                              onClick={toggleMenulang}
-                            >
-                              <img
-                                src={`${process.env.PUBLIC_URL}/images/language_icon.png`}
-                                alt="language-icon"
-                              />
-                            </a>
-                            <div
-                              id="menu-list"
-                              className="menulist_divmanin"
-                              style={{
-                                display: islang ? "block" : "none",
-                              }}
-                            >
-                              <ul className="menubar_list_ul">
-                                {["Hindi", "Tamil", "Telugu"].map(
-                                  (language, index) => (
-                                    <li key={index} className="mainmenulist">
-                                      <a>
-                                        <div className="menubar_divmain">
-                                          <div className="menuname_withicon">
-                                            <div className="menuiconimgdiv">
-                                              <img
-                                                src={`${process.env.PUBLIC_URL}/images/icon_who_we_are.png`}
-                                                alt={`${language}-icon`}
-                                              />
-                                            </div>
-                                            <div className="menuname">
-                                              <h4>{language}</h4>
-                                            </div>
-                                          </div>
-                                          <div className="arrowicondiv">
-                                            <img
-                                              src={`${process.env.PUBLIC_URL}/images/menu_arrow_icon.png`}
-                                              className="arrowicon_menu"
-                                              alt="arrow-icon"
-                                            />
-                                          </div>
-                                        </div>
-                                      </a>
-                                    </li>
-                                  )
-                                )}
-                              </ul>
-                            </div>
-                          </li> */}
-
-                          <li className="nav-item afterlogin_icons_nav notificationclick">
-                            <a className="itmelink_menus">
-                              <img
-                                src={`${process.env.PUBLIC_URL}/images/bell_icon.png`}
-                                alt="bell"
-                                onClick={handleNotificationClick}
-                              />
-                              {unreadCount > 0 && (
-                                <span className="cartcount">{unreadCount}</span>
-                              )}
-                            </a>
-                            <div
-                              className={`notificationdiv_popup ${
-                                isNot ? "show" : ""
-                              }`}
-                              id="notificationPopup"
-                              style={{ display: isNot ? "block" : "none" }}
-                            >
-                              <div
-                                className="topnoticationdiv_main"
-                                id="popupContent"
-                              >
-                                <div className="notificationheading">
-                                  <h2>Notifications</h2>
-                                </div>
-                                <div className="notifi_innerdiv">
-                                  {notification.length > 0 ? (
-                                    notification.map((item) => (
-                                      <div
-                                        className="notifystrip"
-                                        key={item._id}
-                                      >
-                                        <a className="notifylinkdiv">
-                                          <div className="notify-icondiv">
-                                            <img
-                                              src={`${process.env.PUBLIC_URL}/images/favicon.png`}
-                                              alt="notification"
-                                            />
-                                          </div>
-                                          <div className="notificationtext_heading">
-                                            <h2>{item.title}</h2>
-                                            <p>{item.body}</p>
-                                            <div className="notif_timedate">
-                                              <p>
-                                                {moment(item.createdAt).format(
-                                                  "ddd, D MMM, h:mm a"
-                                                )}
-                                              </p>
-                                            </div>
-                                          </div>
-                                        </a>
-                                      </div>
-                                    ))
-                                  ) : (
-                                    <p>No notifications available.</p>
-                                  )}
-                                </div>
-                                <div className="crossicondiv">
-                                  <button
-                                    type="button"
-                                    className="crossbtn_notification"
-                                    id="closeNotificationPopup"
-                                    onClick={() => setIsNot(false)}
-                                  >
-                                    <img
-                                      src={`${process.env.PUBLIC_URL}/images/cross_icon.png`}
-                                      alt="close"
-                                    />
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-                          </li>
-                          <li className="nav-item afterlogin_icons_nav">
-                            <Link to="/cart" className="itmelink_menus">
-                              <img
-                                src={`${process.env.PUBLIC_URL}/images/cart_icon.png`}
-                              />
-                              {/* <span className="cartcount">1</span> */}
-                            </Link>
-                          </li>
-                          <li className="nav-item afterlogin_icons_nav userprofilediv_new">
-                            <Link
-                              to="/my_account"
-                              className="itmelink_menus usermenulink"
-                            >
-                              <div className="userimgdiv">
-                                <img
-                                  src={
-                                    profile?.profile_url ||
-                                    `${process.env.PUBLIC_URL}/images/user_image.png`
-                                  }
-                                  alt="user"
-                                />
-                              </div>
-
-                              {profile?.is_verified_user && (
-                                <div className="userverifyimg">
-                                  <img
-                                    src={`${process.env.PUBLIC_URL}/images/verify.png`}
-                                    alt="verify"
-                                  />
-                                </div>
-                              )}
-                            </Link>
-                          </li>
-                        </ul>
-                        <ul className="navbar moremenubar">
-                          <li className="nav-item humbergermenulist">
-                            <button
-                              type="button"
-                              className="menubaricons showmenus_clickbtn"
-                              aria-controls="menu-list"
-                              onClick={toggleMenu}
-                            >
-                              <span className="moretextmenu">More</span>
-                              <img
-                                src={`${process.env.PUBLIC_URL}/images/humbergur_menu.png`}
-                                alt="menu"
-                              />
-                            </button>
-                          </li>
-                        </ul>
-                      </div>
-                    ) : (
-                      <div className="navbar-collapse newnavbarleft">
-                        <ul className="navbar moremenubar">
-                          <li className="nav-item humbergermenulist">
-                            <button
-                              type="button"
-                              className="menubaricons showmenus_clickbtn"
-                              aria-controls="menu-list"
-                              onClick={toggleMenu}
-                            >
-                              <span className="moretextmenu">More</span>
-                              <img
-                                src={`${process.env.PUBLIC_URL}/images/humbergur_menu.png`}
-                                alt="menu"
-                              />
-                            </button>
-                          </li>
-                        </ul>
-                      </div>
-                    )}
-                    <div
-                      id="menu-list"
-                      // ref={menuRef}
-                      className="menulist_divmanin"
-                      style={{ display: isMenuVisible ? "block" : "none" }}
-                    >
-                      <ul className="menubar_list_ul">
-                        {/* {!token && (
-                          <li className="mainmenulist">
-                            <a
-                              onClick={() => {
-                                // OpenSignIn();
-                                setIsMenuVisible(false);
-                                setLoginPopup(!loginPopup);
-                              }}
-                              className="showsigninpopup_onclick"
-                            >
-                              <div className="menubar_divmain">
-                                <div className="menuname_withicon">
-                                  <div className="menuiconimgdiv">
-                                    <img
-                                      src={`${process.env.PUBLIC_URL}/images/icon_logout.png`}
-                                      alt="Sign In Icon"
-                                    />
-                                  </div>
-                                  <div className="menuname">
-                                    <h4>Sign In / Sign Up</h4>
-                                  </div>
-                                </div>
-                                <div className="arrowicondiv">
-                                  <img
-                                    src={`${process.env.PUBLIC_URL}/images/menu_arrow_icon.png`}
-                                    className="arrowicon_menu"
-                                    alt="Menu Arrow"
-                                  />
-                                </div>
-                              </div>
-                            </a>
-                          </li>
-                        )} */}
-
-                        <li className="mainmenulist">
-                          <Link
-                            to="/who_we_are"
-                            onClick={() => setIsMenuVisible(false)}
-                          >
-                            <div className="menubar_divmain">
-                              <div className="menuname_withicon">
-                                <div className="menuiconimgdiv">
-                                  <img
-                                    src={`${process.env.PUBLIC_URL}/images/icon_who_we_are.png`}
-                                  />
-                                </div>
-                                <div className="menuname">
-                                  <h4>Who We Are</h4>
-                                </div>
-                              </div>
-                              <div className="arrowicondiv">
-                                <img
-                                  src={`${process.env.PUBLIC_URL}/images/menu_arrow_icon.png`}
-                                  className="arrowicon_menu"
-                                />
-                              </div>
-                            </div>
-                          </Link>
-                        </li>
-
-                        <li className="mainmenulist">
-                          <Link
-                            to="/the_winners_circle"
-                            onClick={() => setIsMenuVisible(false)}
-                          >
-                            <div className="menubar_divmain">
-                              <div className="menuname_withicon">
-                                <div className="menuiconimgdiv">
-                                  <img
-                                    src={`${process.env.PUBLIC_URL}/images/icon_the_winners_circle.png`}
-                                  />
-                                </div>
-                                <div className="menuname">
-                                  <h4>The Winners Circle</h4>
-                                </div>
-                              </div>
-                              <div className="arrowicondiv">
-                                <img
-                                  src={`${process.env.PUBLIC_URL}/images/menu_arrow_icon.png`}
-                                  className="arrowicon_menu"
-                                />
-                              </div>
-                            </div>
-                          </Link>
-                        </li>
-
-                        <li className="mainmenulist">
-                          <Link
-                            to="/in_the_press"
-                            onClick={() => setIsMenuVisible(false)}
-                          >
-                            <div className="menubar_divmain">
-                              <div className="menuname_withicon">
-                                <div className="menuiconimgdiv">
-                                  <img
-                                    src={`${process.env.PUBLIC_URL}/images/icon_in_the_press.png`}
-                                  />
-                                </div>
-                                <div
-                                  className="menuname"
-                                  style={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "space-between",
-                                  }}
-                                >
-                                  <h4>SpotsBall In the News </h4>
-                                  <img
-                                    src="https://ges-inet.org/wp-content/uploads/2020/10/new-gif.gif"
-                                    style={{
-                                      width: 50,
-                                      marginTop: 6,
-                                      marginLeft: 10,
-                                    }}
-                                  />
-                                </div>
-
-                                {/* <div className="menuname">
-                                  <h4>SpotsBall In the News</h4>
-                                </div> */}
-                              </div>
-                              <div className="arrowicondiv">
-                                <img
-                                  src={`${process.env.PUBLIC_URL}/images/menu_arrow_icon.png`}
-                                  className="arrowicon_menu"
-                                />
-                              </div>
-                            </div>
-                          </Link>
-                        </li>
-
-                        <li className="mainmenulist">
-                          <Link
-                            to="/live_weekly_winner"
-                            onClick={() => setIsMenuVisible(false)}
-                          >
-                            <div className="menubar_divmain">
-                              <div className="menuname_withicon">
-                                <div className="menuiconimgdiv">
-                                  <img
-                                    src={`${process.env.PUBLIC_URL}/images/icon_live_weekly_winner.png`}
-                                  />
-                                </div>
-                                <div className="menuname">
-                                  {/* <h4>Live Weekly Winner</h4> */}
-                                  <h4>Monday Live Stream : Who Won</h4>
-                                </div>
-                              </div>
-                              <div className="arrowicondiv">
-                                <img
-                                  src={`${process.env.PUBLIC_URL}/images/menu_arrow_icon.png`}
-                                  className="arrowicon_menu"
-                                />
-                              </div>
-                            </div>
-                          </Link>
-                        </li>
-
-                        <li className="mainmenulist">
-                          <Link
-                            to="/contact_us"
-                            onClick={() => setIsMenuVisible(false)}
-                          >
-                            <div className="menubar_divmain">
-                              <div className="menuname_withicon">
-                                <div className="menuiconimgdiv">
-                                  <img
-                                    src={`${process.env.PUBLIC_URL}/images/icon_contact_us.png`}
-                                  />
-                                </div>
-                                <div className="menuname">
-                                  <h4>Contact Us</h4>
-                                </div>
-                              </div>
-                              <div className="arrowicondiv">
-                                <img
-                                  src={`${process.env.PUBLIC_URL}/images/menu_arrow_icon.png`}
-                                  className="arrowicon_menu"
-                                />
-                              </div>
-                            </div>
-                          </Link>
-                        </li>
-
-                        <li className="mainmenulist">
-                          <Link
-                            to="/terms"
-                            onClick={() => setIsMenuVisible(false)}
-                          >
-                            <div className="menubar_divmain">
-                              <div className="menuname_withicon">
-                                <div className="menuiconimgdiv">
-                                  <img
-                                    src={`${process.env.PUBLIC_URL}/images/icon_legal.png`}
-                                  />
-                                </div>
-                                <div className="menuname">
-                                  <h4>Legal</h4>
-                                </div>
-                              </div>
-                              <div className="arrowicondiv">
-                                <img
-                                  src={`${process.env.PUBLIC_URL}/images/menu_arrow_icon.png`}
-                                  className="arrowicon_menu"
-                                />
-                              </div>
-                            </div>
-                          </Link>
-                        </li>
-
-                        {token && (
-                          <li className="mainmenulist">
-                            <a
-                              onClick={() => {
-                                OpenLogout();
-                                setIsMenuVisible(false);
-                              }}
-                            >
-                              <div className="menubar_divmain">
-                                <div className="menuname_withicon">
-                                  <div className="menuiconimgdiv">
-                                    <img
-                                      src={`${process.env.PUBLIC_URL}/images/icon_logout.png`}
-                                      alt="Logout Icon"
-                                    />
-                                  </div>
-                                  <div className="menuname">
-                                    <h4>Logout</h4>
-                                  </div>
-                                </div>
-                                <div className="arrowicondiv">
-                                  <img
-                                    src={`${process.env.PUBLIC_URL}/images/menu_arrow_icon.png`}
-                                    className="arrowicon_menu"
-                                    alt="Menu Arrow"
-                                  />
-                                </div>
-                              </div>
-                            </a>
-                          </li>
+                        {unreadCount > 0 && (
+                          <span className="cartcount">{unreadCount}</span>
                         )}
-                      </ul>
-                    </div>
-                  </nav>
+                      </a>
+
+                      {/* Notification Popup */}
+                      <div
+                        className={`notificationdiv_popup ${isNot ? "" : ""}`}
+                        id="notificationPopup"
+                        style={{ display: isNot ? "block" : "none" }}
+                      >
+                        <div
+                          className="topnoticationdiv_main"
+                          id="popupContent"
+                        >
+                          <div className="notificationheading">
+                            <h2>Notifications</h2>
+                          </div>
+                          <div className="notifi_innerdiv">
+                            {notification.length > 0 ? (
+                              notification.map((item) => (
+                                <div className="notifystrip" key={item._id}>
+                                  <Link
+                                    to={`/notification/${item._id}`}
+                                    className="notifylinkdiv"
+                                  >
+                                    <div className="notify-icondiv">
+                                      <img
+                                        className="notification_img"
+                                        src={`${process.env.PUBLIC_URL}/image/favicon.png`}
+                                        alt="notification"
+                                      />
+                                    </div>
+                                    <div className="notificationtext_heading">
+                                      <h2>{item.title}</h2>
+                                      <p>{item.body}</p>
+                                      <div className="notif_timedate">
+                                        <p>
+                                          {moment(item.createdAt).format(
+                                            "ddd, D MMM, h:mm a"
+                                          )}
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </Link>
+                                </div>
+                              ))
+                            ) : (
+                              <p>No notifications available.</p>
+                            )}
+                          </div>
+                          <div className="crossicondiv">
+                            {/* Close Button */}
+                            <button
+                              type="button"
+                              className="crossbtn_notification"
+                              onClick={() => setIsNot(false)}
+                            >
+                              <img
+                                src={`${process.env.PUBLIC_URL}/image/cross_icon.png`}
+                                alt="close"
+                              />{" "}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </li>
+
+                    {/* Cart Icon */}
+                    <li className="nav-item afterlogin_icons_nav">
+                      <Link to="/cart" className="itmelink_menus">
+                        <img
+                          src={`${process.env.PUBLIC_URL}/image/cart_icon.png`}
+                          // src="/image/cart_icon.png"
+                          alt="Cart"
+                        />
+                      </Link>
+                    </li>
+
+                    {/* User Profile */}
+                    <li className="nav-item afterlogin_icons_nav userprofilediv_new">
+                      <Link
+                        to="/my_account"
+                        className="itmelink_menus usermenulink"
+                      >
+                        <div className="userimgdiv">
+                          <img
+                            src={`${process.env.PUBLIC_URL}${
+                              profile?.profile_url || "/image/user_image.png"
+                            }`}
+                            alt="User"
+                          />
+                        </div>
+                        {profile?.is_verified_user && (
+                          <div className="userverifyimg">
+                            <img
+                              src={`${process.env.PUBLIC_URL}//image/verify.png`}
+                              alt="Verified User"
+                            />
+                          </div>
+                        )}
+                      </Link>
+                    </li>
+                  </ul>
+                </div>
+              )}
+
+              <div className="add-listing">
+                <div className="side-menu">
+                  <a
+                    data-bs-toggle="offcanvas"
+                    data-bs-target="#offcanvasRight"
+                    aria-controls="offcanvasRight"
+                    onClick={toggleMenu}
+                  >
+                    <img
+                      src={`${process.env.PUBLIC_URL}/images/svg/menu.svg`}
+                      // src="./images/svg/menu.svg"
+                    />
+                    <img
+                      className="menu-dark"
+                      src={`${process.env.PUBLIC_URL}/images/svg/menu.svg`}
+                      // src="./images/svg/menu.svg"
+                    />
+                  </a>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-        <Login isVisible={loginPopup} onClose={ClosePopup} />
+        </nav>
       </header>
 
+      <div
+        className={`offcanvas offcanvas-end offcanvas-sidebar-menu ${
+          isMenuVisible ? "show" : ""
+        }`}
+        // className={?offcanvas offcanvas-end offcanvas-sidebar-menu}
+        tabIndex={-1}
+        id="offcanvasRight"
+      >
+        <div className="offcanvas-header text-end justify-content-end p-4">
+          <button
+            type="button"
+            className="btn-close text-reset"
+            data-bs-dismiss="offcanvas"
+            aria-label="Close"
+            onClick={() => setIsMenuVisible(false)}
+          >
+            <i className="fa-solid fa-xmark" />
+          </button>
+        </div>
+        <div className="offcanvas-body p-4 p-sm-5 d-flex align-content-between flex-wrap justify-content-center">
+          <div className="sidebar-menu">
+            <div className="sidebar-logo">
+              <Link to="/">
+                <img
+                  className="logo img-fluid"
+                  src={`${process.env.PUBLIC_URL}/images/logo.png`}
+                  alt="logo"
+                />
+              </Link>
+            </div>
+            <div className="navbar-collapse">
+              <ul className="nav navbar-nav">
+                <li className="dropdown nav-item">
+                  <Link
+                    to="/who_we_are"
+                    onClick={() => setIsMenuVisible(false)}
+                    className="nav-link"
+                  >
+                    <img
+                      src={`${process.env.PUBLIC_URL}/images/icon_who_we_are.png`}
+                    />{" "}
+                    Who We Are
+                  </Link>
+                </li>
+                <li className="dropdown nav-item">
+                  <Link
+                    to="/the_winners_circle"
+                    onClick={() => setIsMenuVisible(false)}
+                    className="nav-link"
+                  >
+                    <img
+                      src={`${process.env.PUBLIC_URL}/images/icon_the_winners_circle.png`}
+                      // src="images/icon_the_winners_circle.png"
+                    />
+                    The Winners Circle
+                  </Link>
+                </li>
+                <li className="dropdown nav-item">
+                  <Link
+                    to="/in_the_press"
+                    onClick={() => setIsMenuVisible(false)}
+                    className="nav-link"
+                  >
+                    <img
+                      src={`${process.env.PUBLIC_URL}/images/icon_in_the_press.png`}
+                    />
+                    SpotsBall in the News
+                  </Link>
+                </li>
+                <li className="dropdown nav-item">
+                  <Link
+                    to="/live_weekly_winner"
+                    onClick={() => setIsMenuVisible(false)}
+                    className="nav-link"
+                  >
+                    <img
+                      src={`${process.env.PUBLIC_URL}/images/icon_live_weekly_winner.png`}
+                    />
+                    Monday Live Stream: Who Won
+                  </Link>
+                </li>
+                <li className="dropdown nav-item">
+                  <Link
+                    to="/contact_us"
+                    onClick={() => setIsMenuVisible(false)}
+                    className="nav-link"
+                  >
+                    <img
+                      src={`${process.env.PUBLIC_URL}/images/icon_contact_us.png`}
+                    />
+                    Contact us
+                  </Link>
+                </li>
+                <li className="dropdown nav-item ">
+                  <Link
+                    to="/terms"
+                    onClick={() => setIsMenuVisible(false)}
+                    className="nav-link"
+                  >
+                    <img
+                      src={`${process.env.PUBLIC_URL}/images/icon_legal.png`}
+                    />
+                    Legal
+                  </Link>
+                </li>
+                <li className="dropdown nav-item ">
+                  <Link
+                    to="/tht"
+                    onClick={() => setIsMenuVisible(false)}
+                    className="nav-link"
+                  >
+                    <img
+                      src={`${process.env.PUBLIC_URL}/images/icon_trust.png`}
+                    />
+                    Trust Honestly Transparency (THT).
+                  </Link>
+                </li>
+                {token && (
+                  <li className="dropdown nav-item ">
+                    <a
+                      onClick={() => {
+                        OpenLogout();
+                        setIsMenuVisible(false);
+                      }}
+                      className="nav-link"
+                      style={{ cursor: "pointer" }}
+                    >
+                      <img
+                        src={`${process.env.PUBLIC_URL}/image/icon_logout.png`}
+                        alt="Logout Icon"
+                      />
+                      Logout
+                    </a>
+                  </li>
+                )}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
       <div
         className={`modal fade deleteacc_mainpopup_mdl ${
           isLogout ? "show" : ""
@@ -974,6 +748,8 @@ function Header() {
         style={{
           paddingRight: isLogout ? 17 : "",
           display: isLogout ? "block" : "none",
+          backgroundColor: isLogout ? "#303030a3" : "",
+          width: "105%",
         }}
         aria-modal="true"
       >
@@ -982,14 +758,12 @@ function Header() {
             <button
               type="button"
               className="logoutpopup_crossicon"
-              data-dismiss="modal"
               onClick={CloseLogout}
             >
-              {" "}
               <img
-                src={`${process.env.PUBLIC_URL}/images/cross_icon.png`}
-                //  src="images/cross_icon.png"
-              />{" "}
+                src={`${process.env.PUBLIC_URL}/image/cross_icon.png`}
+                alt="Close"
+              />
             </button>
             <div className="modal-body mdlbdy_delete_account logoutaccount_divmain">
               <div className="deleteacc_text_data logoutdatamain">
@@ -1002,19 +776,19 @@ function Header() {
                 <button
                   type="button"
                   className="cncle_btn_delete actionbtnmain"
-                  data-dismiss="modal"
                   onClick={CloseLogout}
                 >
                   Cancel
                 </button>
               </div>
               <div className="actionbtn_delete">
-                <a
+                <button
+                  type="button"
                   className="delete_btn_delete actionbtnmain"
-                  onClick={handleLogout}
+                  onClick={Logout}
                 >
                   Logout
-                </a>
+                </button>
               </div>
             </div>
           </div>

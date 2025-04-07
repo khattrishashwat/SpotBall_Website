@@ -1,16 +1,17 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import React, { useEffect, useState, useCallback } from "react";
+import Banner from "./Banner";
+import News from "./News";
+import Faqs from "./Faqs";
 import axios from "axios";
-import Login from "../Auth/Login";
 import Swal from "sweetalert2";
-import Loader from "../Loader/Loader";
-import GeolocationPopup from "../Location/GeolocationPopup";
-import GameUnavailablePopup from "../Location/GameUnavailablePopup";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
-import Slider from "react-slick";
+import {
+  messaging,
+  getToken,
+  onMessage,
+} from "../FirebaseCofig/FirebaseConfig";
 
 function Home() {
+<<<<<<< HEAD
   const navigate = useNavigate();
   const spacing = 2;
   const [countdownType, setCountdownType] = useState("ends"); // "starts" or "ends"
@@ -39,11 +40,39 @@ function Home() {
     useState(false);
   const [isUnavailablePopupVisible, setIsUnavailablePopupVisible] =
     useState(false);
+=======
+  const [restrictedStates, setRestrictedStates] = useState([]);
+  const [apk, setApk] = useState([]);
+  const [banner, setBanner] = useState([]);
+  const [faqs, setFaqs] = useState([]);
+  const [news, setNews] = useState([]);
+  const [livs, setLivs] = useState([]);
+  const [contests, setContests] = useState([]);
+  const [discounts, setDiscounts] = useState([]);
+  const [howItWorks, setHowItWorks] = useState([]);
+  const [bannerGIFS, setBannerGIFS] = useState([]);
+  const [movies, setMovies] = useState("");
+>>>>>>> 257b6be024a1356baedefca1452e6163bbbbabaf
 
-  // const location = useLocation();
+  const requestFirebaseToken = async () => {
+    try {
+      const currentToken = await getToken(messaging, {
+        vapidKey:
+          "BC1L5qE6WKJSgEU46nuptM9bCKtljihEjAikiBrpzRIomSiw6Dd9Wq6jmM4CfIHJokkhmqblgU5qbVaqizNlmeo",
+      });
 
-  const open = async () => {
-    setIsModals(true);
+      if (currentToken) {
+        // console.log("FCM Token:", currentToken);
+        localStorage.setItem("device_token", currentToken);
+
+        // Optionally, send the token to your backend for push notifications
+      } else {
+        console.log("No FCM token available. Request permission.");
+      }
+    } catch (error) {
+      console.error("FCM Token Error:", error);
+      localStorage.setItem("device_token", "currentToken");
+    }
   };
    const OpenSignIn = () => {
      setLoginPopup(true);
@@ -53,110 +82,41 @@ function Home() {
      setLoginPopup(false);
    };
   useEffect(() => {
-    const fetchLocation = async () => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          async (position) => {
-            const { latitude, longitude } = position.coords;
-            // console.log("Latitude:", latitude, "Longitude:", longitude);
+    let isMounted = true;
 
-            try {
-              const response = await axios.get(
-                `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=AIzaSyA8pM5yXTJ3LM8zBF-EkZHEyxlPXSttsl0`
-              );
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem("Web-token");
+        let response;
 
-              const results = response.data.results;
-              if (!results || results.length === 0) {
-                console.error("No results found in geocode response.");
-                return;
-              }
+        if (token) {
+          response = await axios.get("/app/dashboard/authenticated", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+        } else {
+          response = await axios.get("/app/dashboard/public");
+        }
 
-              const addressComponents = results[0].address_components || [];
-              let stateName = "";
-              let countryName = "";
-
-              // Extract state and country from address components
-              addressComponents.forEach((component) => {
-                if (component.types.includes("administrative_area_level_1")) {
-                  stateName = component.long_name;
-                }
-                if (component.types.includes("country")) {
-                  countryName = component.long_name;
-                }
-              });
-
-              // console.log(
-              //   "State Name:",
-              //   stateName,
-              //   "Country Name:",
-              //   countryName
-              // );
-
-              // Ensure restrictedStates is not null or undefined
-              const restrictedAreaStates = restrictedStates || [];
-              // console.log("restrictedAreaStates", restrictedAreaStates);
-
-              // Check if the country is not India
-              if (countryName.toLowerCase() !== "india") {
-                Swal.fire({
-                  title: "Area Restricted",
-                  text: `Access is restricted outside India. Current location: ${stateName}, ${countryName}`,
-                  icon: "error",
-                  confirmButtonText: "OK",
-                });
-
-                localStorage.removeItem("location");
-                localStorage.setItem(
-                  "restrictedArea",
-                  JSON.stringify({ stateName, countryName })
-                );
-
-                setIsUnavailablePopupVisible(true);
-                return;
-              }
-
-              // Check if the state is restricted
-              const isRestrictedState = restrictedAreaStates.some(
-                (restrictedState) =>
-                  restrictedState.toLowerCase() === stateName.toLowerCase()
-              );
-
-              if (isRestrictedState) {
-                localStorage.removeItem("location");
-                localStorage.setItem(
-                  "restrictedArea",
-                  JSON.stringify({ stateName, countryName })
-                );
-
-                setIsUnavailablePopupVisible(true);
-                return;
-              }
-
-              // If not restricted, store location and remove restrictedArea
-              localStorage.removeItem("restrictedArea");
-              localStorage.setItem(
-                "location",
-                JSON.stringify({ stateName, countryName })
-              );
-
-              // console.log("Location saved:", { stateName, countryName });
-            } catch (err) {
-              console.error("Error fetching geocode data:", err);
-            }
-          },
-          (error) => {
-            console.error("Geolocation error:", error.message);
-          }
-        );
+        if (response?.data?.data && isMounted) {
+          setRestrictedStates(response.data.data.restrictedStates || []);
+          setLivs(response.data.data.livelinks || []);
+          setContests(response.data.data.contests || []);
+          setDiscounts(response.data.data.discounts || []);
+          setFaqs(response.data.data.faqs || []);
+          setNews(response.data.data.press || []);
+          setApk(response.data.data.apkLinks || []);
+          setBanner(response.data.data.banner_details || []);
+          setHowItWorks(response.data.data.howItWorks || []);
+          setBannerGIFS(response.data.data.bannerGifs || []);
+        }
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
       }
     };
-    const token = localStorage.getItem("Web-token");
-    if (token) {
-      fetchLocation();
-    }
-    // fetchLocation();
-  }, [restrictedStates]);
 
+<<<<<<< HEAD
   // const handleBuyTicketClick = (contest, discount) => {
   //   setSelectedContest(contest);
   //   SetOnCloseComptition(true);
@@ -370,6 +330,14 @@ const handleAskToPlay = () => {
       videoElement.currentTime = 0;
     }
   };
+=======
+    fetchData();
+    requestFirebaseToken();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+>>>>>>> 257b6be024a1356baedefca1452e6163bbbbabaf
 
   const fetchVideoData = async () => {
     const token = localStorage.getItem("Web-token");
@@ -380,8 +348,9 @@ const handleAskToPlay = () => {
         },
       });
 
-      if (response) {
-        setMovies(response.data.data);
+      if (response?.data?.data) {
+        setMovies(response.data.data[0]);
+        console.log("new", response.data.data[0]);
       }
     } catch (error) {
       console.error("Error fetching video data:", error);
@@ -392,6 +361,7 @@ const handleAskToPlay = () => {
     fetchVideoData();
   }, []);
 
+<<<<<<< HEAD
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -1397,6 +1367,24 @@ const handleAskToPlay = () => {
           </div>
         </div>
       </div>
+=======
+  return (
+    <>
+      <Banner
+        data={{
+          movies,
+          restrictedStates,
+          livs,
+          howItWorks,
+          banner,
+          contests,
+          discounts,
+          bannerGIFS,
+        }}
+      />
+      {news.length > 0 && <News data={{ news }} />}
+      {faqs.length > 0 && <Faqs data={{ apk, faqs }} />}
+>>>>>>> 257b6be024a1356baedefca1452e6163bbbbabaf
     </>
   );
 }

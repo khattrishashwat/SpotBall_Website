@@ -4,7 +4,7 @@ import axios from "axios";
 import Loader from "../../Loader/Loader";
 
 function Privacy() {
-    const [isCookies, setIsCookies] = useState("");
+  const [isCookies, setIsCookies] = useState("");
   const [isLoading, setIsLoading] = useState("");
 
   const fetchCondition = async () => {
@@ -21,7 +21,6 @@ function Privacy() {
         }
       );
       setIsCookies(response.data.data[0]?.description);
-      // console.log("ye",response.data.data);
     } catch (error) {
       console.error("Error data:", error);
     } finally {
@@ -33,9 +32,9 @@ function Privacy() {
     fetchCondition();
   }, []);
 
-   useEffect(() => {
-      window.scrollTo(0, 0);
-    }, []);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <div>
@@ -60,7 +59,7 @@ function Privacy() {
                       <div className="tabbingiconbgdiv">
                         {" "}
                         <img
-                          src={`${process.env.PUBLIC_URL}/images/legal_terms_icons.png`}
+                          src={`${process.env.PUBLIC_URL}/image/legal_terms_icons.png`}
                           alt="Terms"
                         />{" "}
                       </div>{" "}
@@ -72,7 +71,7 @@ function Privacy() {
                       <div className="tabbingiconbgdiv">
                         {" "}
                         <img
-                          src={`${process.env.PUBLIC_URL}/images/legal_terms_icons.png`}
+                          src={`${process.env.PUBLIC_URL}/image/legal_terms_icons.png`}
                           alt="Privacy"
                         />{" "}
                       </div>
@@ -84,7 +83,7 @@ function Privacy() {
                       <div className="tabbingiconbgdiv">
                         {" "}
                         <img
-                          src={`${process.env.PUBLIC_URL}/images/legal_terms_icons.png`}
+                          src={`${process.env.PUBLIC_URL}/image/legal_terms_icons.png`}
                           alt="Rules"
                         />{" "}
                       </div>
@@ -102,7 +101,7 @@ function Privacy() {
                       <div className="tabbingiconbgdiv">
                         {" "}
                         <img
-                          src={`${process.env.PUBLIC_URL}/images/legal_terms_icons.png`}
+                          src={`${process.env.PUBLIC_URL}/image/legal_terms_icons.png`}
                           alt="Cookies"
                         />{" "}
                       </div>{" "}
@@ -117,20 +116,18 @@ function Privacy() {
                 <div className="tab-content">
                   <div id="cookiepolicy" className="tab-pane active">
                     <div className="legaltermsdata_div">
-                      {/* <div className="innerlegal_heaidngwithpara"> */}
-                        
-                          <div
-                            dangerouslySetInnerHTML={{ __html: isCookies }}
-                          />
-                          {/* {isLoading ? (
-                            <Loader /> // Correctly render the Loader component
-                          ) : (
-                            <div
-                              dangerouslySetInnerHTML={{ __html: isCookies }}
-                            />
-                          )} */}
-                        
-                      {/* </div> */}
+                      {isLoading ? (
+                        <Loader /> // This shows a spinner while loading
+                      ) : (
+                        <div
+                          className="innerlegal_heaidngwithpara"
+                          dangerouslySetInnerHTML={{ __html: isCookies }}
+                        />
+                      )}
+                      {/* <div
+                        className="innerlegal_heaidngwithpara"
+                        dangerouslySetInnerHTML={{ __html: isCookies }}
+                      /> */}
                     </div>
                   </div>
                 </div>

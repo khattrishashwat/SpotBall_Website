@@ -9,6 +9,7 @@ dist/
 build/
 # Compiled Java class files
 *.class
+*.zip
 
 # Compiled Python bytecode
 *.py[cod]
@@ -48,3 +49,4 @@ Thumbs.db
 *.mov
 *.wmv
 
+*.zip

@@ -1,308 +1,29 @@
-// import React, { useState, useEffect } from "react";
-// import { Link } from "react-router-dom";
-// import axios from "axios";
-// import PalyVedio from "../../Pages/HowToPlay/PalyVedio";
-
-// function Footer() {
-//   const [footer, setFooter] = useState(""); // Footer content
-//   const [plays, setPlays] = useState(false); // Video state
-//   const [links, setLinks] = useState(false); // Video state
-//   const [androidLink, setAnroidsLinks] = useState(null);
-//   const fetchFooter = async () => {
-//     try {
-//       const response = await axios.get(
-//         "app/static-content/get-all-static-content/footer"
-//       );
-
-//       if (response) {
-//         console.log("links", response.data.data?.liveLinks);
-
-//         setLinks(response.data.data?.liveLinks);
-//         setFooter(response.data.data?.footer?.description || "");
-//       }
-//     } catch (error) {
-//       console.error("Error fetching footer data:", error);
-//     }
-//   };
-//   const fetchAnroidLink = async () => {
-//     try {
-//       const response = await axios.get("app/apk-links");
-
-//       if (response) {
-//         setAnroidsLinks(response.data.data?.android_build); // Set the link
-//       }
-//     } catch (error) {
-//       console.error("Error fetching Android data:", error);
-//     }
-//   };
-
-//   useEffect(() => {
-//     fetchFooter();
-//     fetchAnroidLink();
-//   }, []);
-
-//   const openVideo = () => setPlays(true);
-
-//   const closeVideo = () => {
-//     setPlays(false);
-//     const videoElement = document.getElementById("video_howtoplay");
-//     if (videoElement) {
-//       videoElement.pause();
-//       videoElement.currentTime = 0;
-//     }
-//   };
-
-//   return (
-//     <>
-//       <footer className="footermaindiv_section">
-//         <div className="container contfootermain">
-//           <div className="col-md-12 col12mainfooter">
-//             <div className="row rowmainfooter">
-//               <div className="col-md-4 col4footerightside">
-//                 <div className="footertextinfodiv">
-//                   <div className="winnergurantee_footer">
-//                     <div dangerouslySetInnerHTML={{ __html: footer }} />
-//                   </div>
-//                 </div>
-//               </div>
-//               <div className="col-md-8 col8rightfooterlinks">
-//                 <div className="footerlinksmain_right">
-//                   <div className="footerlinksmaindiv_inner">
-//                     {/* Link Sections */}
-//                     {[
-//                       {
-//                         title: "Winners",
-//                         links: [
-//                           "The Winners Circle",
-//                           "Live Weekly Winner",
-//                           "Trending Articles",
-//                         ],
-//                         paths: [
-//                           "/the_winners_circle",
-//                           "/live_weekly_winner",
-//                           "/in_the_press",
-//                         ],
-//                       },
-//                       {
-//                         title: "About Us",
-//                         links: ["Who We Are", "How to Play", "Contact Us"],
-//                         paths: ["/who_we_are", null, "/contact_us"],
-//                         onClick: [null, openVideo, null],
-//                       },
-//                       {
-//                         title: "Legal Terms",
-//                         links: [
-//                           "Terms & Conditions",
-//                           "Privacy Policy",
-//                           "Rules of Play & FAQs",
-//                           "Cookie Policy",
-//                         ],
-//                         paths: ["/terms", "/privacy", "/rules", "/cookies"],
-//                       },
-//                       {
-//                         title: "Apps",
-//                         links: ["iOS", androidLink ? "Android" : "Loading..."], // Conditionally render Android link
-//                         paths: [links?.Apple_Store, androidLink || "#"], // Store paths for both links
-//                         onClick: (index) => {
-//                           const url =
-//                             index === 0 ? links?.Apple_Store : androidLink; // Determine which link to open
-//                           if (url) {
-//                             window.open(url, "_blank", "noopener,noreferrer");
-//                           }
-//                         },
-//                       },
-//                     ].map((section, index) => (
-//                       <div key={index} className="maindivforfooterlinks">
-//                         <h2 className="linksheading">{section.title}</h2>
-//                         <ul className="links_list_footer">
-//                           {section.links.map((link, i) => (
-//                             <li key={i}>
-//                               <Link
-//                                 to={section.paths[i] || "#"}
-//                                 className="linksanchor"
-//                                 onClick={section.onClick?.[i]}
-//                               >
-//                                 {link}
-//                               </Link>
-//                             </li>
-//                           ))}
-//                         </ul>
-//                       </div>
-//                     ))}
-//                   </div>
-//                 </div>
-//               </div>
-//             </div>
-//             <div className="row rowmainfooter secondfootermaindiv">
-//               <div className="col-md-8 col8rightfooterlinks">
-//                 <div className="footerlinksmain_right footersocialwith_downloadicons">
-//                   {/* App Store and Social Media Icons */}
-//                   <div className="footer_downloadapp_icons">
-//                     <div className="download_app_icondiv">
-//                       <div className="btn btn-dark">
-//                         <a
-//                           href={androidLink}
-//                           className="btn-download"
-//                           download
-//                           // target="_blank"
-//                           // rel="noopener noreferrer"
-//                         >
-//                           {" "}
-//                           <i
-//                             className="fa fa-download"
-//                             aria-hidden="true"
-//                           />{" "}
-//                           Download APK
-//                         </a>
-//                       </div>
-//                       <div className="appstoreicondiv">
-//                         <a
-//                           href={links?.Apple_Store}
-//                           target="_blank"
-//                           rel="noopener noreferrer"
-//                         >
-//                           <img
-//                             src={`${process.env.PUBLIC_URL}/images/apple-store-badge.png`}
-//                             alt="Apple Store"
-//                           />
-//                         </a>
-//                       </div>
-//                     </div>
-//                   </div>
-
-//                   <div className="footer_socialicons">
-//                     <ul>
-//                       {[
-//                         {
-//                           icon: "facebook_icon.png",
-//                           name: "Facebook_Social_Link",
-//                         },
-//                         {
-//                           icon: "Instagram_icon.png",
-//                           name: "Instagram_Social_Link",
-//                         },
-//                         { icon: "Twitter_x_icon.png", name: "X_Social_Link" },
-//                         {
-//                           icon: "Threads_icon.png",
-//                           name: "Threads_Social_Link",
-//                         },
-//                         {
-//                           icon: "youtube_icon.png",
-//                           name: "Youtube_Social_Link",
-//                         },
-//                       ].map((item, i) => {
-//                         const { icon, name } = item;
-//                         const capitalizedName =
-//                           name.split("_")[0].charAt(0).toUpperCase() +
-//                           name.split("_")[0].slice(1); // Capitalize only the first letter
-//                         const link = links ? links[name] : ""; // Dynamically fetch the link based on the name from liveLinks
-
-//                         return (
-//                           <li key={i}>
-//                             {link ? (
-//                               <a
-//                                 href={link}
-//                                 title={capitalizedName}
-//                                 target="_blank"
-//                                 rel="noopener noreferrer"
-//                               >
-//                                 <img
-//                                   src={`${process.env.PUBLIC_URL}/images/${icon}`}
-//                                   alt={capitalizedName}
-//                                   // onError={(e) => {
-//                                   //   e.target.src = `${process.env.PUBLIC_URL}/images/${icon}`; // Fallback image
-//                                   // }}
-//                                 />
-//                               </a>
-//                             ) : (
-//                               <span>{capitalizedName} link not available</span>
-//                             )}
-//                           </li>
-//                         );
-//                       })}
-//                     </ul>
-//                   </div>
-//                 </div>
-//               </div>
-//             </div>
-//           </div>
-//         </div>
-//       </footer>
-
-//       {/* Copyright Footer */}
-//       <footer className="copyrightfooter">
-//         <div className="container contsecondfooter">
-//           <div className="col-md-12 col12secondfootermain">
-//             <div className="row rowmainforcopyrightwithcurrency">
-//               <div className="copyrightwithinrdropdown">
-//                 <div className="divforcopyright">
-//                   <p>
-//                     © <Link to="/">SpotsBall</Link> 2024. All Rights Reserved.
-//                     Designed by <a href="#">Webmobril</a>
-//                   </p>
-//                   <span className="separator">|</span>
-//                   <div className="currencyselectdiv">
-//                     <p>
-//                       Currency <i className="fa fa-inr" aria-hidden="true" />{" "}
-//                       INR
-//                       {/* <select>
-//                         <option>INR</option>
-//                         <option>USD</option>
-//                         <option>EUR</option>
-//                       </select> */}
-//                     </p>
-//                   </div>
-//                 </div>
-//               </div>
-//             </div>
-//           </div>
-//         </div>
-//       </footer>
-
-//       {/* Video Component */}
-//       {plays && <PalyVedio isON={plays} isOFF={closeVideo} />}
-//     </>
-//   );
-// }
-
-// export default Footer;
-
 import React, { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom"; // useLocation hook to get current path
+import { Link, useLocation } from "react-router-dom";
 import axios from "axios";
-import PalyVedio from "../../Pages/HowToPlay/PalyVedio";
 
 function Footer() {
-  const [footer, setFooter] = useState(""); // Footer content
-  const [plays, setPlays] = useState(false); // Video state
-  const [links, setLinks] = useState(false); // Video state
-  const [androidLink, setAnroidsLinks] = useState(null);
-  const location = useLocation(); // useLocation to get current path
+  const [footer, setFooter] = useState("");
+  const [links, setLinks] = useState([]);
+  const [androidLink, setAndroidLink] = useState(null);
+  const location = useLocation();
+  const [showBackToTop, setShowBackToTop] = useState(false);
 
   const fetchFooter = async () => {
     try {
       const response = await axios.get(
         "app/static-content/get-all-static-content/footer"
       );
-
-      if (response) {
-        // console.log("links", response.data.data?.liveLinks);
-
-        setLinks(response.data.data?.liveLinks);
-        setFooter(response.data.data?.footer?.description || "");
-      }
+      setLinks(response.data.data?.liveLinks || []);
     } catch (error) {
       console.error("Error fetching footer data:", error);
     }
   };
 
-  const fetchAnroidLink = async () => {
+  const fetchAndroidLink = async () => {
     try {
       const response = await axios.get("app/apk-links");
-
-      if (response) {
-        setAnroidsLinks(response.data.data?.android_build); // Set the link
-      }
+      setAndroidLink(response.data.data?.android_build || null);
     } catch (error) {
       console.error("Error fetching Android data:", error);
     }
@@ -310,18 +31,31 @@ function Footer() {
 
   useEffect(() => {
     fetchFooter();
-    fetchAnroidLink();
+    fetchAndroidLink();
+
+    // Scroll Event Listener
+    const handleScroll = () => {
+      const scrollPercentage =
+        (window.scrollY /
+          (document.documentElement.scrollHeight - window.innerHeight)) *
+        100;
+      setShowBackToTop(scrollPercentage > 10);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const openVideo = () => setPlays(true);
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
-  const closeVideo = () => {
-    setPlays(false);
-    const videoElement = document.getElementById("video_howtoplay");
-    if (videoElement) {
-      videoElement.pause();
-      videoElement.currentTime = 0;
-    }
+  const iconClass = {
+    facebook: "fab fa-facebook-f",
+    instagram: "fab fa-instagram",
+    twitter: "fa-brands fa-x-twitter",
+    threads: "fa-brands fa-threads",
+    youtube: "fa-brands fa-youtube",
   };
 
   const handleLinkClick = () => {
@@ -342,229 +76,188 @@ function Footer() {
 
   return (
     <>
-      <footer className="footermaindiv_section">
-        <div className="container contfootermain">
-          <div className="col-md-12 col12mainfooter">
-            <div className="row rowmainfooter">
-              <div className="col-md-4 col4footerightside">
-                <div className="footertextinfodiv">
-                  <div className="winnergurantee_footer">
-                    <div dangerouslySetInnerHTML={{ __html: footer }} />
-                  </div>
-                </div>
-              </div>
-              <div className="col-md-8 col8rightfooterlinks">
-                <div className="footerlinksmain_right">
-                  <div className="footerlinksmaindiv_inner">
-                    {/* Link Sections */}
+      <footer className="footer">
+        <div className="min-footer">
+          <div className="container">
+            <div className="row align-items-center justify-content-between mb-4 mb-md-5">
+              {/* Social Media Section */}
+              <div className="col-md-4 col-lg-4 mb-4 mb-lg-0">
+                <h5 className="title mb-3 d-block follow">Follow Us </h5>
+                <div className="footer-social justify-content-center justify-content-lg-start">
+                  {/* <ul>
+                  {links.map((item, index) => {
+                    const { url, name } = item || {};
+                    return (
+                      url &&
+                      name && (
+                        <li key={index}>
+                          <a
+                            href={url}
+                            title={name}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <i
+                              className={
+                                iconClass[name.toLowerCase()] ||
+                                "fa-solid fa-link"
+                              }
+                            />
+                          </a>
+                        </li>
+                      )
+                    );
+                  })}
+                </ul> */}
+
+                  <ul>
                     {[
                       {
-                        title: "Winners",
-                        links: [
-                          "The Winners Circle",
-                          "Live Weekly Winner",
-                          "Trending Articles",
-                        ],
-                        paths: [
-                          "/the_winners_circle",
-                          "/live_weekly_winner",
-                          "/in_the_press",
-                        ],
+                        icon: "fab fa-facebook-f",
+                        name: "Facebook_Social_Link",
                       },
                       {
-                        title: "About Us",
-                        links: ["Who We Are", "How to Play", "Contact Us"],
-                        paths: ["/who_we_are", null, "/contact_us"],
-                        onClick: [null, openVideo, null],
+                        icon: "fab fa-instagram",
+                        name: "Instagram_Social_Link",
+                      },
+                      { icon: "fa-brands fa-x-twitter", name: "X_Social_Link" },
+                      {
+                        icon: "fa-brands fa-threads",
+                        name: "Threads_Social_Link",
                       },
                       {
-                        title: "Legal Terms",
-                        links: [
-                          "Terms & Conditions",
-                          "Privacy Policy",
-                          "Rules of Play & FAQs",
-                          "Cookie Policy",
-                        ],
-                        paths: ["/terms", "/privacy", "/rules", "/cookies"],
+                        icon: "fa-brands fa-youtube",
+                        name: "Youtube_Social_Link",
                       },
-                      {
-                        title: "Apps",
-                        links: ["iOS", androidLink ? "Android" : "Loading..."], // Conditionally render Android link
-                        paths: [links?.Apple_Store, androidLink || "#"], // Store paths for both links
-                        onClick: (index) => {
-                          const url =
-                            index === 0 ? links?.Apple_Store : androidLink; // Determine which link to open
-                          if (url) {
-                            window.open(url, "_blank", "noopener,noreferrer");
-                          }
-                        },
-                      },
-                    ].map((section, index) => (
-                      <div key={index} className="maindivforfooterlinks">
-                        <h2 className="linksheading">{section.title}</h2>
-                        <ul className="links_list_footer">
-                          {section.links.map((link, i) => (
-                            <li key={i}>
-                              {/* {console.log("index", section.paths[i])} */}
-                              <Link
-                                to={section.paths[i]}
-                                className="linksanchor"
-                                onClick={
-                                  section?.paths[i] === null
-                                    ? () => openVideo()
-                                    : handleLinkClick()
-                                }
-                              >
-                                {link}
-                              </Link>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))}
-                  </div>
+                    ].map((item, i) => {
+                      const { icon, name } = item;
+                      const capitalizedName =
+                        name.split("_")[0].charAt(0).toUpperCase() +
+                        name.split("_")[0].slice(1); // Capitalize only the first letter
+                      const link = links ? links[name] : ""; // Dynamically fetch the link based on the name from liveLinks
+
+                      return (
+                        <li key={i}>
+                          {link ? (
+                            <a
+                              href={link}
+                              title={capitalizedName}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              <i className={icon[name.toLowerCase()] || icon} />
+                            </a>
+                          ) : (
+                            <span>{capitalizedName} link not available</span>
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ul>
                 </div>
               </div>
-            </div>
-            <div className="row rowmainfooter secondfootermaindiv">
-              <div className="col-md-8 col8rightfooterlinks">
-                <div className="footerlinksmain_right footersocialwith_downloadicons">
-                  {/* App Store and Social Media Icons */}
-                  <div className="footer_downloadapp_icons">
-                    <div className="download_app_icondiv">
-                      {/* <div className="btn btn-dark">
-                        <a
-                          href={androidLink}
-                          className="btn-download"
-                          download
-                          // target="_blank"
-                          // rel="noopener noreferrer"
-                        >
-                          {" "}
-                          <img
-                            src={`${process.env.PUBLIC_URL}/images/anroid_apk.png`}
-                            alt="Apple Store"
-                          />
-                        </a>
-                      </div> */}
-                      <div className="appstoreicondiv">
-                        <a
-                          href={androidLink}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          <img
-                            src={`${process.env.PUBLIC_URL}/images/anroid_apks.png`}
-                            alt="Play Store"
-                          />
-                        </a>
-                      </div>
-                      <div className="appstoreicondiv">
-                        <a
-                          href={links?.Apple_Store}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          <img
-                            src={`${process.env.PUBLIC_URL}/images/apple-store-badge.png`}
-                            alt="Apple Store"
-                          />
-                        </a>
-                      </div>
-                    </div>
-                  </div>
 
-                  <div className="footer_socialicons">
-                    <ul>
-                      {[
-                        {
-                          icon: "facebook_icon.png",
-                          name: "Facebook_Social_Link",
-                        },
-                        {
-                          icon: "Instagram_icon.png",
-                          name: "Instagram_Social_Link",
-                        },
-                        { icon: "Twitter_x_icon.png", name: "X_Social_Link" },
-                        {
-                          icon: "threads_icon.png",
-                          name: "Threads_Social_Link",
-                        },
-                        {
-                          icon: "youtube_icon.png",
-                          name: "Youtube_Social_Link",
-                        },
-                      ].map((item, i) => {
-                        const { icon, name } = item;
-                        const capitalizedName =
-                          name.split("_")[0].charAt(0).toUpperCase() +
-                          name.split("_")[0].slice(1); // Capitalize only the first letter
-                        const link = links ? links[name] : ""; // Dynamically fetch the link based on the name from liveLinks
+              {/* Logo Section */}
+              <div className="col-md-4 col-lg-4 text-center mb-4 mb-lg-0">
+                <Link to="/" className="footer-logo">
+                  <img
+                    className="logo img-fluid"
+                    src="images/logo.png"
+                    alt="logo"
+                  />
+                </Link>
+              </div>
 
-                        return (
-                          <li key={i}>
-                            {link ? (
-                              <a
-                                href={link}
-                                title={capitalizedName}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                <img
-                                  src={`${process.env.PUBLIC_URL}/images/${icon}`}
-                                  alt={capitalizedName}
-                                  // onError={(e) => {
-                                  //   e.target.src = `${process.env.PUBLIC_URL}/images/${icon}`; // Fallback image
-                                  // }}
-                                />
-                              </a>
-                            ) : (
-                              <span>{capitalizedName} link not available</span>
-                            )}
-                          </li>
-                        );
-                      })}
-                    </ul>
+              {/* Download App Section */}
+              <div className="col-md-4 col-lg-4">
+                <div className="download-app align-items-center justify-content-center justify-content-lg-start text-center">
+                  <h5 className="title mb-3 d-block download">Download App</h5>
+                  <div className="app_icons">
+                    {androidLink && (
+                      <a
+                        href={androidLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <img
+                          className="img-fluid"
+                          src={`${process.env.PUBLIC_URL}/images/android-download.png`}
+                          alt="Play Store"
+                        />
+                      </a>
+                    )}
+
+                    {links?.Apple_Store && (
+                      <a
+                        href={links.Apple_Store}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <img
+                          className="img-fluid"
+                          src={`${process.env.PUBLIC_URL}/images/appleapp.svg`}
+                          alt="Apple Store"
+                        />
+                      </a>
+                    )}
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </footer>
 
-      {/* Copyright Footer */}
-      <footer className="copyrightfooter">
-        <div className="container contsecondfooter">
-          <div className="col-md-12 col12secondfootermain">
-            <div className="row rowmainforcopyrightwithcurrency">
-              <div className="copyrightwithinrdropdown">
-                <div className="divforcopyright">
-                  <p>
-                    © <Link to="/">SpotsBall</Link> 2024. All Rights Reserved.
-                    Designed by <a href="#">Webmobril</a>
-                  </p>
-                  <span className="separator">|</span>
-                  <div className="currencyselectdiv">
-                    <p>
-                      Currency <i className="fa fa-inr" aria-hidden="true" />{" "}
-                      INR
-                      {/* <select>
-                        <option>INR</option>
-                        <option>USD</option>
-                        <option>EUR</option>
-                      </select> */}
-                    </p>
-                  </div>
+        {/* Footer Bottom */}
+        <div className="footer-bottom">
+          <div className="container">
+            <div className="row align-items-center copyright">
+              <div className="col-12 col-md-6 text-center text-md-start">
+                <div className="copyright-menu footer-menu">
+                  <ul className="mb-0 justify-content-center justify-content-md-start list-unstyled">
+                    <li>
+                      <Link to="/terms">Terms &amp; Conditions</Link>
+                    </li>
+                    <li>
+                      <Link to="/privacy">Privacy Policy</Link>
+                    </li>
+                    <li>
+                      <Link to="/cookies">Cookie Policy</Link>
+                    </li>
+                    <li>
+                      <Link to="/rules">Rules Of Play &amp; FAQs</Link>
+                    </li>
+                  </ul>
                 </div>
+              </div>
+              <div className="col-12 col-md-6 text-center text-md-end mt-2 mt-md-0">
+                <p className="mb-0">
+                  © Copyright <span id="copyright"> 2025</span>{" "}
+                  <Link to="/"> SpotsBall Global PVT. LTD. </Link> All Rights
+                  Reserved
+                </p>
               </div>
             </div>
           </div>
         </div>
       </footer>
 
-      {/* Video Component */}
-      {plays && <PalyVedio isON={plays} isOFF={closeVideo} />}
+      <div
+        id="back-to-top"
+        className="back-to-top"
+        style={{
+          display: showBackToTop ? "block" : "none",
+          position: "fixed",
+          bottom: "20px",
+          right: "20px",
+          cursor: "pointer",
+          zIndex: "99",
+        }}
+        onClick={scrollToTop}
+      >
+        <a>
+          <i className="fa-solid fa-arrow-up" />
+        </a>
+      </div>
     </>
   );
 }

@@ -1,20 +1,39 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
-import { GoogleOAuthProvider } from "@react-oauth/google";
+import React, { useEffect } from "react";
+import ReactDOM from "react-dom/client";
+import "./index.css";
+import App from "./App";
+import reportWebVitals from "./reportWebVitals";
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-  <React.StrictMode>
-    <GoogleOAuthProvider clientId="976408149307-eh3v2kkvll82ak8f6sv1k21egft6g1d5.apps.googleusercontent.com">
+const root = ReactDOM.createRoot(document.getElementById("root"));
+
+const checkVersion = async () => {
+  try {
+    // Fetch the meta.json file
+    const response = await fetch("/meta.json");
+    const meta = await response.json();
+
+    // Get the stored version from localStorage
+    const currentVersion = localStorage.getItem("app_version");
+
+    // If the version has changed, reload the page
+    if (currentVersion && currentVersion !== meta.version) {
+      localStorage.setItem("app_version", meta.version); // Update stored version
+      window.location.reload(true); // Force refresh the page
+    } else {
+      localStorage.setItem("app_version", meta.version); // Store version if it's the same
+    }
+  } catch (error) {
+    console.error("Version check failed:", error);
+  }
+};
+
+// Check the version before rendering the app
+checkVersion().then(() => {
+  root.render(
+    <React.StrictMode>
       <App />
-    </GoogleOAuthProvider>
-  </React.StrictMode>
-);
+    </React.StrictMode>
+  );
+});
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();

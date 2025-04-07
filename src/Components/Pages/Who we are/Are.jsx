@@ -20,7 +20,7 @@ function Are() {
       );
 
       if (response.data.data) {
-        console.log("Fetched ", response.data.data);
+     //  console.log("Fetched ", response.data.data);
         setWhos(response.data.data);
       }
     } catch (error) {

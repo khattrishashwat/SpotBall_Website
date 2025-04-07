@@ -24,7 +24,7 @@ function Contact() {
       );
 
       if (response.data.data) {
-        console.log("Fetched Contacts ", response.data.data);
+      //  console.log("Fetched Contacts ", response.data.data);
         setContacts(response.data.data[0] || {});
       }
     } catch (error) {
@@ -148,7 +148,7 @@ function Contact() {
                         <h2>{contact.info}</h2>
                         <div className="helpsupport_info">
                           <img
-                            src={`${process.env.PUBLIC_URL}/images/mail.png`}
+                            src={`${process.env.PUBLIC_URL}/image/mail.png`}
                             alt="Mail"
                           />
                           <p>
@@ -174,7 +174,7 @@ function Contact() {
                               rel="noopener noreferrer"
                             >
                               <img
-                                src={`${process.env.PUBLIC_URL}/images/facebook_contact.png`}
+                                src={`${process.env.PUBLIC_URL}/image/facebook_contact.png`}
                                 alt="Facebook"
                               />
                             </a>
@@ -187,7 +187,7 @@ function Contact() {
                               className="bggreen"
                             >
                               <img
-                                src={`${process.env.PUBLIC_URL}/images/instagram_contact-white.png`}
+                                src={`${process.env.PUBLIC_URL}/image/instagram_contact-white.png`}
                                 alt="Instagram"
                               />
                             </a>
@@ -200,7 +200,7 @@ function Contact() {
                               rel="noopener noreferrer"
                             >
                               <img
-                                src={`${process.env.PUBLIC_URL}/images/twitter_contact.png`}
+                                src={`${process.env.PUBLIC_URL}/image/twitter_contact.png`}
                                 alt="Twitter"
                               />
                             </a>

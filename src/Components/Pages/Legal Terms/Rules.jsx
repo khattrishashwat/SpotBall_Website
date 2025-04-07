@@ -87,7 +87,7 @@ function Rules() {
                     <Link to="/terms" className="nav-link">
                       <div className="tabbingiconbgdiv">
                         <img
-                          src={`${process.env.PUBLIC_URL}/images/legal_terms_icons.png`}
+                          src={`${process.env.PUBLIC_URL}/image/legal_terms_icons.png`}
                           alt="Terms"
                         />
                       </div>
@@ -98,7 +98,7 @@ function Rules() {
                     <Link to="/privacy" className="nav-link">
                       <div className="tabbingiconbgdiv">
                         <img
-                          src={`${process.env.PUBLIC_URL}/images/legal_terms_icons.png`}
+                          src={`${process.env.PUBLIC_URL}/image/legal_terms_icons.png`}
                           alt="Privacy"
                         />
                       </div>
@@ -109,7 +109,7 @@ function Rules() {
                     <Link to="/rules" className="nav-link active">
                       <div className="tabbingiconbgdiv">
                         <img
-                          src={`${process.env.PUBLIC_URL}/images/legal_terms_icons.png`}
+                          src={`${process.env.PUBLIC_URL}/image/legal_terms_icons.png`}
                           alt="Rules"
                         />
                       </div>
@@ -120,7 +120,7 @@ function Rules() {
                     <Link to="/cookies" className="nav-link">
                       <div className="tabbingiconbgdiv">
                         <img
-                          src={`${process.env.PUBLIC_URL}/images/legal_terms_icons.png`}
+                          src={`${process.env.PUBLIC_URL}/image/legal_terms_icons.png`}
                           alt="Cookies"
                         />
                       </div>
@@ -136,20 +136,20 @@ function Rules() {
                 <div className="tab-content">
                   <div id="rulesplay" className="tab-pane active">
                     <div className="legaltermsdata_div">
-                      <div
+                      {/* <div
+                        className="innerlegal_heaidngwithpara"
                         dangerouslySetInnerHTML={{
                           __html: rules,
                         }}
-                      />
-                      {/* {isLoading ? (
-                        <Loader />
+                      /> */}
+                      {isLoading ? (
+                        <Loader /> // This shows a spinner while loading
                       ) : (
                         <div
-                          dangerouslySetInnerHTML={{
-                            __html: rules,
-                          }}
+                          className="innerlegal_heaidngwithpara"
+                          dangerouslySetInnerHTML={{ __html: rules }}
                         />
-                      )} */}
+                      )}
                     </div>
                   </div>
                 </div>

@@ -37,7 +37,7 @@ if (firebase.messaging.isSupported()) {
     self.registration.showNotification(notificationTitle, notificationOptions);
   });
 } else {
-  console.log("Firebase Messaging is not supported in this browser.");
+ // console.log("Firebase Messaging is not supported in this browser.");
 }
 
 // self.addEventListener("message", (e) => {

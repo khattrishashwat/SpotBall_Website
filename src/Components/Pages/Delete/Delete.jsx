@@ -19,7 +19,7 @@ function Delete() {
       return;
     }
 
-    console.log("Email/Mobile Input:", emailOrMobile);
+   // console.log("Email/Mobile Input:", emailOrMobile);
 
     try {
       // Make API request to send OTP

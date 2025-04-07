@@ -9,6 +9,7 @@ import Swal from "sweetalert2";
 
 function Profile() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [activeTab, setActiveTab] = useState("update_profile");
   const [isDeactivate, setIsDeactivate] = useState(false);
@@ -29,6 +30,11 @@ function Profile() {
     setActiveTab(tabId);
     resetForm(tabId); // Reset form when tab is changed
   };
+  useEffect(() => {
+    if (location.state?.activeTab) {
+      setActiveTab(location.state.activeTab);
+    }
+  }, [location.state]);
 
   useEffect(() => {
     resetForm(activeTab); // Reset on initial load or tab change
@@ -64,20 +70,24 @@ function Profile() {
         },
       });
 
-      if (response) {
+      if (response.status === 200) {
         Swal.fire({
-          title: response.data.message,
+          icon: "success",
+          title: "Your account has been succe  ssfully deactivated",
           confirmButtonText: "OK",
-          allowOutsideClick: false,
         }).then(() => {
-          setTimeout(() => {
-            localStorage.removeItem("Web-token");
-            navigate("/");
-          }, 20000); // 20 seconds delay
+          navigate("/");
+          localStorage.removeItem("Web-token");
         });
       }
     } catch (error) {
-      console.log("err", error);
+      console.error("Error:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Account Deactivation Failed",
+        text: error.response?.data?.message,
+        confirmButtonText: "OK",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -120,21 +130,25 @@ function Profile() {
         },
       });
 
-      if (response) {
-        // Clear token and navigate to homepage
-        localStorage.removeItem("Web-token");
+      if (response.status === 200) {
         Swal.fire({
-          title: response.data.message,
+          title: "Your account has been deleted successfully.",
+          text: "To reactivate, please contact support at support.in@spotsball.com.",
           confirmButtonText: "OK",
           allowOutsideClick: false,
         }).then(() => {
-          setTimeout(() => {
-            window.location.reload();
-          }, [10000]);
+          navigate("/");
+          localStorage.removeItem("Web-token");
         });
       }
     } catch (error) {
-      
+      console.error("Error deleting account:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Account Deletion Failed",
+        text: error.response?.data?.message,
+        confirmButtonText: "OK",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -184,7 +198,7 @@ function Profile() {
             <div className="container contrighttabbingpage">
               <div className="col-md-10 offset-md-1">
                 <div className="row rowtabbingpage">
-                  <div className="col-md-4 coltabbingdiv">
+                  <div className="col-lg-4 coltabbingdiv">
                     <div className="navtabdiv">
                       <ul className="nav nav-tabs">
                         <li className="nav-item">
@@ -197,7 +211,7 @@ function Profile() {
                             <div className="tabbingiconbgdiv">
                               {" "}
                               <img
-                                src={`${process.env.PUBLIC_URL}/images/profile_icon.png`}
+                                src={`${process.env.PUBLIC_URL}/image/profile_icon.png`}
                               />{" "}
                             </div>
                             <span className="navlinkname">Update Profile</span>{" "}
@@ -213,7 +227,7 @@ function Profile() {
                             <div className="tabbingiconbgdiv">
                               {" "}
                               <img
-                                src={`${process.env.PUBLIC_URL}/images/change_pass_icon.png`}
+                                src={`${process.env.PUBLIC_URL}/image/change_pass_icon.png`}
                               />{" "}
                             </div>
                             <span className="navlinkname">Change Password</span>
@@ -229,7 +243,7 @@ function Profile() {
                             <div className="tabbingiconbgdiv">
                               {" "}
                               <img
-                                src={`${process.env.PUBLIC_URL}/images/payment_icon.png`}
+                                src={`${process.env.PUBLIC_URL}/image/payment_icon.png`}
                               />{" "}
                             </div>
                             <span className="navlinkname">Past Payments</span>
@@ -245,7 +259,7 @@ function Profile() {
                             <div className="tabbingiconbgdiv">
                               {" "}
                               <img
-                                src={`${process.env.PUBLIC_URL}/images/deactivate_acc_icon.png`}
+                                src={`${process.env.PUBLIC_URL}/image/deactivate_acc_icon.png`}
                               />{" "}
                             </div>
                             <span className="navlinkname">
@@ -263,7 +277,7 @@ function Profile() {
                             <div className="tabbingiconbgdiv">
                               {" "}
                               <img
-                                src={`${process.env.PUBLIC_URL}/images/delete_acc_icon.png`}
+                                src={`${process.env.PUBLIC_URL}/image/delete_acc_icon.png`}
                               />{" "}
                             </div>
                             <span className="navlinkname">Delete Account</span>
@@ -279,7 +293,7 @@ function Profile() {
                             <div className="tabbingiconbgdiv">
                               {" "}
                               <img
-                                src={`${process.env.PUBLIC_URL}/images/logout_icon.png`}
+                                src={`${process.env.PUBLIC_URL}/image/logout_icon.png`}
                               />{" "}
                             </div>
                             <span className="navlinkname">Logout</span>
@@ -288,7 +302,7 @@ function Profile() {
                       </ul>
                     </div>
                   </div>
-                  <div className="col-md-8 coltabdata_righttext">
+                  <div className="col-lg-8 coltabdata_righttext">
                     <div className="tabingrighttextdiv checkoutcards_section">
                       <div className="tab-content">
                         <div
@@ -338,7 +352,7 @@ function Profile() {
         id="deactivate_account_modal"
         role="dialog"
         style={{
-          paddingRight: isDeactivate ? 17 : "",
+          // paddingRight: isDeactivate ? 17 : "",
           display: isDeactivate ? "block" : "none",
           backgroundColor: isDeactivate ? "#303030a3" : "",
         }}
@@ -353,7 +367,7 @@ function Profile() {
               onClick={DeccloseModal}
             >
               <img
-                src={`${process.env.PUBLIC_URL}/images/cross_icon.png`}
+                src={`${process.env.PUBLIC_URL}/image/cross_icon.png`}
                 alt="close"
               />
             </button>
@@ -401,7 +415,7 @@ function Profile() {
         className={`modal fade deleteacc_mainpopup_mdl ${isDel ? "show" : ""}`}
         id="delete_account_modal"
         style={{
-          paddingRight: isDel ? 17 : "",
+          // paddingRight: isDel ? 17 : "",
           display: isDel ? "block" : "none",
           backgroundColor: isDel ? "#303030a3" : "",
         }}
@@ -417,15 +431,18 @@ function Profile() {
             >
               {" "}
               <img
-                src={`${process.env.PUBLIC_URL}/images/cross_icon.png`}
-                // src="images/cross_icon.png"
+                src={`${process.env.PUBLIC_URL}/image/cross_icon.png`}
+                // src="image/cross_icon.png"
               />{" "}
             </button>
             <div className="modal-body mdlbdy_delete_account">
               <div className="deleteacc_text_data">
                 <h2>Delete Account</h2>
                 <p>
-                You chose to temporarily opt out of playing SpotsBall, so we have put your account in deleted state. If you wish to reactivate your deleted account, you can send an email to support.in@spotsball.com.
+                  You chose to temporarily opt out of playing SpotsBall, so we
+                  have put your account in deleted state. If you wish to
+                  reactivate your deleted account, you can send an email to
+                  support.in@spotsball.com.
                 </p>
               </div>
             </div>
@@ -464,6 +481,7 @@ function Profile() {
           paddingRight: isLogout ? 17 : "",
           display: isLogout ? "block" : "none",
           backgroundColor: isLogout ? "#303030a3" : "",
+          width: "105%",
         }}
         aria-modal="true"
       >
@@ -475,7 +493,7 @@ function Profile() {
               onClick={CloseLogout}
             >
               <img
-                src={`${process.env.PUBLIC_URL}/images/cross_icon.png`}
+                src={`${process.env.PUBLIC_URL}/image/cross_icon.png`}
                 alt="Close"
               />
             </button>

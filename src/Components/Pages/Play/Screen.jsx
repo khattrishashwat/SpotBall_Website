@@ -65,13 +65,13 @@ function Screen() {
       });
 
       if (response.data.data) {
-        console.log("Fetched video data:", response.data.data);
+        //   console.log("Fetched video data:", response.data.data);
         setMovies(response.data.data);
       } else {
         console.error("No video data found.");
       }
     } catch (error) {
-      console.error("Error fetching video data:", error);
+      //  console.error("Error fetching video data:", error);
     }
   };
 
@@ -546,80 +546,79 @@ function Screen() {
       <section className="playgame_section">
         <div className="container contfld_playgame">
           <div className="row rowmain_playgame">
-            <div className="col-md-8 col9playgame_mainscreen">
+            <div className="col-sm-12 col-lg-8 col9playgame_mainscreen">
               <div
                 className="gamescreenimg_right"
                 style={{ position: "relative" }}
               >
+                {/* Protected Image */}
                 <img
                   ref={imgRef}
                   src={responseData?.player_image?.file_url || ""}
+                  alt="Player"
                   onMouseMove={handleMouseMove}
                   onClick={handleClick}
                   onLoad={handleImageLoad}
-                  onContextMenu={handleContextMenu}
+                  // onContextMenu={handleContextMenu}
                   onMouseEnter={handleMouseEnter}
                   onMouseLeave={handleMouseLeave}
+                  // Disable right-click and drag
+                  onContextMenu={(e) => {
+                    e.preventDefault();
+                    return false;
+                  }}
+                  draggable="false"
                   style={{
                     cursor: "crosshair",
                     display: "block",
                     position: "relative",
+                    userSelect: "none",
                   }}
-                  alt="Player"
                 />
 
-                {/* {clickedPoints.map((point, index) => (
-                  <div
-                    key={index}
-                    style={{
-                      position: "absolute",
-                      left: `${
-                        (point.x / imgRef.current.naturalWidth) *
-                        imgRef.current.clientWidth
-                      }px`,
-                      top: `${
-                        (point.y / imgRef.current.naturalHeight) *
-                        imgRef.current.clientHeight
-                      }px`,
-                      transform: "translate(-50%, -50%)",
-                    }}
-                  >
-                    <RxCross2
-                      style={{
-                        color: colorIndex,
-                        fontSize: "40px",
-                      }}
-                    />
-                  </div>
-                ))} */}
-                {clickedPoints.map((point, index) => (
-                  <div
-                    key={index}
-                    style={{
-                      position: "absolute",
-                      left: `${
-                        (point.x / imgRef.current.naturalWidth) *
-                        imgRef.current.clientWidth
-                      }px`,
-                      top: `${
-                        (point.y / imgRef.current.naturalHeight) *
-                        imgRef.current.clientHeight
-                      }px`,
-                      transform: "translate(-50%, -50%)", // Keeps it centered
-                      pointerEvents: "none", // So that clicks do not interfere
-                    }}
-                  >
-                    <RxCross2
-                      style={{
-                        color: colorIndex,
-                        fontSize: "40px",
-                        // position: "absolute",
-                      }}
-                    />
-                  </div>
-                ))}
+                {/* Watermark Overlay */}
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: "10px",
+                    right: "10px",
+                    backgroundColor: "rgba(0, 0, 0, 0.5)",
+                    color: "white",
+                    padding: "5px",
+                    fontSize: "14px",
+                    pointerEvents: "none",
+                  }}
+                >
+                  © SpotsBall
+                </div>
 
-                {showTooltip && (
+                {/* Clicked Points */}
+                {imgRef.current &&
+                  clickedPoints.map((point, index) => (
+                    <div
+                      key={index}
+                      style={{
+                        position: "absolute",
+                        left: `${
+                          (point.x / imgRef.current.naturalWidth) *
+                          imgRef.current.clientWidth
+                        }px`,
+                        top: `${
+                          (point.y / imgRef.current.naturalHeight) *
+                          imgRef.current.clientHeight
+                        }px`,
+                        transform: "translate(-50%, -50%)",
+                        pointerEvents: "none",
+                      }}
+                    >
+                      <RxCross2
+                        style={{ color: colorIndex, fontSize: "40px" }}
+                      />
+                    </div>
+                  ))}
+
+                {/* Tooltip */}
+                {imgRef.current && showTooltip && (
                   <div
                     style={{
                       position: "absolute",
@@ -634,17 +633,17 @@ function Screen() {
                       backgroundColor: "rgba(0, 0, 0, 0.7)",
                       color: "#fff",
                       pointerEvents: "none",
-                      transform: "translate(-50%, -100%)", // Slightly above the cursor
+                      transform: "translate(-50%, -100%)",
+                      padding: "2px 5px",
+                      fontSize: "12px",
                     }}
                   >
-                    <p>
-                      (X: {coordinates.x}, Y: {coordinates.y})
-                    </p>
+                    (X: {coordinates.x}, Y: {coordinates.y})
                   </div>
                 )}
               </div>
             </div>
-            <div className="col-md-4 col3ticketscontest">
+            <div className="col-sm-12 col-lg-4 col3ticketscontest">
               <div className="ticketaxis_div">
                 <div className="ticketheading">
                   <h3>Tickets</h3>
@@ -656,7 +655,7 @@ function Screen() {
                   >
                     <div className="the_icon">
                       <img
-                        src={`${process.env.PUBLIC_URL}/images/user_guide_icon.png`}
+                        src={`${process.env.PUBLIC_URL}/image/user_guide_icon.png`}
                       />
                     </div>
 
@@ -665,7 +664,7 @@ function Screen() {
                   <div className="threeicons_action" onClick={handleTicket}>
                     <div className="the_icon">
                       <img
-                        src={`${process.env.PUBLIC_URL}/images/ticket_icon.png`}
+                        src={`${process.env.PUBLIC_URL}/image/ticket_icon.png`}
                         alt="Add Ticket"
                       />
                     </div>
@@ -674,7 +673,7 @@ function Screen() {
                   <div className="threeicons_action" onClick={handleRefreshAll}>
                     <div className="the_icon">
                       <img
-                        src={`${process.env.PUBLIC_URL}/images/refresh_icon.png`}
+                        src={`${process.env.PUBLIC_URL}/image/refresh_icon.png`}
                         alt="Refresh"
                       />
                     </div>
@@ -713,7 +712,7 @@ function Screen() {
                               ticket.xCord > 0 &&
                               ticket.yCord > 0 ? (
                                 <img
-                                  src={`${process.env.PUBLIC_URL}/images/cord_check.png`}
+                                  src={`${process.env.PUBLIC_URL}/image/cord_check.png`}
                                   alt="Checked"
                                 />
                               ) : null}
@@ -733,7 +732,7 @@ function Screen() {
                               onClick={() => handleReply(ticket.id)}
                             >
                               <img
-                                src={`${process.env.PUBLIC_URL}/images/refresh_cord.png`}
+                                src={`${process.env.PUBLIC_URL}/image/refresh_cord.png`}
                               />
                             </div>
                             <p className="actionheading">Replay</p>
@@ -744,7 +743,7 @@ function Screen() {
                               onClick={handleAddTicket}
                             >
                               <img
-                                src={`${process.env.PUBLIC_URL}/images/add_cord.png`}
+                                src={`${process.env.PUBLIC_URL}/image/add_cord.png`}
                                 alt="Add"
                               />
                             </div>
@@ -756,7 +755,7 @@ function Screen() {
                               onClick={() => handleDeleteTicket(ticket.id)}
                             >
                               <img
-                                src={`${process.env.PUBLIC_URL}/images/delete_cord.png`}
+                                src={`${process.env.PUBLIC_URL}/image/delete_cord.png`}
                               />
                             </div>
                             <p className="actionheading">Delete</p>
@@ -800,7 +799,7 @@ function Screen() {
                     onClick={close}
                   >
                     <img
-                      src={`${process.env.PUBLIC_URL}/images/cross_icon.png`}
+                      src={`${process.env.PUBLIC_URL}/image/cross_icon.png`}
                       // src="images/cross_icon.png"
                       alt="Close"
                     />

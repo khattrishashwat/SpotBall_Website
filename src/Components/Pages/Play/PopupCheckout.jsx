@@ -30,6 +30,7 @@ function PopupCheckout() {
             }
           );
 
+<<<<<<< HEAD
           console.log(
             "Order Status Response:",
             response.data.data.transaction_status
@@ -37,6 +38,15 @@ function PopupCheckout() {
           setPaymentStatus(response.data?.data?.transaction_status || ""); // Default to pending
         } catch (error) {
           console.error("Error fetching payment status:", error);
+=======
+          // console.log(
+          //   "Order Status Response:",
+          //   response.data.data.transaction_status
+          // );
+          setPaymentStatus(response.data?.data?.transaction_status || ""); // Default to pending
+        } catch (error) {
+         // console.error("Error fetching payment status:", error);
+>>>>>>> 257b6be024a1356baedefca1452e6163bbbbabaf
           setErrorMessage("Failed to fetch payment status. Please try again.");
         }
       };
@@ -70,7 +80,11 @@ function PopupCheckout() {
         headers: { Authorization: `Bearer ${token}` },
       });
 
+<<<<<<< HEAD
       console.log("PDF URL:", response.data.data.pdf);
+=======
+     // console.log("PDF URL:", response.data.data.pdf);
+>>>>>>> 257b6be024a1356baedefca1452e6163bbbbabaf
       const pdfUrl = response.data.data.pdf;
       if (pdfUrl) {
         window.open(pdfUrl, "_blank");
