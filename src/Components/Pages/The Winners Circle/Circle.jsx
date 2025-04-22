@@ -41,9 +41,10 @@ function Circle() {
   }, []);
 
   const groupByMonth = (data) => {
+    const lang = localStorage.getItem("selectedLanguage") || "en";
     return data.reduce((acc, item) => {
       const date = new Date(item.createdAt);
-      const monthYear = date.toLocaleString("default", {
+      const monthYear = date.toLocaleString(lang, {
         month: "long",
         year: "numeric",
       });
@@ -57,14 +58,11 @@ function Circle() {
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return `${date.toLocaleString("default", {
+    const lang = localStorage.getItem("selectedLanguage") || "en";
+    return `${date.toLocaleString(lang, {
       month: "long",
     })} ${date.getDate()}, ${date.getFullYear()}`;
   };
-
-  // Generate dynamic year options
-  const currentYear = new Date().getFullYear();
-  const yearOptions = Array.from({ length: 5 }, (_, i) => currentYear + i);
 
   return (
     <section className="maincont_section">
