@@ -12,6 +12,7 @@ import {
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
 import Swal from "sweetalert2"; // Assuming Swal is already installed
 import axios from "axios";
+// import { useNavigate } from "react-router-dom";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -51,71 +52,107 @@ function detectIncognitoMode() {
   });
 }
 
-// Main logic
 // if ("serviceWorker" in navigator) {
-//   detectIncognitoMode().then((isIncognito) => {
-//     if (isIncognito) {
-//       Swal.fire({
-//         title: "Incognito Mode Detected",
-//         text: "Push notifications are disabled in incognito mode. Please switch to normal mode for full functionality.",
-//         icon: "warning",
-//         confirmButtonText: "OK",
-//       });
-//       return; // Stop execution if incognito mode is detected
-//     }
+//   navigator.serviceWorker
+//     .register("/firebase-messaging-sw.js", {
+//       scope: "/spotsball/web/",
+//     })
+//     .then((registration) => {
+//       console.log("Service Worker registered:", registration);
 
-//     navigator.serviceWorker
-//       .register("/firebase-messaging-sw.js", {
-//         scope: "/spotsball/web/",
+//       getToken(messaging, {
+//         vapidKey:
+//           "BC1L5qE6WKJSgEU46nuptM9bCKtljihEjAikiBrpzRIomSiw6Dd9Wq6jmM4CfIHJokkhmqblgU5qbVaqizNlmeo",
 //       })
-//       .then((registration) => {
-//         console.log("Service Worker registered:", registration);
-
-//         getToken(messaging, {
-//           vapidKey:
-//             "BNkI-Se9LgfgnkAxsoNDTe3uQDR7HBWV6rY-Mhc3A6AioGIl-VnUn49NTAdTZHgBnt6id6KokU02Pku4G0GpYxA",
+//         .then((currentToken) => {
+//           if (currentToken) {
+//             console.log("Current token:", currentToken);
+//             localStorage.setItem("device_token", currentToken);
+//           } else {
+//             console.log(
+//               "No registration token available. Request permission to generate one."
+//             );
+//           }
 //         })
-//           .then((currentToken) => {
-//             if (currentToken) {
-//               console.log("Current token:", currentToken);
-//               localStorage.setItem("device_token", currentToken);
-//             } else {
-//               console.log(
-//                 "No registration token available. Request permission to generate one."
-//               );
-//             }
-//           })
-//           .catch((err) => {
-//             console.error("Error getting token:", err);
-//           });
-
-//         onMessage(messaging, (payload) => {
-//           console.log("Message received:", payload);
-//           Swal.fire({
-//             title: "New Message!",
-//             text: payload.notification.body,
-//             icon: "info",
-//             confirmButtonText: "OK",
-//           });
+//         .catch((err) => {
+//           console.error("Error getting token:", err);
 //         });
-//       })
-//       .catch((error) => {
-//         console.error("Service Worker registration failed:", error);
+
+//       onMessage(messaging, (payload) => {
+//         // console.log("Message received:", payload);
+//         Swal.fire({
+//           title: "New Message!",
+//           text: payload.notification.body,
+//           icon: "info",
+//           confirmButtonText: "OK",
+//         });
 //       });
-//   });
+//     })
+//     .catch((error) => {
+//       console.error("Service Worker registration failed:", error);
+//     });
 // }
+// if ("serviceWorker" in navigator) {
+//   navigator.serviceWorker
+//     .register("/firebase-messaging-sw.js")
+//     .then((registration) => {
+//       console.log("Service Worker registered:", registration);
+
+//       // Request notification permission
+//       Notification.requestPermission().then((permission) => {
+//         if (permission === "granted") {
+//           console.log("Notification permission granted.");
+
+//           // Retrieve the current token
+//           getToken(messaging, {
+//             vapidKey:
+//               "BC1L5qE6WKJSgEU46nuptM9bCKtljihEjAikiBrpzRIomSiw6Dd9Wq6jmM4CfIHJokkhmqblgU5qbVaqizNlmeo",
+//           })
+//             .then((currentToken) => {
+//               if (currentToken) {
+//                 console.log("Current token:", currentToken);
+//                 localStorage.setItem("device_token", currentToken);
+//               } else {
+//                 console.log(
+//                   "No registration token available. Request permission to generate one."
+//                 );
+//               }
+//             })
+//             .catch((err) => {
+//               console.error("Error getting token:", err);
+//             });
+
+//           // Handle incoming messages
+//           onMessage(messaging, (payload) => {
+//             console.log("Message received:", payload);
+//             Swal.fire({
+//               title: payload.notification?.title || "New Message!",
+//               text:
+//                 payload.notification?.body || "You have a new notification.",
+//               icon: "info",
+//               confirmButtonText: "OK",
+//             });
+//           });
+//         } else {
+//           console.log("Notification permission denied.");
+//         }
+//       });
+//     })
+//     .catch((error) => {
+//       console.error("Service Worker registration failed:", error);
+//     });
+// }
+
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker
-    .register(
-      "/firebase-messaging-sw.js"
-      //   , {
-      //   scope: "/spotsball/web/",
-      // }
-    )
+    // .register("/spotsball/landing/firebase-messaging-sw.js")
+    .register("/firebase-messaging-sw.js")
     .then((registration) => {
       console.log("Service Worker registered:", registration);
 
+      // Pass the registration to getToken:
       getToken(messaging, {
+        serviceWorkerRegistration: registration,
         vapidKey:
           "BC1L5qE6WKJSgEU46nuptM9bCKtljihEjAikiBrpzRIomSiw6Dd9Wq6jmM4CfIHJokkhmqblgU5qbVaqizNlmeo",
       })
@@ -124,13 +161,14 @@ if ("serviceWorker" in navigator) {
             console.log("Current token:", currentToken);
             localStorage.setItem("device_token", currentToken);
           } else {
-            console.log(
-              "No registration token available. Request permission to generate one."
-            );
+            // console.log(
+            //   "No registration token available. Request permission to generate one."
+            // );
           }
         })
         .catch((err) => {
           console.error("Error getting token:", err);
+          localStorage.setItem("device_token", "currentToken");
         });
 
       onMessage(messaging, (payload) => {
@@ -147,9 +185,52 @@ if ("serviceWorker" in navigator) {
       console.error("Service Worker registration failed:", error);
     });
 }
+// if ("serviceWorker" in navigator) {
+//   navigator.serviceWorker
+//     .register("/spotsball/web/firebase-messaging-sw.js", {
+//       scope: "/spotsball/web/",
+//     })
+//     .then((registration) => {
+//       console.log("Service Worker registered:", registration);
 
+//       // Pass the registration to getToken:
+//       getToken(messaging, {
+//         serviceWorkerRegistration: registration,
+//         vapidKey:
+//           "BC1L5qE6WKJSgEU46nuptM9bCKtljihEjAikiBrpzRIomSiw6Dd9Wq6jmM4CfIHJokkhmqblgU5qbVaqizNlmeo",
+//       })
+//         .then((currentToken) => {
+//           if (currentToken) {
+//             console.log("Current token:", currentToken);
+//             localStorage.setItem("device_token", currentToken);
+//           } else {
+//             console.log(
+//               "No registration token available. Request permission to generate one."
+//             );
+//           }
+//         })
+//         .catch((err) => {
+//           console.error("Error getting token:", err);
+//           localStorage.setItem("device_token", "currentToken");
+
+//           // Check if it's a permission blocked error
+//         });
+
+//       onMessage(messaging, (payload) => {
+//         console.log("Message received:", payload);
+//         Swal.fire({
+//           title: "New Message!",
+//           text: payload.notification.body,
+//           icon: "info",
+//           confirmButtonText: "OK",
+//         });
+//       });
+//     })
+//     .catch((error) => {
+//       console.error("Service Worker registration failed:", error);
+//     });
+// }
 let userDetails;
-let UserDetails;
 
 {
   /*---------------------------------*/
@@ -163,7 +244,7 @@ export const signInWithGoogle = async (setFieldValue) => {
     if (!user) throw new Error("Google sign-in failed. No user data found.");
 
     const { uid, displayName, email, photoURL } = user;
-    console.log("User info:", user);
+    //   console.log("User info:", user);
 
     const nameParts = displayName ? displayName.split(" ") : [];
     const firstName = nameParts[0] || "";
@@ -187,16 +268,78 @@ export const signInWithGoogle = async (setFieldValue) => {
 /**
  * Handles Google Sign-In and manages the login/signup flow.
  */
+// export const LoginWithGoogle = async () => {
+//   try {
+//     const result = await signInWithPopup(auth, provider);
+//     const user = result.user;
+
+//     if (!user) throw new Error("Google sign-in failed. No user data found.");
+
+//     const { uid, displayName, email, photoURL } = user;
+//     // console.log("User data:", user);
+
+//     const nameParts = displayName ? displayName.split(" ") : [];
+//     const firstName = nameParts[0] || "";
+//     const lastName = nameParts.slice(1).join(" ") || "";
+
+//     const userData = {
+//       uid,
+//       displayName,
+//       email,
+//       photoURL,
+//       signup_method: "google",
+//       first_name: firstName,
+//       last_name: lastName,
+//     };
+//     userDetails = { ...userData };
+//     //  console.log("Google Sign-In successful. User UID:", uid);
+
+//     // Check if UID exists in the backend
+//     const checkUIDResponse = await axios.get(
+//       `app/auth/check-uid-exists/${uid}`
+//     );
+
+//     if (checkUIDResponse.data.message === "Uid found") {
+//       // Perform social login
+//       const response = await axios.post("app/auth/social-login", {
+//         signup_method: "google",
+//         uid,
+//         device_type: "website",
+//         device_token: localStorage.getItem("device_token"),
+//       });
+
+//       //     console.log("Signup response:", response.data);
+
+//       const token = response.data.data.token;
+//       localStorage.setItem("Web-token", token);
+
+//       Swal.fire({
+//         icon: "success",
+//         title: "Login Successful",
+//         showConfirmButton: false,
+//         timer: 2000,
+//       });
+
+//       // window.location.reload(); // Reload or navigate as needed
+//     } else(checkUIDResponse.data.message === "Uid Not Found") {
+//       throw new Error("UID not found in the system.");
+//     }
+//   } catch (error) {
+//     console.error("Error during Google sign-in or API request:", error);
+
+//     //console.log("User details for UID not found:", userDetails);
+//     // localStorage.setItem("UIDNotFound", JSON.stringify(userDetails));
+
+//     // window.location.reload();
+//   }
+// };
 export const LoginWithGoogle = async () => {
   try {
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
-
     if (!user) throw new Error("Google sign-in failed. No user data found.");
 
     const { uid, displayName, email, photoURL } = user;
-    console.log("User data:", user);
-
     const nameParts = displayName ? displayName.split(" ") : [];
     const firstName = nameParts[0] || "";
     const lastName = nameParts.slice(1).join(" ") || "";
@@ -210,46 +353,53 @@ export const LoginWithGoogle = async () => {
       first_name: firstName,
       last_name: lastName,
     };
-    userDetails = { ...userData };
-    console.log("Google Sign-In successful. User UID:", uid);
 
-    // Check if UID exists in the backend
-    const checkUIDResponse = await axios.get(
-      `app/auth/check-uid-exists/${uid}`
-    );
+    try {
+      // Check if UID exists in backend
+      const checkUIDResponse = await axios.get(
+        `app/auth/check-uid-exists/${uid}`
+      );
 
-    if (checkUIDResponse.data.message === "Uid found") {
-      // Perform social login
-      const response = await axios.post("app/auth/social-login", {
-        signup_method: "google",
-        uid,
-        device_type: "website",
-        device_token: localStorage.getItem("device_token"),
-      });
+      if (checkUIDResponse.data.message === "Uid found") {
+        // Perform social login
+        const response = await axios.post("app/auth/social-login", {
+          signup_method: "google",
+          uid,
+          device_type: "website",
+          device_token: localStorage.getItem("device_token") || "",
+        });
 
-      console.log("Signup response:", response.data);
+        localStorage.setItem("Web-token", response.data.data.token);
 
-      const token = response.data.data.token;
-      localStorage.setItem("Web-token", token);
+        Swal.fire({
+          icon: "success",
+          title: "Login Successful",
+          showConfirmButton: false,
+          timer: 2000,
+        });
 
-      Swal.fire({
-        icon: "success",
-        title: "Social Login Successful",
-        showConfirmButton: false,
-        timer: 2000,
-      });
-
-      window.location.reload(); // Reload or navigate as needed
-    } else {
-      throw new Error("UID not found in the system.");
+        window.location.href = "/spotsball/landing/"; // Redirect after login
+      }
+    } catch (error) {
+      if (error.response?.data?.message === "Uid Not Found") {
+        localStorage.setItem("UIDNotFound", JSON.stringify(userData));
+        window.location.href = "/spotsball/landing/socialsignup";
+      } else {
+        console.error("API Error:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Login Failed",
+          text: error.response?.data?.message,
+        });
+      }
     }
   } catch (error) {
-    console.error("Error during Google sign-in or API request:", error);
-
-    console.log("User details for UID not found:", userDetails);
-    localStorage.setItem("UIDNotFound", JSON.stringify(userDetails));
-
-    window.location.reload();
+    console.error("Google Sign-In Error:", error);
+    Swal.fire({
+      icon: "error",
+      title: "Login Failed",
+      text: error.message,
+    });
   }
 };
 
@@ -259,322 +409,200 @@ export const LoginWithGoogle = async () => {
 
 export const signInWithFacebook = async (setFieldValue) => {
   try {
-    // Add email scope for additional user data
     facebookProvider.addScope("email");
-    console.log("Opening Facebook sign-in popup...");
 
-    // Initiate sign-in process
     const result = await signInWithPopup(auth, facebookProvider);
     const user = result.user;
     console.log("Sign-in successful:", user);
 
-    const userData = {
-      uid: user.uid,
-      displayName: user.displayName,
-      email: user.email,
-      photoURL: user.photoURL,
-    };
+    const { uid, displayName, email } = user;
 
-    console.log("User info:", userData);
+    const nameParts = displayName ? displayName.split(" ") : [];
+    const firstName = nameParts[0] || "";
+    const lastName = nameParts.slice(1).join(" ") || "";
 
-    // Parse user name into first and last name
-    const nameParts = userData.displayName
-      ? userData.displayName.split(" ")
-      : [];
-    setFieldValue("first_name", nameParts[0] || "");
-    setFieldValue("last_name", nameParts.slice(1).join(" ") || "");
-    setFieldValue("email", userData.email || "");
-    setFieldValue("uid", userData.uid || "");
+    // Set form field values
+    setFieldValue("first_name", firstName);
+    setFieldValue("last_name", lastName);
+    setFieldValue("email", email || "");
+    setFieldValue("uid", uid || "");
   } catch (error) {
     console.error("Error during Facebook sign-in:", error);
 
-    // Handle specific errors
-    if (error.code === "auth/popup-closed-by-user") {
-      Swal.fire({
-        icon: "warning",
-        title: "Popup closed",
-        text: error.message,
-      });
-    } else {
-      Swal.fire({
-        icon: "error",
-        title: "Sign-in failed",
-        text: error.message,
-      });
-    }
+    const errorMessages = {
+      "auth/account-exists-with-different-credential":
+        "This email is already linked to another account. Please sign in with the linked provider.",
+      "auth/invalid-credential":
+        "Invalid credentials. Check your Facebook API configuration.",
+      "auth/popup-closed-by-user":
+        "Error while Login perform! Please try again.",
+      "auth/cancelled-popup-request": "The popup request was canceled.",
+    };
+
+    Swal.fire({
+      icon: "error",
+      text:
+        errorMessages[error.code] ||
+        "An unexpected error occurred. Please try again.",
+    });
   }
 };
 
 // export const LoginWithFacebook = async () => {
 //   try {
-//     console.log("Starting Facebook login process...");
-
-//     // Sign in with Facebook
+//     facebookProvider.addScope("email");
 //     const result = await signInWithPopup(auth, facebookProvider);
 //     const user = result.user;
-//     console.log("Facebook user data:", user);
+
+//     if (!user) throw new Error("Facebook sign-in failed. No user data found.");
+
+//     const { uid, displayName, email, photoURL } = user;
+//     const nameParts = displayName ? displayName.split(" ") : [];
+//     const firstName = nameParts[0] || "";
+//     const lastName = nameParts.slice(1).join(" ") || "";
 
 //     const userData = {
-//       uid: user.uid,
-//       displayName: user.displayName,
-//       email: user.email,
-//       photoURL: user.photoURL,
+//       uid,
+//       displayName,
+//       email,
+//       photoURL,
 //       signup_method: "facebook",
+//       first_name: firstName,
+//       last_name: lastName,
 //     };
 
-//     // Split user name into first and last name
-//     const nameParts = userData.displayName
-//       ? userData.displayName.split(" ")
-//       : [];
-//     const first_name = nameParts[0] || "";
-//     const last_name = nameParts.length > 1 ? nameParts.slice(1).join(" ") : "";
+//     try {
+//       // Check if UID exists
+//       const checkUIDResponse = await axios.get(
+//         `app/auth/check-uid-exists/${uid}`
+//       );
 
-//     // Store user details locally
-//     const UserDetails = { ...userData, first_name, last_name };
-//     console.log("Facebook Sign-In successful. UserDetails:", UserDetails);
+//       if (checkUIDResponse.data.message === "Uid found") {
+//         // Perform social login
+//         const response = await axios.post("app/auth/social-login", {
+//           signup_method: "facebook",
+//           uid,
+//           device_type: "website",
+//           device_token: localStorage.getItem("device_token") || "",
+//         });
 
-//     // Check UID in database
-//     const checkUIDResponse = await axios.get(
-//       `app/auth/check-uid-exists/${user.uid}`
-//     );
+//         localStorage.setItem("Web-token", response.data.data.token);
 
-//     if (checkUIDResponse.data.message === "Uid found") {
-//       // UID found, proceed with social login
-//       const response = await axios.post("app/auth/social-login", {
-//         signup_method: "facebook",
-//         uid: user.uid,
-//         device_type: "website",
-//         device_token: localStorage.getItem("device_token"),
-//       });
+//         Swal.fire({
+//           icon: "success",
+//           title: "Login Successful",
+//           showConfirmButton: false,
+//           timer: 2000,
+//         });
 
-//       console.log("Social login response:", response.data);
-
-//       // Save token and show success message
-//       const token = response.data.data.token;
-//       localStorage.setItem("Web-token", token);
-//       Swal.fire({
-//         icon: "success",
-//         title: "Login Successful",
-//         showConfirmButton: false,
-//         timer: 2000,
-//       });
-
-//       // Reload page
-//       window.location.reload();
-//     } else if (checkUIDResponse.data.message === "Uid Not Found") {
-//       // UID not found, redirect user to sign-up
-//       Swal.fire({
-//         icon: "error",
-//         text: ,
-//       });
-
-//       // window.location.reload();
+//         window.location.href = "/spotsball/landing/"; // Redirect after login
+//       }
+//     } catch (error) {
+//       if (error.response?.data?.message === "Uid Not Found") {
+//         localStorage.setItem("UIDNotFound", JSON.stringify(userData));
+//         window.location.href = "/socialsignup"; // Redirect properly
+//       } else {
+//         console.error("API Error:", error);
+//         Swal.fire({
+//           icon: "error",
+//           title: "Login Failed",
+//           text:
+//             error.response?.data?.message || "An unexpected error occurred.",
+//         });
+//       }
 //     }
 //   } catch (error) {
-//     console.error("Facebook Sign-In or API request failed:", error);
-
-//     localStorage.setItem("UIDNotFound", JSON.stringify(UserDetails));
-
-//     window.location.reload();
-//   }
-// };
-
-// export const LoginWithFacebook = async () => {
-//   try {
-//     console.log("Starting Facebook login process...");
-
-//     // Sign in with Facebook
-//     const result = await signInWithPopup(auth, facebookProvider);
-//     const user = result.user;
-//     console.log("Facebook user data:", user);
-
-//     const userData = {
-//       uid: user.uid,
-//       displayName: user.displayName,
-//       email: user.email,
-//       photoURL: user.photoURL,
-//       signup_method: "facebook",
-//     };
-
-//     // Split user name into first and last name
-//     const nameParts = userData.displayName
-//       ? userData.displayName.split(" ")
-//       : [];
-//     const first_name = nameParts[0] || "";
-//     const last_name = nameParts.length > 1 ? nameParts.slice(1).join(" ") : "";
-
-//     // Store user details locally
-//     const UserDetails = { ...userData, first_name, last_name };
-//     console.log("Facebook Sign-In successful. UserDetails:", UserDetails);
-
-//     // Check UID in database
-//     const checkUIDResponse = await axios.get(
-//       `app/auth/check-uid-exists/${user.uid}`
-//     );
-
-//     if (checkUIDResponse.data.message === "Uid found") {
-//       // UID found, proceed with social login
-//       const response = await axios.post("app/auth/social-login", {
-//         signup_method: "facebook",
-//         uid: user.uid,
-//         device_type: "website",
-//         device_token: localStorage.getItem("device_token"),
-//       });
-
-//       console.log("Social login response:", response.data);
-
-//       // Save token and show success message
-//       const token = response.data.data.token;
-//       localStorage.setItem("Web-token", token);
-//       Swal.fire({
-//         icon: "success",
-//         title: "Login Successful",
-//         showConfirmButton: false,
-//         timer: 2000,
-//       });
-
-//       // Reload page
-//       window.location.reload();
-//     } else if (checkUIDResponse.data.message === "Uid Not Found") {
-//       // UID not found, redirect user to sign-up
-//       Swal.fire({
-//         icon: "error",
-//         text: "User not found. Please sign up first.",
-//       });
-
-//       // Store UIDNotFound data
-//       localStorage.setItem("UIDNotFound", JSON.stringify(UserDetails));
-//       console.log("impotant -->", JSON.stringify(UserDetails));
-//       // window.location.reload(); // Uncomment if necessary
-//     }
-//   } catch (error) {
-//     console.error("Facebook Sign-In or API request failed:", error);
-
-//     if (error.code === "auth/popup-closed-by-user") {
-//       Swal.fire({
-//         icon: "warning",
-//         title: "Login Cancelled",
-//         text: "It looks like you closed the popup before completing the sign-in. Please try again.",
-//       });
-//       return;
-//     }
-
+//     console.error("Facebook Sign-In Error:", error);
 //     Swal.fire({
 //       icon: "error",
 //       title: "Login Failed",
-//       text:
-//         error.message || "An error occurred during login. Please try again.",
+//       text: error.message,
 //     });
 //   }
 // };
 
 export const LoginWithFacebook = async () => {
   try {
-    console.log("Starting Facebook login process...");
+    facebookProvider.addScope("email");
 
-    // Sign in with Facebook
-    const result = await signInWithPopup(auth, facebookProvider);
-    if (!result)
-      throw new Error("Popup was blocked. Please allow popups and try again.");
-
-    const user = result.user;
-    console.log("Facebook user data:", user);
-
-    const userData = {
-      uid: user.uid,
-      displayName: user.displayName,
-      email: user.email,
-      photoURL: user.photoURL,
-      signup_method: "facebook",
-    };
-
-    // Extract first and last name
-    const nameParts = userData.displayName?.split(" ") || [];
-    const first_name = nameParts[0] || "";
-    const last_name = nameParts.slice(1).join(" ") || "";
-
-    // Store user details locally
-    const UserDetails = { ...userData, first_name, last_name };
-    console.log("Facebook Sign-In successful. UserDetails:", UserDetails);
-
-    // Check UID in database
-    const checkUIDResponse = await axios.get(
-      `app/auth/check-uid-exists/${user.uid}`
-    );
-
-    if (checkUIDResponse.data.message === "Uid found") {
-      // Proceed with social login
-      const response = await axios.post("app/auth/social-login", {
-        signup_method: "facebook",
-        uid: user.uid,
-        device_type: "website",
-        device_token: localStorage.getItem("device_token"),
-      });
-
-      console.log("Social login response:", response.data);
-
-      // Save token and show success message
-      localStorage.setItem("Web-token", response.data.data.token);
-      Swal.fire({
-        icon: "success",
-        title: "Login Successful",
-        showConfirmButton: false,
-        timer: 2000,
-      });
-
-      // Reload page
-      window.location.reload();
-    } else {
-      // UID not found, prompt user to sign up
-      Swal.fire({
-        icon: "error",
-        text: "User not found. Please sign up first.",
-      });
-
-      // Store data locally for sign-up flow
-      localStorage.setItem("UIDNotFound", JSON.stringify(UserDetails));
-      console.log(
-        "User details saved for sign-up:",
-        JSON.stringify(UserDetails)
-      );
-    }
-  } catch (error) {
-    console.error("Facebook Sign-In or API request failed:", error);
-
-    if (error.code === "auth/popup-closed-by-user") {
-      const retry = await Swal.fire({
-        icon: "warning",
-        title: "Login Cancelled",
-        text: "You closed the popup before completing sign-in. Do you want to try again?",
-        showCancelButton: true,
-        confirmButtonText: "Retry",
-      });
-
-      if (retry.isConfirmed) return LoginWithFacebook(); // Retry login
-    }
-
-    if (error.message.includes("Popup was blocked")) {
-      Swal.fire({
-        icon: "error",
-        title: "Popup Blocked",
-        text: "Please allow popups for this site and try again.",
-      });
+    let result;
+    try {
+      result = await signInWithPopup(auth, facebookProvider);
+    } catch (popupError) {
+      console.warn("Popup sign-in failed, trying redirect:", popupError);
+      await signInWithRedirect(auth, facebookProvider);
       return;
     }
 
+    const user = result.user;
+    if (!user) throw new Error("Facebook sign-in failed. No user data found.");
+    console.log("facebook", user);
+    const { uid, displayName, email, photoURL } = user;
+    const nameParts = displayName ? displayName.split(" ") : [];
+    const firstName = nameParts[0] || "";
+    const lastName = nameParts.slice(1).join(" ") || "";
+
+    const userData = {
+      uid,
+      displayName,
+      email,
+      photoURL,
+      signup_method: "facebook",
+      first_name: firstName,
+      last_name: lastName,
+    };
+
+    console.log("facebook user data", userData);
+
+    try {
+      // Check if UID exists
+      const checkUIDResponse = await axios.get(
+        `app/auth/check-uid-exists/${uid}`
+      );
+
+      if (checkUIDResponse.data.message === "Uid found") {
+        // Perform social login
+        const response = await axios.post("app/auth/social-login", {
+          signup_method: "facebook",
+          uid,
+          device_type: "website",
+          device_token: localStorage.getItem("device_token") || "",
+        });
+
+        localStorage.setItem("Web-token", response.data.data.token);
+
+        Swal.fire({
+          icon: "success",
+          title: "Login Successful",
+          showConfirmButton: false,
+          timer: 2000,
+        });
+
+        window.location.href = "/spotsball/landing/";
+      }
+    } catch (apiError) {
+      if (apiError.response?.data?.message === "Uid Not Found") {
+        localStorage.setItem("UIDNotFound", JSON.stringify(userData));
+        window.location.href = "/socialsignup";
+      } else {
+        console.error("API Error:", apiError);
+        Swal.fire({
+          icon: "error",
+          title: "Login Failed",
+          text:
+            apiError.response?.data?.message || "An unexpected error occurred.",
+        });
+      }
+    }
+  } catch (error) {
+    console.error("Facebook Sign-In Error:", error);
     Swal.fire({
       icon: "error",
       title: "Login Failed",
-      text:
-        error.message || "An error occurred during login. Please try again.",
+      text: error.message,
     });
-
-    // Fallback to sign-in with redirect for better compatibility
-    console.log("Falling back to sign-in with redirect...");
-    await signInWithRedirect(auth, facebookProvider);
   }
 };
-
 {
   /*------Twitter--------*/
 }
@@ -594,8 +622,8 @@ export const signWithTwitter = async (setFieldValue) => {
       email: user?.email || "",
     };
 
-    console.log("Twitter Login Result:", result);
-    console.log("Processed User Data:", userData);
+    // console.log("Twitter Login Result:", result);
+    // console.log("Processed User Data:", userData);
 
     // Update Formik fields
     setFieldValue("first_name", userData.name);
@@ -617,7 +645,7 @@ export const signWithTwitter = async (setFieldValue) => {
       "auth/invalid-credential":
         "Invalid credentials. Check your Twitter API configuration.",
       "auth/popup-closed-by-user":
-        "The popup was closed before completing the sign-in process.",
+        "Error while Login perform! Please try again",
       "auth/cancelled-popup-request": "The popup request was canceled.",
     };
 
@@ -634,6 +662,8 @@ export const LoginWithTwitter = async () => {
     const result = await signInWithPopup(auth, twitterProvider);
     const user = result.user;
     const credential = TwitterAuthProvider.credentialFromResult(result);
+    console.log("credential", credential);
+    console.log("user", user);
 
     const oauthAccessToken = credential?.accessToken;
     const oauthTokenSecret = credential?.secret;
@@ -645,7 +675,7 @@ export const LoginWithTwitter = async () => {
       photoURL: user?.photoURL || "",
       signup_method: "twitter",
     };
-
+    console.log("userData", userData);
     const nameParts = userData.displayName.split(" ");
     const first_name = nameParts[0] || "";
     const last_name = nameParts.length > 1 ? nameParts.slice(1).join(" ") : "";
@@ -656,7 +686,7 @@ export const LoginWithTwitter = async () => {
       last_name,
     };
 
-    console.log("Twitter User Details:", userDetails);
+    // console.log("Twitter User Details:", userDetails);
 
     // Check UID in the database
     const checkUIDResponse = await axios.get(
@@ -672,7 +702,7 @@ export const LoginWithTwitter = async () => {
         device_token: localStorage.getItem("device_token"),
       });
 
-      console.log("Login Response:", response.data);
+      //  console.log("Login Response:", response.data);
 
       // Store token and redirect
       localStorage.setItem("Web-token", response.data.data.token);
@@ -687,7 +717,7 @@ export const LoginWithTwitter = async () => {
       // Inform user to sign up
       Swal.fire({
         icon: "error",
-        text: "Go to Sign Up, then try social login",
+        text: "Try again Later with  social login",
       });
       // window.location.reload();
     }
@@ -723,7 +753,7 @@ export const signInWithApple = async (setFieldValue) => {
     const result = await signInWithPopup(auth, appleProvider);
     const user = result.user;
 
-    console.log("User info from Apple:", user);
+    //("User info from Apple:", user);
     const userData = {
       uid: user.uid,
       displayName: user.displayName,
@@ -754,7 +784,7 @@ export const LoginWithApple = async () => {
     const result = await signInWithPopup(auth, appleProvider);
     const user = result.user;
 
-    console.log("Apple Sign-In successful. User UID:", user.uid);
+    // console.log("Apple Sign-In successful. User UID:", user.uid);
 
     const checkUIDResponse = await axios.get(
       `app/auth/check-uid-exists/${user.uid}`
@@ -768,7 +798,7 @@ export const LoginWithApple = async () => {
         device_token: localStorage.getItem("device_token"),
       });
 
-      console.log("Apple response:", response.data);
+      //    console.log("Apple response:", response.data);
 
       const token = response.data.data.token;
       localStorage.setItem("token", token);

@@ -2,13 +2,17 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import Loader from "../../Loader/Loader";
+import { useTranslation } from "react-i18next";
 
 function Tearms() {
   const [terms, setTerms] = useState("");
   const [isLoading, setIsLoading] = useState("");
+  const { t } = useTranslation();
 
   const fetchCondition = async () => {
     const token = localStorage.getItem("Web-token");
+    const lang = localStorage.getItem("selectedLanguage");
+
     try {
       setIsLoading(true);
 
@@ -17,15 +21,14 @@ function Tearms() {
         {
           headers: {
             Authorization: `Bearer ${token}`,
+            "Accept-Language": lang,
           },
         }
       );
       setTerms(response.data.data[0]?.description);
-      // console.log("ye",response.data.data);
     } catch (error) {
       console.error("Error data:", error);
-    } 
-    finally {
+    } finally {
       setIsLoading(false);
     }
   };
@@ -34,9 +37,9 @@ function Tearms() {
     fetchCondition();
   }, []);
 
-   useEffect(() => {
-      window.scrollTo(0, 0);
-    }, []);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <div>
@@ -45,7 +48,7 @@ function Tearms() {
           <div className="row rowmainheading_inner">
             <div className="col-md-12 colmainheading_innerpages">
               <div className="pageheading_main">
-                <h2>Terms & Conditions</h2>
+                <h2>{t("Terms & Conditions")}</h2>
               </div>
             </div>
           </div>
@@ -65,11 +68,13 @@ function Tearms() {
                       <div className="tabbingiconbgdiv">
                         {" "}
                         <img
-                          src={`${process.env.PUBLIC_URL}/images/legal_terms_icons.png`}
+                          src={`${process.env.PUBLIC_URL}/image/legal_terms_icons.png`}
                           alt="Terms"
                         />{" "}
                       </div>{" "}
-                      <span className="navlinkname">Terms & Conditions</span>{" "}
+                      <span className="navlinkname">
+                        {t("Terms & Conditions")}
+                      </span>{" "}
                     </Link>
                   </li>
                   <li className="nav-item">
@@ -77,11 +82,13 @@ function Tearms() {
                       <div className="tabbingiconbgdiv">
                         {" "}
                         <img
-                          src={`${process.env.PUBLIC_URL}/images/legal_terms_icons.png`}
+                          src={`${process.env.PUBLIC_URL}/image/legal_terms_icons.png`}
                           alt="Privacy"
                         />{" "}
                       </div>
-                      <span className="navlinkname">Privacy Policies</span>
+                      <span className="navlinkname">
+                        {t("Privacy Policies")}
+                      </span>
                     </Link>
                   </li>
                   <li className="nav-item">
@@ -89,12 +96,12 @@ function Tearms() {
                       <div className="tabbingiconbgdiv">
                         {" "}
                         <img
-                          src={`${process.env.PUBLIC_URL}/images/legal_terms_icons.png`}
+                          src={`${process.env.PUBLIC_URL}/image/legal_terms_icons.png`}
                           alt="Rules"
                         />{" "}
                       </div>
                       <span className="navlinkname">
-                        Rules of Play &amp; FAQs
+                        {t("Rules of Play")} &amp; {t("FAQs")}
                       </span>
                     </Link>
                   </li>
@@ -103,11 +110,11 @@ function Tearms() {
                       <div className="tabbingiconbgdiv">
                         {" "}
                         <img
-                          src={`${process.env.PUBLIC_URL}/images/legal_terms_icons.png`}
+                          src={`${process.env.PUBLIC_URL}/image/legal_terms_icons.png`}
                           alt="Cookies"
                         />{" "}
                       </div>{" "}
-                      <span className="navlinkname">Cookie Policy</span>
+                      <span className="navlinkname">{t("Cookie Policy")}</span>
                     </Link>
                   </li>
                 </ul>
@@ -118,15 +125,14 @@ function Tearms() {
                 <div className="tab-content">
                   <div id="terms_conditions" className="tab-pane active">
                     <div className="legaltermsdata_div">
-                        <div dangerouslySetInnerHTML={{ __html: terms }} />
-                      {/* <div className="innerlegal_heaidngwithpara"> */}
-
-                        {/* {isLoading ? (
-                          <Loader /> // Correctly render the Loader component
-                        ) : (
-                          <div dangerouslySetInnerHTML={{ __html: terms }} />
-                        )} */}
-                      {/* </div> */}
+                      {isLoading ? (
+                        <Loader />
+                      ) : (
+                        <div
+                          className="innerlegal_heaidngwithpara"
+                          dangerouslySetInnerHTML={{ __html: terms }}
+                        />
+                      )}
                     </div>
                   </div>
                 </div>

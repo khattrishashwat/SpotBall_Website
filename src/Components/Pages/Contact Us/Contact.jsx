@@ -4,14 +4,18 @@ import Loader from "../../Loader/Loader";
 import axios from "axios";
 import * as Yup from "yup";
 import Swal from "sweetalert2";
+import { useTranslation } from "react-i18next";
 
 function Contact() {
   const [isLoading, setIsLoading] = useState(false);
+  const { t } = useTranslation();
 
   const [contacts, setContacts] = useState("");
 
   const fetchContact = async () => {
     const token = localStorage.getItem("Web-token");
+    const lang = localStorage.getItem("selectedLanguage");
+
     try {
       setIsLoading(true);
       const response = await axios.get(
@@ -19,12 +23,12 @@ function Contact() {
         {
           headers: {
             Authorization: `Bearer ${token}`,
+            "Accept-Language": lang,
           },
         }
       );
 
       if (response.data.data) {
-        console.log("Fetched Contacts ", response.data.data);
         setContacts(response.data.data[0] || {});
       }
     } catch (error) {
@@ -45,28 +49,46 @@ function Contact() {
 
   const handleNumericInput = (value) =>
     value.replace(/[^0-9]/g, "").slice(0, 10);
-
   const validationContact = Yup.object().shape({
     first_name: Yup.string()
       .required("First Name is required")
-      .matches(/^[A-Z]/, "First letter must be capital"),
+      .matches(/^[A-Z]/, "First letter must be capital")
+      .max(20, "First Name cannot exceed 20 characters"), // Max 20 characters
+
     last_name: Yup.string()
       .required("Last Name is required")
-      .matches(/^[A-Z]/, "First letter must be capital"),
+      .matches(/^[A-Z]/, "First letter must be capital")
+      .max(20, "Last Name cannot exceed 20 characters"), // Max 20 characters
+
     email: Yup.string()
+      .required("Email is required")
       .email("Invalid email address")
-      .required("Email is required"),
+      .matches(
+        /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+        "Invalid email format. Please enter a valid email address."
+      )
+      .matches(
+        /@(gmail\.com|yahoo\.com|outlook\.com|hotmail\.com)$/,
+        "Only Gmail, Yahoo, Outlook, and Hotmail domains are allowed"
+      ),
+
     phone: Yup.string()
       .required("Phone number is required")
       .matches(/^(?:\+91)?[6-9][0-9]{9}$/, "Invalid Indian phone number"),
-    subject: Yup.string().required("Subject is required"),
+
+    subject: Yup.string()
+      .required("Subject is required")
+      .max(150, "Subject cannot exceed 150 characters"), // Max 150 characters
+
     message: Yup.string()
       .required("Message is required")
-      .matches(/^[A-Z]/, "First letter of the message must be capital"),
+      .matches(/^[A-Z]/, "First letter of the message must be capital")
+      .max(500, "Message cannot exceed 500 characters"), // Max 500 characters
   });
 
   const Contact_Us = async (values, { resetForm }) => {
     const token = localStorage.getItem("Web-token");
+    const lang = localStorage.getItem("selectedLanguage");
     const formattedPhone = values.phone.startsWith("+91")
       ? values.phone
       : `+91${values.phone}`;
@@ -78,6 +100,7 @@ function Contact() {
         {
           headers: {
             Authorization: `Bearer ${token}`,
+            "Accept-Language": lang,
           },
         }
       );
@@ -124,13 +147,13 @@ function Contact() {
               <div className="row contactusdiv_innerrow">
                 <div className="col-md-5 col5forcontactdetails">
                   <div className="contactdetails_div">
-                    <h3>Contact Information</h3>
+                    <h3>{t("Contact Information")}</h3>
                     {contacts.emailInfo?.map((contact) => (
                       <div className="helpdeksdiv_all" key={contact._id}>
                         <h2>{contact.info}</h2>
                         <div className="helpsupport_info">
                           <img
-                            src={`${process.env.PUBLIC_URL}/images/mail.png`}
+                            src={`${process.env.PUBLIC_URL}/image/mail.png`}
                             alt="Mail"
                           />
                           <p>
@@ -156,7 +179,7 @@ function Contact() {
                               rel="noopener noreferrer"
                             >
                               <img
-                                src={`${process.env.PUBLIC_URL}/images/facebook_contact.png`}
+                                src={`${process.env.PUBLIC_URL}/image/facebook_contact.png`}
                                 alt="Facebook"
                               />
                             </a>
@@ -169,7 +192,7 @@ function Contact() {
                               className="bggreen"
                             >
                               <img
-                                src={`${process.env.PUBLIC_URL}/images/instagram_contact-white.png`}
+                                src={`${process.env.PUBLIC_URL}/image/instagram_contact-white.png`}
                                 alt="Instagram"
                               />
                             </a>
@@ -182,7 +205,7 @@ function Contact() {
                               rel="noopener noreferrer"
                             >
                               <img
-                                src={`${process.env.PUBLIC_URL}/images/twitter_contact.png`}
+                                src={`${process.env.PUBLIC_URL}/image/twitter_contact.png`}
                                 alt="Twitter"
                               />
                             </a>
@@ -211,12 +234,14 @@ function Contact() {
                           <div className="row rowcontactform_inner">
                             <div className="col-md-6 colcontactinputsdiv">
                               <div className="inputformdiv">
-                                <label className="contactlbl">First Name</label>
+                                <label className="contactlbl">
+                                  {t("First Name")}
+                                </label>
                                 <Field
                                   name="first_name"
                                   type="text"
                                   className="contactinputs"
-                                  placeholder="First name"
+                                  placeholder={t("First name")}
                                   onChange={(e) =>
                                     setFieldValue(
                                       "first_name",
@@ -233,12 +258,14 @@ function Contact() {
                             </div>
                             <div className="col-md-6 colcontactinputsdiv">
                               <div className="inputformdiv">
-                                <label className="contactlbl">Last Name</label>
+                                <label className="contactlbl">
+                                  {t("Last Name")}
+                                </label>
                                 <Field
                                   name="last_name"
                                   type="text"
                                   className="contactinputs"
-                                  placeholder="Last name"
+                                  placeholder={t("Last name")}
                                   onChange={(e) =>
                                     setFieldValue(
                                       "last_name",
@@ -255,7 +282,9 @@ function Contact() {
                             </div>
                             <div className="col-md-6 colcontactinputsdiv">
                               <div className="inputformdiv">
-                                <label className="contactlbl">Email</label>
+                                <label className="contactlbl">
+                                  {t("Email")}
+                                </label>
                                 <Field
                                   name="email"
                                   type="email"
@@ -272,7 +301,7 @@ function Contact() {
                             <div className="col-md-6 colcontactinputsdiv">
                               <div className="inputformdiv">
                                 <label className="contactlbl">
-                                  Phone Number
+                                  {t("Phone Number")}
                                 </label>
                                 <Field
                                   name="phone"
@@ -297,7 +326,7 @@ function Contact() {
                             <div className="col-md-12 colcontactinputsdiv">
                               <div className="inputformdiv">
                                 <label className="contactlbl">
-                                  Select Subject
+                                  {t("Select Subject")}
                                 </label>
                                 <div className="subjectradioninputs">
                                   <div className="form-group">
@@ -307,7 +336,7 @@ function Contact() {
                                       name="subject"
                                       value="technical"
                                     />
-                                    <label htmlFor="gnrl1">Technical</label>
+                                    <label htmlFor="gnrl1">{"Technical"}</label>
                                   </div>
                                   <div className="form-group">
                                     <Field
@@ -316,7 +345,9 @@ function Contact() {
                                       name="subject"
                                       value="support"
                                     />
-                                    <label htmlFor="gnrl2">Support</label>
+                                    <label htmlFor="gnrl2">
+                                      {t("Support")}
+                                    </label>
                                   </div>
                                   {/* <div className="form-group">
                                     <Field
@@ -334,7 +365,9 @@ function Contact() {
                                       name="subject"
                                       value="business"
                                     />
-                                    <label htmlFor="gnrl4">Business</label>
+                                    <label htmlFor="gnrl4">
+                                      {t("Business")}
+                                    </label>
                                   </div>
                                 </div>
                                 <ErrorMessage
@@ -346,7 +379,9 @@ function Contact() {
                             </div>
                             <div className="col-md-12 colcontactinputsdiv">
                               <div className="inputformdiv">
-                                <label className="contactlbl">Message</label>
+                                <label className="contactlbl">
+                                  {t("Message")}
+                                </label>
                                 <Field
                                   name="message"
                                   type="text"
@@ -372,7 +407,7 @@ function Contact() {
                                   type="submit"
                                   className="sendmsg_contformbtn"
                                 >
-                                  Send Message
+                                  {t("Send Message")}
                                 </button>
                               </div>
                             </div>

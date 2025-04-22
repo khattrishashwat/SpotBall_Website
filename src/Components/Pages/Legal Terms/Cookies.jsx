@@ -2,13 +2,17 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import Loader from "../../Loader/Loader";
+import { useTranslation } from "react-i18next";
 
 function Privacy() {
-    const [isCookies, setIsCookies] = useState("");
+  const [isCookies, setIsCookies] = useState("");
   const [isLoading, setIsLoading] = useState("");
 
+  const { t } = useTranslation();
   const fetchCondition = async () => {
     const token = localStorage.getItem("Web-token");
+            const lang = localStorage.getItem("selectedLanguage");
+
     try {
       setIsLoading(true);
 
@@ -17,11 +21,11 @@ function Privacy() {
         {
           headers: {
             Authorization: `Bearer ${token}`,
+            "Accept-Language": lang,
           },
         }
       );
       setIsCookies(response.data.data[0]?.description);
-      // console.log("ye",response.data.data);
     } catch (error) {
       console.error("Error data:", error);
     } finally {
@@ -33,9 +37,9 @@ function Privacy() {
     fetchCondition();
   }, []);
 
-   useEffect(() => {
-      window.scrollTo(0, 0);
-    }, []);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <div>
@@ -44,7 +48,7 @@ function Privacy() {
           <div className="row rowmainheading_inner">
             <div className="col-md-12 colmainheading_innerpages">
               <div className="pageheading_main">
-                <h2>Cookie Policy</h2>
+                <h2>{t("Cookie Policy")}</h2>
               </div>
             </div>
           </div>
@@ -60,11 +64,13 @@ function Privacy() {
                       <div className="tabbingiconbgdiv">
                         {" "}
                         <img
-                          src={`${process.env.PUBLIC_URL}/images/legal_terms_icons.png`}
+                          src={`${process.env.PUBLIC_URL}/image/legal_terms_icons.png`}
                           alt="Terms"
                         />{" "}
                       </div>{" "}
-                      <span className="navlinkname">Terms & Conditions</span>{" "}
+                      <span className="navlinkname">
+                        {t("Terms & Conditions")}
+                      </span>{" "}
                     </Link>
                   </li>
                   <li className="nav-item">
@@ -72,11 +78,13 @@ function Privacy() {
                       <div className="tabbingiconbgdiv">
                         {" "}
                         <img
-                          src={`${process.env.PUBLIC_URL}/images/legal_terms_icons.png`}
+                          src={`${process.env.PUBLIC_URL}/image/legal_terms_icons.png`}
                           alt="Privacy"
                         />{" "}
                       </div>
-                      <span className="navlinkname">Privacy Policies</span>
+                      <span className="navlinkname">
+                        {t("Privacy Policies")}
+                      </span>
                     </Link>
                   </li>
                   <li className="nav-item">
@@ -84,12 +92,12 @@ function Privacy() {
                       <div className="tabbingiconbgdiv">
                         {" "}
                         <img
-                          src={`${process.env.PUBLIC_URL}/images/legal_terms_icons.png`}
+                          src={`${process.env.PUBLIC_URL}/image/legal_terms_icons.png`}
                           alt="Rules"
                         />{" "}
                       </div>
                       <span className="navlinkname">
-                        Rules of Play &amp; FAQs
+                        {t("Rules of Play")} &amp; {t("FAQs")}
                       </span>
                     </Link>
                   </li>
@@ -102,11 +110,11 @@ function Privacy() {
                       <div className="tabbingiconbgdiv">
                         {" "}
                         <img
-                          src={`${process.env.PUBLIC_URL}/images/legal_terms_icons.png`}
+                          src={`${process.env.PUBLIC_URL}/image/legal_terms_icons.png`}
                           alt="Cookies"
                         />{" "}
                       </div>{" "}
-                      <span className="navlinkname">Cookie Policy</span>
+                      <span className="navlinkname">{t("Cookie Policy")}</span>
                     </Link>
                   </li>
                 </ul>
@@ -117,20 +125,18 @@ function Privacy() {
                 <div className="tab-content">
                   <div id="cookiepolicy" className="tab-pane active">
                     <div className="legaltermsdata_div">
-                      {/* <div className="innerlegal_heaidngwithpara"> */}
-                        
-                          <div
-                            dangerouslySetInnerHTML={{ __html: isCookies }}
-                          />
-                          {/* {isLoading ? (
-                            <Loader /> // Correctly render the Loader component
-                          ) : (
-                            <div
-                              dangerouslySetInnerHTML={{ __html: isCookies }}
-                            />
-                          )} */}
-                        
-                      {/* </div> */}
+                      {isLoading ? (
+                        <Loader />
+                      ) : (
+                        <div
+                          className="innerlegal_heaidngwithpara"
+                          dangerouslySetInnerHTML={{ __html: isCookies }}
+                        />
+                      )}
+                      {/* <div
+                        className="innerlegal_heaidngwithpara"
+                        dangerouslySetInnerHTML={{ __html: isCookies }}
+                      /> */}
                     </div>
                   </div>
                 </div>

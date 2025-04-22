@@ -1,58 +1,49 @@
-import React from 'react'
+import React from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import "./Pages.css";
 
-
 function PageNot() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleHomeNavigation = () => {
+    navigate("/");
+    // if (location.pathname === "/") {
+    //   window.location.reload(); // Reload the page if already on the homepage
+    // } else {
+    //   // Otherwise, navigate to the homepage
+    //   navigate("/");
+    // }
+  };
+
   return (
-    <div>
-      <header className="top-header"></header>
-
-      {/* Dust particles */}
-      <div>
-        <div className="starsec"></div>
-        <div className="starthird"></div>
-        <div className="starfourth"></div>
-        <div className="starfifth"></div>
-      </div>
-      {/* Dust particle end */}
-
-      <div className="lamp__wrap">
-        <div className="lamp">
-          <div className="cable"></div>
-          <div className="cover"></div>
-          <div className="in-cover">
-            <div className="bulb"></div>
+    <div className="comming-soon not-found">
+      <div className="comming-soon-info">
+        <div className="comming-soon-inner">
+          {/* Logo Start */}
+          <div className="logo">
+            <img src={`${process.env.PUBLIC_URL}/images/logo.png`} alt="logo" />
           </div>
-          <div className="light"></div>
-        </div>
-      </div>
-      {/* END Lamp */}
-
-      <section className="autop">
-        {/* Content */}
-        <div className="autop__content">
-          <div className="autop__message message">
-            <h1 className="message__title">Page Not Found</h1>
-            <p className="message__text">
-              We're sorry, the page you were looking for isn't found here. The
-              link you followed may either be broken or no longer exists. Please
-              try again, or take a look at our.
-            </p>
-          </div>
-          <div className="autop__nav e-nav">
-            <a
-              target="_blank"
-              rel="noopener noreferrer"
-              className="e-nav__link"
-            >
-              Go to Home
-            </a>
+          {/* Logo End */}
+          <div className="not-found-text">
+            <h2>Page not found</h2>
+            <h4>Sorry, this page doesn't appear to exist</h4>
+            <div className="buyticketsbtndiv">
+              <div className="addtocardbtnicon">
+                <button
+                  type="button"
+                  className="buyticketbtn onclickcarticon_showcartpopup"
+                  onClick={handleHomeNavigation}
+                >
+                  TAKE ME HOME
+                </button>
+              </div>
+            </div>
           </div>
         </div>
-        {/* END Content */}
-      </section>
+      </div>
     </div>
   );
 }
 
-export default PageNot
+export default PageNot;

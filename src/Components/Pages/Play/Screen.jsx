@@ -3,19 +3,21 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { RxCross2 } from "react-icons/rx";
 import axios from "axios";
 import Swal from "sweetalert2";
+import { useTranslation } from "react-i18next";
 
 function Screen() {
   const navigate = useNavigate();
   const imgRef = useRef(null);
 
-  const [colorIndex, setColorIndex] = useState(""); // Track the current color index
+  const [colorIndex, setColorIndex] = useState("");
+  const { t } = useTranslation();
 
   const location = useLocation();
-  const { quantity, responseData, leftticket } = location.state.payload || {};
-  console.log("leftticket", leftticket);
+  const { responseData, leftticket } = location.state.payload || {};
+  const quantity = parseInt(localStorage.getItem("quantity"), 10);
 
   const [usedTickets, setUsedTickets] = useState(0);
-  const [totalTickets, setTotalTickets] = useState(quantity || "");
+  const [totalTickets, setTotalTickets] = useState(quantity || 0);
   const [tickets, setTickets] = useState(
     Array.from({ length: quantity }, (_, i) => ({
       id: i + 1,
@@ -57,21 +59,24 @@ function Screen() {
 
   const fetchVideoData = async () => {
     const token = localStorage.getItem("Web-token");
+            const lang = localStorage.getItem("selectedLanguage");
+
     try {
       const response = await axios.get("app/how-to-play/get-how-to-play", {
         headers: {
           Authorization: `Bearer ${token}`,
+          "Accept-Language": lang,
         },
       });
 
       if (response.data.data) {
-        console.log("Fetched video data:", response.data.data);
+        //   console.log("Fetched video data:", response.data.data);
         setMovies(response.data.data);
       } else {
         console.error("No video data found.");
       }
     } catch (error) {
-      console.error("Error fetching video data:", error);
+      //  console.error("Error fetching video data:", error);
     }
   };
 
@@ -99,19 +104,25 @@ function Screen() {
   const handleTicket = () => {
     const choosedTicket = responseData.maxTickets - leftticket; // Calculate choosedTicket
 
-    // Check if totalTickets is less than responseData.maxTickets
+    console.log("Current Total Tickets:", typeof totalTickets);
+
     if (
       totalTickets < responseData.maxTickets &&
       totalTickets + 1 <= leftticket
     ) {
-      const newTicket = {
-        id: tickets.length + 1,
-        xCord: "____",
-        yCord: "____",
-      };
+      setTickets((prevTickets) => [
+        ...prevTickets,
+        {
+          id: prevTickets.length + 1,
+          xCord: "____",
+          yCord: "____",
+        },
+      ]);
 
-      setTickets((prev) => [...prev, newTicket]);
-      setTotalTickets((prev) => prev + 1); // Increment totalTickets, but not usedTickets yet
+      setTotalTickets((prevTotal) => {
+        console.log("Previous Total:", prevTotal);
+        return prevTotal + 1;
+      });
     } else {
       Swal.fire({
         icon: "warning",
@@ -119,7 +130,7 @@ function Screen() {
         text:
           leftticket === 0
             ? "There are no tickets left to add."
-            : `You can only purchase a maximum of ${responseData.maxTickets} tickets per person, but you have already bought ${choosedTicket} tickets. You have only (${leftticket}) ticket left to purchase .`,
+            : `You can only purchase a maximum of ${responseData.maxTickets} tickets per person, but you have already bought ${choosedTicket} tickets. You have only (${leftticket}) ticket left to purchase.`,
         confirmButtonText: "OK",
         allowOutsideClick: false,
       });
@@ -183,7 +194,7 @@ function Screen() {
     const ticketToDelete = tickets.find((ticket) => ticket.id === id);
 
     if (!ticketToDelete) {
-      return; // Exit if the ticket doesn't exist
+      return; 
     }
 
     Swal.fire({
@@ -197,6 +208,7 @@ function Screen() {
       confirmButtonText: "Yes, delete it",
       cancelButtonText: "No, cancel",
     }).then((result) => {
+      // debugger
       if (result.isConfirmed) {
         // Proceed with deletion
         const updatedTickets = tickets.filter((ticket) => ticket.id !== id);
@@ -205,6 +217,9 @@ function Screen() {
           ...ticket,
           id: index + 1,
         }));
+
+        // console.log("ticket",reindexedTickets.length)
+        localStorage.setItem("quantity", reindexedTickets?.length);
 
         setTickets(reindexedTickets);
 
@@ -235,6 +250,16 @@ function Screen() {
   };
 
   const handleReply = (id) => {
+    const ticketToUpdate = tickets.find((ticket) => ticket.id === id);
+
+    if (
+      !ticketToUpdate ||
+      ticketToUpdate.xCord === "____" ||
+      ticketToUpdate.yCord === "____"
+    ) {
+      return;
+    }
+
     Swal.fire({
       title: "Are you sure?",
       text: "Do you want to remove this coordinate?",
@@ -246,6 +271,7 @@ function Screen() {
       confirmButtonText: "Yes, delete it",
       cancelButtonText: "No, cancel",
     }).then((result) => {
+      console.log("res", result);
       if (result.isConfirmed) {
         const updatedTickets = tickets.map((ticket) =>
           ticket.id === id
@@ -299,11 +325,106 @@ function Screen() {
     setShowTooltip(false);
   };
 
+  // const handleClick = (e) => {
+  //   setColorIndex(responseData.cursor_color);
+  //   // Check if the user has used all their chances
+  //   if (clickCount >= totalTickets) {
+  //     alert("You've used all your tickets. Click '+' to add more.");
+  //     return;
+  //   }
+
+  //   const image = e.target;
+  //   const rect = image.getBoundingClientRect(); // Get the image position and size in the viewport
+
+  //   // Get the relative position of the click within the image
+  //   const xRelative = e.clientX - rect.left; // X coordinate relative to the image
+  //   const yRelative = e.clientY - rect.top; // Y coordinate relative to the image
+
+  //   // Calculate the click's position based on the image's natural size
+  //   const x = ((xRelative / rect.width) * image.naturalWidth).toFixed(2); // X based on image's intrinsic width
+  //   const y = ((yRelative / rect.height) * image.naturalHeight).toFixed(2); // Y based on image's intrinsic height
+
+  //   const updatedTickets = [...tickets];
+
+  //   // Find a ticket with empty coordinates
+  //   const ticketIndex = updatedTickets.findIndex(
+  //     (ticket) => ticket.xCord === "____" && ticket.yCord === "____"
+  //   );
+
+  //   if (ticketIndex !== -1) {
+  //     // Update the ticket's coordinates
+  //     updatedTickets[ticketIndex] = {
+  //       ...updatedTickets[ticketIndex],
+  //       xCord: x,
+  //       yCord: y,
+  //     };
+
+  //     // Update state
+  //     setTickets(updatedTickets);
+  //     setClickedPoints((prev) => [...prev, { x, y }]);
+  //     setClickCount((prev) => prev + 1); // Increment clickCount
+
+  //     // Only now increment usedTickets, since a ticket is now fully filled
+  //     setUsedTickets((prev) => prev + 1);
+  //   } else {
+  //     alert("All tickets are already filled.");
+  //   }
+  // };
+
+  // const handleClick = (e) => {
+  //   setColorIndex(responseData.cursor_color);
+
+  //   if (clickCount >= totalTickets) {
+  //     alert("You've used all your tickets. Click '+' to add more.");
+  //     return;
+  //   }
+
+  //   const image = e.target;
+  //   const rect = image.getBoundingClientRect();
+
+  //   // Get relative position
+  //   const xRelative = e.clientX - rect.left;
+  //   const yRelative = e.clientY - rect.top;
+
+  //   // Calculate based on natural size
+  //   const x = (xRelative / rect.width) * image.naturalWidth;
+  //   const y = (yRelative / rect.height) * image.naturalHeight;
+
+  //   const updatedTickets = [...tickets];
+
+  //   // Find a ticket with empty coordinates
+  //   const ticketIndex = updatedTickets.findIndex(
+  //     (ticket) => ticket.xCord === "____" && ticket.yCord === "____"
+  //   );
+
+  //   if (ticketIndex !== -1) {
+  //     updatedTickets[ticketIndex] = {
+  //       ...updatedTickets[ticketIndex],
+  //       xCord: x,
+  //       yCord: y,
+  //     };
+
+  //     setTickets(updatedTickets);
+  //     setClickedPoints((prev) => [...prev, { x, y }]); // No filtering, allow exact overlap
+  //     setClickCount((prev) => prev + 1);
+  //     setUsedTickets((prev) => prev + 1);
+  //   } else {
+  //     alert("All tickets are already filled.");
+  //   }
+  // };
+
   const handleClick = (e) => {
     setColorIndex(responseData.cursor_color);
+
     // Check if the user has used all their chances
     if (clickCount >= totalTickets) {
-      alert("You've used all your tickets. Click '+' to add more.");
+      Swal.fire({
+        icon: "warning",
+        title: "Limit Reached",
+        text: "You've used all your tickets. Click '+' to add more.",
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
+      });
       return;
     }
 
@@ -317,6 +438,22 @@ function Screen() {
     // Calculate the click's position based on the image's natural size
     const x = ((xRelative / rect.width) * image.naturalWidth).toFixed(0); // X based on image's intrinsic width
     const y = ((yRelative / rect.height) * image.naturalHeight).toFixed(0); // Y based on image's intrinsic height
+
+    // Check if the coordinates already exist
+    const isDuplicate = clickedPoints.some(
+      (point) => point.x === x && point.y === y
+    );
+
+    if (isDuplicate) {
+      Swal.fire({
+        icon: "error",
+        title: "Duplicate Coordinates",
+        text: "You have already played a ticket with these coordinates.",
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
+      });
+      return;
+    }
 
     const updatedTickets = [...tickets];
 
@@ -341,7 +478,13 @@ function Screen() {
       // Only now increment usedTickets, since a ticket is now fully filled
       setUsedTickets((prev) => prev + 1);
     } else {
-      alert("All tickets are already filled.");
+      Swal.fire({
+        icon: "warning",
+        title: "All Tickets Used",
+        text: "All tickets are already filled.",
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
+      });
     }
   };
 
@@ -406,9 +549,12 @@ function Screen() {
 
     try {
       const token = localStorage.getItem("Web-token");
+              const lang = localStorage.getItem("selectedLanguage");
+
       const response = await axios.post("app/contest/add-to-cart", values, {
         headers: {
           Authorization: `Bearer ${token}`,
+          "Accept-Language": lang,
         },
       });
 
@@ -442,84 +588,86 @@ function Screen() {
     }
   };
 
+  const handleContextMenu = (event) => {
+    event.preventDefault(); // Prevent right-click menu
+  };
   return (
     <>
       <section className="playgame_section">
         <div className="container contfld_playgame">
           <div className="row rowmain_playgame">
-            <div className="col-md-8 col9playgame_mainscreen">
+            <div className="col-sm-12 col-lg-8 col9playgame_mainscreen">
               <div
                 className="gamescreenimg_right"
                 style={{ position: "relative" }}
               >
+                {/* Protected Image */}
                 <img
                   ref={imgRef}
                   src={responseData?.player_image?.file_url || ""}
+                  alt="Player"
                   onMouseMove={handleMouseMove}
                   onClick={handleClick}
                   onLoad={handleImageLoad}
                   onMouseEnter={handleMouseEnter}
                   onMouseLeave={handleMouseLeave}
+                  // Disable right-click and drag
+                  onContextMenu={(e) => {
+                    e.preventDefault();
+                    return false;
+                  }}
+                  draggable="false"
                   style={{
                     cursor: "crosshair",
                     display: "block",
                     position: "relative",
+                    userSelect: "none",
                   }}
-                  alt="Player"
                 />
 
-                {/* {clickedPoints.map((point, index) => (
-                  <div
-                    key={index}
-                    style={{
-                      position: "absolute",
-                      left: `${
-                        (point.x / imgRef.current.naturalWidth) *
-                        imgRef.current.clientWidth
-                      }px`,
-                      top: `${
-                        (point.y / imgRef.current.naturalHeight) *
-                        imgRef.current.clientHeight
-                      }px`,
-                      transform: "translate(-50%, -50%)",
-                    }}
-                  >
-                    <RxCross2
-                      style={{
-                        color: colorIndex,
-                        fontSize: "40px",
-                      }}
-                    />
-                  </div>
-                ))} */}
-                {clickedPoints.map((point, index) => (
-                  <div
-                    key={index}
-                    style={{
-                      position: "absolute",
-                      left: `${
-                        (point.x / imgRef.current.naturalWidth) *
-                        imgRef.current.clientWidth
-                      }px`,
-                      top: `${
-                        (point.y / imgRef.current.naturalHeight) *
-                        imgRef.current.clientHeight
-                      }px`,
-                      transform: "translate(-50%, -50%)", // Keeps it centered
-                      pointerEvents: "none", // So that clicks do not interfere
-                    }}
-                  >
-                    <RxCross2
-                      style={{
-                        color: colorIndex,
-                        fontSize: "40px",
-                        // position: "absolute",
-                      }}
-                    />
-                  </div>
-                ))}
+                {/* Watermark Overlay */}
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: "10px",
+                    right: "10px",
+                    backgroundColor: "rgba(0, 0, 0, 0.5)",
+                    color: "white",
+                    padding: "5px",
+                    fontSize: "14px",
+                    pointerEvents: "none",
+                  }}
+                >
+                  © SpotsBall
+                </div>
 
-                {showTooltip && (
+                {/* Clicked Points */}
+                {imgRef.current &&
+                  clickedPoints.map((point, index) => (
+                    <div
+                      key={index}
+                      style={{
+                        position: "absolute",
+                        left: `${
+                          (point.x / imgRef.current.naturalWidth) *
+                          imgRef.current.clientWidth
+                        }px`,
+                        top: `${
+                          (point.y / imgRef.current.naturalHeight) *
+                          imgRef.current.clientHeight
+                        }px`,
+                        transform: "translate(-50%, -50%)",
+                        pointerEvents: "none",
+                      }}
+                    >
+                      <RxCross2
+                        style={{ color: colorIndex, fontSize: "40px" }}
+                      />
+                    </div>
+                  ))}
+
+                {/* Tooltip */}
+                {imgRef.current && showTooltip && (
                   <div
                     style={{
                       position: "absolute",
@@ -534,20 +682,20 @@ function Screen() {
                       backgroundColor: "rgba(0, 0, 0, 0.7)",
                       color: "#fff",
                       pointerEvents: "none",
-                      transform: "translate(-50%, -100%)", // Slightly above the cursor
+                      transform: "translate(-50%, -100%)",
+                      padding: "2px 5px",
+                      fontSize: "12px",
                     }}
                   >
-                    <p>
-                      (X: {coordinates.x}, Y: {coordinates.y})
-                    </p>
+                    (X: {coordinates.x}, Y: {coordinates.y})
                   </div>
                 )}
               </div>
             </div>
-            <div className="col-md-4 col3ticketscontest">
+            <div className="col-sm-12 col-lg-4 col3ticketscontest">
               <div className="ticketaxis_div">
                 <div className="ticketheading">
-                  <h3>Tickets</h3>
+                  <h3>{t("Tickets")}</h3>
                 </div>
                 <div className="actionicon_btn">
                   <div
@@ -556,30 +704,30 @@ function Screen() {
                   >
                     <div className="the_icon">
                       <img
-                        src={`${process.env.PUBLIC_URL}/images/user_guide_icon.png`}
+                        src={`${process.env.PUBLIC_URL}/image/user_guide_icon.png`}
                       />
                     </div>
 
-                    <p>Video</p>
+                    <p>{t("Video")}</p>
                   </div>
                   <div className="threeicons_action" onClick={handleTicket}>
                     <div className="the_icon">
                       <img
-                        src={`${process.env.PUBLIC_URL}/images/ticket_icon.png`}
+                        src={`${process.env.PUBLIC_URL}/image/ticket_icon.png`}
                         alt="Add Ticket"
                       />
                     </div>
-                    <p>Ticket</p>
+                    <p>{t("Ticket")}</p>
                   </div>
                   <div className="threeicons_action" onClick={handleRefreshAll}>
                     <div className="the_icon">
                       <img
-                        src={`${process.env.PUBLIC_URL}/images/refresh_icon.png`}
+                        src={`${process.env.PUBLIC_URL}/image/refresh_icon.png`}
                         alt="Refresh"
                       />
                     </div>
 
-                    <p>Refresh All</p>
+                    <p>{t("Refresh All")}</p>
                   </div>
                 </div>
                 <div className="ticketcount_div">
@@ -599,7 +747,7 @@ function Screen() {
                               {Number(
                                 responseData.jackpot_price
                               ).toLocaleString()}{" "}
-                              Contest
+                              {t("Contest")}
                             </h3>
                           </div>
                           <div className="usedticket_withcheck">
@@ -613,7 +761,7 @@ function Screen() {
                               ticket.xCord > 0 &&
                               ticket.yCord > 0 ? (
                                 <img
-                                  src={`${process.env.PUBLIC_URL}/images/cord_check.png`}
+                                  src={`${process.env.PUBLIC_URL}/image/cord_check.png`}
                                   alt="Checked"
                                 />
                               ) : null}
@@ -633,10 +781,10 @@ function Screen() {
                               onClick={() => handleReply(ticket.id)}
                             >
                               <img
-                                src={`${process.env.PUBLIC_URL}/images/refresh_cord.png`}
+                                src={`${process.env.PUBLIC_URL}/image/refresh_cord.png`}
                               />
                             </div>
-                            <p className="actionheading">Replay</p>
+                            <p className="actionheading">{t("Replay")}</p>
                           </div>
                           <div className="cord_actiondiv">
                             <div
@@ -644,11 +792,11 @@ function Screen() {
                               onClick={handleAddTicket}
                             >
                               <img
-                                src={`${process.env.PUBLIC_URL}/images/add_cord.png`}
+                                src={`${process.env.PUBLIC_URL}/image/add_cord.png`}
                                 alt="Add"
                               />
                             </div>
-                            <p className="actionheading">Add</p>
+                            <p className="actionheading">{t("Add")}</p>
                           </div>
                           <div className="cord_actiondiv">
                             <div
@@ -656,10 +804,10 @@ function Screen() {
                               onClick={() => handleDeleteTicket(ticket.id)}
                             >
                               <img
-                                src={`${process.env.PUBLIC_URL}/images/delete_cord.png`}
+                                src={`${process.env.PUBLIC_URL}/image/delete_cord.png`}
                               />
                             </div>
-                            <p className="actionheading">Delete</p>
+                            <p className="actionheading">{t("Delete")}</p>
                           </div>
                         </div>
                       </div>
@@ -674,7 +822,7 @@ function Screen() {
                     }`} // Add disabled-btn class when the condition is met
                     disabled={usedTickets !== totalTickets} // Button disabled until condition is met
                   >
-                    Checkout
+                    {t("Checkout")}
                   </button>
                 </div>
               </div>
@@ -700,7 +848,7 @@ function Screen() {
                     onClick={close}
                   >
                     <img
-                      src={`${process.env.PUBLIC_URL}/images/cross_icon.png`}
+                      src={`${process.env.PUBLIC_URL}/image/cross_icon.png`}
                       // src="images/cross_icon.png"
                       alt="Close"
                     />

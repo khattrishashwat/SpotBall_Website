@@ -6,9 +6,12 @@ import ChangePassword from "./ChangePassword";
 import PastPayment from "./PastPayment";
 import axios from "axios";
 import Swal from "sweetalert2";
+import { useTranslation } from "react-i18next";
 
 function Profile() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { t } = useTranslation();
 
   const [activeTab, setActiveTab] = useState("update_profile");
   const [isDeactivate, setIsDeactivate] = useState(false);
@@ -29,6 +32,11 @@ function Profile() {
     setActiveTab(tabId);
     resetForm(tabId); // Reset form when tab is changed
   };
+  useEffect(() => {
+    if (location.state?.activeTab) {
+      setActiveTab(location.state.activeTab);
+    }
+  }, [location.state]);
 
   useEffect(() => {
     resetForm(activeTab); // Reset on initial load or tab change
@@ -56,73 +64,70 @@ function Profile() {
 
   const fetchDeactive = async () => {
     const token = localStorage.getItem("Web-token");
+    const lang = localStorage.getItem("selectedLanguage");
     try {
       setIsLoading(true);
       const response = await axios.get(`app/profile/active-inactive`, {
         headers: {
           Authorization: `Bearer ${token}`,
+          "Accept-Language": lang,
         },
       });
 
-      if (response) {
-        // Clear token and navigate to homepage
-        localStorage.removeItem("Web-token");
+      if (response.status === 200) {
         Swal.fire({
-          title: response.data.message,
+          icon: "success",
+          title: "Your account has been succe  ssfully deactivated",
           confirmButtonText: "OK",
-          allowOutsideClick: false,
         }).then(() => {
           navigate("/");
-        });
-      } else {
-        Swal.fire({
-          title: response.data.message,
-          confirmButtonText: "OK",
-          allowOutsideClick: false,
+          localStorage.removeItem("Web-token");
         });
       }
     } catch (error) {
+      console.error("Error:", error);
       Swal.fire({
-        text: error.response ? error.response.data.message : error.message,
+        icon: "error",
+        title: "Account Deactivation Failed",
+        text: error.response?.data?.message,
         confirmButtonText: "OK",
-        allowOutsideClick: false,
       });
     } finally {
       setIsLoading(false);
     }
   };
+
   const fetchDelete = async () => {
     const token = localStorage.getItem("Web-token");
+    const lang = localStorage.getItem("selectedLanguage");
+
     try {
       setIsLoading(true);
       const response = await axios.get(`app/profile/delete-account`, {
         headers: {
           Authorization: `Bearer ${token}`,
+          "Accept-Language": lang,
         },
       });
 
-      if (response) {
-        // Clear token and navigate to homepage
-        localStorage.removeItem("Web-token");
+      if (response.status === 200) {
         Swal.fire({
-          title: response.data.message,
+          title: "Your account has been deleted successfully.",
+          text: "To reactivate, please contact support at support.in@spotsball.com.",
           confirmButtonText: "OK",
           allowOutsideClick: false,
         }).then(() => {
-          window.location.reload();
-        });
-      } else {
-        Swal.fire({
-          title: response.data.message,
-          confirmButtonText: "OK",
-          allowOutsideClick: false,
+          navigate("/");
+          localStorage.removeItem("Web-token");
         });
       }
     } catch (error) {
+      console.error("Error deleting account:", error);
       Swal.fire({
-        text: error.response ? error.response.data.message : error.message,
+        icon: "error",
+        title: "Account Deletion Failed",
+        text: error.response?.data?.message,
         confirmButtonText: "OK",
-        allowOutsideClick: false,
       });
     } finally {
       setIsLoading(false);
@@ -165,7 +170,7 @@ function Profile() {
               <div className="row rowmainheading_inner">
                 <div className="col-md-12 colmainheading_innerpages">
                   <div className="pageheading_main page_myaccountdiv">
-                    <h2 className="myaccounheading">My Account</h2>
+                    <h2 className="myaccounheading">{t("My Account")}</h2>
                   </div>
                 </div>
               </div>
@@ -173,7 +178,7 @@ function Profile() {
             <div className="container contrighttabbingpage">
               <div className="col-md-10 offset-md-1">
                 <div className="row rowtabbingpage">
-                  <div className="col-md-4 coltabbingdiv">
+                  <div className="col-lg-4 coltabbingdiv">
                     <div className="navtabdiv">
                       <ul className="nav nav-tabs">
                         <li className="nav-item">
@@ -186,10 +191,12 @@ function Profile() {
                             <div className="tabbingiconbgdiv">
                               {" "}
                               <img
-                                src={`${process.env.PUBLIC_URL}/images/profile_icon.png`}
+                                src={`${process.env.PUBLIC_URL}/image/profile_icon.png`}
                               />{" "}
                             </div>
-                            <span className="navlinkname">Update Profile</span>{" "}
+                            <span className="navlinkname">
+                              {t("Update Profile")}
+                            </span>{" "}
                           </a>
                         </li>
                         <li className="nav-item">
@@ -202,10 +209,12 @@ function Profile() {
                             <div className="tabbingiconbgdiv">
                               {" "}
                               <img
-                                src={`${process.env.PUBLIC_URL}/images/change_pass_icon.png`}
+                                src={`${process.env.PUBLIC_URL}/image/change_pass_icon.png`}
                               />{" "}
                             </div>
-                            <span className="navlinkname">Change Password</span>
+                            <span className="navlinkname">
+                              {t("Change Password")}
+                            </span>
                           </a>
                         </li>
                         <li className="nav-item">
@@ -218,10 +227,12 @@ function Profile() {
                             <div className="tabbingiconbgdiv">
                               {" "}
                               <img
-                                src={`${process.env.PUBLIC_URL}/images/payment_icon.png`}
+                                src={`${process.env.PUBLIC_URL}/image/payment_icon.png`}
                               />{" "}
                             </div>
-                            <span className="navlinkname">Past Payments</span>
+                            <span className="navlinkname">
+                              {t("Past Payments")}
+                            </span>
                           </a>
                         </li>
                         <li className="nav-item">
@@ -234,11 +245,11 @@ function Profile() {
                             <div className="tabbingiconbgdiv">
                               {" "}
                               <img
-                                src={`${process.env.PUBLIC_URL}/images/deactivate_acc_icon.png`}
+                                src={`${process.env.PUBLIC_URL}/image/deactivate_acc_icon.png`}
                               />{" "}
                             </div>
                             <span className="navlinkname">
-                              Deactivate Account
+                              {t("Deactivate Account")}
                             </span>
                           </a>
                         </li>
@@ -252,10 +263,12 @@ function Profile() {
                             <div className="tabbingiconbgdiv">
                               {" "}
                               <img
-                                src={`${process.env.PUBLIC_URL}/images/delete_acc_icon.png`}
+                                src={`${process.env.PUBLIC_URL}/image/delete_acc_icon.png`}
                               />{" "}
                             </div>
-                            <span className="navlinkname">Delete Account</span>
+                            <span className="navlinkname">
+                              {t("Delete Account")}
+                            </span>
                           </a>
                         </li>
                         <li className="nav-item">
@@ -268,16 +281,16 @@ function Profile() {
                             <div className="tabbingiconbgdiv">
                               {" "}
                               <img
-                                src={`${process.env.PUBLIC_URL}/images/logout_icon.png`}
+                                src={`${process.env.PUBLIC_URL}/image/logout_icon.png`}
                               />{" "}
                             </div>
-                            <span className="navlinkname">Logout</span>
+                            <span className="navlinkname">{t("Logout")}</span>
                           </a>
                         </li>
                       </ul>
                     </div>
                   </div>
-                  <div className="col-md-8 coltabdata_righttext">
+                  <div className="col-lg-8 coltabdata_righttext">
                     <div className="tabingrighttextdiv checkoutcards_section">
                       <div className="tab-content">
                         <div
@@ -327,7 +340,7 @@ function Profile() {
         id="deactivate_account_modal"
         role="dialog"
         style={{
-          paddingRight: isDeactivate ? 17 : "",
+          // paddingRight: isDeactivate ? 17 : "",
           display: isDeactivate ? "block" : "none",
           backgroundColor: isDeactivate ? "#303030a3" : "",
         }}
@@ -342,22 +355,28 @@ function Profile() {
               onClick={DeccloseModal}
             >
               <img
-                src={`${process.env.PUBLIC_URL}/images/cross_icon.png`}
+                src={`${process.env.PUBLIC_URL}/image/cross_icon.png`}
                 alt="close"
               />
             </button>
             <div className="modal-body mdlbdy_delete_account">
               <div className="deleteacc_text_data">
-                <h2>Deactivate Account</h2>
+                <h2>{t("Deactivate Account")}</h2>
                 <p>
-                  You choose to temporarily OptOut from Playing SpotsBall, we
-                  put your account in a suspended state. When/if you want to
-                  reactivate, you can send an email to{" "}
+                  {t(
+                    "You choose to temporarily OptOut from Playing SpotsBall, we"
+                  )}
+                  {t(
+                    "put your account in a suspended state. When/if you want to"
+                  )}
+                  {t("reactivate, you can send an email to")}{" "}
                   <span className="support-email">
                     {" "}
-                    support.in@spotsball.com
+                    {t("support.in@spotsball.com")}
                   </span>
-                  , and will receive reset instructions for your password.
+                  {t(
+                    ", and will receive reset instructions for your password."
+                  )}
                 </p>
               </div>
             </div>
@@ -369,7 +388,7 @@ function Profile() {
                   data-dismiss="modal"
                   onClick={DeccloseModal}
                 >
-                  Cancel
+                  {t("Cancel")}
                 </button>
               </div>
               <div className="actionbtn_delete">
@@ -378,7 +397,7 @@ function Profile() {
                   className="delete_btn_delete actionbtnmain"
                   onClick={fetchDeactive}
                 >
-                  Deactivate
+                  {t("Deactivate")}
                 </button>
               </div>
             </div>
@@ -390,7 +409,7 @@ function Profile() {
         className={`modal fade deleteacc_mainpopup_mdl ${isDel ? "show" : ""}`}
         id="delete_account_modal"
         style={{
-          paddingRight: isDel ? 17 : "",
+          // paddingRight: isDel ? 17 : "",
           display: isDel ? "block" : "none",
           backgroundColor: isDel ? "#303030a3" : "",
         }}
@@ -406,19 +425,22 @@ function Profile() {
             >
               {" "}
               <img
-                src={`${process.env.PUBLIC_URL}/images/cross_icon.png`}
-                // src="images/cross_icon.png"
+                src={`${process.env.PUBLIC_URL}/image/cross_icon.png`}
+                // src="image/cross_icon.png"
               />{" "}
             </button>
             <div className="modal-body mdlbdy_delete_account">
               <div className="deleteacc_text_data">
-                <h2>Delete Account</h2>
+                <h2>{t("Delete Account")}</h2>
                 <p>
-                  If you delete or terminate your access to the SpotsBall app or
-                  website, your ID and passwords will no longer work. To rejoin,
-                  you'll need to sign up as a new user. However, for legacy,
-                  archiving, and audit purposes, your profile and data will be
-                  retained for up to 180 days from the date of deletion.
+                  {t(
+                    "You chose to temporarily opt out of playing SpotsBall, so we"
+                  )}
+                  {t("have put your account in deleted state. If you wish to")}
+                  {t(
+                    "reactivate your deleted account, you can send an email to"
+                  )}
+                  {t("support.in@spotsball.com.")}
                 </p>
               </div>
             </div>
@@ -430,7 +452,7 @@ function Profile() {
                   data-dismiss="modal"
                   onClick={DeleteCloseModal}
                 >
-                  Cancel
+                  {t("Cancel")}
                 </button>
               </div>
               <div className="actionbtn_delete">
@@ -439,7 +461,7 @@ function Profile() {
                   className="delete_btn_delete actionbtnmain"
                   onClick={fetchDelete}
                 >
-                  Delete
+                  {t("Delete")}
                 </button>
               </div>
             </div>
@@ -457,6 +479,7 @@ function Profile() {
           paddingRight: isLogout ? 17 : "",
           display: isLogout ? "block" : "none",
           backgroundColor: isLogout ? "#303030a3" : "",
+          width: "105%",
         }}
         aria-modal="true"
       >
@@ -468,14 +491,14 @@ function Profile() {
               onClick={CloseLogout}
             >
               <img
-                src={`${process.env.PUBLIC_URL}/images/cross_icon.png`}
+                src={`${process.env.PUBLIC_URL}/image/cross_icon.png`}
                 alt="Close"
               />
             </button>
             <div className="modal-body mdlbdy_delete_account logoutaccount_divmain">
               <div className="deleteacc_text_data logoutdatamain">
-                <h2>Logout</h2>
-                <p>Are you sure you want to logout?</p>
+                <h2>{t("Logout")}</h2>
+                <p>{t("Are you sure you want to logout?")}</p>
               </div>
             </div>
             <div className="mdlftr_delete_acc_actionbtn">
@@ -485,7 +508,7 @@ function Profile() {
                   className="cncle_btn_delete actionbtnmain"
                   onClick={CloseLogout}
                 >
-                  Cancel
+                  {t("Cancel")}
                 </button>
               </div>
               <div className="actionbtn_delete">
@@ -494,7 +517,7 @@ function Profile() {
                   className="delete_btn_delete actionbtnmain"
                   onClick={Logout}
                 >
-                  Logout
+                  {t("Logout")}
                 </button>
               </div>
             </div>

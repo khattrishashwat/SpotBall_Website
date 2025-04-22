@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
+import { useTranslation } from "react-i18next";
 
 function PastPayment() {
   const [payments, setPayments] = useState([]);
   const [dropdownStates, setDropdownStates] = useState({});
+  const [loading, setLoading] = useState(true); // Added loading state
+  const { t } = useTranslation();
 
   const toggleDropdown = (id) => {
     setDropdownStates((prevState) => ({
@@ -15,11 +18,14 @@ function PastPayment() {
 
   useEffect(() => {
     const fetchPayments = async () => {
+      setLoading(true); // Start loading
       const token = localStorage.getItem("Web-token");
+      const lang = localStorage.getItem("selectedLanguage");
 
       try {
         const response = await axios.get("app/payments/get-contest-payments", {
           headers: { Authorization: `Bearer ${token}` },
+          "Accept-Language": lang,
         });
 
         setPayments(response.data.data || []);
@@ -32,6 +38,8 @@ function PastPayment() {
           confirmButtonText: "OK",
           allowOutsideClick: false,
         });
+      } finally {
+        setLoading(false); // Stop loading
       }
     };
 
@@ -41,12 +49,13 @@ function PastPayment() {
   const handleDownload = async (e, paymentId) => {
     e.preventDefault();
     const token = localStorage.getItem("Web-token");
+    const lang = localStorage.getItem("selectedLanguage");
 
     try {
       const response = await axios.get(`app/payments/get-bill/${paymentId}`, {
         headers: { Authorization: `Bearer ${token}` },
+        "Accept-Language": lang,
       });
-      console.log("pdf", response.data.data.pdf);
       const pdfUrl = response.data.data.pdf;
       if (pdfUrl) {
         window.open(pdfUrl, "_blank");
@@ -61,13 +70,20 @@ function PastPayment() {
   return (
     <div className="payment_methoddiv pastpay_detailmaindiv_new">
       <div className="cartwithcordinatetables">
-        {payments.length > 0 ? (
+        {loading ? (
+          // <h2 style={{ color: "white" }}>Loading...<
+          // /h2>
+          <img
+            src={`${process.env.PUBLIC_URL}/images/LoaderGif.gif`}
+            alt="Loader"
+          />
+        ) : payments.length > 0 ? (
           payments.map((payment) => (
             <div key={payment._id} className="cartstripe pastpaydetail_maindiv">
               <div className="checkout_cartdiv">
                 <div className="cart_jackpotdetails">
                   <div className="cart_windiv">
-                    Win{" "}
+                    {t("Win")}{" "}
                     <span className="winprice_cart">
                       ₹
                       {Number(
@@ -81,48 +97,79 @@ function PastPayment() {
                       {Number(
                         payment?.contestId?.jackpot_price
                       ).toLocaleString()}{" "}
-                      Jackpot
+                      {t("Grand Prize")}
                     </h3>
                     <span>
-                      {new Date(payment?.createdAt).toLocaleDateString()}
+                      {new Date(payment?.createdAt)
+                        .toLocaleString("en-GB", {
+                          weekday: "short",
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          hour12: true,
+                        })
+                        .replace(",", "")}
                     </span>
-                    <h4>{payment?.tickets} Tickets</h4>
+                    <h4>
+                      {payment?.tickets} {t("Tickets")}
+                    </h4>
                   </div>
                 </div>
                 <div className="cart_gametotalprice pastpay_right">
                   <div className="pastpay_invoicediv">
                     <a
                       className="downloadinvoice_hreftag"
-                      onClick={(e) => handleDownload(e, payment._id)}
+                      onClick={(e) => handleDownload(e, payment?.paymentId)}
                     >
                       <img
-                        src={`${process.env.PUBLIC_URL}/images/download_invoice.png`}
+                        src={`${process.env.PUBLIC_URL}/image/download_invoice.png`}
                         alt="Download Invoice"
                         style={{ cursor: "pointer" }}
                       />
-                      <p>Download Invoice</p>
+                      <p>{t("Download Invoice")}</p>
                     </a>
                   </div>
-                  <p>Txn. Id.: {payment?.paymentId}</p>
+                  <p>
+                    {t("Txn. Id.")}: {payment?.paymentId}
+                  </p>
                   <h3>₹{payment?.amount?.toFixed(2)}</h3>
-
-                  <div className="pastpay_dropdownicon">
-                    <button
-                      type="button"
-                      className="dropbtn_pastpy"
-                      onClick={() => toggleDropdown(payment._id)}
+                </div>
+              </div>
+              <div className="transaction-sec d-flex justify-content-between">
+                <div className="payment-option">
+                  <h4>
+                    {t("Transaction Status")}:{" "}
+                    <span
+                      className={`text-${
+                        payment?.transaction_status === "SUCCESS"
+                          ? "success"
+                          : payment?.transaction_status === "Pending"
+                          ? "warning"
+                          : "danger"
+                      }`}
                     >
-                      <img
-                        src={`${process.env.PUBLIC_URL}/images/arrow_icon_payment.png`}
-                        className={
-                          dropdownStates[payment._id]
-                            ? ""
-                            : "rotate_pastpayicon"
-                        }
-                        alt="Toggle"
-                      />
-                    </button>
-                  </div>
+                      {payment?.transaction_status
+                        ? payment?.transaction_status.toLowerCase()
+                        : "cancelled"}
+                    </span>
+                  </h4>
+                </div>
+                <div className="pastpay_dropdownicon">
+                  <button
+                    type="button"
+                    className="dropbtn_pastpy"
+                    onClick={() => toggleDropdown(payment._id)}
+                  >
+                    <img
+                      src={`${process.env.PUBLIC_URL}/image/arrow_icon_payment.png`}
+                      className={
+                        dropdownStates[payment._id] ? "" : "rotate_pastpayicon"
+                      }
+                      alt="Toggle"
+                    />
+                  </button>
                 </div>
               </div>
               {dropdownStates[payment._id] && (
@@ -130,9 +177,9 @@ function PastPayment() {
                   <table className="table table-bordered cordtable_new">
                     <thead>
                       <tr>
-                        <th>Tickets</th>
-                        <th>X- Coordinates</th>
-                        <th>Y- Coordinates</th>
+                        <th>{t("Tickets")}</th>
+                        <th>{t("X- Coordinates")}</th>
+                        <th>{t("Y- Coordinates")}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -150,7 +197,7 @@ function PastPayment() {
             </div>
           ))
         ) : (
-          <h2 style={{ color: "white" }}>No Payment History Found!</h2>
+          <h2 style={{ color: "white" }}>{t("No Payment History Found!")}</h2>
         )}
       </div>
     </div>

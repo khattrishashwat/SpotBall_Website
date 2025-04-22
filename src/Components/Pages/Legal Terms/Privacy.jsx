@@ -2,28 +2,32 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import Loader from "../../Loader/Loader";
+import { useTranslation } from "react-i18next";
 
 function Privacy() {
-    const [isPrivacy, setIsPrivacy] = useState('');
-  const [isLoading, setIsLoading] = useState("");
+  const [isPrivacy, setIsPrivacy] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const { t } = useTranslation();
 
   const fetchCondition = async () => {
     const token = localStorage.getItem("Web-token");
-    try {
-      setIsLoading(true);
-
+           const lang = localStorage.getItem("selectedLanguage");
+ try {
       const response = await axios.get(
         "app/static-content/get-all-static-content/privacy_policy",
         {
           headers: {
             Authorization: `Bearer ${token}`,
+            "Accept-Language": lang,
           },
         }
       );
-      setIsPrivacy(response.data.data[0]?.description);
-      // console.log("ye",response.data.data);
+      setIsPrivacy(
+        response.data.data[0]?.description || "No content available"
+      ); // Fallback if no data
     } catch (error) {
-      console.error("Error data:", error);
+      console.error("Error fetching data:", error);
+      setIsPrivacy("Failed to load privacy policy.");
     } finally {
       setIsLoading(false);
     }
@@ -40,7 +44,7 @@ function Privacy() {
           <div className="row rowmainheading_inner">
             <div className="col-md-12 colmainheading_innerpages">
               <div className="pageheading_main">
-                <h2>Privacy Policies</h2>
+                <h2>{t("Privacy Policies")}</h2>
               </div>
             </div>
           </div>
@@ -52,57 +56,50 @@ function Privacy() {
                 <ul className="nav nav-tabs">
                   <li className="nav-item">
                     <Link to="/terms" className="nav-link" data-toggle="tab">
-                      {" "}
                       <div className="tabbingiconbgdiv">
-                        {" "}
                         <img
-                          src={`${process.env.PUBLIC_URL}/images/legal_terms_icons.png`}
+                          src={`${process.env.PUBLIC_URL}/image/legal_terms_icons.png`}
                           alt="Terms"
-                        />{" "}
-                      </div>{" "}
-                      <span className="navlinkname">Terms & Conditions</span>{" "}
+                        />
+                      </div>
+                      <span className="navlinkname">{t("Terms & Conditions")}</span>
                     </Link>
                   </li>
                   <li className="nav-item">
                     <Link
                       to="/privacy"
-                      className="nav-link  active"
+                      className="nav-link active"
                       data-toggle="tab"
                     >
                       <div className="tabbingiconbgdiv">
-                        {" "}
                         <img
-                          src={`${process.env.PUBLIC_URL}/images/legal_terms_icons.png`}
+                          src={`${process.env.PUBLIC_URL}/image/legal_terms_icons.png`}
                           alt="Privacy"
-                        />{" "}
+                        />
                       </div>
-                      <span className="navlinkname">Privacy Policies</span>
+                      <span className="navlinkname">{t("Privacy Policies")}</span>
                     </Link>
                   </li>
                   <li className="nav-item">
                     <Link to="/rules" className="nav-link" data-toggle="tab">
                       <div className="tabbingiconbgdiv">
-                        {" "}
                         <img
-                          src={`${process.env.PUBLIC_URL}/images/legal_terms_icons.png`}
+                          src={`${process.env.PUBLIC_URL}/image/legal_terms_icons.png`}
                           alt="Rules"
-                        />{" "}
+                        />
                       </div>
-                      <span className="navlinkname">
-                        Rules of Play &amp; FAQs
-                      </span>
+                      <span className="navlinkname">{t("Rules of Play & FAQs")}</span>
                     </Link>
                   </li>
                   <li className="nav-item">
                     <Link to="/cookies" className="nav-link" data-toggle="tab">
                       <div className="tabbingiconbgdiv">
-                        {" "}
                         <img
-                          src={`${process.env.PUBLIC_URL}/images/legal_terms_icons.png`}
+                          src={`${process.env.PUBLIC_URL}/image/legal_terms_icons.png`}
                           alt="Cookies"
-                        />{" "}
-                      </div>{" "}
-                      <span className="navlinkname">Cookie Policy</span>
+                        />
+                      </div>
+                      <span className="navlinkname">{t("Cookie Policy")}</span>
                     </Link>
                   </li>
                 </ul>
@@ -113,21 +110,14 @@ function Privacy() {
                 <div className="tab-content">
                   <div id="pricvacypolicy" className="tab-pane active">
                     <div className="legaltermsdata_div">
-                          <div
-                            dangerouslySetInnerHTML={{ __html: isPrivacy }}
-                          />
-                      {/* <div className="innerlegal_heaidngwithpara">
-                    
-
-                          {/* {isLoading ? (
-                            <Loader /> // Correctly render the Loader component
-                          ) : (
-                            <div
-                              dangerouslySetInnerHTML={{ __html: isPrivacy }}
-                            />
-                          )} */}
-                        
-                      {/* </div> */}
+                      {isLoading ? (
+                        <Loader />
+                      ) : (
+                        <div
+                          className="innerlegal_heaidngwithpara"
+                          dangerouslySetInnerHTML={{ __html: isPrivacy }}
+                        />
+                      )}
                     </div>
                   </div>
                 </div>

@@ -1,6 +1,10 @@
-import React from 'react'
+import React from "react";
+import { useTranslation } from "react-i18next";
 
 const GameUnavailablePopup = ({ onOk }) => {
+
+    const { t } = useTranslation();
+
   return (
     <div
       className="geolocationmaindiv gameunavailable_popup"
@@ -10,16 +14,15 @@ const GameUnavailablePopup = ({ onOk }) => {
         <div className="locationwantsdiv">
           <div className="locationicondiv">
             <img
-              src={`${process.env.PUBLIC_URL}/images/unvailable_icon.png`}
+              src={`${process.env.PUBLIC_URL}/image/unvailable_icon.png`}
               // src="images/unvailable_icon.png"
               alt="Unavailable Icon"
             />
           </div>
           <div className="locationtextwithheading">
-            <h2>Game Unavailable in Your Region</h2>
+            <h2>{t("Game Unavailable in Your Region")}</h2>
             <p>
-              Sorry, SpotsBall is not available in your current location due to
-              local regulations.
+              {t("Sorry, SpotsBall is not available in your current location due to local regulations.")}
             </p>
           </div>
           <div className="locationactionbtndiv">
@@ -29,7 +32,7 @@ const GameUnavailablePopup = ({ onOk }) => {
                 className="okbtn_gameunavail"
                 onClick={onOk}
               >
-                OK
+                {t("OK")}
               </button>
             </div>
           </div>
@@ -39,4 +42,4 @@ const GameUnavailablePopup = ({ onOk }) => {
   );
 };
 
-export default GameUnavailablePopup
+export default GameUnavailablePopup;
