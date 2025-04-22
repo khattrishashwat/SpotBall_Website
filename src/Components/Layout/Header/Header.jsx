@@ -325,7 +325,7 @@ function Header() {
 
         <nav className="navbar navbar-static-top navbar-expand-xl header3">
           <div className="container main-header position-relative">
-            {/* <div className="dropdown mobile" tabIndex={0}>
+            <div className="dropdown mobile" tabIndex={0}>
               <button
                 id="dropdown-btn"
                 onClick={() => setIslangOpen((prev) => !prev)}
@@ -350,7 +350,7 @@ function Header() {
                     })}
                 </ul>
               )}
-            </div> */}
+            </div>
             <Link to="/" className="navbar-brand d-flex d-xl-none">
               <img
                 className="logo img-fluid"
@@ -365,7 +365,7 @@ function Header() {
                 alt="logo"
               />
             </Link>
-            {/* <div className="dropdown dekstop-none" tabIndex={0}>
+            <div className="dropdown dekstop-none" tabIndex={0}>
               <button
                 id="dropdown-btn"
                 onClick={() => setIslangOpen(!islangOpen)}
@@ -393,7 +393,7 @@ function Header() {
                     })}
                 </ul>
               )}
-            </div> */}
+            </div>
 
             <div className="navbar-collapse collapse">
               <ul className="nav navbar-nav">
