@@ -53,25 +53,20 @@ function Header() {
   const updateProfile = async () => {
     try {
       const token = localStorage.getItem("Web-token");
-      const formData = new FormData();
       const lang = localStorage.getItem("selectedLanguage");
-
-      // if you need to send the selected language, you can do:
-      formData.append("language", localStorage.getItem("selectedLanguage"));
 
       const response = await axios.post(
         `app/profile/update-profile`,
-        formData,
+        { language: lang },
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
             "Accept-Language": lang,
           },
         }
       );
 
-      console.log("Profile updated successfully");
+      console.log("Profile updated successfully", response.data);
     } catch (error) {
       const errorMessage =
         error.response?.data?.message || "Failed to update profile";
@@ -123,9 +118,9 @@ function Header() {
       });
 
       setProfile(response.data.data);
-      console.log("nlasna", response.data.data.language);
+      // console.log("nlasna", response.data.data.language);
 
-      localStorage.setItem("new", response.data.data.language);
+      localStorage.setItem("selectedLanguage", response.data.data.language);
     } catch (error) {
       console.error("Error fetching profile:", error);
     }
@@ -330,7 +325,7 @@ function Header() {
 
         <nav className="navbar navbar-static-top navbar-expand-xl header3">
           <div className="container main-header position-relative">
-            <div className="dropdown mobile" tabIndex={0}>
+            {/* <div className="dropdown mobile" tabIndex={0}>
               <button
                 id="dropdown-btn"
                 onClick={() => setIslangOpen((prev) => !prev)}
@@ -355,7 +350,7 @@ function Header() {
                     })}
                 </ul>
               )}
-            </div>
+            </div> */}
             <Link to="/" className="navbar-brand d-flex d-xl-none">
               <img
                 className="logo img-fluid"
@@ -370,7 +365,7 @@ function Header() {
                 alt="logo"
               />
             </Link>
-            <div className="dropdown dekstop-none" tabIndex={0}>
+            {/* <div className="dropdown dekstop-none" tabIndex={0}>
               <button
                 id="dropdown-btn"
                 onClick={() => setIslangOpen(!islangOpen)}
@@ -398,7 +393,7 @@ function Header() {
                     })}
                 </ul>
               )}
-            </div>
+            </div> */}
 
             <div className="navbar-collapse collapse">
               <ul className="nav navbar-nav">
@@ -528,7 +523,7 @@ function Header() {
                         {profile?.is_verified_user && (
                           <div className="userverifyimg">
                             <img
-                              src={`${process.env.PUBLIC_URL}//image/verify.png`}
+                              src={`${process.env.PUBLIC_URL}/image/verify.png`}
                               alt="Verified User"
                             />
                           </div>

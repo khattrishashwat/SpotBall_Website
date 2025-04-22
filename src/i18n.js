@@ -99,7 +99,7 @@ i18n
           "Privacy Policy": "Privacy Policy",
           "Cookie Policy": "Cookie Policy",
           FAQs: "FAQs",
-          "Rules Of Play": "Rules Of Play",
+          "Rules of Play": "Rules of Play",
           "No data available on selected filter":
             "No data available on selected filter",
           "Select Month": "Select Month",

@@ -392,7 +392,7 @@ function Checkout() {
     try {
       const token = localStorage.getItem("Web-token");
       const order_amount = totalBeforeDiscount.toFixed(2);
-        const lang = localStorage.getItem("selectedLanguage");
+      const lang = localStorage.getItem("selectedLanguage");
 
       console.log("Total Before Discount:", order_amount);
 
@@ -441,8 +441,8 @@ function Checkout() {
       // ✅ If order_amount > 0, initialize Cashfree SDK
       let cashfree;
       try {
-        cashfree = await load({ mode: "sandbox" });
-        // cashfree = await load({ mode: "production" });
+        // cashfree = await load({ mode: "sandbox" });
+        cashfree = await load({ mode: "production" });
         console.log("Cashfree SDK initialized successfully.");
       } catch (sdkError) {
         console.error("SDK Initialization Error:", sdkError);
