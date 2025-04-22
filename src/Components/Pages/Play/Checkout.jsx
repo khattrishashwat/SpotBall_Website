@@ -57,9 +57,9 @@ function Checkout() {
         setAlertShown(true);
 
         Swal.fire({
-          icon: "info",
-          text: "No game has been played yet.",
-          confirmButtonText: "OK",
+          icon: t("info"),
+          text: t("No game has been played yet."),
+          confirmButtonText: t("OK"),
           allowOutsideClick: false,
         }).then((result) => {
           if (result.isConfirmed) navigate("/");
@@ -134,7 +134,6 @@ function Checkout() {
       setPromoCodes(promocodes || []);
     } catch (error) {
       console.error(
-        "Error fetching cart data:",
         error.response?.data?.message || error.message
       );
     }
@@ -183,16 +182,16 @@ function Checkout() {
   const handleApplyPromoCode = async () => {
     if (!promoCode.trim()) {
       Swal.fire({
-        icon: "warning",
-        text: "Please enter a promo code before applying.",
+        icon: t("warning"),
+        text: t("Please enter a promo code before applying."),
       });
       return;
     }
 
     if (appliedPromoCode && appliedPromoCode.name === promoCode) {
       Swal.fire({
-        icon: "info",
-        title: "Promo Code Already Applied.",
+        icon: t("info"),
+        title: t("Promo Code Already Applied."),
       });
       return;
     }
@@ -238,20 +237,20 @@ function Checkout() {
         setReloadData((prev) => !prev);
         await fetchData();
         Swal.fire({
-          icon: "success",
-          title: "Promo Code Applied Successfully.",
+          icon: t("success"),
+          title: t("Promo Code Applied Successfully."),
         });
       } catch (error) {
         console.error("API Error:", error);
         Swal.fire({
-          icon: "error",
-          title: "Failed to Apply Promo Code.",
+          icon: t("error"),
+          title: t("Failed to Apply Promo Code."),
         });
       }
     } else {
       Swal.fire({
-        icon: "error",
-        title: "Invalid Promo Code.",
+        icon: t("error"),
+        title: t("Invalid Promo Code."),
       });
     }
   };
@@ -273,10 +272,6 @@ function Checkout() {
     const discountAmount = !cart.contest_id.promocodeApplied
       ? (cart.totalTicketPrice * discountPercentage) / 100
       : 0;
-
-    console.log("Promo Amount:", PromoAmount);
-    console.log("Promo Discount:", promoDiscountAmount);
-    console.log("Regular Discount:", discountAmount);
 
     const discountedTotalTicketPrice = Math.max(
       cart.totalTicketPrice - promoDiscountAmount - discountAmount,
@@ -310,8 +305,7 @@ function Checkout() {
       parseFloat(discountedSubtotal) + parseFloat(discountedTotalRazorpayFee)
     ).toFixed(2);
 
-    console.log("new pee", discountPercentage);
-    console.log("new ", discountAmount);
+    
     return {
       promoDiscountName,
       PromoAmount,
@@ -334,12 +328,12 @@ function Checkout() {
     const lang = localStorage.getItem("selectedLanguage");
 
     Swal.fire({
-      title: "Are you sure?",
-      text: "Do you really want to delete this item?",
-      icon: "warning",
+      title: t("Are you sure?"),
+      text: t("Do you really want to delete this item?"),
+      icon: t("warning"),
       showCancelButton: true,
-      confirmButtonText: "Yes, delete it!",
-      cancelButtonText: "No, keep it",
+      confirmButtonText: t("Yes, delete it!"),
+      cancelButtonText: t("No, keep it"),
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
@@ -363,7 +357,7 @@ function Checkout() {
 
           // Handle successful response
           Swal.fire({
-            title: "Success!",
+            title: t("Success!"),
             text: response.data.message,
             icon: "success",
             allowOutsideClick: false,
@@ -372,12 +366,11 @@ function Checkout() {
           });
           navigate("/");
 
-          // Optionally, remove the cart from the state
           setCarts((prevCarts) => prevCarts.filter((c) => c._id !== cart._id));
         } catch (error) {
           console.error(error);
           Swal.fire({
-            title: "Error!",
+            title: t("Error!"),
             text: error.response?.data?.message,
             confirmButtonText: "OK",
             allowOutsideClick: false,
@@ -394,7 +387,6 @@ function Checkout() {
       const order_amount = totalBeforeDiscount.toFixed(2);
       const lang = localStorage.getItem("selectedLanguage");
 
-      console.log("Total Before Discount:", order_amount);
 
       // Step 1: Call Money API to get paymentSessionId
       const response = await axios.post(
@@ -414,9 +406,9 @@ function Checkout() {
       if (!paymentOrderId) {
         console.error("Error: Payment order ID is missing.");
         Swal.fire({
-          icon: "error",
-          title: "Payment Error",
-          text: "Payment order ID is missing. Please try again.",
+          icon: t("error"),
+          title: t("Payment Error"),
+          text: t("Payment order ID is missing. Please try again."),
         });
         return;
       }
@@ -429,9 +421,9 @@ function Checkout() {
       if (parseFloat(order_amount) === 0) {
         console.log("Order amount is zero, skipping Cashfree payment.");
         Swal.fire({
-          icon: "success",
-          title: "Payment Successful",
-          text: "Your order has been placed successfully.",
+          icon: t("success"),
+          title: t("Payment Successful"),
+          text: t("Your order has been placed successfully."),
         }).then(() => {
           navigate("/"); // Navigate to home
         });

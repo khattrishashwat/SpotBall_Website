@@ -59,7 +59,7 @@ function Screen() {
 
   const fetchVideoData = async () => {
     const token = localStorage.getItem("Web-token");
-            const lang = localStorage.getItem("selectedLanguage");
+    const lang = localStorage.getItem("selectedLanguage");
 
     try {
       const response = await axios.get("app/how-to-play/get-how-to-play", {
@@ -125,13 +125,15 @@ function Screen() {
       });
     } else {
       Swal.fire({
-        icon: "warning",
-        title: "Maximum ticket limit reached",
+        icon: t("warning"),
+        title: t("Maximum ticket limit reached"),
         text:
           leftticket === 0
-            ? "There are no tickets left to add."
-            : `You can only purchase a maximum of ${responseData.maxTickets} tickets per person, but you have already bought ${choosedTicket} tickets. You have only (${leftticket}) ticket left to purchase.`,
-        confirmButtonText: "OK",
+            ? t("There are no tickets left to add.")
+            : t(
+                `You can only purchase a maximum of ${responseData.maxTickets} tickets per person, but you have already bought ${choosedTicket} tickets. You have only (${leftticket}) ticket left to purchase.`
+              ),
+        confirmButtonText: t("OK"),
         allowOutsideClick: false,
       });
     }
@@ -157,21 +159,20 @@ function Screen() {
         yCord: "____",
       };
 
-      // Add the new ticket
       setTickets((prev) => [...prev, newTicket]);
 
-      // Increment usedTickets and totalTickets
-      setUsedTickets((prev) => prev + 1); // Increment usedTickets
-      setTotalTickets((prev) => prev + 1); // Update totalTickets
+      setUsedTickets((prev) => prev + 1);
+      setTotalTickets((prev) => prev + 1);
     } else {
-      // Show a message if the maximum limit is reached or no tickets left
       Swal.fire({
-        icon: "warning",
+        icon: t("warning"),
         title: "Cannot add more tickets",
         text:
           leftticket === 0
-            ? "There are no tickets left to add."
-            : `You can only purchase a maximum of ${responseData.maxTickets} tickets per person, but you have already bought  ${choosedTicket} tickets.You have only (${leftticket})  ticket left to purchase`,
+            ? t("There are no tickets left to add.")
+            : t(
+                `You can only purchase a maximum of ${responseData.maxTickets} tickets per person, but you have already bought  ${choosedTicket} tickets.You have only (${leftticket})  ticket left to purchase`
+              ),
         confirmButtonText: "OK",
         allowOutsideClick: false,
       });
@@ -194,19 +195,19 @@ function Screen() {
     const ticketToDelete = tickets.find((ticket) => ticket.id === id);
 
     if (!ticketToDelete) {
-      return; 
+      return;
     }
 
     Swal.fire({
-      title: "Are you sure?",
-      text: "Do you want to delete this ticket?",
-      icon: "warning",
+      title: t("Are you sure?"),
+      text: t("Do you want to delete this ticket?"),
+      icon: t("warning"),
       allowOutsideClick: false,
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete it",
-      cancelButtonText: "No, cancel",
+      confirmButtonText: t("Yes, delete it"),
+      cancelButtonText: t("No, cancel"),
     }).then((result) => {
       // debugger
       if (result.isConfirmed) {
@@ -233,18 +234,17 @@ function Screen() {
             )
           );
 
-          setClickCount((prev) => prev - 1); // Decrement click count
-          setUsedTickets((prev) => prev - 1); // Decrement used tickets
+          setClickCount((prev) => prev - 1);
+          setUsedTickets((prev) => prev - 1);
         }
 
-        // Decrement total tickets only if there are any left
         if (totalTickets > 0) {
           setTotalTickets((prev) => prev - 1);
         }
 
-        Swal.fire("Deleted!", "The ticket has been removed.", "success");
+        Swal.fire(t("Deleted!"), t("The ticket has been removed."), "success");
       } else {
-        Swal.fire("Cancelled", "Your ticket is safe.", "error");
+        Swal.fire(t("Cancelled"), t("Your ticket is safe."), "error");
       }
     });
   };
@@ -295,9 +295,21 @@ function Screen() {
           setClickCount((prevClickCount) => prevClickCount - 1);
           setUsedTickets((prevUsedTickets) => prevUsedTickets - 1);
         }
-        Swal.fire("Deleted!", "The Coordinates has been removed.", "success");
+        // Swal.fire("Deleted!", "The Coordinates has been removed.", "success");
+              Swal.fire(
+                t("Deleted!"),
+                t("The Coordinates has been removed."),
+                "success"
+              );
+
       } else {
-        Swal.fire("Cancelled", "Your Coordinates is safe.", "error");
+              Swal.fire(
+                t("Cancelled"),
+                t("Your Coordinates is safe."),
+                "error"
+              );
+
+        // Swal.fire("Cancelled", "Your Coordinates is safe.", "error");
       }
     });
   };
@@ -419,10 +431,10 @@ function Screen() {
     // Check if the user has used all their chances
     if (clickCount >= totalTickets) {
       Swal.fire({
-        icon: "warning",
-        title: "Limit Reached",
-        text: "You've used all your tickets. Click '+' to add more.",
-        confirmButtonText: "OK",
+        icon: t("warning"),
+        title: t("Limit Reached"),
+        text: t("You've used all your tickets. Click '+' to add more."),
+        confirmButtonText: t("OK"),
         allowOutsideClick: false,
       });
       return;
@@ -446,10 +458,10 @@ function Screen() {
 
     if (isDuplicate) {
       Swal.fire({
-        icon: "error",
-        title: "Duplicate Coordinates",
-        text: "You have already played a ticket with these coordinates.",
-        confirmButtonText: "OK",
+        icon: t("error"),
+        title: t("Duplicate Coordinates"),
+        text: t("You have already played a ticket with these coordinates."),
+        confirmButtonText: t("OK"),
         allowOutsideClick: false,
       });
       return;
@@ -457,32 +469,28 @@ function Screen() {
 
     const updatedTickets = [...tickets];
 
-    // Find a ticket with empty coordinates
     const ticketIndex = updatedTickets.findIndex(
       (ticket) => ticket.xCord === "____" && ticket.yCord === "____"
     );
 
     if (ticketIndex !== -1) {
-      // Update the ticket's coordinates
       updatedTickets[ticketIndex] = {
         ...updatedTickets[ticketIndex],
         xCord: x,
         yCord: y,
       };
 
-      // Update state
       setTickets(updatedTickets);
       setClickedPoints((prev) => [...prev, { x, y }]);
-      setClickCount((prev) => prev + 1); // Increment clickCount
+      setClickCount((prev) => prev + 1); 
 
-      // Only now increment usedTickets, since a ticket is now fully filled
       setUsedTickets((prev) => prev + 1);
     } else {
       Swal.fire({
-        icon: "warning",
-        title: "All Tickets Used",
-        text: "All tickets are already filled.",
-        confirmButtonText: "OK",
+        icon: t("warning"),
+        title: t("All Tickets Used"),
+        text: t("All tickets are already filled."),
+        confirmButtonText: t("OK"),
         allowOutsideClick: false,
       });
     }
@@ -507,7 +515,7 @@ function Screen() {
 
     try {
       const token = localStorage.getItem("Web-token");
-              const lang = localStorage.getItem("selectedLanguage");
+      const lang = localStorage.getItem("selectedLanguage");
 
       const response = await axios.post("app/contest/add-to-cart", values, {
         headers: {
