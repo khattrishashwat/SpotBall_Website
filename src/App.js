@@ -18,6 +18,7 @@ import {
 import axios from "axios";
 import { Helmet } from "react-helmet";
 import Swal from "sweetalert2";
+import { LanguageProvider } from "./LanguageContext";
 
 // Import components
 import PageNot from "./Components/PageNot/PageNot";
@@ -100,70 +101,75 @@ const RoutesWithInterceptors = () => {
   useInactivityLogout();
 
   return (
-    <Suspense fallback={<Loader />}>
-      <Routes>
-        {/* Protected Routes */}
-        <Route element={<ProtectedRoute />}>
+    <LanguageProvider>
+      <Suspense fallback={<Loader />}>
+        <Routes>
+          {/* Protected Routes */}
+          <Route element={<ProtectedRoute />}>
+            <Route
+              path="/my_account"
+              element={<WithLayout component={Profile} />}
+            />
+            <Route
+              path="/play_screen"
+              element={<WithLayout component={Screen} />}
+            />
+            <Route path="/cart" element={<WithLayout component={Checkout} />} />
+          </Route>
+
+          {/* Public Routes */}
+          <Route path="/" element={<WithLayout component={Home} />} />
+          {/* <Route path="/home" element={<WithLayout component={Homes} />} /> */}
           <Route
-            path="/my_account"
-            element={<WithLayout component={Profile} />}
+            path="/contact_us"
+            element={<WithLayout component={Contact} />}
+          />
+          <Route path="/terms" element={<WithLayout component={Tearms} />} />
+          <Route path="/privacy" element={<WithLayout component={Privacy} />} />
+          <Route path="/rules" element={<WithLayout component={Rules} />} />
+          <Route path="/cookies" element={<WithLayout component={Cookies} />} />
+          <Route path="/tht" element={<WithLayout component={Tht} />} />
+
+          <Route
+            path="/playss"
+            element={<WithLayout component={PlayVedio} />}
           />
           <Route
-            path="/play_screen"
-            element={<WithLayout component={Screen} />}
+            path="/in_the_press"
+            element={<WithLayout component={Press} />}
           />
-          <Route path="/cart" element={<WithLayout component={Checkout} />} />
-        </Route>
-
-        {/* Public Routes */}
-        <Route path="/" element={<WithLayout component={Home} />} />
-        {/* <Route path="/home" element={<WithLayout component={Homes} />} /> */}
-        <Route
-          path="/contact_us"
-          element={<WithLayout component={Contact} />}
-        />
-        <Route path="/terms" element={<WithLayout component={Tearms} />} />
-        <Route path="/privacy" element={<WithLayout component={Privacy} />} />
-        <Route path="/rules" element={<WithLayout component={Rules} />} />
-        <Route path="/cookies" element={<WithLayout component={Cookies} />} />
-        <Route path="/tht" element={<WithLayout component={Tht} />} />
-
-        <Route path="/playss" element={<WithLayout component={PlayVedio} />} />
-        <Route
-          path="/in_the_press"
-          element={<WithLayout component={Press} />}
-        />
-        <Route
-          path="/press-details/:id/:title"
-          element={<WithLayout component={PressDetails} />}
-        />
-        <Route
-          path="/payments"
-          element={<WithLayout component={SuccessPage} />}
-        />
-        <Route path="/who_we_are" element={<WithLayout component={Are} />} />
-        <Route
-          path="/live_weekly_winner"
-          element={<WithLayout component={Weekly} />}
-        />
-        <Route
-          path="/the_winners_circle"
-          element={<WithLayout component={Circle} />}
-        />
-        <Route
-          path="/my_account_delete"
-          element={<WithLayout component={Delete} />}
-        />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/forgot" element={<Forget />} />
-        <Route path="/otp" element={<OTp />} />
-        <Route path="/otps" element={<Otps />} />
-        <Route path="/createpassword" element={<CreateNewPassword />} />
-        <Route path="/socialsignup" element={<Socialsignup />} />
-        <Route path="*" element={<PageNot />} />
-      </Routes>
-    </Suspense>
+          <Route
+            path="/press-details/:id/:title"
+            element={<WithLayout component={PressDetails} />}
+          />
+          <Route
+            path="/payments"
+            element={<WithLayout component={SuccessPage} />}
+          />
+          <Route path="/who_we_are" element={<WithLayout component={Are} />} />
+          <Route
+            path="/live_weekly_winner"
+            element={<WithLayout component={Weekly} />}
+          />
+          <Route
+            path="/the_winners_circle"
+            element={<WithLayout component={Circle} />}
+          />
+          <Route
+            path="/my_account_delete"
+            element={<WithLayout component={Delete} />}
+          />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/forgot" element={<Forget />} />
+          <Route path="/otp" element={<OTp />} />
+          <Route path="/otps" element={<Otps />} />
+          <Route path="/createpassword" element={<CreateNewPassword />} />
+          <Route path="/socialsignup" element={<Socialsignup />} />
+          <Route path="*" element={<PageNot />} />
+        </Routes>
+      </Suspense>
+    </LanguageProvider>
   );
 };
 

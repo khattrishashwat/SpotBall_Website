@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import LocationSettingPopup from "./LocationSettingPopup";
+import { useTranslation } from "react-i18next";
 
 const GameDenyPopup = ({ onCancel }) => {
   const [showLocationSettingPopup, setShowLocationSettingPopup] =
     useState(false);
+  const { t } = useTranslation();
 
   const handleKnowMore = () => {
     setShowLocationSettingPopup(true); // Show the LocationSettingPopup
@@ -30,10 +32,10 @@ const GameDenyPopup = ({ onCancel }) => {
                 />
               </div>
               <div className="locationtextwithheading">
-                <h2>Location Access Required</h2>
+                <h2>{t("Location Access Required")}</h2>
                 <p>
-                  To play SpotsBall, you need to enable location services.
-                  Please allow access to your location.
+                  {t("To play SpotsBall, you need to enable location services.")}
+                  {t("Please allow access to your location.")}
                 </p>
               </div>
               <div className="locationactionbtndiv">
@@ -43,7 +45,7 @@ const GameDenyPopup = ({ onCancel }) => {
                     className="cnclbtn_coution"
                     onClick={onCancel}
                   >
-                    Cancel
+                    {t("Cancel")}
                   </button>
                 </div>
                 <div className="coutionactionbtn">
@@ -52,7 +54,7 @@ const GameDenyPopup = ({ onCancel }) => {
                     className="knowmorebtn_coution"
                     onClick={handleKnowMore}
                   >
-                    Know More
+                    {t("Know More")}
                   </button>
                 </div>
               </div>

@@ -9,6 +9,7 @@ import GeolocationPopup from "../Location/GeolocationPopup";
 import GameUnavailablePopup from "../Location/GameUnavailablePopup";
 import { Dialog, DialogContent, IconButton, Button } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import { useTranslation } from "react-i18next";
 
 function Banner({ data }) {
   const {
@@ -25,6 +26,7 @@ function Banner({ data }) {
   const title = howItWorks?.title || "";
   const words = title.split(" ");
   const [leftticket, setLeftticket] = useState("");
+  const { t } = useTranslation();
 
   const [quantity, setQuantity] = useState(3);
 
@@ -117,41 +119,6 @@ function Banner({ data }) {
     return () => clearInterval(interval);
   }, []);
 
-  // useEffect(() => {
-  //   const checkGeolocation = () => {
-  //     const location = localStorage.getItem("location");
-  //     const restrictedArea = localStorage.getItem("restrictedArea");
-  //     // const location = JSON.parse(localStorage.getItem("location"));
-  //     // const restrictedArea = JSON.parse(localStorage.getItem("restrictedArea"));
-  //     const token = localStorage.getItem("Web-token");
-
-  //     const hasLocation = location && Object.keys(location).length > 0;
-  //     const hasRestrictedArea =
-  //       restrictedArea && Object.keys(restrictedArea).length > 0;
-
-  //     if (token) {
-  //       setGeolocationPopupVisible(!(hasLocation || hasRestrictedArea));
-  //     } else {
-  //       setGeolocationPopupVisible(false);
-  //     }
-  //   };
-
-  //   checkGeolocation();
-
-  //   // Listen for localStorage changes
-  //   const handleStorageChange = (event) => {
-  //     if (event.key === "location" || event.key === "restrictedArea") {
-  //       checkGeolocation();
-  //     }
-  //   };
-
-  //   window.addEventListener("storage", handleStorageChange);
-
-  //   return () => {
-  //     window.removeEventListener("storage", handleStorageChange);
-  //   };
-  // }, [token]);
-
   const handleAskToPaly = () => {
     const restrictedArea = localStorage.getItem("restrictedArea");
     const location = localStorage.getItem("location");
@@ -178,16 +145,15 @@ function Banner({ data }) {
       return;
     }
 
-    // handleBuyTicketClick(contests[0], discounts);
     if (location) {
       handleBuyTicketClick(contests[0], discounts);
     } else {
-      //   console.log("Location not found in localStorage");
+      console.log("Location not found");
     }
   };
 
   const handleBuyTicketClick = (contest, discount) => {
-    const token = localStorage.getItem("Web-token"); // Replace with your token retrieval method
+    const token = localStorage.getItem("Web-token");
 
     if (contest.totalTickets === 75) {
       Swal.fire({
@@ -212,7 +178,6 @@ function Banner({ data }) {
       return;
     }
 
-    // If contest is active, proceed with normal flow
     setSelectedContest(contest);
     setOnCarts(true);
     setSelectedDiscount(discount);
@@ -271,7 +236,7 @@ function Banner({ data }) {
     const ticketsLeft =
       selectedContest.maxTickets - selectedContest.totalTickets;
     setLeftticket(ticketsLeft);
-    // If the selected value exceeds the available tickets, show an error
+
     if (value > ticketsLeft) {
       Swal.fire({
         icon: "error",
@@ -280,7 +245,7 @@ function Banner({ data }) {
         confirmButtonText: "OK",
         allowOutsideClick: false,
       });
-      return; // Stop execution if the selection is invalid
+      return;
     }
     setQuantity(value);
   };
@@ -290,7 +255,6 @@ function Banner({ data }) {
       selectedContest.maxTickets - selectedContest.totalTickets;
     setLeftticket(ticketsLeft);
 
-    // Ensure the default quantity (3) doesn't exceed available tickets
     if (ticketsLeft === 0) {
       Swal.fire({
         icon: "error",
@@ -315,7 +279,7 @@ function Banner({ data }) {
 
     const payload = {
       leftticket: ticketsLeft,
-      quantity: quantity > ticketsLeft ? ticketsLeft : quantity, // Ensure quantity does not exceed available tickets
+      quantity: quantity > ticketsLeft ? ticketsLeft : quantity,
       responseData: selectedContest,
     };
 
@@ -338,7 +302,14 @@ function Banner({ data }) {
         navigator.geolocation.getCurrentPosition(
           async (position) => {
             const { latitude, longitude } = position.coords;
-            console.log("Latitude:", latitude, "Longitude:", longitude);
+            console.log(
+              "Latitude:",
+              latitude,
+              "Longitude:",
+              longitude,
+              "neee",
+              position
+            );
 
             try {
               const response = await axios.get(
@@ -355,7 +326,6 @@ function Banner({ data }) {
               let stateName = "";
               let countryName = "";
 
-              // Extract state and country from address components
               addressComponents.forEach((component) => {
                 if (component.types.includes("administrative_area_level_1")) {
                   stateName = component.long_name;
@@ -372,11 +342,8 @@ function Banner({ data }) {
                 countryName
               );
 
-              // Ensure restrictedStates is not null or undefined
               const restrictedAreaStates = restrictedStates || [];
-              // console.log("restrictedAreaStates", restrictedAreaStates);
 
-              // Check if the country is not India
               if (countryName.toLowerCase() !== "india") {
                 Swal.fire({
                   title: "Area Restricted",
@@ -412,14 +379,11 @@ function Banner({ data }) {
                 return;
               }
 
-              // If not restricted, store location and remove restrictedArea
               localStorage.removeItem("restrictedArea");
               localStorage.setItem(
                 "location",
                 JSON.stringify({ stateName, countryName })
               );
-
-              // console.log("Location saved:", { stateName, countryName });
             } catch (err) {
               console.error("Error fetching geocode data:", err);
             }
@@ -456,7 +420,6 @@ function Banner({ data }) {
 
     checkGeolocation();
 
-    // Listen for localStorage changes
     const handleStorageChange = (event) => {
       if (event.key === "location" || event.key === "restrictedArea") {
         checkGeolocation();
@@ -586,7 +549,7 @@ function Banner({ data }) {
                               data-duration="1.5s"
                               data-delay="3.0s"
                             >
-                              Sign In
+                              {t("Sign In")}
                             </Link>
                           )}
 
@@ -600,13 +563,15 @@ function Banner({ data }) {
                               setOpen(true);
                             }}
                           >
-                            How To Play
+                            {t("How To Play")}
                           </a>
                         </div>
                         <div className="btn_tdy p-3 px-3">
                           <span>
-                            {!token && <Link to="/signup"> Sign Up </Link>}
-                            Today, Play and Win the game
+                            {!token && (
+                              <Link to="/signup"> {t("Sign Up")} </Link>
+                            )}
+                            {t("Today, Play and Win the game")}
                           </span>
                         </div>
                       </div>
@@ -693,7 +658,7 @@ function Banner({ data }) {
                               </span>
                             </div>
                             <div className="listar-feature-item-excerpt">
-                              {step.description || "No description available"}
+                              {step.description}
                             </div>
                           </div>
                         </div>
@@ -734,13 +699,15 @@ function Banner({ data }) {
                       />
                     </div>
                     <div className="entriesdiv_inner opendiv_entries">
-                      <h3>Entries Open</h3>
-                      <p>Monday: 12:00 hrs</p>
+                      <h3>{t("Entries Open")}</h3>
+                      <p>{t("Monday: 12:00 hrs")}</p>
                     </div>
                   </div>
                   <div className="live-match-block">
                     <div className="text-label">
-                      <h5 className="white text-uppercase">upcoming Contest</h5>
+                      <h5 className="white text-uppercase">
+                        {t("upcoming Contest")}
+                      </h5>
                     </div>
                     <div className="live-box">
                       <img
@@ -751,16 +718,28 @@ function Banner({ data }) {
                       <div className="counter-box">
                         <ul className="unstyled countdown-left">
                           <li>
-                            <h2 id="days">{timeLeft.days}D:</h2>
+                            <h2 id="days">
+                              {timeLeft.days}
+                              {t("D")}:
+                            </h2>
                           </li>
                           <li>
-                            <h2 id="hours">{timeLeft.hours}H:</h2>
+                            <h2 id="hours">
+                              {timeLeft.hours}
+                              {t("H")}:
+                            </h2>
                           </li>
                           <li>
-                            <h2 id="minutes">{timeLeft.minutes}M:</h2>
+                            <h2 id="minutes">
+                              {timeLeft.minutes}
+                              {t("M")}:
+                            </h2>
                           </li>
                           <li>
-                            <h2 id="seconds">{timeLeft.seconds}S</h2>
+                            <h2 id="seconds">
+                              {timeLeft.seconds}
+                              {t("S")}
+                            </h2>
                           </li>
                         </ul>
                       </div>
@@ -768,8 +747,8 @@ function Banner({ data }) {
                   </div>
                   <div className="team-block">
                     <div className="entriesdiv_inner closediv_entries">
-                      <h3>Entries Close</h3>
-                      <p>Sunday: 23:59 hrs</p>
+                      <h3>{t("Entries Close")}</h3>
+                      <p>{t("Sunday: 23:59 hrs")}</p>
                     </div>
 
                     <div
@@ -795,7 +774,7 @@ function Banner({ data }) {
           <div className="container">
             <div className="section-title mb-4 text-center">
               <h2 className="title">
-                Current <span>contest</span>
+                {t("Current")} <span>{t("contest")}</span>
               </h2>
             </div>
 
@@ -819,7 +798,7 @@ function Banner({ data }) {
                     />
                   )}{" "}
                 <span className="mark-text ">
-                  Mark the hidden ball in the picture!
+                  {t("Mark the hidden ball in the picture!")}
                 </span>
                 <div
                   className="pattern-03 banner1"
@@ -865,7 +844,7 @@ function Banner({ data }) {
                             src={`${process.env.PUBLIC_URL}/images/calendar.png`}
                           />
                         </span>
-                        <h4>Every Week’s Contest Ends</h4>
+                        <h4>{t("Every Week’s Contest Ends")}</h4>
                       </div>
                       <div className="contestrightdaysdate contest_newtiming_strip mb-0">
                         <span className="line-img calendar">
@@ -874,7 +853,7 @@ function Banner({ data }) {
                           />
                         </span>
                         <h4 className="contslist_span_inner">
-                          Sunday- 23:59hrs
+                          {t("Sunday- 23:59hrs")}
                         </h4>
                       </div>
                     </div>
@@ -886,8 +865,8 @@ function Banner({ data }) {
                           />
                         </span>
                         <h4>
-                          Every Week Live Stream <br /> SpotsBall’s “Weekly
-                          Winner Show”
+                          {t("Every Week Live Stream")} <br />{" "}
+                          {t("SpotsBall’s “Weekly Winner Show”")}
                         </h4>
                       </div>
                       <div className="contestrightdaysdate contest_newtiming_strip mb-0">
@@ -897,7 +876,7 @@ function Banner({ data }) {
                           />
                         </span>
                         <h4 className="contslist_span_inner">
-                          Monday- 21:00hrs
+                          {t("Monday- 21:00hrs")}
                         </h4>
                       </div>
                     </div>
@@ -917,8 +896,8 @@ function Banner({ data }) {
                             rel="noopener noreferrer"
                           >
                             <span className="fb">
-                              <i className="fa-brands fa-facebook"></i> Watch on
-                              Facebook
+                              <i className="fa-brands fa-facebook"></i>{" "}
+                              {t("Watch on Facebook")}
                             </span>
                           </a>
                         )}
@@ -929,8 +908,8 @@ function Banner({ data }) {
                             rel="noopener noreferrer"
                           >
                             <span className="yt">
-                              <i className="fa-brands fa-youtube"></i> Watch on
-                              YouTube
+                              <i className="fa-brands fa-youtube"></i>{" "}
+                              {t("Watch on YouTube")}
                             </span>
                           </a>
                         )}
@@ -944,7 +923,7 @@ function Banner({ data }) {
             <div className="discount-coupons1">
               <div className="container">
                 <div className="section-title short mb-3 d-flex justify-content-center">
-                  <h2 className="title">Discounts Available</h2>
+                  <h2 className="title">{t("Discounts Available")}</h2>
                 </div>
                 <div className="discount-coupons">
                   {discounts?.map((discount, index) => (
@@ -964,10 +943,12 @@ function Banner({ data }) {
                         <div className="vertical"></div>
                         <div className="content">
                           <h2>
-                            Tickets: {discount.minTickets}-{discount.maxTickets}
+                            {t("Tickets")}: {discount.minTickets}-
+                            {discount.maxTickets}
                           </h2>
                           <h1>
-                            {discount.discountPercentage}% <span>Discount</span>
+                            {discount.discountPercentage}%{" "}
+                            <span>{t("Discount")}</span>
                           </h1>
                         </div>
                       </div>
@@ -993,7 +974,7 @@ function Banner({ data }) {
             <div className="heading mb-3">
               <div className="d-flex flex-wrap gap-16 align-items-center justify-content-between">
                 <h3 className=" ">
-                  Tickets <span>Available</span>
+                  {t("Tickets")} <span>{t("Available")}</span>
                 </h3>
               </div>
             </div>
@@ -1030,16 +1011,16 @@ function Banner({ data }) {
                     <div className="contest_maindiv_popup_inner">
                       <div className="contestheading">
                         <h2>
-                          <span>For</span> ₹
+                          <span>{t("For")}</span> ₹
                           {contests[0]?.jackpot_price?.toLocaleString()}{" "}
-                          <span>Grand Prize</span>
+                          <span>{t("Grand Prize")}</span>
                         </h2>
                       </div>
 
                       <div className="contesttickeprice">
                         <p>
                           {" "}
-                          Ticket :
+                          {t("Ticket")} :
                           <span>
                             <i className="fa fa-inr" aria-hidden="true"></i>
                             {contests[0]?.ticket_price}/-
@@ -1053,15 +1034,16 @@ function Banner({ data }) {
                             src={`${process.env.PUBLIC_URL}/images/ball_icon.png`}
                           />
                           <h2>
-                            Use Add and subtract button for increase and
-                            decrease your tickets
+                            {t(
+                              "Use Add and subtract button for increase and decrease your tickets"
+                            )}
                           </h2>
                         </div>
                         <div className="addcart_contst_textinfo">
                           <img
                             src={`${process.env.PUBLIC_URL}/images/ball_icon.png`}
                           />
-                          <h2>Max 75 tickets per person</h2>
+                          <h2>{t("Max 75 tickets per person")}</h2>
                         </div>
                       </div>
 
@@ -1070,7 +1052,7 @@ function Banner({ data }) {
                           onClick={handleAskToPaly}
                           className="btn btn-primary text-uppercase rounded-2"
                         >
-                          buy Now
+                          {t("Buy Now")}
                         </a>
                       </div>
                     </div>
@@ -1078,36 +1060,6 @@ function Banner({ data }) {
                 </div>
               </div>
 
-              {/* <div className="col-lg-6">
-                  <section
-                    className="video-section-02"
-                    style={{
-                      backgroundImage: "url(images/home-4-banner-bg.jpg)",
-                      backgroundRepeat: "no-repeat",
-                      backgroundSize: "100% 100%",
-                      position: "relative",
-                      zIndex: 1,
-                      height: "266px",
-                      borderRadius: "10px",
-                    }}
-                  >
-                    <div className="container">
-                      <div className="row justify-content-center">
-                        <div className="col-md-10 col-lg-9 col-xl-7">
-                          <div className="video-style-04">
-                            <a
-                              href="https://youtu.be/n_Cn8eFo7u8"
-                              className="play-btn circle b-round popup-youtube video-btn"
-                            >
-                              <i className="fa-solid fa-play"></i>
-                            </a>
-                            <h2>How To Play</h2>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </section>
-                </div> */}
               <div className="col-lg-6">
                 <section
                   className="video-section-02"
@@ -1136,7 +1088,7 @@ function Banner({ data }) {
                           >
                             <i className="fa-solid fa-play"></i>
                           </a>
-                          <h2>How To Play</h2>
+                          <h2>{t("How To Play")}</h2>
                         </div>
                       </div>
                     </div>
@@ -1197,18 +1149,19 @@ function Banner({ data }) {
             <div className="contest_maindiv_popup_inner">
               <div className="contestheading text-center">
                 <h2>
-                  <i className="fa fa-gamepad" aria-hidden="true"></i> Game Play
-                  Closed!
+                  <i className="fa fa-gamepad" aria-hidden="true"></i>{" "}
+                  {t("Game Play Closed!")}
                 </h2>
               </div>
 
               <div className="quantity_contest text-center mt-3">
                 <h3 className="text-white">
-                  The current gameplay has been closed.
+                  {t("The current gameplay has been closed.")}
                 </h3>
                 <h4 className="text-white">
-                  But don't worry, a new competition launches this Monday at
-                  12:00 HRS!
+                  {t(
+                    "But don't worry, a new competition launches this Monday at 12:00 HRS!"
+                  )}
                 </h4>
               </div>
               <div className="contest_quantity_para_div">
@@ -1228,7 +1181,7 @@ function Banner({ data }) {
                     }}
                   ></i>{" "}
                   <h2 className="text-white ">
-                    Mark your calendars and get ready to join the fun!
+                    {t("Mark your calendars and get ready to join the fun!")}
                   </h2>
                 </div>
                 <div className="addcart_contst_textinfo">
@@ -1247,13 +1200,14 @@ function Banner({ data }) {
                     }}
                   ></i>
                   <h2 className="text-white">
-                    Don’t forget to tune in to our live streaming every Monday
-                    at 21:00 HRS to catch all the excitement.
+                    {t(
+                      "Don’t forget to tune in to our live streaming every Monday at 21:00 HRS to catch all the excitement."
+                    )}
                   </h2>
                 </div>
               </div>
               <div className="everyweek_livewatchdiv text-center">
-                <h4 className="text-white">Watch On Live Streams</h4>
+                <h4 className="text-white">{t("Watch On Live Streams")}</h4>
                 <div className="watchondiv justify-content-center">
                   {livs?.Facebook_Streaming && (
                     <a
@@ -1284,7 +1238,7 @@ function Banner({ data }) {
 
               <div className="addtocart_btn_popup_div">
                 <button className="addcartbtn_inpopup" onClick={ClosedCarts}>
-                  Close
+                  {t("Close")}
                 </button>
               </div>
             </div>
@@ -1302,16 +1256,16 @@ function Banner({ data }) {
             <div className="contest_maindiv_popup_inner">
               <div className="contestheading">
                 <h2>
-                  Weekly ₹
+                  {t("Weekly")} ₹
                   {selectedContest?.jackpot_price
                     ? Number(selectedContest.jackpot_price).toLocaleString()
                     : "0"}{" "}
-                  Grand Prize
+                  {t("Grand Prize")}
                 </h2>
               </div>
               <div className="contesttickeprice">
                 <p>
-                  Ticket Price:{" "}
+                  {t("Ticket Price")}:{" "}
                   <span>
                     <i className="fa fa-inr" aria-hidden="true" />{" "}
                     {selectedContest?.ticket_price}
@@ -1319,7 +1273,7 @@ function Banner({ data }) {
                 </p>
               </div>
               <div className="quantity_contest">
-                <h4>Quantity</h4>
+                <h4>{t("Quantity")}</h4>
                 <div className="quantity">
                   <button
                     className="minus"
@@ -1351,8 +1305,9 @@ function Banner({ data }) {
                     alt="Icon"
                   />
                   <h2>
-                    Use Add and subtract buttons to increase or decrease your
-                    tickets
+                    {t(
+                      "Use Add and subtract buttons to increase or decrease your tickets"
+                    )}
                   </h2>
                 </div>
                 <div className="addcart_contst_textinfo">
@@ -1361,11 +1316,14 @@ function Banner({ data }) {
                     // src="images/ball_icon.png"
                     alt="Icon"
                   />
-                  <h2>Max {selectedContest?.maxTickets} tickets per person</h2>
+                  <h2>
+                    {t("Max")} {selectedContest?.maxTickets}{" "}
+                    {t("tickets per person")}
+                  </h2>
                 </div>
               </div>
               <div className="dis-pop">
-                <h5>Discount</h5>
+                <h5>{t("Discount")}</h5>
 
                 <Slider {...settings}>
                   {Array.isArray(selectedDiscount) &&
@@ -1381,12 +1339,12 @@ function Banner({ data }) {
                           <div className="vertical" />
                           <div className="content">
                             <h2>
-                              Tickets: {discount.minTickets} -{" "}
+                              {t("Tickets")}: {discount.minTickets} -{" "}
                               {discount.maxTickets}
                             </h2>
                             <h1>
                               {discount.discountPercentage}%{" "}
-                              <span>Discount</span>
+                              <span>{t("Discount")}</span>
                             </h1>
                           </div>
                         </div>
@@ -1396,7 +1354,7 @@ function Banner({ data }) {
               </div>
               <div className="bulkticketdiv">
                 <div className="buybulkticket_heaidng">
-                  <h2 className="bulkticketheading">Buy Bulk Tickets</h2>
+                  <h2 className="bulkticketheading">{t("Buy Bulk Tickets")}</h2>
                 </div>
                 <div className="chooseforinputsdiv_bulkticket">
                   {(selectedContest?.quantities || []).map((value) => (
@@ -1411,7 +1369,9 @@ function Banner({ data }) {
                           checked={quantity === value}
                         />
                         <span className="radio-custom-dummy" />
-                        <span className="spanforcheck">{value} Tickets</span>
+                        <span className="spanforcheck">
+                          {value} {t("Tickets")}
+                        </span>
                       </label>
                     </div>
                   ))}
@@ -1419,7 +1379,7 @@ function Banner({ data }) {
               </div>
               <div className="addtocart_btn_popup_div">
                 <button className="addcartbtn_inpopup" onClick={handlePlayNow}>
-                  Play Now
+                  {t("Play Now")}
                 </button>
               </div>
             </div>

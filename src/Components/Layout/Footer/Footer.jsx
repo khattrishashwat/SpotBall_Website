@@ -1,18 +1,28 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import axios from "axios";
+import { useTranslation } from "react-i18next";
 
 function Footer() {
   const [footer, setFooter] = useState("");
   const [links, setLinks] = useState([]);
+  const { t } = useTranslation();
+
   const [androidLink, setAndroidLink] = useState(null);
   const location = useLocation();
   const [showBackToTop, setShowBackToTop] = useState(false);
 
   const fetchFooter = async () => {
+            const lang = localStorage.getItem("selectedLanguage");
+
     try {
       const response = await axios.get(
-        "app/static-content/get-all-static-content/footer"
+        "app/static-content/get-all-static-content/footer",
+        {
+          headers: {
+            "Accept-Language": lang,
+          },
+        }
       );
       setLinks(response.data.data?.liveLinks || []);
     } catch (error) {
@@ -66,34 +76,8 @@ function Footer() {
             <div className="row align-items-center justify-content-between mb-4 mb-md-5">
               {/* Social Media Section */}
               <div className="col-md-4 col-lg-4 mb-4 mb-lg-0">
-                <h5 className="title mb-3 d-block follow">Follow Us </h5>
+                <h5 className="title mb-3 d-block follow">{t("Follow Us")} </h5>
                 <div className="footer-social justify-content-center justify-content-lg-start">
-                  {/* <ul>
-                  {links.map((item, index) => {
-                    const { url, name } = item || {};
-                    return (
-                      url &&
-                      name && (
-                        <li key={index}>
-                          <a
-                            href={url}
-                            title={name}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            <i
-                              className={
-                                iconClass[name.toLowerCase()] ||
-                                "fa-solid fa-link"
-                              }
-                            />
-                          </a>
-                        </li>
-                      )
-                    );
-                  })}
-                </ul> */}
-
                   <ul>
                     {[
                       {
@@ -132,7 +116,9 @@ function Footer() {
                               <i className={icon[name.toLowerCase()] || icon} />
                             </a>
                           ) : (
-                            <span>{capitalizedName} link not available</span>
+                            <span>
+                              {capitalizedName} {t("link not available")}
+                            </span>
                           )}
                         </li>
                       );
@@ -155,7 +141,9 @@ function Footer() {
               {/* Download App Section */}
               <div className="col-md-4 col-lg-4">
                 <div className="download-app align-items-center justify-content-center justify-content-lg-start text-center">
-                  <h5 className="title mb-3 d-block download">Download App</h5>
+                  <h5 className="title mb-3 d-block download">
+                    {t("Download App")}
+                  </h5>
                   <div className="app_icons">
                     {androidLink && (
                       <a
@@ -199,16 +187,20 @@ function Footer() {
                 <div className="copyright-menu footer-menu">
                   <ul className="mb-0 justify-content-center justify-content-md-start list-unstyled">
                     <li>
-                      <Link to="/terms">Terms &amp; Conditions</Link>
+                      <Link to="/terms">
+                        {t("Terms")} &amp; {t("Conditions")}
+                      </Link>
                     </li>
                     <li>
-                      <Link to="/privacy">Privacy Policy</Link>
+                      <Link to="/privacy">{t("Privacy Policy")}</Link>
                     </li>
                     <li>
-                      <Link to="/cookies">Cookie Policy</Link>
+                      <Link to="/cookies">{t("Cookie Policy")}</Link>
                     </li>
                     <li>
-                      <Link to="/rules">Rules Of Play &amp; FAQs</Link>
+                      <Link to="/rules">
+                        {t("Rules of Play")} &amp; {t("FAQs")}
+                      </Link>
                     </li>
                   </ul>
                 </div>

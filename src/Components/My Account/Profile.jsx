@@ -6,10 +6,12 @@ import ChangePassword from "./ChangePassword";
 import PastPayment from "./PastPayment";
 import axios from "axios";
 import Swal from "sweetalert2";
+import { useTranslation } from "react-i18next";
 
 function Profile() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
 
   const [activeTab, setActiveTab] = useState("update_profile");
   const [isDeactivate, setIsDeactivate] = useState(false);
@@ -62,11 +64,13 @@ function Profile() {
 
   const fetchDeactive = async () => {
     const token = localStorage.getItem("Web-token");
+    const lang = localStorage.getItem("selectedLanguage");
     try {
       setIsLoading(true);
       const response = await axios.get(`app/profile/active-inactive`, {
         headers: {
           Authorization: `Bearer ${token}`,
+          "Accept-Language": lang,
         },
       });
 
@@ -93,40 +97,16 @@ function Profile() {
     }
   };
 
-  // const fetchDeactive = async () => {
-  //   const token = localStorage.getItem("Web-token");
-  //   try {
-  //     setIsLoading(true);
-  //     const response = await axios.get(`app/profile/active-inactive`, {
-  //       headers: {
-  //         Authorization: `Bearer ${token}`,
-  //       },
-  //     });
-
-  //     if (response) {
-  //       // Clear token and navigate to homepage
-  //       localStorage.removeItem("Web-token");
-  //       Swal.fire({
-  //         title: response.data.message,
-  //         confirmButtonText: "OK",
-  //         allowOutsideClick: false,
-  //       }).then(() => {
-  //         navigate("/");
-  //       },10000);
-  //     }
-  //   } catch (error) {
-  //     console.log("err",error)
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
   const fetchDelete = async () => {
     const token = localStorage.getItem("Web-token");
+    const lang = localStorage.getItem("selectedLanguage");
+
     try {
       setIsLoading(true);
       const response = await axios.get(`app/profile/delete-account`, {
         headers: {
           Authorization: `Bearer ${token}`,
+          "Accept-Language": lang,
         },
       });
 
@@ -190,7 +170,7 @@ function Profile() {
               <div className="row rowmainheading_inner">
                 <div className="col-md-12 colmainheading_innerpages">
                   <div className="pageheading_main page_myaccountdiv">
-                    <h2 className="myaccounheading">My Account</h2>
+                    <h2 className="myaccounheading">{t("My Account")}</h2>
                   </div>
                 </div>
               </div>
@@ -214,7 +194,9 @@ function Profile() {
                                 src={`${process.env.PUBLIC_URL}/image/profile_icon.png`}
                               />{" "}
                             </div>
-                            <span className="navlinkname">Update Profile</span>{" "}
+                            <span className="navlinkname">
+                              {t("Update Profile")}
+                            </span>{" "}
                           </a>
                         </li>
                         <li className="nav-item">
@@ -230,7 +212,9 @@ function Profile() {
                                 src={`${process.env.PUBLIC_URL}/image/change_pass_icon.png`}
                               />{" "}
                             </div>
-                            <span className="navlinkname">Change Password</span>
+                            <span className="navlinkname">
+                              {t("Change Password")}
+                            </span>
                           </a>
                         </li>
                         <li className="nav-item">
@@ -246,7 +230,9 @@ function Profile() {
                                 src={`${process.env.PUBLIC_URL}/image/payment_icon.png`}
                               />{" "}
                             </div>
-                            <span className="navlinkname">Past Payments</span>
+                            <span className="navlinkname">
+                              {t("Past Payments")}
+                            </span>
                           </a>
                         </li>
                         <li className="nav-item">
@@ -263,7 +249,7 @@ function Profile() {
                               />{" "}
                             </div>
                             <span className="navlinkname">
-                              Deactivate Account
+                              {t("Deactivate Account")}
                             </span>
                           </a>
                         </li>
@@ -280,7 +266,9 @@ function Profile() {
                                 src={`${process.env.PUBLIC_URL}/image/delete_acc_icon.png`}
                               />{" "}
                             </div>
-                            <span className="navlinkname">Delete Account</span>
+                            <span className="navlinkname">
+                              {t("Delete Account")}
+                            </span>
                           </a>
                         </li>
                         <li className="nav-item">
@@ -296,7 +284,7 @@ function Profile() {
                                 src={`${process.env.PUBLIC_URL}/image/logout_icon.png`}
                               />{" "}
                             </div>
-                            <span className="navlinkname">Logout</span>
+                            <span className="navlinkname">{t("Logout")}</span>
                           </a>
                         </li>
                       </ul>
@@ -373,16 +361,22 @@ function Profile() {
             </button>
             <div className="modal-body mdlbdy_delete_account">
               <div className="deleteacc_text_data">
-                <h2>Deactivate Account</h2>
+                <h2>{t("Deactivate Account")}</h2>
                 <p>
-                  You choose to temporarily OptOut from Playing SpotsBall, we
-                  put your account in a suspended state. When/if you want to
-                  reactivate, you can send an email to{" "}
+                  {t(
+                    "You choose to temporarily OptOut from Playing SpotsBall, we"
+                  )}
+                  {t(
+                    "put your account in a suspended state. When/if you want to"
+                  )}
+                  {t("reactivate, you can send an email to")}{" "}
                   <span className="support-email">
                     {" "}
-                    support.in@spotsball.com
+                    {t("support.in@spotsball.com")}
                   </span>
-                  , and will receive reset instructions for your password.
+                  {t(
+                    ", and will receive reset instructions for your password."
+                  )}
                 </p>
               </div>
             </div>
@@ -394,7 +388,7 @@ function Profile() {
                   data-dismiss="modal"
                   onClick={DeccloseModal}
                 >
-                  Cancel
+                  {t("Cancel")}
                 </button>
               </div>
               <div className="actionbtn_delete">
@@ -403,7 +397,7 @@ function Profile() {
                   className="delete_btn_delete actionbtnmain"
                   onClick={fetchDeactive}
                 >
-                  Deactivate
+                  {t("Deactivate")}
                 </button>
               </div>
             </div>
@@ -437,12 +431,16 @@ function Profile() {
             </button>
             <div className="modal-body mdlbdy_delete_account">
               <div className="deleteacc_text_data">
-                <h2>Delete Account</h2>
+                <h2>{t("Delete Account")}</h2>
                 <p>
-                  You chose to temporarily opt out of playing SpotsBall, so we
-                  have put your account in deleted state. If you wish to
-                  reactivate your deleted account, you can send an email to
-                  support.in@spotsball.com.
+                  {t(
+                    "You chose to temporarily opt out of playing SpotsBall, so we"
+                  )}
+                  {t("have put your account in deleted state. If you wish to")}
+                  {t(
+                    "reactivate your deleted account, you can send an email to"
+                  )}
+                  {t("support.in@spotsball.com.")}
                 </p>
               </div>
             </div>
@@ -454,7 +452,7 @@ function Profile() {
                   data-dismiss="modal"
                   onClick={DeleteCloseModal}
                 >
-                  Cancel
+                  {t("Cancel")}
                 </button>
               </div>
               <div className="actionbtn_delete">
@@ -463,7 +461,7 @@ function Profile() {
                   className="delete_btn_delete actionbtnmain"
                   onClick={fetchDelete}
                 >
-                  Delete
+                  {t("Delete")}
                 </button>
               </div>
             </div>
@@ -499,8 +497,8 @@ function Profile() {
             </button>
             <div className="modal-body mdlbdy_delete_account logoutaccount_divmain">
               <div className="deleteacc_text_data logoutdatamain">
-                <h2>Logout</h2>
-                <p>Are you sure you want to logout?</p>
+                <h2>{t("Logout")}</h2>
+                <p>{t("Are you sure you want to logout?")}</p>
               </div>
             </div>
             <div className="mdlftr_delete_acc_actionbtn">
@@ -510,7 +508,7 @@ function Profile() {
                   className="cncle_btn_delete actionbtnmain"
                   onClick={CloseLogout}
                 >
-                  Cancel
+                  {t("Cancel")}
                 </button>
               </div>
               <div className="actionbtn_delete">
@@ -519,7 +517,7 @@ function Profile() {
                   className="delete_btn_delete actionbtnmain"
                   onClick={Logout}
                 >
-                  Logout
+                  {t("Logout")}
                 </button>
               </div>
             </div>

@@ -5,6 +5,7 @@ import axios from "axios";
 import GameDenyPopup from "./GameDenyPopup";
 import GameUnavailablePopup from "./GameUnavailablePopup";
 import LocationSettingPopup from "./LocationSettingPopup";
+import { useTranslation } from "react-i18next";
 
 const GeolocationPopup = ({ Area, onClose }) => {
   const [isPopupVisible, setPopupVisible] = useState(false);
@@ -12,6 +13,7 @@ const GeolocationPopup = ({ Area, onClose }) => {
     useState(false);
   const [showLocationSettingPopup, setShowLocationSettingPopup] =
     useState(false);
+  const { t } = useTranslation();
 
   const handleCancel = () => {
     setPopupVisible(false);
@@ -20,162 +22,6 @@ const GeolocationPopup = ({ Area, onClose }) => {
   const handleKnowMore = () => {
     setShowLocationSettingPopup(true);
   };
-
-  // const handleAllow = () => {
-  //   if (!navigator.geolocation) {
-  //     console.error("Geolocation is not supported by this browser.");
-  //     return;
-  //   }
-
-  //   navigator.geolocation.getCurrentPosition(
-  //     async (position) => {
-  //       const { latitude, longitude } = position.coords;
-  //       console.log("Latitude:", latitude, "Longitude:", longitude);
-
-  //       try {
-  //         const response = await axios.get(
-  //           `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=AIzaSyA8pM5yXTJ3LM8zBF-EkZHEyxlPXSttsl0`
-  //         );
-
-  //         const results = response.data.results;
-  //         if (!results || results.length === 0) {
-  //           console.error("No results found in geocode response.");
-  //           onClose(); // Ensure this function exists
-  //           return;
-  //         }
-
-  //         const addressComponents = results[0].address_components || [];
-  //         let stateName = "";
-  //         let countryName = "";
-
-  //         addressComponents.forEach((component) => {
-  //           if (component.types.includes("administrative_area_level_1")) {
-  //             stateName = component.long_name;
-  //           }
-  //           if (component.types.includes("country")) {
-  //             countryName = component.long_name;
-  //           }
-  //         });
-
-  //         console.log("State Name:", stateName, "Country Name:", countryName);
-
-  //         // Safely access the restricted states
-  //         const restrictedStates = Area || []; // Ensure `Area` is defined and an array
-  //         if (
-  //           !Array.isArray(restrictedStates) ||
-  //           restrictedStates.length === 0
-  //         ) {
-  //           console.warn("No restricted states defined.");
-  //           return;
-  //         }
-
-  //         const isRestricted = restrictedStates.some(
-  //           (restrictedState) =>
-  //             restrictedState.toLowerCase() === stateName.toLowerCase() ||
-  //             restrictedState.toLowerCase() === countryName.toLowerCase()
-  //         );
-  //         console.log("isRestricted", isRestricted);
-
-  //         if (isRestricted) {
-  //           Swal.fire({
-  //             title: "Area Restricted",
-  //             text: `This area is restricted for this game. State: ${stateName} in Country: ${countryName}`,
-  //             icon: "error",
-  //             confirmButtonText: "OK",
-  //           });
-
-  //           // Remove the token if restricted
-  //           localStorage.removeItem("Web-token");
-  //         } else {
-  //           localStorage.setItem(
-  //             "location",
-  //             JSON.stringify({ stateName, countryName })
-  //           );
-  //           console.log("Location saved:", { stateName, countryName });
-  //           if (onClose) onClose();
-  //         }
-  //       } catch (error) {
-  //         console.error("Error fetching geocode:", error);
-  //         if (onClose) onClose();
-  //       }
-  //     },
-  //     (error) => {
-  //       console.error("Error getting location:", error.message);
-  //       setShowLocationSettingPopup(true); // Ensure this state function exists
-  //     }
-  //   );
-  // };
-
-  // const handleAllow = () => {
-  //   if (!navigator.geolocation) {
-  //     console.error("Geolocation is not supported by this browser.");
-  //     return;
-  //   }
-
-  //   navigator.geolocation.getCurrentPosition(
-  //     async (position) => {
-  //       const { latitude, longitude } = position.coords;
-  //       console.log("Latitude:", latitude, "Longitude:", longitude);
-
-  //       try {
-  //         const response = await axios.get(
-  //           `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=AIzaSyA8pM5yXTJ3LM8zBF-EkZHEyxlPXSttsl0`
-  //         );
-
-  //         const results = response.data.results;
-  //         if (!results || results.length === 0) {
-  //           console.error("No results found in geocode response.");
-  //           onClose && onClose(); // Ensure this function exists
-  //           return;
-  //         }
-
-  //         const addressComponents = results[0].address_components || [];
-  //         let stateName = "";
-  //         let countryName = "";
-
-  //         addressComponents.forEach((component) => {
-  //           if (component.types.includes("administrative_area_level_1")) {
-  //             stateName = component.long_name;
-  //           }
-  //           if (component.types.includes("country")) {
-  //             countryName = component.long_name;
-  //           }
-  //         });
-
-  //         console.log("State Name:", stateName, "Country Name:", countryName);
-
-  //         // Allow only if in India or Indian states
-  //         if (countryName.toLowerCase() !== "india") {
-  //           Swal.fire({
-  //             title: "Area Restricted",
-  //             text: `Access is restricted outside India. Current location: ${stateName}, ${countryName}`,
-  //             icon: "error",
-  //             confirmButtonText: "OK",
-  //           });
-  //           // localStorage.removeItem("Web-token");
-  //           return;
-  //         }
-
-  //         // If in India, save location
-  //         localStorage.setItem(
-  //           "location",
-  //           JSON.stringify({ stateName, countryName })
-  //         );
-  //         console.log("Location saved:", { stateName, countryName });
-
-  //         // Close the popup if present
-  //         onClose && onClose();
-  //       } catch (error) {
-  //         console.error("Error fetching geocode:", error);
-  //         onClose && onClose();
-  //       }
-  //     },
-  //     (error) => {
-  //       console.error("Error getting location:", error.message);
-  //       setShowLocationSettingPopup && setShowLocationSettingPopup(true); // Ensure this state function exists
-  //     }
-  //   );
-  // };
 
   const handleAllow = () => {
     if (!navigator.geolocation) {
@@ -186,7 +32,15 @@ const GeolocationPopup = ({ Area, onClose }) => {
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const { latitude, longitude } = position.coords;
-        console.log("Latitude:", latitude, "Longitude:", longitude);
+        const accuracy = position.coords.accuracy;
+        console.log(
+          "Latitude:",
+          latitude,
+          "Longitude:",
+          longitude,
+          "aa-----",
+          accuracy
+        );
 
         try {
           const response = await axios.get(
@@ -318,10 +172,11 @@ const GeolocationPopup = ({ Area, onClose }) => {
               />
             </div>
             <div className="locationtextwithheading">
-              <h2>Enable Location Services</h2>
+              <h2>{t("Enable Location Services")}</h2>
               <p>
-                We need to access your location to ensure you're in a region
-                where SpotsBall is available.
+                {t(
+                  "We need to access your location to ensure you're in a region where SpotsBall is available."
+                )}
               </p>
             </div>
             <div className="locationactionbtndiv">
@@ -331,7 +186,7 @@ const GeolocationPopup = ({ Area, onClose }) => {
                   className="denybtn loc_btn"
                   onClick={handleDeny}
                 >
-                  Deny
+                  {t("Deny")}
                 </button>
               </div>
               <div className="allowbtndiv actionbtn_loc">
@@ -340,7 +195,7 @@ const GeolocationPopup = ({ Area, onClose }) => {
                   className="allowbtn loc_btn"
                   onClick={handleAllow} // Corrected to call handleAllow
                 >
-                  Allow
+                  {t("Allow")}
                 </button>
               </div>
             </div>

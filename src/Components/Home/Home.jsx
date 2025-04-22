@@ -50,16 +50,22 @@ function Home() {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem("Web-token");
+        const lang = localStorage.getItem("selectedLanguage");
         let response;
 
         if (token) {
           response = await axios.get("/app/dashboard/authenticated", {
             headers: {
               Authorization: `Bearer ${token}`,
+              "Accept-Language": lang,
             },
           });
         } else {
-          response = await axios.get("/app/dashboard/public");
+          response = await axios.get("/app/dashboard/public", {
+            headers: {
+              "Accept-Language": lang,
+            },
+          });
         }
 
         if (response?.data?.data && isMounted) {
@@ -97,7 +103,6 @@ function Home() {
 
       if (response?.data?.data) {
         setMovies(response.data.data[0]);
-        console.log("new", response.data.data[0]);
       }
     } catch (error) {
       console.error("Error fetching video data:", error);

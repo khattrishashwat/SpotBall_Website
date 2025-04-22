@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 function Faqs({ data }) {
+    const { t } = useTranslation();
+  
   const [activeIndex, setActiveIndex] = useState(null);
   if (!data) return null;
   const { apk, faqs } = data;
@@ -57,18 +60,18 @@ function Faqs({ data }) {
                     data-animation-duration={1}
                   >
                     <h2 className="title ">
-                      Test Your Cricket Skills, Spot the Ball and
-                      <span>Stand a Chance to Win</span>
+                      {t("Test Your Cricket Skills, Spot the Ball and")}
+                      <span>{t("Stand a Chance to Win")}</span>
                     </h2>
                     <p>
-                      SpotsBall is the ultimate cricket challenge app where you
-                      can put your cricket skills to the test. At SpotsBall, we
-                      bring the thrill of cricket right to your fingertips. We
-                      host a weekly exciting contest where you simply have to
-                      spot the hidden ball in the game. Think you have got sharp
-                      eyes and cricket instincts? Find the ball, mark the exact
-                      coordinates, and stand a chance to win the grand prize,
-                      every week.
+                      {t("SpotsBall is the ultimate cricket challenge app where you")}
+                     {t(" can put your cricket skills to the test. At SpotsBall, we")}
+                      {t("bring the thrill of cricket right to your fingertips. We")}
+                      {t("host a weekly exciting contest where you simply have to")}
+                      {t("spot the hidden ball in the game. Think you have got sharp")}
+                      {t("eyes and cricket instincts? Find the ball, mark the exact")}
+                      {t("coordinates, and stand a chance to win the grand prize,")}
+                      {t("every week.")}
                     </p>
                     <div
                       className=" animated animated-media-none"
@@ -89,7 +92,7 @@ function Faqs({ data }) {
                                 src={`${process.env.PUBLIC_URL}/images/apple.svg`}
                                 alt="App Store"
                               />
-                              App Store
+                              {t("App Store")}
                             </a>
                           </div>
                         )}
@@ -107,7 +110,7 @@ function Faqs({ data }) {
                                 src={`${process.env.PUBLIC_URL}/images/android.svg`}
                                 alt="Android App"
                               />
-                              Android App
+                              {t("Android App")}
                             </a>
                           </div>
                         )}
@@ -146,48 +149,10 @@ function Faqs({ data }) {
             <div className="col-lg-12">
               <div className="section-title mb-4 faq">
                 <h2>
-                  Frequently asked <span>questions</span>
+                  {t("Frequently asked")} <span>{t("questions")}</span>
                 </h2>
               </div>
-              {/* <div
-                className="accordion accordion-flush"
-                id="accordionFlushExample"
-              >
-                {faqs.map((item, index) => (
-                  <div className="accordion-item" key={index}>
-                    <h2
-                      className="accordion-header"
-                      id={`flush-heading${index}`}
-                    >
-                      <button
-                        className={`accordion-button ${
-                          activeIndex === index ? "" : "collapsed"
-                        }`}
-                        type="button"
-                        onClick={() => toggleFAQ(index)}
-                        data-bs-toggle="collapse"
-                        data-bs-target={`#flush-collapse${index}`}
-                        aria-expanded={activeIndex === index ? "true" : "false"}
-                        aria-controls={`flush-collapse${index}`}
-                      >
-                        {item.question}
-                      </button>
-                    </h2>
-                    <div
-                      id={`flush-collapse${index}`}
-                      className={`accordion-collapse collapse ${
-                        activeIndex === index ? "show" : ""
-                      }`}
-                      aria-labelledby={`flush-heading${index}`}
-                      data-bs-parent="#accordionFlushExample"
-                    >
-                      <div className="accordion-body">
-                        <p>{item.answer}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div> */}
+              
               <div
                 className="accordion accordion-flush"
                 id="accordionFlushExample"
@@ -233,7 +198,7 @@ function Faqs({ data }) {
                   to="/rules"
                   className="btn btn-primary text-uppercase rounded-2"
                 >
-                  View All
+                  {t("View All")}
                 </Link>
               </div>
             </div>

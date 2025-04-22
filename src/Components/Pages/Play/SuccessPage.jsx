@@ -2,17 +2,21 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 function SucessPage() {
   const [payments, setPayments] = useState([]);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchPayments = async () => {
       const token = localStorage.getItem("Web-token");
+      const lang = localStorage.getItem("selectedLanguage");
 
       try {
         const response = await axios.get("app/payments/get-contest-payments", {
           headers: { Authorization: `Bearer ${token}` },
+          "Accept-Language": lang,
         });
 
         setPayments(response.data.data[0] || []);
@@ -31,11 +35,6 @@ function SucessPage() {
     fetchPayments();
   }, []);
 
-  console.log("status", payments.createdAt);
-  console.log("transaction_status", payments.transaction_status);
-  // console.log("status", payments.paymentId);
-  // console.log("status", payments.paymentId);
-
   const navigate = useNavigate();
 
   const handlePaymentNavigation = () => {
@@ -48,7 +47,7 @@ function SucessPage() {
           <div className="row rowmainheading_inner">
             <div className="col-md-12 colmainheading_innerpages">
               <div className="pageheading_main page_myaccountdiv">
-                <h2 className="myaccounheading">Payment Status</h2>
+                <h2 className="myaccounheading">{t("Payment Status")}</h2>
               </div>
             </div>
           </div>
@@ -63,18 +62,6 @@ function SucessPage() {
                       <div className="profilesection_inner">
                         <div className="update_profile_main">
                           <div className="payment-success-div">
-                            {/* Icon */}
-                            {/* <div className="icon">
-                              {payments.transaction_status === "SUCCESS" ? (
-                                <span style={{ color: "green" }}>✔</span>
-                              ) : payments.transaction_status === "PENDING" ? (
-                                <span style={{ color: "orange" }}>⏳</span> // Pending icon
-                              ) : payments.transaction_status === "FAILED" ? (
-                                <span style={{ color: "red" }}>❌</span> // Failed icon
-                              ) : (
-                                <span style={{ color: "gray" }}>❌</span> // Default for other statuses
-                              )}
-                            </div> */}
                             <div className="icon">
                               {{
                                 SUCCESS: (
@@ -91,23 +78,25 @@ function SucessPage() {
 
                             {/* Payment Successful Text */}
                             <h2 className="text-center text-white">
-                              Payment{" "}
+                              {t("Payment")}{" "}
                               {payments.transaction_status
                                 ? payments.transaction_status
                                 : "Cancled"}
                             </h2>
 
                             <p className="subtitle text-center">
-                              Thank you for your participation!
+                              {t("Thank you for your participation!")}
                             </p>
                             {/* Order ID */}
                             <div className="order-id text-center">
-                              <span>📄 Ref. No: #{payments.paymentId}</span>
+                              <span>
+                                📄 {t("Ref. No")}: #{payments.paymentId}
+                              </span>
                             </div>
                             {/* Payment Details */}
                             <div className="details">
                               <p>
-                                <span>Time / Date</span>
+                                <span>{t("Time / Date")}</span>
                                 <span>
                                   {new Date(payments?.createdAt)
                                     .toLocaleString("en-GB", {
@@ -139,7 +128,9 @@ function SucessPage() {
                                 <span>₹{payments.}</span>
                               </p> */}
                               <p>
-                                <span className="bold">Total Amount</span>
+                                <span className="bold">
+                                  {t("Total Amount")}
+                                </span>
                                 <span className="bold">
                                   ₹
                                   {payments.amount
@@ -154,7 +145,7 @@ function SucessPage() {
                                 onClick={handlePaymentNavigation}
                                 className="paybtn_debitcard showpaydonepopup_click"
                               >
-                                View all payments
+                                {t("View all payments")}
                               </button>
                             </div>
                           </div>

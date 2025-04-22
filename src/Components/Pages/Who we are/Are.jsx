@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Loader from "../../Loader/Loader";
+import { useTranslation } from "react-i18next";
 
 function Are() {
   const [whos, setWhos] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const { t } = useTranslation();
 
   const fetchWho = async () => {
     const token = localStorage.getItem("Web-token");
+    const lang = localStorage.getItem("selectedLanguage");
+
     try {
       setIsLoading(true);
       const response = await axios.get(
@@ -15,12 +19,12 @@ function Are() {
         {
           headers: {
             Authorization: `Bearer ${token}`,
+            "Accept-Language": lang,
           },
         }
       );
 
       if (response.data.data) {
-     //  console.log("Fetched ", response.data.data);
         setWhos(response.data.data);
       }
     } catch (error) {
@@ -47,7 +51,7 @@ function Are() {
             <div className="row rowmainheading_inner">
               <div className="col-md-12 colmainheading_innerpages">
                 <div className="pageheading_main">
-                  <h2>Who We Are</h2>
+                  <h2>{t("Who We Are")}</h2>
                 </div>
               </div>
             </div>

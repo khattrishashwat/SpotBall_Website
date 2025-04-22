@@ -4,6 +4,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import * as Yup from "yup";
 import Loader from "../Loader/Loader";
+import { useTranslation } from "react-i18next";
 
 function Account() {
   const [pro, setPro] = useState();
@@ -12,6 +13,7 @@ function Account() {
   const [profileImagePreview, setProfileImagePreview] = useState(
     "image/user_image.png"
   );
+  const { t } = useTranslation();
 
   const [initialValues, setInitialValues] = useState({
     first_name: "",
@@ -45,11 +47,13 @@ function Account() {
 
   const fetchData = async () => {
     const token = localStorage.getItem("Web-token");
+    const lang = localStorage.getItem("selectedLanguage");
     try {
       setIsLoading(true);
       const response = await axios.get(`app/profile/get-profile`, {
         headers: {
           Authorization: `Bearer ${token}`,
+          "Accept-Language": lang,
         },
       });
 
@@ -94,56 +98,58 @@ function Account() {
     }
   };
 
- const updateProfile = async (values) => {
-   try {
-     const token = localStorage.getItem("Web-token");
-     const formData = new FormData();
+  const updateProfile = async (values) => {
+    try {
+      const token = localStorage.getItem("Web-token");
 
-     // Add only changed values to formData
-     if (values.first_name !== initialValues.first_name) {
-       formData.append("first_name", values.first_name);
-     }
-     if (values.last_name !== initialValues.last_name) {
-       formData.append("last_name", values.last_name);
-     }
-     if (values.profile && values.profile !== initialValues.profile) {
-       formData.append("profile", values.profile);
-     }
+      const lang = localStorage.getItem("selectedLanguage");
+      const formData = new FormData();
 
-     if (
-       formData.has("first_name") ||
-       formData.has("last_name") ||
-       formData.has("profile")
-     ) {
-       const response = await axios.post(
-         `app/profile/update-profile`,
-         formData,
-         {
-           headers: {
-             Authorization: `Bearer ${token}`,
-             "Content-Type": "multipart/form-data",
-           },
-         }
-       );
+      // Add only changed values to formData
+      if (values.first_name !== initialValues.first_name) {
+        formData.append("first_name", values.first_name);
+      }
+      if (values.last_name !== initialValues.last_name) {
+        formData.append("last_name", values.last_name);
+      }
+      if (values.profile && values.profile !== initialValues.profile) {
+        formData.append("profile", values.profile);
+      }
 
-       // Refresh data after successful update
-       fetchData();
+      if (
+        formData.has("first_name") ||
+        formData.has("last_name") ||
+        formData.has("profile")
+      ) {
+        const response = await axios.post(
+          `app/profile/update-profile`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "multipart/form-data",
+              "Accept-Language": lang,
+            },
+          }
+        );
 
-       // Show success message
-       Swal.fire("Success!", "Profile updated successfully", "success");
-     } else {
-       Swal.fire("Info!", "No changes detected", "info");
-     }
-   } catch (error) {
-     // Handle error message from response if available
-     const errorMessage =
-       error.response?.data?.message || "Failed to update profile";
+        // Refresh data after successful update
+        fetchData();
 
-     Swal.fire("Error!", errorMessage, "error");
-     console.error("Error updating profile:", error);
-   }
- };
+        // Show success message
+        Swal.fire("Success!", "Profile updated successfully", "success");
+      } else {
+        Swal.fire("Info!", "No changes detected", "info");
+      }
+    } catch (error) {
+      // Handle error message from response if available
+      const errorMessage =
+        error.response?.data?.message || "Failed to update profile";
 
+      Swal.fire("Error!", errorMessage, "error");
+      console.error("Error updating profile:", error);
+    }
+  };
 
   return (
     <div className="profilesection_inner">
@@ -164,7 +170,7 @@ function Account() {
                         <label className="-label" htmlFor="file">
                           <span>
                             <i className="fa fa-pencil" aria-hidden="true" />{" "}
-                            Change Image
+                            {t("Change Image")}
                           </span>
                         </label>
                         <input
@@ -204,7 +210,7 @@ function Account() {
                   name="first_name"
                   type="text"
                   className="updateinput"
-                  placeholder="Enter First Name"
+                  placeholder={t("Enter First Name")}
                   maxLength={25}
                   onKeyDown={(e) => {
                     if (!/[a-zA-Z\s]/.test(e.key) && e.key !== "Backspace") {
@@ -212,10 +218,7 @@ function Account() {
                     }
                   }}
                 />
-                {/* <img
-                  src={`${process.env.PUBLIC_URL}/images/edit_pro.png`}
-                  className="editicon_input"
-                /> */}
+
                 <ErrorMessage
                   name="first_name"
                   component="div"
@@ -228,7 +231,7 @@ function Account() {
                   name="last_name"
                   type="text"
                   className="updateinput"
-                  placeholder="Enter Last Name"
+                  placeholder={t("Enter Last Name")}
                   maxLength={15}
                   onKeyDown={(e) => {
                     if (!/[a-zA-Z\s]/.test(e.key) && e.key !== "Backspace") {
@@ -252,7 +255,7 @@ function Account() {
                   name="email"
                   type="email"
                   className="updateinput"
-                  placeholder="Enter Email"
+                  placeholder={t("Enter Email id")}
                   disabled
                 />
                 <ErrorMessage
@@ -267,7 +270,7 @@ function Account() {
                   name="phone"
                   type="tel"
                   className="updateinput"
-                  placeholder="Enter Phone Number"
+                  placeholder={t("Enter Phone Number")}
                   disabled
                 />
                 <ErrorMessage
@@ -278,7 +281,7 @@ function Account() {
               </div>
 
               <button type="submit" className="btn btn-primary">
-                Update Profile
+                {t("Update Profile")}
               </button>
             </Form>
           )}

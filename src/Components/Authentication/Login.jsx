@@ -10,12 +10,14 @@ import {
   LoginWithGoogle,
   LoginWithFacebook,
 } from "../FirebaseCofig/FirebaseConfig";
+import { useTranslation } from "react-i18next";
 
 function Login() {
   const formikRef = useRef(null);
 
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState("");
+  const { t } = useTranslation();
 
   const [showPassword, setShowPassword] = useState(false);
 
@@ -222,21 +224,24 @@ function Login() {
                     <Form>
                       <div className="colformlogin">
                         <div className="login-heading">
+                          {/* <h2>{t("Sign In")}</h2> */}
                           <h2>Sign In</h2>
                         </div>
                         <div className="formstart">
                           <div className="form-control frmctrldiv">
                             <Field
                               type="text"
+                              // name={t("emailOrPhone")}
                               name="emailOrPhone"
                               className="error"
-                              placeholder="Email / Mobile Number"
+                              placeholder={t("Email / Mobile Number")}
                               aria-label="Email or Phone Number"
                               onInput={(e) => {
                                 e.target.value = e.target.value.toLowerCase();
                               }}
                             />
                             <ErrorMessage
+                              // name={t("emailOrPhone")}
                               name="emailOrPhone"
                               component="div"
                               className="error-message"
@@ -245,10 +250,11 @@ function Login() {
                           <div className="form-control frmctrldiv formrgnbtm0">
                             <Field
                               type={showPassword ? "text" : "password"}
+                              // name={t("password")}
                               name="password"
                               className="error"
                               id="createpass_inp"
-                              placeholder="Password"
+                              placeholder={t("Password")}
                               aria-label="Password"
                               autoComplete="new-password"
                             />
@@ -264,6 +270,7 @@ function Login() {
                             />
                             <ErrorMessage
                               name="password"
+                              // name={t("password")}
                               component="div"
                               className="error-message"
                             />
@@ -277,7 +284,7 @@ function Login() {
                                 onClick={handleForgotPassword}
                                 className="frgtbtn"
                               >
-                                Forgot Password?
+                                {t("Forgot Password?")}
                               </button>
                             </a>
                           </div>
@@ -289,12 +296,12 @@ function Login() {
                         </div>
                         <div className="registerdiv">
                           <p>
-                            Don't have an account{" "}
-                            <Link to="/signup">Sign Up</Link>{" "}
+                            {t("Don't have an account ?")}{" "}
+                            <Link to="/signup">{t("Sign Up")}</Link>{" "}
                           </p>
                         </div>
                         <div className="signupwithsocial_div">
-                          <p>or Sign In using</p>
+                          <p>{t("or Sign In using")}</p>
                           <div className="signupsociallinks">
                             <ul>
                               <li>

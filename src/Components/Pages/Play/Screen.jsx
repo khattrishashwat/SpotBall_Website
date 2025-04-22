@@ -3,12 +3,14 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { RxCross2 } from "react-icons/rx";
 import axios from "axios";
 import Swal from "sweetalert2";
+import { useTranslation } from "react-i18next";
 
 function Screen() {
   const navigate = useNavigate();
   const imgRef = useRef(null);
 
-  const [colorIndex, setColorIndex] = useState(""); // Track the current color index
+  const [colorIndex, setColorIndex] = useState("");
+  const { t } = useTranslation();
 
   const location = useLocation();
   const { responseData, leftticket } = location.state.payload || {};
@@ -57,10 +59,13 @@ function Screen() {
 
   const fetchVideoData = async () => {
     const token = localStorage.getItem("Web-token");
+            const lang = localStorage.getItem("selectedLanguage");
+
     try {
       const response = await axios.get("app/how-to-play/get-how-to-play", {
         headers: {
           Authorization: `Bearer ${token}`,
+          "Accept-Language": lang,
         },
       });
 
@@ -189,7 +194,7 @@ function Screen() {
     const ticketToDelete = tickets.find((ticket) => ticket.id === id);
 
     if (!ticketToDelete) {
-      return; // Exit if the ticket doesn't exist
+      return; 
     }
 
     Swal.fire({
@@ -502,9 +507,12 @@ function Screen() {
 
     try {
       const token = localStorage.getItem("Web-token");
+              const lang = localStorage.getItem("selectedLanguage");
+
       const response = await axios.post("app/contest/add-to-cart", values, {
         headers: {
           Authorization: `Bearer ${token}`,
+          "Accept-Language": lang,
         },
       });
 
@@ -645,7 +653,7 @@ function Screen() {
             <div className="col-sm-12 col-lg-4 col3ticketscontest">
               <div className="ticketaxis_div">
                 <div className="ticketheading">
-                  <h3>Tickets</h3>
+                  <h3>{t("Tickets")}</h3>
                 </div>
                 <div className="actionicon_btn">
                   <div
@@ -658,7 +666,7 @@ function Screen() {
                       />
                     </div>
 
-                    <p>Video</p>
+                    <p>{t("Video")}</p>
                   </div>
                   <div className="threeicons_action" onClick={handleTicket}>
                     <div className="the_icon">
@@ -667,7 +675,7 @@ function Screen() {
                         alt="Add Ticket"
                       />
                     </div>
-                    <p>Ticket</p>
+                    <p>{t("Ticket")}</p>
                   </div>
                   <div className="threeicons_action" onClick={handleRefreshAll}>
                     <div className="the_icon">
@@ -677,7 +685,7 @@ function Screen() {
                       />
                     </div>
 
-                    <p>Refresh All</p>
+                    <p>{t("Refresh All")}</p>
                   </div>
                 </div>
                 <div className="ticketcount_div">
@@ -697,7 +705,7 @@ function Screen() {
                               {Number(
                                 responseData.jackpot_price
                               ).toLocaleString()}{" "}
-                              Contest
+                              {t("Contest")}
                             </h3>
                           </div>
                           <div className="usedticket_withcheck">
@@ -734,7 +742,7 @@ function Screen() {
                                 src={`${process.env.PUBLIC_URL}/image/refresh_cord.png`}
                               />
                             </div>
-                            <p className="actionheading">Replay</p>
+                            <p className="actionheading">{t("Replay")}</p>
                           </div>
                           <div className="cord_actiondiv">
                             <div
@@ -746,7 +754,7 @@ function Screen() {
                                 alt="Add"
                               />
                             </div>
-                            <p className="actionheading">Add</p>
+                            <p className="actionheading">{t("Add")}</p>
                           </div>
                           <div className="cord_actiondiv">
                             <div
@@ -757,7 +765,7 @@ function Screen() {
                                 src={`${process.env.PUBLIC_URL}/image/delete_cord.png`}
                               />
                             </div>
-                            <p className="actionheading">Delete</p>
+                            <p className="actionheading">{t("Delete")}</p>
                           </div>
                         </div>
                       </div>
@@ -772,7 +780,7 @@ function Screen() {
                     }`} // Add disabled-btn class when the condition is met
                     disabled={usedTickets !== totalTickets} // Button disabled until condition is met
                   >
-                    Checkout
+                    {t("Checkout")}
                   </button>
                 </div>
               </div>

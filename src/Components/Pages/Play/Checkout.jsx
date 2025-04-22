@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import Loader from "../../Loader/Loader";
 import Swal from "sweetalert2";
 import { load } from "@cashfreepayments/cashfree-js";
+import { useTranslation } from "react-i18next";
 
 function Checkout() {
   const navigate = useNavigate();
@@ -14,6 +15,7 @@ function Checkout() {
   const [alertShown, setAlertShown] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(""); // Store payment status
   const [viewPopup, setViewPopup] = useState(false);
+  const { t } = useTranslation();
 
   const [isEntrysActive, setIsEntrysActive] = useState(false);
   const [isImageRotated, setIsImageRotated] = useState(false);
@@ -41,16 +43,18 @@ function Checkout() {
     // isFetched.current = true;
 
     const token = localStorage.getItem("Web-token");
+    const lang = localStorage.getItem("selectedLanguage");
 
     try {
       const response = await axios.get("app/contest/get-all-cart-items", {
         headers: { Authorization: `Bearer ${token}` },
+        "Accept-Language": lang,
       });
 
       const { cartItems, discounts, promocodes } = response.data.data;
 
       if (cartItems.length === 0 && !alertShown) {
-        setAlertShown(true); // Prevent multiple alerts
+        setAlertShown(true);
 
         Swal.fire({
           icon: "info",
@@ -224,8 +228,11 @@ function Checkout() {
         };
 
         const token = localStorage.getItem("Web-token");
+        const lang = localStorage.getItem("selectedLanguage");
+
         await axios.post("app/contest/add-to-cart", payload, {
           headers: { Authorization: `Bearer ${token}` },
+          "Accept-Language": lang,
         });
 
         setReloadData((prev) => !prev);
@@ -248,99 +255,6 @@ function Checkout() {
       });
     }
   };
-
-  // const handleApplyPromoCode = async () => {
-  //   if (!promoCode.trim()) {
-  //     Swal.fire({
-  //       icon: "warning",
-  //       text: "Please enter a promo code before applying.",
-  //     });
-  //     return;
-  //   }
-
-  //   if (appliedPromoCode && appliedPromoCode.name === promoCode) {
-  //     Swal.fire({
-  //       icon: "info",
-  //       title: "Promo Code Already Applied.",
-  //     });
-  //     return;
-  //   }
-
-  //   const promo = promoCodes.find((code) => code.name === promoCode);
-
-  //   if (promo) {
-  //     const updatedCarts = calculatedCarts.map((cart) => ({
-  //       ...cart,
-  //       discount: null, // Remove any existing discount
-  //       promocodeApplied: {
-  //         name: promo.name,
-  //         amount: promo.amount,
-  //       },
-  //     }));
-
-  //     setCalculatedCarts(updatedCarts);
-  //     setAppliedPromoCode(promo);
-  //     setSelectedPromoCode(selectedPromoCode);
-
-  //     Swal.fire({
-  //       icon: "success",
-  //       text: `Promo code "${promo.name}" applied. Discount: ${promo.amount}%.`,
-  //     });
-
-  //     try {
-  //       const updatedCart = updatedCarts[0];
-  //       if (!updatedCart) return;
-
-  //       const payload = {
-  //         contest_id: updatedCart?.contest_id?._id,
-  //         tickets_count: updatedCart?.tickets_count,
-  //         user_coordinates: updatedCart?.user_coordinates,
-  //         promocodeApplied: {
-  //           name: promo.name,
-  //           amount: promo.amount,
-  //         },
-  //       };
-
-  //       const token = localStorage.getItem("Web-token");
-  //       await axios.post("app/contest/add-to-cart", payload, {
-  //         headers: { Authorization: `Bearer ${token}` },
-  //       });
-
-  //       setReloadData((prev) => !prev);
-
-  //       // Show loader before fetching new data
-  //       Swal.fire({
-  //         title: "Applying Promo Code...",
-  //         text: "Please wait while we update your cart.",
-  //         allowOutsideClick: false,
-  //         didOpen: () => {
-  //           Swal.showLoading();
-  //         },
-  //       });
-
-  //       // Simulate loading delay before fetching new data
-  //       setTimeout(async () => {
-  //         await fetchData(); // Fetch new data after applying promo code
-
-  //         Swal.fire({
-  //           icon: "success",
-  //           title: "Promo Code Applied Successfully.",
-  //         });
-  //       }, 10000); // Wait for 10 seconds before fetching data
-  //     } catch (error) {
-  //       console.error("API Error:", error);
-  //       Swal.fire({
-  //         icon: "error",
-  //         title: "Failed to Apply Promo Code.",
-  //       });
-  //     }
-  //   } else {
-  //     Swal.fire({
-  //       icon: "error",
-  //       title: "Invalid Promo Code.",
-  //     });
-  //   }
-  // };
 
   const calculateDiscounts = (cart) => {
     const promoDiscountName = cart.promocodeApplied
@@ -417,6 +331,7 @@ function Checkout() {
   const handleCrossClick = async (cart) => {
     const { contest_id, tickets_count, user_coordinates } = cart;
     const token = localStorage.getItem("Web-token");
+    const lang = localStorage.getItem("selectedLanguage");
 
     Swal.fire({
       title: "Are you sure?",
@@ -433,6 +348,7 @@ function Checkout() {
             {
               headers: {
                 Authorization: `Bearer ${token}`,
+                "Accept-Language": lang,
               },
               params: {
                 contest_id: contest_id._id,
@@ -476,6 +392,7 @@ function Checkout() {
     try {
       const token = localStorage.getItem("Web-token");
       const order_amount = totalBeforeDiscount.toFixed(2);
+        const lang = localStorage.getItem("selectedLanguage");
 
       console.log("Total Before Discount:", order_amount);
 
@@ -485,6 +402,7 @@ function Checkout() {
         { order_amount },
         {
           headers: { Authorization: `Bearer ${token}` },
+          "Accept-Language": lang,
         }
       );
 
@@ -723,6 +641,8 @@ function Checkout() {
   const OrderStatus = async (paymentOrderId) => {
     try {
       const token = localStorage.getItem("Web-token");
+      const lang = localStorage.getItem("selectedLanguage");
+
       if (token) {
         const response = await axios.post(
           `app/cashfree/update-order-status?order_id=${paymentOrderId}`,
@@ -730,6 +650,7 @@ function Checkout() {
           {
             headers: {
               Authorization: `Bearer ${token}`,
+              "Accept-Language": lang,
             },
           }
         );
@@ -758,6 +679,7 @@ function Checkout() {
 
   const Pay = async (data) => {
     const token = localStorage.getItem("Web-token");
+    const lang = localStorage.getItem("selectedLanguage");
 
     try {
       const response = await axios.post(
@@ -766,6 +688,7 @@ function Checkout() {
         {
           headers: {
             Authorization: `Bearer ${token}`,
+            "Accept-Language": lang,
           },
         }
       );
@@ -785,7 +708,7 @@ function Checkout() {
           <div className="row rowmainheading_inner">
             <div className="col-md-12 colmainheading_innerpages">
               <div className="pageheading_main page_myaccountdiv">
-                <h2 className="myaccounheading">Checkout</h2>
+                <h2 className="myaccounheading">{t("Checkout")}</h2>
               </div>
             </div>
           </div>
@@ -804,7 +727,7 @@ function Checkout() {
                           <div className="checkout_cartdiv">
                             <div className="cart_jackpotdetails cartwindiv_mainformov">
                               <div className="cart_windiv">
-                                Win{" "}
+                                {t("Win")}{" "}
                                 <span className="winprice_cart">
                                   ₹
                                   {Number(
@@ -818,11 +741,15 @@ function Checkout() {
                                   {Number(
                                     cart.contest_id.jackpot_price
                                   ).toLocaleString()}{" "}
-                                  Jackpot
+                                  {t("Grand Prize")}
                                 </h3>
 
-                                <h4>{cart.tickets_count} Tickets</h4>
-                                <p>Spot &amp; Win</p>
+                                <h4>
+                                  {cart.tickets_count} {t("Tickets")}
+                                </h4>
+                                <p>
+                                  {t("Spot")} &amp; {t("Win")}
+                                </p>
                               </div>
                             </div>
                             <div className="cart_gametotalprice">
@@ -863,7 +790,7 @@ function Checkout() {
                               </div>
                               <div className="cardbills">
                                 <div className="creditbils_div">
-                                  <h4>Bill Details</h4>
+                                  <h4>{t("Bill Details")}</h4>
                                 </div>
                               </div>
                               <div
@@ -895,20 +822,20 @@ function Checkout() {
                                       className="cart-itemss table-blockk"
                                     >
                                       <p>
-                                        <strong>Items Total: </strong>₹
+                                        <strong>{t("Items Total")}: </strong>₹
                                         {cart.totalTicketPrice}
                                       </p>
                                       {cart.promoCode && (
                                         <>
                                           <p>
                                             <strong>
-                                              Promo Applied({PromoAmount}
+                                              {t("Promo Applied")}({PromoAmount}
                                               %):
                                             </strong>{" "}
                                             ₹{promoDiscountAmount}
                                           </p>
                                           <p>
-                                            <strong>After: </strong>₹
+                                            <strong>{t("After")}: </strong>₹
                                             {discountedTotalTicketPrice}
                                           </p>
                                         </>
@@ -917,12 +844,13 @@ function Checkout() {
                                         <>
                                           <p className="discount-line">
                                             <strong>
-                                              Discount ({discountPercentage}%):
+                                              {t("Discount")} (
+                                              {discountPercentage}%):
                                             </strong>{" "}
                                             ₹{discountAmount}
                                           </p>
                                           <p>
-                                            <strong>After: </strong>₹
+                                            <strong>{t("After")}: </strong>₹
                                             {discountedTotalTicketPrice}
                                           </p>
                                         </>
@@ -935,14 +863,15 @@ function Checkout() {
                                       </p>
                                       <p>
                                         <strong>
-                                          Subtotal (Base Amount + GST):{" "}
+                                          {t("Subtotal")} (
+                                          {t("Base Amount + GST")}):{" "}
                                         </strong>
                                         ₹{discountedSubtotal}
                                       </p>
                                       <hr />
                                       <p>
                                         <strong>
-                                          Platform Fee (@
+                                          {t("Platform Fee")} (@
                                           {
                                             cart.contest_id.platformFeeRate
                                           }%):{" "}
@@ -951,20 +880,23 @@ function Checkout() {
                                       </p>
                                       <p>
                                         <strong>
-                                          GST on Platform Fee (@
+                                          {t("GST on Platform Fee")} (@
                                           {cart.contest_id.gstOnPlatformFeeRate}
                                           %):{" "}
                                         </strong>
                                         ₹{discountedGstOnPlatformFee}
                                       </p>
                                       <p>
-                                        <strong>Total Platform Fee: </strong>₹
-                                        {discountedTotalRazorpayFee}
+                                        <strong>
+                                          {t("Total Platform Fee")}:{" "}
+                                        </strong>
+                                        ₹{discountedTotalRazorpayFee}
                                       </p>
                                       <hr />
                                       <p>
                                         <strong>
-                                          Grand Total (Subtotal + Platform):{" "}
+                                          {t("Grand Total")} (
+                                          {t("Subtotal + Platform")}):{" "}
                                         </strong>
                                         ₹{discountedGrandTotal}
                                       </p>
@@ -981,9 +913,9 @@ function Checkout() {
                       <table className="table table-bordered cordtable_new">
                         <thead>
                           <tr>
-                            <th>Tickets</th>
-                            <th>X- Coordinates</th>
-                            <th>Y- Coordinates</th>
+                            <th>{t("Tickets")}</th>
+                            <th>{t("X- Coordinates")}</th>
+                            <th>{t("Y- Coordinates")}</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -1017,7 +949,7 @@ function Checkout() {
                           className="apply_button_cart"
                           onClick={handleApplyPromoCode}
                         >
-                          Apply
+                          {t("Apply")}
                         </button>
                       </div>
 
@@ -1039,7 +971,7 @@ function Checkout() {
                         <div className="cardpay">
                           <div className="creditpays">
                             <div className="cardpayment">
-                              <p>Pay Now</p>
+                              <p>{t("Pay Now")}</p>
                             </div>
                           </div>
                         </div>

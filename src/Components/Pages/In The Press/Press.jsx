@@ -2,13 +2,13 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Loader from "../../Loader/Loader";
+import { useTranslation } from "react-i18next";
 
 function Press() {
   const [isLoading, setIsLoading] = useState(false);
   const [press, setPress] = useState([]);
   const navigate = useNavigate();
-
-  // Function to generate a URL-friendly slug from the title
+  const { t } = useTranslation();
   const generateSlug = (title) => {
     return title
       .toLowerCase()
@@ -24,11 +24,14 @@ function Press() {
 
   const fetchPress = async () => {
     const token = localStorage.getItem("Web-token");
+            const lang = localStorage.getItem("selectedLanguage");
+
     try {
       setIsLoading(true);
       const response = await axios.get("app/press/get-press", {
         headers: {
           Authorization: `Bearer ${token}`,
+          "Accept-Language": lang,
         },
       });
 
@@ -52,7 +55,7 @@ function Press() {
         <div className="row rowmainheading_inner">
           <div className="col-md-12 colmainheading_innerpages">
             <div className="pageheading_main">
-              <h2>Trending Articles </h2>
+              <h2>{t("Trending Articles")} </h2>
             </div>
           </div>
         </div>
@@ -86,7 +89,7 @@ function Press() {
                         handleArticleClick(pressItem._id, pressItem.title)
                       }
                     >
-                      Read Full Article
+                      {t("Read Full Article")}
                     </a>
                   </div>
                 </div>
@@ -95,7 +98,7 @@ function Press() {
           </div>
         ) : (
           <div className="row inthepress_mainrow">
-            <div className="no-data-message">No Press Found</div>
+            <div className="no-data-message">{t("No Press Found")}</div>
           </div>
         )}
       </div>

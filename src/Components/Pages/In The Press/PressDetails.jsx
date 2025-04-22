@@ -3,20 +3,26 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 
 function PressDetails() {
-  const { id } = useParams(); // Fetch the article ID from the URL
-  const [article, setArticle] = useState(null); // State to store article data
-  const [isLoading, setIsLoading] = useState(true); // Loading state
-  const [error, setError] = useState(null); // Error state
+  const { id } = useParams();
+  const [article, setArticle] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchArticle = async () => {
       try {
+        const lang = localStorage.getItem("selectedLanguage");
+
         setIsLoading(true);
         const response = await axios.get(
-          `app/press/get-press-by-id?press_id=${id}`
-        ); // Replace with your API URL
+          `app/press/get-press-by-id?press_id=${id}`,
+          {
+            headers: {
+              "Accept-Language": lang,
+            },
+          }
+        );
         setArticle(response.data.data);
-        // console.log("Article Data: ", response.data.data);
       } catch (err) {
         setError("Failed to load article.");
       } finally {

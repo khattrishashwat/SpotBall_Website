@@ -2,19 +2,23 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import Loader from "../../Loader/Loader";
+import { useTranslation } from "react-i18next";
 
 function Privacy() {
   const [isPrivacy, setIsPrivacy] = useState("");
-  const [isLoading, setIsLoading] = useState(true); // Set to true initially to show loader
+  const [isLoading, setIsLoading] = useState(true);
+  const { t } = useTranslation();
 
   const fetchCondition = async () => {
     const token = localStorage.getItem("Web-token");
-    try {
+           const lang = localStorage.getItem("selectedLanguage");
+ try {
       const response = await axios.get(
         "app/static-content/get-all-static-content/privacy_policy",
         {
           headers: {
             Authorization: `Bearer ${token}`,
+            "Accept-Language": lang,
           },
         }
       );
@@ -40,7 +44,7 @@ function Privacy() {
           <div className="row rowmainheading_inner">
             <div className="col-md-12 colmainheading_innerpages">
               <div className="pageheading_main">
-                <h2>Privacy Policies</h2>
+                <h2>{t("Privacy Policies")}</h2>
               </div>
             </div>
           </div>
@@ -58,7 +62,7 @@ function Privacy() {
                           alt="Terms"
                         />
                       </div>
-                      <span className="navlinkname">Terms & Conditions</span>
+                      <span className="navlinkname">{t("Terms & Conditions")}</span>
                     </Link>
                   </li>
                   <li className="nav-item">
@@ -73,7 +77,7 @@ function Privacy() {
                           alt="Privacy"
                         />
                       </div>
-                      <span className="navlinkname">Privacy Policies</span>
+                      <span className="navlinkname">{t("Privacy Policies")}</span>
                     </Link>
                   </li>
                   <li className="nav-item">
@@ -84,7 +88,7 @@ function Privacy() {
                           alt="Rules"
                         />
                       </div>
-                      <span className="navlinkname">Rules of Play & FAQs</span>
+                      <span className="navlinkname">{t("Rules of Play & FAQs")}</span>
                     </Link>
                   </li>
                   <li className="nav-item">
@@ -95,7 +99,7 @@ function Privacy() {
                           alt="Cookies"
                         />
                       </div>
-                      <span className="navlinkname">Cookie Policy</span>
+                      <span className="navlinkname">{t("Cookie Policy")}</span>
                     </Link>
                   </li>
                 </ul>
@@ -107,7 +111,7 @@ function Privacy() {
                   <div id="pricvacypolicy" className="tab-pane active">
                     <div className="legaltermsdata_div">
                       {isLoading ? (
-                        <Loader /> // This shows a spinner while loading
+                        <Loader />
                       ) : (
                         <div
                           className="innerlegal_heaidngwithpara"

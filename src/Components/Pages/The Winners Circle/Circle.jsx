@@ -2,11 +2,13 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import { useTranslation } from "react-i18next";
 
 function Circle() {
   const [links, setLinks] = useState([]);
   const [year, setYear] = useState(new Date().getFullYear().toString());
   const [month, setMonth] = useState("");
+  const { t } = useTranslation();
 
   useEffect(() => {
     AOS.init({ duration: 1000 });
@@ -14,12 +16,15 @@ function Circle() {
   useEffect(() => {
     const fetchLinks = async () => {
       const token = localStorage.getItem("Web-token");
+      const lang = localStorage.getItem("selectedLanguage");
+
       try {
         const response = await axios.get(
           `app/contest/the-winners-circle/?year=${year}&month=${month}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
+              "Accept-Language": lang,
             },
           }
         );
@@ -67,7 +72,7 @@ function Circle() {
         <div className="row rowmainheading_inner">
           <div className="col-md-12 colmainheading_innerpages">
             <div className="pageheading_main">
-              <h2>The Winners Circle</h2>
+              <h2>{t("The Winners Circle")}</h2>
             </div>
           </div>
         </div>
@@ -97,19 +102,19 @@ function Circle() {
                   value={month}
                   onChange={(e) => setMonth(e.target.value)}
                 >
-                  <option value="">Select Month</option>
-                  <option value="1">January</option>
-                  <option value="2">February</option>
-                  <option value="3">March</option>
-                  <option value="4">April</option>
-                  <option value="5">May</option>
-                  <option value="6">June</option>
-                  <option value="7">July</option>
-                  <option value="8">August</option>
-                  <option value="9">September</option>
-                  <option value="10">October</option>
-                  <option value="11">November</option>
-                  <option value="12">December</option>
+                  <option value="">{t("Select Month")}</option>
+                  <option value="1">{t("January")}</option>
+                  <option value="2">{t("February")}</option>
+                  <option value="3">{t("March")}</option>
+                  <option value="4">{t("April")}</option>
+                  <option value="5">{t("May")}</option>
+                  <option value="6">{t("June")}</option>
+                  <option value="7">{t("July")}</option>
+                  <option value="8">{t("August")}</option>
+                  <option value="9">{t("September")}</option>
+                  <option value="10">{t("October")}</option>
+                  <option value="11">{t("November")}</option>
+                  <option value="12">{t("December")}</option>
                 </select>
               </div>
             </div>
@@ -124,7 +129,7 @@ function Circle() {
                 data-aos="fade-up"
                 data-aos-delay="200"
               >
-                No data available on selected filter
+                {t("No data available on selected filter")}
               </div>
             ) : (
               <>
@@ -177,15 +182,17 @@ function Circle() {
                                       <h3>
                                         {`${item?.userId?.first_name} ${item?.userId?.last_name}`.toUpperCase()}
                                       </h3>
-                                      <p>{`Jackpot ${formatDate(
-                                        item?.createdAt
-                                      )}`}</p>
                                       <p>
-                                        Winning Coordinates:{" "}
+                                        {t("Grand Prize")}{" "}
+                                        {formatDate(item?.createdAt)}
+                                      </p>
+
+                                      <p>
+                                        {t("Winning Coordinates")}:{" "}
                                         {`X: ${item?.contestId?.winning_coordinates?.x}, Y: ${item?.contestId?.winning_coordinates?.y}`}
                                       </p>
                                       <p>
-                                        Closest Coordinate:{" "}
+                                        {t("Closest Coordinate")}:{" "}
                                         {`X: ${item?.closestCoordinate?.x}, Y: ${item?.closestCoordinate?.y}`}
                                       </p>
                                       <h4>{`₹${item?.prize.toLocaleString(

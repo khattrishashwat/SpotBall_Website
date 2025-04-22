@@ -3,6 +3,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 import Swal from "sweetalert2";
+import { useTranslation } from "react-i18next";
 
 function ChangePassword({ resetForm }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -10,6 +11,7 @@ function ChangePassword({ resetForm }) {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const formikRef = useRef();
+  const { t } = useTranslation();
 
   const togglePasswordVisibility = () => {
     setShowPassword((prevState) => !prevState);
@@ -33,7 +35,7 @@ function ChangePassword({ resetForm }) {
       .required("Password is required")
       .min(6, "Password should be between 6-16 characters long")
       .max(16, "Password should be between 6-16 characters long"),
-      
+
     confirm_password: Yup.string()
       .oneOf(
         [Yup.ref("new_password"), null],
@@ -45,9 +47,11 @@ function ChangePassword({ resetForm }) {
   const ChangeSubmit = async (values) => {
     try {
       const token = localStorage.getItem("Web-token");
+      const lang = localStorage.getItem("selectedLanguage");
       const response = await axios.post("app/profile/change-password", values, {
         headers: {
           Authorization: `Bearer ${token}`,
+          "Accept-Language": lang,
         },
       });
       Swal.fire({
@@ -99,7 +103,7 @@ function ChangePassword({ resetForm }) {
                     name="old_password"
                     autoComplete="off"
                     id="createpass_inp"
-                    placeholder="Old Password"
+                    placeholder={t("Enter Old Password")}
                   />
                   <span
                     onClick={togglePasswordVisibility}
@@ -125,7 +129,7 @@ function ChangePassword({ resetForm }) {
                     className="changepassinput"
                     autoComplete="off"
                     id="createpass_inp1"
-                    placeholder="New Password"
+                    placeholder={t("Enter New Password")}
                   />
                   <span
                     onClick={toggleNewPasswordVisibility}
@@ -153,7 +157,7 @@ function ChangePassword({ resetForm }) {
                     className="changepassinput"
                     autoComplete="off"
                     id="createpass_inp2"
-                    placeholder="Confirm Password"
+                    placeholder={t("Enter Confirm Password")}
                   />
                   <span
                     onClick={toggleConfirmPasswordVisibility}
@@ -175,7 +179,7 @@ function ChangePassword({ resetForm }) {
 
               <div className="savepass_btndiv">
                 <button type="submit" className="savepass_change_myacc">
-                  Save Password
+                  {t("Save Password")}
                 </button>
               </div>
             </div>

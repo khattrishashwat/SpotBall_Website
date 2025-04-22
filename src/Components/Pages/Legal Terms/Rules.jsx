@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import Loader from "../../Loader/Loader";
+import { useTranslation } from "react-i18next";
 
 function Rules() {
   const [rules, setRules] = useState("");
@@ -9,6 +10,7 @@ function Rules() {
   const [faqs, setFaqs] = useState([]);
   const [activeIndex, setActiveIndex] = useState(null);
   const [activeTab, setActiveTab] = useState("rules_play");
+  const { t } = useTranslation();
 
   // Scroll to top on component mount
   useEffect(() => {
@@ -18,6 +20,8 @@ function Rules() {
   // Fetch Rules of Play data
   const fetchRules = async () => {
     const token = localStorage.getItem("Web-token");
+    const lang = localStorage.getItem("selectedLanguage");
+
     try {
       setIsLoading(true);
       const response = await axios.get(
@@ -25,6 +29,7 @@ function Rules() {
         {
           headers: {
             Authorization: `Bearer ${token}`,
+            "Accept-Language": lang,
           },
         }
       );
@@ -39,11 +44,14 @@ function Rules() {
   // Fetch FAQ data
   const fetchFaqs = async () => {
     const token = localStorage.getItem("Web-token");
+    const lang = localStorage.getItem("selectedLanguage");
+
     try {
       setIsLoading(true);
       const response = await axios.get("app/faq/get-all-faq", {
         headers: {
           Authorization: `Bearer ${token}`,
+          "Accept-Language": lang,
         },
       });
       setFaqs(response.data.data || []);
@@ -72,7 +80,7 @@ function Rules() {
           <div className="row rowmainheading_inner">
             <div className="col-md-12 colmainheading_innerpages">
               <div className="pageheading_main">
-                <h2>Rules of Play & FAQs</h2>
+                <h2>{t("Rules of Play & FAQs")}</h2>
               </div>
             </div>
           </div>
@@ -91,7 +99,9 @@ function Rules() {
                           alt="Terms"
                         />
                       </div>
-                      <span className="navlinkname">Terms & Conditions</span>
+                      <span className="navlinkname">
+                        {t("Terms & Conditions")}
+                      </span>
                     </Link>
                   </li>
                   <li className="nav-item">
@@ -102,7 +112,9 @@ function Rules() {
                           alt="Privacy"
                         />
                       </div>
-                      <span className="navlinkname">Privacy Policies</span>
+                      <span className="navlinkname">
+                        {t("Privacy Policies")}
+                      </span>
                     </Link>
                   </li>
                   <li className="nav-item">
@@ -113,7 +125,9 @@ function Rules() {
                           alt="Rules"
                         />
                       </div>
-                      <span className="navlinkname">Rules of Play & FAQs</span>
+                      <span className="navlinkname">
+                        {t("Rules of Play")} &amp; {t("FAQs")}
+                      </span>
                     </Link>
                   </li>
                   <li className="nav-item">
@@ -124,7 +138,7 @@ function Rules() {
                           alt="Cookies"
                         />
                       </div>
-                      <span className="navlinkname">Cookie Policy</span>
+                      <span className="navlinkname">{t("Cookie Policy")}</span>
                     </Link>
                   </li>
                 </ul>
@@ -136,14 +150,8 @@ function Rules() {
                 <div className="tab-content">
                   <div id="rulesplay" className="tab-pane active">
                     <div className="legaltermsdata_div">
-                      {/* <div
-                        className="innerlegal_heaidngwithpara"
-                        dangerouslySetInnerHTML={{
-                          __html: rules,
-                        }}
-                      /> */}
                       {isLoading ? (
-                        <Loader /> // This shows a spinner while loading
+                        <Loader />
                       ) : (
                         <div
                           className="innerlegal_heaidngwithpara"
@@ -161,7 +169,7 @@ function Rules() {
             <div className="row termsinnerfaqdiv_row" id="faqnew_innerdiv">
               <div className="col-md-12 col12termsfaqnew">
                 <div className="terms_faqinnerdiv">
-                  <h3>FAQs</h3>
+                  <h3>{t("FAQs")}</h3>
                   <div className="faq_content">
                     <div
                       className="panel-group"

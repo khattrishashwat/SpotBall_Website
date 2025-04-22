@@ -10,10 +10,12 @@ import {
   LoginWithGoogle,
   LoginWithFacebook,
 } from "../FirebaseCofig/FirebaseConfig";
+import { useTranslation } from "react-i18next";
 
 function Signup() {
   const formikRef = useRef(null);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const [emails, setEmails] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -206,14 +208,14 @@ function Signup() {
                       {({ isSubmitting, errors, touched, setFieldValue }) => (
                         <Form>
                           <div className="login-heading">
-                            <h2>Sign Up</h2>
+                            <h2>{t("Sign Up")}</h2>
                           </div>
                           <div className="formstart signup">
                             <div className="form-control frmctrldiv">
                               <Field
                                 type="text"
-                                name="first_name"
-                                placeholder="First Name"
+                                name={t("first_name")}
+                                placeholder={t("First Name")}
                                 onChange={(e) =>
                                   handleFieldChange(
                                     "first_name",
@@ -235,7 +237,7 @@ function Signup() {
                               />
 
                               <ErrorMessage
-                                name="first_name"
+                                name={t("first_name")}
                                 component="div"
                                 className="error-message"
                               />
@@ -243,8 +245,8 @@ function Signup() {
                             <div className="form-control frmctrldiv">
                               <Field
                                 type="text"
-                                name="last_name"
-                                placeholder="Last Name"
+                                name={t("last_name")}
+                                placeholder={t("Last Name")}
                                 onChange={(e) =>
                                   handleFieldChange(
                                     "last_name",
@@ -265,7 +267,7 @@ function Signup() {
                                 }}
                               />
                               <ErrorMessage
-                                name="last_name"
+                                name={t("last_name")}
                                 component="div"
                                 className="error-message"
                               />
@@ -273,8 +275,8 @@ function Signup() {
                             <div className="form-control frmctrldiv">
                               <Field
                                 type="email"
-                                name="email"
-                                placeholder="Email"
+                                name={t("email")}
+                                placeholder={t("Email")}
                                 onChange={(e) =>
                                   handleFieldChange(
                                     "email",
@@ -292,7 +294,7 @@ function Signup() {
                                 }}
                               />
                               <ErrorMessage
-                                name="email"
+                                name={t("email")}
                                 component="div"
                                 className="error-message"
                               />
@@ -300,8 +302,8 @@ function Signup() {
                             <div className="form-control frmctrldiv">
                               <Field
                                 type="text"
-                                name="phone"
-                                placeholder="Mobile no."
+                                name={t("phone")}
+                                placeholder={t("Mobile no.")}
                                 onChange={(e) => {
                                   const numericValue = handleNumericInput(
                                     e.target.value
@@ -316,7 +318,7 @@ function Signup() {
                               />
 
                               <ErrorMessage
-                                name="phone"
+                                name={t("phone")}
                                 component="div"
                                 className="error-message"
                               />
@@ -324,8 +326,8 @@ function Signup() {
                             <div className="form-control frmctrldiv ">
                               <Field
                                 type={showNewPassword ? "text" : "password"}
-                                name="password"
-                                placeholder="Password"
+                                name={t("password")}
+                                placeholder={t("Password")}
                                 onChange={(e) =>
                                   handleFieldChange(
                                     "password",
@@ -344,7 +346,7 @@ function Signup() {
                                 aria-hidden="true"
                               />
                               <ErrorMessage
-                                name="password"
+                                name={t("password")}
                                 component="div"
                                 className="error-message"
                               />
@@ -352,8 +354,8 @@ function Signup() {
                             <div className="form-control frmctrldiv formrgnbtm0">
                               <Field
                                 type={showConfirmPassword ? "text" : "password"}
-                                name="confirm_password"
-                                placeholder="Confirm Password"
+                                name={t("confirm_password")}
+                                placeholder={t("Confirm Password")}
                                 onChange={(e) =>
                                   handleFieldChange(
                                     "confirm_password",
@@ -372,7 +374,7 @@ function Signup() {
                                 aria-hidden="true"
                               />
                               <ErrorMessage
-                                name="confirm_password"
+                                name={t("confirm_password")}
                                 component="div"
                                 className="error-message"
                               />
@@ -382,20 +384,24 @@ function Signup() {
                             <div className="rememebrmediv">
                               <Field
                                 type="checkbox"
-                                name="agreeAllLegal"
+                                name={t("agreeAllLegal")}
                                 className="checkboxemeber"
                               />
                               <label
                                 htmlFor="rememebrbtn"
                                 className="labelrememebrme"
                               >
-                                I have read &amp; agree with{" "}
-                                <Link to="/terms">Terms &amp; Conditions</Link>,{" "}
-                                <Link to="/privacy">Privacy Policy</Link> &amp;{" "}
-                                <Link to="/cookies">Cookie Policy</Link>
+                                {t("I have read")} &amp; {t("agree with")}{" "}
+                                <Link to="/terms">
+                                  {t("Terms")} &amp; {t("Conditions")}
+                                </Link>
+                                ,{" "}
+                                <Link to="/privacy">{t("Privacy Policy")}</Link>{" "}
+                                &amp;{" "}
+                                <Link to="/cookies">{t("Cookie Policy")}</Link>
                               </label>
                               <ErrorMessage
-                                name="agreeAllLegal"
+                                name={t("agreeAllLegal")}
                                 component="div"
                                 className="error-message"
                               />
@@ -405,20 +411,20 @@ function Signup() {
                             <div className="rememebrmediv">
                               <Field
                                 type="checkbox"
-                                name="agreeRules"
+                                name={t("agreeRules")}
                                 className="checkboxemeber"
                               />
                               <label
                                 htmlFor="rememebrbtn2"
                                 className="labelrememebrme"
                               >
-                                I have read &amp; agree with{" "}
+                                {t("I have read")} &amp; {t("agree with")}{" "}
                                 <Link to="/rules">
-                                  Rules of Play &amp; FAQ's
+                                  {t("Rules of Play")} &amp; {t("FAQ's")}
                                 </Link>
                               </label>
                               <ErrorMessage
-                                name="agreeRules"
+                                name={t("agreeRules")}
                                 component="div"
                                 className="error-message"
                               />
@@ -428,19 +434,17 @@ function Signup() {
                             <div className="rememebrmediv">
                               <Field
                                 type="checkbox"
-                                name="agreeAge"
+                                name={t("agreeAge")}
                                 className="checkboxemeber"
                               />
                               <label
                                 htmlFor="rememebrbtn2"
                                 className="labelrememebrme"
                               >
-                                I hereby confirm and acknowledge that I am not a
-                                minor, and that I am least 18 years old as of
-                                today’s date.
+                                {("I hereby confirm and acknowledge that I am not a minor, and that I am least 18 years old as of today’s date.")}
                               </label>
                               <ErrorMessage
-                                name="agreeAge"
+                                name={t("agreeAge")}
                                 component="div"
                                 className="error-message"
                               />
@@ -460,13 +464,13 @@ function Signup() {
                     </Formik>
                     <div className="registerdiv">
                       <p>
-                        Already have an account?{" "}
-                        <Link to="/login">Sign In</Link>{" "}
+                        {t("Already have an account?")}{" "}
+                        <Link to="/login">{t("Sign In")}</Link>{" "}
                       </p>
                     </div>
 
                     <div className="signupwithsocial_div">
-                      <p>or Sign Up using</p>
+                      <p>{t("or Sign Up using")}</p>
                       <div className="signupsociallinks">
                         <ul>
                           <li>

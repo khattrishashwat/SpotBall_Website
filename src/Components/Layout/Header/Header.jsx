@@ -3,19 +3,13 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import moment from "moment";
 import Swal from "sweetalert2";
+import { useTranslation } from "react-i18next";
 
-const locales = ["en-GB", "hi-IN", "ta-IN", "te-IN"];
-
-// function getFlagSrc(countryCode) {
-//   return /^[A-Z]{2}$/.test(countryCode)
-//     ? `https://flagsapi.com/${countryCode.toUpperCase()}/shiny/64.png`
-//     : "";
-// }
+const locales = ["en", "hi"];
 
 function Header() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [headerClass, setHeaderClass] = useState("");
   const [notification, setNotification] = useState("");
   const [profile, setProfile] = useState({});
   const [isMenuVisible, setIsMenuVisible] = useState(false);
@@ -23,21 +17,84 @@ function Header() {
   const [selectedLocale, setSelectedLocale] = useState(locales[0]);
   const [islangOpen, setIslangOpen] = useState(false);
   const [isLogout, setIsLogout] = useState("");
+  const { i18n, t } = useTranslation();
 
+  // const getLangName = (locale) => {
+  //   const intlLocale = new Intl.Locale(locale);
+  //   return new Intl.DisplayNames([locale], { type: "language" }).of(
+  //     intlLocale.language
+  //   );
+  // };
+
+  const getLangName = (locale) => {
+    const langMap = {
+      en: "English",
+      hi: "हिंदी",
+    };
+    return langMap[locale] || locale;
+  };
+  const langName = getLangName(selectedLocale);
   useEffect(() => {
-    const browserLang = new Intl.Locale(navigator.language).language;
-    const matchedLocale = locales.find(
-      (locale) => new Intl.Locale(locale).language === browserLang
-    );
-    if (matchedLocale) {
-      setSelectedLocale(matchedLocale);
+    const storedLang = localStorage.getItem("selectedLanguage");
+    if (storedLang) {
+      setSelectedLocale(storedLang);
+      i18n.changeLanguage(storedLang);
+    } else {
+      const browserLang = new Intl.Locale(navigator.language).language;
+      const matchedLocale = locales.find(
+        (locale) => new Intl.Locale(locale).language === browserLang
+      );
+      const defaultLang = matchedLocale || "en";
+      setSelectedLocale(defaultLang);
+      i18n.changeLanguage(defaultLang);
+      localStorage.setItem("selectedLanguage", defaultLang);
     }
   }, []);
+  const updateProfile = async () => {
+    try {
+      const token = localStorage.getItem("Web-token");
+      const formData = new FormData();
+      const lang = localStorage.getItem("selectedLanguage");
 
-  const handleSelectLocale = (locale) => {
+      // if you need to send the selected language, you can do:
+      formData.append("language", localStorage.getItem("selectedLanguage"));
+
+      const response = await axios.post(
+        `app/profile/update-profile`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+            "Accept-Language": lang,
+          },
+        }
+      );
+
+      console.log("Profile updated successfully");
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || "Failed to update profile";
+      console.error("Error updating profile:", errorMessage);
+    }
+  };
+
+  const handleSelectLocale = async (locale) => {
+    localStorage.setItem("selectedLanguage", locale);
     setSelectedLocale(locale);
     setIslangOpen(false);
+    i18n.changeLanguage(locale);
+
+    const token = localStorage.getItem("Web-token");
+
+    if (token) {
+      await updateProfile();
+      window.location.reload();
+    } else {
+      window.location.reload();
+    }
   };
+
   const OpenLogout = () => {
     setIsLogout(true);
   };
@@ -45,69 +102,30 @@ function Header() {
     setIsLogout(false);
   };
 
-  const intlLocale = new Intl.Locale(selectedLocale);
-  const langName = new Intl.DisplayNames(["en"], { type: "language" }).of(
-    intlLocale.language
-  );
-
   const toggleMenu = () => {
-    setIsMenuVisible((prevState) => !prevState); // Toggle the state
+    setIsMenuVisible((prevState) => !prevState);
   };
 
-  // const handleClickOutside = (event) => {
-  //   // Menu elements
-  //   const menuButton = document.querySelector(".menubaricons");
-  //   const menuList = document.querySelector(".menulist_divmanin");
-
-  //   // Notification elements
-  //   const notificationButton = document.querySelector(
-  //     ".notificationclick .itmelink_menus"
-  //   );
-  //   const notificationList = document.querySelector(".notificationdiv_popup");
-
-  //   // Close menu if clicked outside
-  //   if (
-  //     menuButton &&
-  //     menuList &&
-  //     !menuButton.contains(event.target) &&
-  //     !menuList.contains(event.target)
-  //   ) {
-  //     setIsMenuVisible(false); // Hide the menu
-  //   }
-
-  //   // Close notification dropdown if clicked outside
-  //   if (
-  //     notificationButton &&
-  //     notificationList &&
-  //     !notificationButton.contains(event.target) &&
-  //     !notificationList.contains(event.target)
-  //   ) {
-  //     setIsNot(false); // Hide the notifications
-  //   }
-  // };
-
-  // const isHomePage = location.pathname === "/";
-
-  // useEffect(() => {
-  //   document.addEventListener("mousedown", handleClickOutside);
-  //   return () => {
-  //     document.removeEventListener("mousedown", handleClickOutside);
-  //   };
-  // }, []);
   const isHomePage = location.pathname === "/";
   const token = localStorage.getItem("Web-token");
 
   const fetchProfile = async () => {
     try {
       const token = localStorage.getItem("Web-token");
+      const lang = localStorage.getItem("selectedLanguage");
+
       if (!token) return;
       const response = await axios.get("app/profile/get-profile", {
         headers: {
           Authorization: `Bearer ${token}`,
+          "Accept-Language": lang,
         },
       });
 
       setProfile(response.data.data);
+      console.log("nlasna", response.data.data.language);
+
+      localStorage.setItem("new", response.data.data.language);
     } catch (error) {
       console.error("Error fetching profile:", error);
     }
@@ -121,6 +139,8 @@ function Header() {
   const fetchNotification = async () => {
     try {
       const token = localStorage.getItem("Web-token");
+      const lang = localStorage.getItem("selectedLanguage");
+
       if (!token) return;
 
       const response = await axios.get(
@@ -128,6 +148,7 @@ function Header() {
         {
           headers: {
             Authorization: `Bearer ${token}`,
+            "Accept-Language": lang,
           },
         }
       );
@@ -141,6 +162,8 @@ function Header() {
   const updateNotifications = async () => {
     try {
       const token = localStorage.getItem("Web-token");
+      const lang = localStorage.getItem("selectedLanguage");
+
       if (!token) return;
 
       await axios.patch(
@@ -149,6 +172,7 @@ function Header() {
         {
           headers: {
             Authorization: `Bearer ${token}`,
+            "Accept-Language": lang,
           },
         }
       );
@@ -303,79 +327,23 @@ function Header() {
             </div>
           </div>
         </div>
-        {/* <nav className="navbar navbar-static-top navbar-expand-xl header3">
-          <div className="container main-header position-relative">
-            <Link to="/" className="navbar-brand d-flex d-xl-none">
-              <img
-                className="logo img-fluid"
-                src="images/logo.png"
-                alt="logo"
-              />
-              <img
-                className="sticky-logo img-fluid"
-                src="images/logo.png"
-                alt="logo"
-              />
-            </Link>
-            <div className="navbar-collapse collapse">
-              <ul className="nav navbar-nav">
-                <li className="nav-item navbar-brand-item">
-                  <Link to="/" className="navbar-brand">
-                    <img
-                      className="logo img-fluid"
-                      src="images/logo.png"
-                      alt="logo"
-                    />
-                    <img
-                      className="sticky-logo img-fluid"
-                      src="images/logo.png"
-                      alt="logo"
-                    />
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div className="add-listing">
-              <div className="side-menu">
-                <a
-                  data-bs-toggle="offcanvas"
-                  data-bs-target="#offcanvasRight"
-                  aria-controls="offcanvasRight"
-                  onClick={toggleMenu}
-                >
-                  <img
-                    src={`${process.env.PUBLIC_URL}/images/svg/menu.svg`}
-                    // src="./images/svg/menu.svg"
-                  />
-                  <img
-                    className="menu-dark"
-                    src={`${process.env.PUBLIC_URL}/images/svg/menu.svg`}
-                    // src="./images/svg/menu.svg"
-                  />
-                </a>
-              </div>
-            </div>
-          </div>
-        </nav> */}
+
         <nav className="navbar navbar-static-top navbar-expand-xl header3">
           <div className="container main-header position-relative">
             <div className="dropdown mobile" tabIndex={0}>
               <button
                 id="dropdown-btn"
-                onClick={() => setIslangOpen(!islangOpen)}
+                onClick={() => setIslangOpen((prev) => !prev)}
               >
                 {langName} <span className="arrow-down"></span>
               </button>
+
               {islangOpen && (
                 <ul className="dropdown-content" id="dropdown-content">
                   {locales
                     .filter((locale) => locale !== selectedLocale)
                     .map((otherLocale) => {
-                      const otherIntlLocale = new Intl.Locale(otherLocale);
-                      const otherLangName = new Intl.DisplayNames(["en"], {
-                        type: "language",
-                      }).of(otherIntlLocale.language);
-
+                      const otherLangName = getLangName(otherLocale);
                       return (
                         <li
                           key={otherLocale}
@@ -512,7 +480,7 @@ function Header() {
                                 </div>
                               ))
                             ) : (
-                              <p>No notifications available.</p>
+                              <p>{t("No notifications available.")}</p>
                             )}
                           </div>
                           <div className="crossicondiv">
@@ -637,7 +605,7 @@ function Header() {
                     <img
                       src={`${process.env.PUBLIC_URL}/images/icon_who_we_are.png`}
                     />{" "}
-                    Who We Are
+                    {t("Who We Are")}
                   </Link>
                 </li>
                 <li className="dropdown nav-item">
@@ -650,7 +618,7 @@ function Header() {
                       src={`${process.env.PUBLIC_URL}/images/icon_the_winners_circle.png`}
                       // src="images/icon_the_winners_circle.png"
                     />
-                    The Winners Circle
+                    {t("The Winners Circle")}
                   </Link>
                 </li>
                 <li className="dropdown nav-item">
@@ -662,7 +630,7 @@ function Header() {
                     <img
                       src={`${process.env.PUBLIC_URL}/images/icon_in_the_press.png`}
                     />
-                    SpotsBall in the News
+                    {t("SpotsBall in the News")}
                   </Link>
                 </li>
                 <li className="dropdown nav-item">
@@ -674,7 +642,7 @@ function Header() {
                     <img
                       src={`${process.env.PUBLIC_URL}/images/icon_live_weekly_winner.png`}
                     />
-                    Monday Live Stream: Who Won
+                    {t("Monday Live Stream: Who Won")}
                   </Link>
                 </li>
                 <li className="dropdown nav-item">
@@ -686,7 +654,7 @@ function Header() {
                     <img
                       src={`${process.env.PUBLIC_URL}/images/icon_contact_us.png`}
                     />
-                    Contact us
+                    {t("Contact us")}
                   </Link>
                 </li>
                 <li className="dropdown nav-item ">
@@ -698,7 +666,7 @@ function Header() {
                     <img
                       src={`${process.env.PUBLIC_URL}/images/icon_legal.png`}
                     />
-                    Legal
+                    {t("Legal")}
                   </Link>
                 </li>
                 <li className="dropdown nav-item ">
@@ -710,7 +678,7 @@ function Header() {
                     <img
                       src={`${process.env.PUBLIC_URL}/images/icon_trust.png`}
                     />
-                    Trust Honestly Transparency (THT).
+                    {t("Trust Honestly Transparency (THT).")}
                   </Link>
                 </li>
                 {token && (
@@ -727,7 +695,7 @@ function Header() {
                         src={`${process.env.PUBLIC_URL}/image/icon_logout.png`}
                         alt="Logout Icon"
                       />
-                      Logout
+                      {t("Logout")}
                     </a>
                   </li>
                 )}
@@ -764,8 +732,8 @@ function Header() {
             </button>
             <div className="modal-body mdlbdy_delete_account logoutaccount_divmain">
               <div className="deleteacc_text_data logoutdatamain">
-                <h2>Logout</h2>
-                <p>Are you sure you want to logout?</p>
+                <h2>{t("Logout")}</h2>
+                <p>{t("Are you sure you want to logout?")}</p>
               </div>
             </div>
             <div className="mdlftr_delete_acc_actionbtn">
@@ -775,7 +743,7 @@ function Header() {
                   className="cncle_btn_delete actionbtnmain"
                   onClick={CloseLogout}
                 >
-                  Cancel
+                  {t("Cancel")}
                 </button>
               </div>
               <div className="actionbtn_delete">
@@ -784,7 +752,7 @@ function Header() {
                   className="delete_btn_delete actionbtnmain"
                   onClick={Logout}
                 >
-                  Logout
+                  {t("Logout")}
                 </button>
               </div>
             </div>
