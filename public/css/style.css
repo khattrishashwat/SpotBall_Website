@@ -732,7 +732,7 @@ body {
   font-size: 16px;
   line-height: 1.5;
   color: #8d8c8c;
-  overflow-x: hidden;
+  overflow-x: hidden !important;
   font-weight: 500;
 
   /* background: #12111a;  */
@@ -11032,7 +11032,9 @@ header .footer-wave {
   }
 }
 
-
+.adminloginsection {
+  min-height: 100vh;
+}
 
 .listar-feature-item .listar-feature-item-inner {
   padding: 50px 30px;
@@ -11043,8 +11045,8 @@ header .footer-wave {
 }
 
 .listar-feature-item .listar-feature-item-inner {
-  padding-top: 60px;
-  padding-bottom: 60px;
+  padding-top: 40px;
+  padding-bottom: 90px;
 }
 
 .listar-feature-item .listar-feature-item-inner:before {
@@ -13289,7 +13291,7 @@ img.img-fluid.hori-move.login {
   color: black;
   font-weight: 400;
   margin-bottom: 12px;
-  text-align: justify ;
+  text-align: justify;
 }
 
 .tht-ul ul {
@@ -13492,6 +13494,10 @@ header.header.header-sticky.default.header-style-02.bg-blue {
     right: 250px;
   }
 
+  .barcode-box img {
+    width: 80px;
+  }
+
   .banner.banner-01 .pagination-button .swiper-button-next {
     right: 62px;
   }
@@ -13540,6 +13546,10 @@ header.header.header-sticky.default.header-style-02.bg-blue {
 
   .playgame_section {
     padding: 70px;
+  }
+
+  .ticket-container .contest_maindiv_popup_inner {
+    padding-left: 24px;
   }
 
   .faq_content .panel-group .panel .panel-heading h4 a {
@@ -13877,6 +13887,8 @@ header.header.header-sticky.default.header-style-02.bg-blue {
     top: -190px;
     left: -180px;
   }
+
+
 }
 
 
@@ -14666,5 +14678,12 @@ header.header.header-sticky.default.header-style-02.bg-blue {
 
   .adminloginsection {
     height: 100svh;
+  }
+}
+
+
+@media (min-width: 1400px) {
+  .ticket-container .contest_maindiv_popup_inner {
+    padding-left: 24px;
   }
 }

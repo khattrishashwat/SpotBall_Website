@@ -85,7 +85,7 @@ const App = () => {
   return (
     <>
       <Helmet>
-        <title>{loading ? "Loading..." : "SpotsBall"}</title>
+        <title>{loading ? "SpotsBall..." : "SpotsBall"}</title>
       </Helmet>
       <Router basename="/">
         <TawkScriptLoader />
@@ -212,9 +212,15 @@ const useInactivityLogout = () => {
   const timeoutRef = useRef(null);
 
   const resetTimer = useCallback(() => {
+    const token = localStorage.getItem("Web-token");
+    if (!token) return; // Don't start timer if no token
+
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
 
     timeoutRef.current = setTimeout(() => {
+      const currentToken = localStorage.getItem("Web-token");
+      if (!currentToken) return; // Double-check before logout
+
       localStorage.removeItem("Web-token");
       Swal.fire({
         icon: "warning",
@@ -223,18 +229,24 @@ const useInactivityLogout = () => {
         allowOutsideClick: false,
         confirmButtonText: "OK",
       }).then(() => navigate("/"));
-    }, 30 * 60 * 1000); // 30 minutes
-    // }, 3 * 60 * 1000); // 3 minutes
+    }, 1 * 60 * 1000); // 30 minutes
   }, [navigate]);
 
   useEffect(() => {
-    resetTimer();
     const events = ["mousemove", "keydown", "click"];
-    events.forEach((event) => window.addEventListener(event, resetTimer));
+    const checkAndReset = () => {
+      const token = localStorage.getItem("Web-token");
+      if (token) resetTimer();
+    };
+
+    checkAndReset(); // Run once on mount
+    events.forEach((event) => window.addEventListener(event, checkAndReset));
 
     return () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
-      events.forEach((event) => window.removeEventListener(event, resetTimer));
+      events.forEach((event) =>
+        window.removeEventListener(event, checkAndReset)
+      );
     };
   }, [resetTimer]);
 };

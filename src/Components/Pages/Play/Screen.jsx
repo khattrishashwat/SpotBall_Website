@@ -191,10 +191,80 @@ function Screen() {
     setClickCount(0);
   };
 
+  // const handleDeleteTicket = (id) => {
+  //   const ticketToDelete = tickets.find((ticket) => ticket.id === id);
+
+  //   if (!ticketToDelete) {
+  //     return;
+  //   }
+
+  //   Swal.fire({
+  //     title: t("Are you sure?"),
+  //     text: t("Do you want to delete this ticket?"),
+  //     icon: t("warning"),
+  //     allowOutsideClick: false,
+  //     showCancelButton: true,
+  //     confirmButtonColor: "#3085d6",
+  //     cancelButtonColor: "#d33",
+  //     confirmButtonText: t("Yes, delete it"),
+  //     cancelButtonText: t("No, cancel"),
+  //   }).then((result) => {
+  //     // debugger
+  //     if (result.isConfirmed) {
+  //       // Proceed with deletion
+  //       const updatedTickets = tickets.filter((ticket) => ticket.id !== id);
+
+  //       const reindexedTickets = updatedTickets.map((ticket, index) => ({
+  //         ...ticket,
+  //         id: index + 1,
+  //       }));
+
+  //       // console.log("ticket",reindexedTickets.length)
+  //       localStorage.setItem("quantity", reindexedTickets?.length);
+
+  //       setTickets(reindexedTickets);
+
+  //       // Check if xCord and yCord are valid
+  //       if (ticketToDelete.xCord && ticketToDelete.yCord) {
+  //         setClickedPoints((prev) =>
+  //           prev.filter(
+  //             (point) =>
+  //               point.x !== ticketToDelete.xCord &&
+  //               point.y !== ticketToDelete.yCord
+  //           )
+  //         );
+
+  //         setClickCount((prev) => prev - 1);
+  //         setUsedTickets((prev) => prev - 1);
+  //       }
+
+  //       if (totalTickets > 0) {
+  //         setTotalTickets((prev) => prev - 1);
+  //       }
+
+  //       Swal.fire(t("Deleted!"), t("The ticket has been removed."), "success");
+  //     } else {
+  //       Swal.fire(t("Cancelled"), t("Your ticket is safe."), "error");
+  //     }
+  //   });
+  // };
+
   const handleDeleteTicket = (id) => {
     const ticketToDelete = tickets.find((ticket) => ticket.id === id);
 
     if (!ticketToDelete) {
+      return;
+    }
+
+    // Prevent deleting the last remaining ticket
+    if (tickets.length === 1) {
+      Swal.fire({
+        icon: "warning",
+        title: t("Not Allowed"),
+        text: t("Last Ticket Cannot be Deleted"),
+        confirmButtonText: t("OK"),
+        allowOutsideClick: false,
+      });
       return;
     }
 
@@ -209,9 +279,7 @@ function Screen() {
       confirmButtonText: t("Yes, delete it"),
       cancelButtonText: t("No, cancel"),
     }).then((result) => {
-      // debugger
       if (result.isConfirmed) {
-        // Proceed with deletion
         const updatedTickets = tickets.filter((ticket) => ticket.id !== id);
 
         const reindexedTickets = updatedTickets.map((ticket, index) => ({
@@ -219,12 +287,9 @@ function Screen() {
           id: index + 1,
         }));
 
-        // console.log("ticket",reindexedTickets.length)
         localStorage.setItem("quantity", reindexedTickets?.length);
-
         setTickets(reindexedTickets);
 
-        // Check if xCord and yCord are valid
         if (ticketToDelete.xCord && ticketToDelete.yCord) {
           setClickedPoints((prev) =>
             prev.filter(
@@ -233,7 +298,6 @@ function Screen() {
                 point.y !== ticketToDelete.yCord
             )
           );
-
           setClickCount((prev) => prev - 1);
           setUsedTickets((prev) => prev - 1);
         }
@@ -296,18 +360,13 @@ function Screen() {
           setUsedTickets((prevUsedTickets) => prevUsedTickets - 1);
         }
         // Swal.fire("Deleted!", "The Coordinates has been removed.", "success");
-              Swal.fire(
-                t("Deleted!"),
-                t("The Coordinates has been removed."),
-                "success"
-              );
-
+        Swal.fire(
+          t("Deleted!"),
+          t("The Coordinates has been removed."),
+          "success"
+        );
       } else {
-              Swal.fire(
-                t("Cancelled"),
-                t("Your Coordinates is safe."),
-                "error"
-              );
+        Swal.fire(t("Cancelled"), t("Your Coordinates is safe."), "error");
 
         // Swal.fire("Cancelled", "Your Coordinates is safe.", "error");
       }
@@ -336,94 +395,6 @@ function Screen() {
   const handleMouseLeave = () => {
     setShowTooltip(false);
   };
-
-  // const handleClick = (e) => {
-  //   setColorIndex(responseData.cursor_color);
-  //   // Check if the user has used all their chances
-  //   if (clickCount >= totalTickets) {
-  //     alert("You've used all your tickets. Click '+' to add more.");
-  //     return;
-  //   }
-
-  //   const image = e.target;
-  //   const rect = image.getBoundingClientRect(); // Get the image position and size in the viewport
-
-  //   // Get the relative position of the click within the image
-  //   const xRelative = e.clientX - rect.left; // X coordinate relative to the image
-  //   const yRelative = e.clientY - rect.top; // Y coordinate relative to the image
-
-  //   // Calculate the click's position based on the image's natural size
-  //   const x = ((xRelative / rect.width) * image.naturalWidth).toFixed(2); // X based on image's intrinsic width
-  //   const y = ((yRelative / rect.height) * image.naturalHeight).toFixed(2); // Y based on image's intrinsic height
-
-  //   const updatedTickets = [...tickets];
-
-  //   // Find a ticket with empty coordinates
-  //   const ticketIndex = updatedTickets.findIndex(
-  //     (ticket) => ticket.xCord === "____" && ticket.yCord === "____"
-  //   );
-
-  //   if (ticketIndex !== -1) {
-  //     // Update the ticket's coordinates
-  //     updatedTickets[ticketIndex] = {
-  //       ...updatedTickets[ticketIndex],
-  //       xCord: x,
-  //       yCord: y,
-  //     };
-
-  //     // Update state
-  //     setTickets(updatedTickets);
-  //     setClickedPoints((prev) => [...prev, { x, y }]);
-  //     setClickCount((prev) => prev + 1); // Increment clickCount
-
-  //     // Only now increment usedTickets, since a ticket is now fully filled
-  //     setUsedTickets((prev) => prev + 1);
-  //   } else {
-  //     alert("All tickets are already filled.");
-  //   }
-  // };
-
-  // const handleClick = (e) => {
-  //   setColorIndex(responseData.cursor_color);
-
-  //   if (clickCount >= totalTickets) {
-  //     alert("You've used all your tickets. Click '+' to add more.");
-  //     return;
-  //   }
-
-  //   const image = e.target;
-  //   const rect = image.getBoundingClientRect();
-
-  //   // Get relative position
-  //   const xRelative = e.clientX - rect.left;
-  //   const yRelative = e.clientY - rect.top;
-
-  //   // Calculate based on natural size
-  //   const x = (xRelative / rect.width) * image.naturalWidth;
-  //   const y = (yRelative / rect.height) * image.naturalHeight;
-
-  //   const updatedTickets = [...tickets];
-
-  //   // Find a ticket with empty coordinates
-  //   const ticketIndex = updatedTickets.findIndex(
-  //     (ticket) => ticket.xCord === "____" && ticket.yCord === "____"
-  //   );
-
-  //   if (ticketIndex !== -1) {
-  //     updatedTickets[ticketIndex] = {
-  //       ...updatedTickets[ticketIndex],
-  //       xCord: x,
-  //       yCord: y,
-  //     };
-
-  //     setTickets(updatedTickets);
-  //     setClickedPoints((prev) => [...prev, { x, y }]); // No filtering, allow exact overlap
-  //     setClickCount((prev) => prev + 1);
-  //     setUsedTickets((prev) => prev + 1);
-  //   } else {
-  //     alert("All tickets are already filled.");
-  //   }
-  // };
 
   const handleClick = (e) => {
     setColorIndex(responseData.cursor_color);
@@ -482,7 +453,7 @@ function Screen() {
 
       setTickets(updatedTickets);
       setClickedPoints((prev) => [...prev, { x, y }]);
-      setClickCount((prev) => prev + 1); 
+      setClickCount((prev) => prev + 1);
 
       setUsedTickets((prev) => prev + 1);
     } else {

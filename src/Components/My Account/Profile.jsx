@@ -147,10 +147,10 @@ function Profile() {
   };
 
   useEffect(() => {
-    if (isDel || isLogout || isDeactivate) {
-      document.body.style.overflow = "hidden"; // Disable background scrolling
-    } else {
-      document.body.style.overflow = "auto"; // Enable background scrolling
+    const shouldBlockScroll = isDel || isLogout || isDeactivate;
+
+    if (shouldBlockScroll) {
+      document.body.style.overflow = "hidden";
     }
 
     // Cleanup on component unmount or modal close

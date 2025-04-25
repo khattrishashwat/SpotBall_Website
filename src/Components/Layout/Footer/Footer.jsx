@@ -13,7 +13,7 @@ function Footer() {
   const [showBackToTop, setShowBackToTop] = useState(false);
 
   const fetchFooter = async () => {
-            const lang = localStorage.getItem("selectedLanguage");
+    const lang = localStorage.getItem("selectedLanguage");
 
     try {
       const response = await axios.get(
@@ -132,7 +132,7 @@ function Footer() {
                 <Link to="/" className="footer-logo">
                   <img
                     className="logo img-fluid"
-                    src="images/logo.png"
+                    src={`${process.env.PUBLIC_URL}/images/logo.png`}
                     alt="logo"
                   />
                 </Link>

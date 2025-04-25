@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 function Faqs({ data }) {
-    const { t } = useTranslation();
-  
+  const { t } = useTranslation();
+
   const [activeIndex, setActiveIndex] = useState(null);
   if (!data) return null;
   const { apk, faqs } = data;
@@ -19,9 +19,9 @@ function Faqs({ data }) {
         <div className="container">
           <div>
             <video
-              autoPlay=""
-              loop=""
-              muted=""
+              autoPlay
+              loop
+              muted
               style={{
                 margin: "auto",
                 position: "absolute",
@@ -64,13 +64,27 @@ function Faqs({ data }) {
                       <span>{t("Stand a Chance to Win")}</span>
                     </h2>
                     <p>
-                      {t("SpotsBall is the ultimate cricket challenge app where you")}
-                     {t(" can put your cricket skills to the test. At SpotsBall, we")}
-                      {t("bring the thrill of cricket right to your fingertips. We")}
-                      {t("host a weekly exciting contest where you simply have to")}
-                      {t("spot the hidden ball in the game. Think you have got sharp")}
-                      {t("eyes and cricket instincts? Find the ball, mark the exact")}
-                      {t("coordinates, and stand a chance to win the grand prize,")}
+                      {t(
+                        "SpotsBall is the ultimate cricket challenge app where you"
+                      )}
+                      {t(
+                        " can put your cricket skills to the test. At SpotsBall, we"
+                      )}
+                      {t(
+                        "bring the thrill of cricket right to your fingertips. We"
+                      )}
+                      {t(
+                        "host a weekly exciting contest where you simply have to"
+                      )}
+                      {t(
+                        "spot the hidden ball in the game. Think you have got sharp"
+                      )}
+                      {t(
+                        "eyes and cricket instincts? Find the ball, mark the exact"
+                      )}
+                      {t(
+                        "coordinates, and stand a chance to win the grand prize,"
+                      )}
                       {t("every week.")}
                     </p>
                     <div
@@ -110,7 +124,7 @@ function Faqs({ data }) {
                                 src={`${process.env.PUBLIC_URL}/images/android.svg`}
                                 alt="Android App"
                               />
-                              {t("Android App")}
+                              {t("Android Apk")}
                             </a>
                           </div>
                         )}
@@ -152,7 +166,7 @@ function Faqs({ data }) {
                   {t("Frequently asked")} <span>{t("questions")}</span>
                 </h2>
               </div>
-              
+
               <div
                 className="accordion accordion-flush"
                 id="accordionFlushExample"

@@ -11,8 +11,8 @@ function Privacy() {
 
   const fetchCondition = async () => {
     const token = localStorage.getItem("Web-token");
-           const lang = localStorage.getItem("selectedLanguage");
- try {
+    const lang = localStorage.getItem("selectedLanguage");
+    try {
       const response = await axios.get(
         "app/static-content/get-all-static-content/privacy_policy",
         {
@@ -35,6 +35,9 @@ function Privacy() {
 
   useEffect(() => {
     fetchCondition();
+  }, []);
+  useEffect(() => {
+    window.scrollTo(0, 0);
   }, []);
 
   return (
@@ -62,7 +65,9 @@ function Privacy() {
                           alt="Terms"
                         />
                       </div>
-                      <span className="navlinkname">{t("Terms & Conditions")}</span>
+                      <span className="navlinkname">
+                        {t("Terms & Conditions")}
+                      </span>
                     </Link>
                   </li>
                   <li className="nav-item">
@@ -77,7 +82,9 @@ function Privacy() {
                           alt="Privacy"
                         />
                       </div>
-                      <span className="navlinkname">{t("Privacy Policies")}</span>
+                      <span className="navlinkname">
+                        {t("Privacy Policies")}
+                      </span>
                     </Link>
                   </li>
                   <li className="nav-item">
@@ -88,7 +95,9 @@ function Privacy() {
                           alt="Rules"
                         />
                       </div>
-                      <span className="navlinkname">{t("Rules of Play & FAQs")}</span>
+                      <span className="navlinkname">
+                        {t("Rules of Play & FAQs")}
+                      </span>
                     </Link>
                   </li>
                   <li className="nav-item">

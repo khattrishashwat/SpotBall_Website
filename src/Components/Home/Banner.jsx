@@ -434,16 +434,18 @@ function Banner({ data }) {
   }, [token]);
 
   useEffect(() => {
-    if (onCarts || onCloseComptition) {
+    const shouldBlockScroll = onCarts || onCloseComptition;
+
+    if (shouldBlockScroll) {
       document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "auto";
     }
 
     return () => {
+      // Always clean up
       document.body.style.overflow = "auto";
     };
   }, [onCarts, onCloseComptition]);
+
   return (
     <>
       <div className="color-container">
@@ -541,7 +543,7 @@ function Banner({ data }) {
                         )}
 
                         <div className="d-flex align-items-center gap-2">
-                          {!token && (
+                          {!token ? (
                             <Link
                               to="/login"
                               className="btn btn-white mt-3 mt-md-4"
@@ -551,6 +553,16 @@ function Banner({ data }) {
                             >
                               {t("Sign In")}
                             </Link>
+                          ) : (
+                            <a
+                              onClick={handleAskToPaly}
+                              className="btn btn-white mt-3 mt-md-4"
+                              data-swiper-animation="fadeInUp"
+                              data-duration="1.5s"
+                              data-delay="3.0s"
+                            >
+                              {t("Play Now")}
+                            </a>
                           )}
 
                           <a
@@ -648,8 +660,11 @@ function Banner({ data }) {
                               </div>
                             </div>
                           </div>
-                          <div className="listar-feature-content-wrapper">
-                            <div className="listar-feature-item-title">
+                          <div
+                            className="listar-feature-content-wrapper"
+                            style={{ paddingTop: "0" }}
+                          >
+                            <div className="listar-feature-item-title listar-feature-counter-added">
                               <span>
                                 <span>
                                   {String(index + 1).padStart(2, "0")}
@@ -1052,7 +1067,7 @@ function Banner({ data }) {
                           onClick={handleAskToPaly}
                           className="btn btn-primary text-uppercase rounded-2"
                         >
-                          {t("Buy Now")}
+                          {t("Play Now")}
                         </a>
                       </div>
                     </div>
@@ -1111,7 +1126,7 @@ function Banner({ data }) {
                       className="custom-close-btn"
                       onClick={() => setOpen(false)}
                     >
-                      <CloseIcon />
+                      {/* <CloseIcon /> */}
                     </IconButton>
 
                     {/* Embedded YouTube Video */}

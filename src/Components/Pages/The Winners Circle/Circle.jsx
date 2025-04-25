@@ -40,11 +40,17 @@ function Circle() {
     window.scrollTo(0, 0);
   }, []);
 
+  const getValidLocale = () => {
+    const lang = localStorage.getItem("selectedLanguage");
+    const supportedLocales = ["en-US", "fr-FR", "es-ES", "de-DE"]; // extend this list as needed
+    return supportedLocales.includes(lang) ? lang : "en-US";
+  };
+
   const groupByMonth = (data) => {
-    const lang = localStorage.getItem("selectedLanguage") || "en";
+    const locale = getValidLocale();
     return data.reduce((acc, item) => {
       const date = new Date(item.createdAt);
-      const monthYear = date.toLocaleString(lang, {
+      const monthYear = date.toLocaleString(locale, {
         month: "long",
         year: "numeric",
       });
@@ -53,13 +59,12 @@ function Circle() {
       return acc;
     }, {});
   };
-
   const groupedLinks = groupByMonth(links);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    const lang = localStorage.getItem("selectedLanguage") || "en";
-    return `${date.toLocaleString(lang, {
+    const locale = getValidLocale();
+    return `${date.toLocaleString(locale, {
       month: "long",
     })} ${date.getDate()}, ${date.getFullYear()}`;
   };
