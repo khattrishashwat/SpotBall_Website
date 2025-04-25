@@ -229,7 +229,7 @@ const useInactivityLogout = () => {
         allowOutsideClick: false,
         confirmButtonText: "OK",
       }).then(() => navigate("/"));
-    }, 1 * 60 * 1000); // 30 minutes
+    }, 30 * 60 * 1000); // 30 minutes
   }, [navigate]);
 
   useEffect(() => {
