@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
 
@@ -10,8 +10,17 @@ function Footer() {
 
   const [androidLink, setAndroidLink] = useState(null);
   const location = useLocation();
+  const navigate = useNavigate();
+
   const [showBackToTop, setShowBackToTop] = useState(false);
 
+  const handleLogoClick = () => {
+    if (location.pathname === "/") {
+      window.scrollTo(0, 0);
+    } else {
+      navigate("/");
+    }
+  };
   const fetchFooter = async () => {
     const lang = localStorage.getItem("selectedLanguage");
 
@@ -129,13 +138,17 @@ function Footer() {
 
               {/* Logo Section */}
               <div className="col-md-4 col-lg-4 text-center mb-4 mb-lg-0">
-                <Link to="/" className="footer-logo">
+                <a
+                  onClick={handleLogoClick}
+                  className="footer-logo"
+                  style={{ cursor: "pointer" }}
+                >
                   <img
                     className="logo img-fluid"
                     src={`${process.env.PUBLIC_URL}/images/logo.png`}
                     alt="logo"
                   />
-                </Link>
+                </a>
               </div>
 
               {/* Download App Section */}

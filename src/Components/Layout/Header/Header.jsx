@@ -292,7 +292,7 @@ function Header() {
     }
     // Cleanup on component unmount or modal close
     return () => {
-      document.body.style.overflow = "auto";
+      document.body.style.overflow = "";
     };
   }, [isMenuVisible, isLogout]);
   return (

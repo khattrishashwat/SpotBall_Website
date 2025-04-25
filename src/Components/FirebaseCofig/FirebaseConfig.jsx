@@ -382,23 +382,109 @@ export const signInWithFacebook = async (setFieldValue) => {
   }
 };
 
+// export const LoginWithFacebook = async () => {
+//   try {
+//     facebookProvider.addScope("email");
+
+//     let result;
+//     try {
+//       // result = await signInWithPopup(auth, facebookProvider);
+//       result = await signInWithPopup(auth, facebookProvider);
+//       return;
+//     } catch (popupError) {
+//       console.warn("Popup sign-in failed, trying redirect:", popupError);
+//       // await signInWithRedirect(auth, facebookProvider);
+//       // return;
+//     }
+
+//     const user = result.user;
+//     if (!user) throw new Error("Facebook sign-in failed. No user data found.");
+//     console.log("facebook", user);
+//     const { uid, displayName, email, photoURL } = user;
+//     const nameParts = displayName ? displayName.split(" ") : [];
+//     const firstName = nameParts[0] || "";
+//     const lastName = nameParts.slice(1).join(" ") || "";
+
+//     const userData = {
+//       uid,
+//       displayName,
+//       email,
+//       photoURL,
+//       signup_method: "facebook",
+//       first_name: firstName,
+//       last_name: lastName,
+//     };
+
+//     console.log("facebook user data", userData);
+
+//     try {
+//       // Check if UID exists
+//       const checkUIDResponse = await axios.get(
+//         `app/auth/check-uid-exists/${uid}`
+//       );
+
+//       if (checkUIDResponse.data.message === "Uid found") {
+//         // Perform social login
+//         const response = await axios.post("app/auth/social-login", {
+//           signup_method: "facebook",
+//           uid,
+//           device_type: "website",
+//           device_token: localStorage.getItem("device_token") || "",
+//         });
+
+//         localStorage.setItem("Web-token", response.data.data.token);
+
+//         Swal.fire({
+//           icon: "success",
+//           title: "Login Successful",
+//           showConfirmButton: false,
+//           timer: 2000,
+//         });
+
+//         // window.location.href = "/spotsball/landing/";
+//         window.location.href = "/";
+//       }
+//     } catch (apiError) {
+//       if (apiError.response?.data?.message === "Uid Not Found") {
+//         localStorage.setItem("UIDNotFound", JSON.stringify(userData));
+//         window.location.href = "/socialsignup";
+//       } else {
+//         console.error("API Error:", apiError);
+//         Swal.fire({
+//           icon: "error",
+//           title: "Login Failed",
+//           text:
+//             apiError.response?.data?.message || "An unexpected error occurred.",
+//         });
+//       }
+//     }
+//   } catch (error) {
+//     console.error("Facebook Sign-In Error:", error);
+//     Swal.fire({
+//       icon: "error",
+//       title: "Login Failed",
+//       text: error.message,
+//     });
+//   }
+// };
 export const LoginWithFacebook = async () => {
   try {
     facebookProvider.addScope("email");
 
     let result;
     try {
-      // result = await signInWithPopup(auth, facebookProvider);
       result = await signInWithPopup(auth, facebookProvider);
-      return;
     } catch (popupError) {
       console.warn("Popup sign-in failed, trying redirect:", popupError);
+      // Optional fallback:
       // await signInWithRedirect(auth, facebookProvider);
       // return;
     }
 
+    if (!result || !result.user)
+      throw new Error("Facebook sign-in failed. No user data found.");
+
     const user = result.user;
-    if (!user) throw new Error("Facebook sign-in failed. No user data found.");
     console.log("facebook", user);
     const { uid, displayName, email, photoURL } = user;
     const nameParts = displayName ? displayName.split(" ") : [];
@@ -418,13 +504,11 @@ export const LoginWithFacebook = async () => {
     console.log("facebook user data", userData);
 
     try {
-      // Check if UID exists
       const checkUIDResponse = await axios.get(
         `app/auth/check-uid-exists/${uid}`
       );
 
       if (checkUIDResponse.data.message === "Uid found") {
-        // Perform social login
         const response = await axios.post("app/auth/social-login", {
           signup_method: "facebook",
           uid,
@@ -441,7 +525,6 @@ export const LoginWithFacebook = async () => {
           timer: 2000,
         });
 
-        // window.location.href = "/spotsball/landing/";
         window.location.href = "/";
       }
     } catch (apiError) {
@@ -467,6 +550,7 @@ export const LoginWithFacebook = async () => {
     });
   }
 };
+
 {
   /*------Twitter--------*/
 }

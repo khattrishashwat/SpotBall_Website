@@ -734,6 +734,7 @@ body {
   color: #8d8c8c;
   overflow-x: hidden !important;
   font-weight: 500;
+  min-height: 100vh;
 
   /* background: #12111a;  */
 }
@@ -1201,6 +1202,14 @@ textarea.form-control {
 @media (max-width: 991px) {
   .map-section .accordion {
     margin-left: 0px;
+  }
+
+  .coltabdata_righttext .tabingrighttextdiv {
+    min-height: 70vh;
+  }
+
+  .paddingnoneformob_legelpage .tab-content>.active {
+    min-height: 70vh;
   }
 }
 
@@ -3810,6 +3819,24 @@ input[type="radio"]:radio {
   .testimonial .testimonial-author .testimonial-name span {
     font-size: 16px;
   }
+
+  .col4pressdi .inthepressdivmain {
+    height: 100%;
+  }
+
+  .inthepressdivmain p {
+    margin-bottom: 35px;
+  }
+
+  a.seefullarticle_btn {
+
+    left: 9px;
+    width: 92%;
+  }
+
+
+
+
 }
 
 @media (max-width: 575px) {
@@ -4922,7 +4949,7 @@ header.header.header-sticky.is-sticky .navbar .add-listing .side-menu .menu-dark
   justify-content: space-between;
 }
 
-.banner .swiper-slide1 .pattern-01 {
+.banner .pattern-01 {
   position: absolute;
   left: -50px;
   bottom: 150px;
@@ -5247,8 +5274,8 @@ span.fs-1.fw-800 {
   justify-content: center;
   align-items: center;
   position: fixed;
-  bottom: 50px;
-  right: 40px;
+  bottom: 86px;
+  right: 30px;
   width: 50px;
   height: 50px;
   margin: 0px;
@@ -11036,6 +11063,15 @@ header .footer-wave {
   min-height: 100vh;
 }
 
+.swiper-container {
+  margin: 0 auto;
+}
+
+.banner .pattern-01 {
+  left: -10px !important;
+  bottom: 34%;
+}
+
 .listar-feature-item .listar-feature-item-inner {
   padding: 50px 30px;
   border-radius: 6px;
@@ -13132,7 +13168,7 @@ img.img-fluid.hori-move.login {
 }
 
 .remeberrecoverydiv .rememebrmediv .checkboxemeber {
-  margin-top: 0px;
+  margin-top: -2px;
 }
 
 .remeberrecoverydiv .rememebrmediv .labelrememebrme a {
@@ -13233,7 +13269,7 @@ img.img-fluid.hori-move.login {
 
 .login_left_img.banner .pattern-03 {
   position: absolute;
-  left: 49%;
+  left: 54%;
   top: 66%;
   opacity: 0.8;
   z-index: 9;
@@ -13243,7 +13279,7 @@ img.img-fluid.hori-move.login {
 
 .login_left_img.banner .pattern-04 {
   position: absolute;
-  left: 49%;
+  left: 54%;
   top: 61%;
   opacity: 1;
   z-index: 9;
@@ -13342,6 +13378,7 @@ header.header.header-sticky.default.header-style-02.bg-blue {
   display: flex;
   align-items: center;
   justify-content: right;
+  gap: 8px;
 }
 
 .working-process.ct {
@@ -13451,12 +13488,12 @@ header.header.header-sticky.default.header-style-02.bg-blue {
     margin-bottom: 0;
   }
 
-  .banner .swiper-slide1 .pattern-01 {
+  .banner .pattern-01 {
     left: -60px;
     bottom: 30px;
   }
 
-  .banner .swiper-slide1 .pattern-01 img {}
+
 
   .banner .swiper-slide1 .pattern-02 {
     left: 75%;
@@ -13543,6 +13580,21 @@ header.header.header-sticky.default.header-style-02.bg-blue {
 
 
 @media (min-width:767px) and (max-width: 991px) {
+
+  .winnerbox_live_imgdiv img {
+    height: 230px;
+    width: 200px;
+    object-fit: cover;
+  }
+
+  .col4aboutus_imgdiv {
+    order: 1;
+  }
+
+  .col4aboutus_imgdiv .about_img img {
+
+    border-radius: 30px;
+  }
 
   .playgame_section {
     padding: 70px;
@@ -13714,7 +13766,7 @@ header.header.header-sticky.default.header-style-02.bg-blue {
   .listar-feature-item.listar-feature-has-link:before {
     width: 60%;
     left: 72%;
-    top: -70%;
+    top: -75%;
   }
 
   .listar-feature-icon-wrapper {
@@ -14185,7 +14237,7 @@ header.header.header-sticky.default.header-style-02.bg-blue {
     line-height: 20px;
   }
 
-  .banner .swiper-slide1 .pattern-01 img {
+  .banner .pattern-01 img {
     width: 75px;
   }
 
@@ -14306,7 +14358,7 @@ header.header.header-sticky.default.header-style-02.bg-blue {
   }
 
   .Current-contest-1.main.img .side-curve {
-    left: 0px;
+    left: -25px;
     width: 310px;
     height: 310px;
   }
@@ -14327,6 +14379,8 @@ header.header.header-sticky.default.header-style-02.bg-blue {
   .Current-contest-1.main.img {
     position: relative;
     justify-content: center;
+    width: fit-content;
+    margin: 0 auto;
   }
 
   .contestpoints_main .contesteveryweekdiv {
@@ -14679,11 +14733,21 @@ header.header.header-sticky.default.header-style-02.bg-blue {
   .adminloginsection {
     height: 100svh;
   }
+
+
+
+
+
 }
 
 
 @media (min-width: 1400px) {
   .ticket-container .contest_maindiv_popup_inner {
     padding-left: 24px;
+  }
+
+  .listar-feature-item .listar-feature-item-inner {
+    padding-top: 45px;
+    padding-bottom: 140px;
   }
 }

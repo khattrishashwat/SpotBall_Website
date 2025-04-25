@@ -442,7 +442,7 @@ function Banner({ data }) {
 
     return () => {
       // Always clean up
-      document.body.style.overflow = "auto";
+      document.body.style.overflow = "";
     };
   }, [onCarts, onCloseComptition]);
 
@@ -471,21 +471,22 @@ function Banner({ data }) {
           }}
         >
           <div className="container">
+            <div
+              className="pattern-01"
+              data-swiper-animation="fadeIn"
+              data-duration="1.5s"
+              data-delay="1.0s"
+            >
+              <img
+                className="img-fluid vert-move"
+                src={`${process.env.PUBLIC_URL}/images/home-01/pattern-01.png`}
+                alt=""
+              />
+            </div>
+
             <div id="main-slider1" className="swiper-container">
               <div className="swiper-wrapper1">
                 <div className="swiper-slide1 align-items-center d-flex slide-01 header-position">
-                  <div
-                    className="pattern-01"
-                    data-swiper-animation="fadeIn"
-                    data-duration="1.5s"
-                    data-delay="1.0s"
-                  >
-                    <img
-                      className="img-fluid vert-move"
-                      src={`${process.env.PUBLIC_URL}/images/home-01/pattern-01.png`}
-                      alt=""
-                    />
-                  </div>
                   <div
                     className="pattern-03"
                     data-swiper-animation="fadeIn"
@@ -627,14 +628,14 @@ function Banner({ data }) {
 
         <div className="working-process pt-2">
           <div className="container">
-            <div className="section-title">
+            <div className="section-title mb-3">
               <h2 className="title">
                 {words.slice(0, -1).join(" ")}{" "}
                 {/* Join all words except the last one */}
                 <span> {words[words.length - 1]}</span>{" "}
                 {/* Wrap the last word in span */}
               </h2>
-              ;<h3 className="sub-title">{howItWorks.description}</h3>
+              <h3 className="sub-title">{howItWorks.description}</h3>
             </div>
           </div>
 

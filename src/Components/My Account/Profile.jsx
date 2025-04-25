@@ -155,7 +155,7 @@ function Profile() {
 
     // Cleanup on component unmount or modal close
     return () => {
-      document.body.style.overflow = "auto";
+      document.body.style.overflow = "";
     };
   }, [isDel, isLogout, isDeactivate]);
 

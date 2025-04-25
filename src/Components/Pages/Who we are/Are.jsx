@@ -57,7 +57,7 @@ function Are() {
             </div>
             <div className="container cont_maindata_inner_aboutus">
               <div className="row rowmaindatainner_aboutus">
-                <div className="col-md-8 colaboutusdiv_inner">
+                <div className="col-lg-8 colaboutusdiv_inner">
                   <div className="aboutusdiv_text">
                     <h3>{whos[0]?.subTitle || ""}</h3>
                     <div
@@ -66,19 +66,19 @@ function Are() {
                     />
                   </div>
                 </div>
-                <div className="col-md-4 col4aboutus_imgdiv">
+                <div className="col-lg-4 col4aboutus_imgdiv">
                   <div className="about_img">
                     <img src={whos[0]?.image || ""} alt="About Us" />
                   </div>
                 </div>
               </div>
               <div className="row rowmaindatainner_aboutus">
-                <div className="col-md-4 col4aboutus_imgdiv">
+                <div className="col-lg-4 col4aboutus_imgdiv">
                   <div className="about_img">
                     <img src={whos[1]?.image} alt="Cricket Passion" />
                   </div>
                 </div>
-                <div className="col-md-8 colaboutusdiv_inner">
+                <div className="col-lg-8 colaboutusdiv_inner">
                   <div className="aboutusdiv_text">
                     <h3>{whos[1]?.subTitle}</h3>
                     <div
