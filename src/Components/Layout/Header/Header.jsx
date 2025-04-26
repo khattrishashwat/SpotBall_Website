@@ -448,8 +448,8 @@ function Header() {
                             {notification.length > 0 ? (
                               notification.map((item) => (
                                 <div className="notifystrip" key={item._id}>
-                                  <Link
-                                    to={`/notification/${item._id}`}
+                                  <a
+                                    // to={`/notification/${item._id}`}
                                     className="notifylinkdiv"
                                   >
                                     <div className="notify-icondiv">
@@ -470,7 +470,7 @@ function Header() {
                                         </p>
                                       </div>
                                     </div>
-                                  </Link>
+                                  </a>
                                 </div>
                               ))
                             ) : (
