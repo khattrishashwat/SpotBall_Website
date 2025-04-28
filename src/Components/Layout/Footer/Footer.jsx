@@ -205,15 +205,15 @@ function Footer() {
                       </Link>
                     </li>
                     <li>
-                      <Link to="/privacy">{t("Privacy Policy")}</Link>
-                    </li>
-                    <li>
-                      <Link to="/cookies">{t("Cookie Policy")}</Link>
+                      <Link to="/privacy">{t("Privacy Policies")}</Link>
                     </li>
                     <li>
                       <Link to="/rules">
                         {t("Rules of Play")} &amp; {t("FAQs")}
                       </Link>
+                    </li>
+                    <li>
+                      <Link to="/cookies">{t("Cookie Policy")}</Link>
                     </li>
                   </ul>
                 </div>
@@ -221,8 +221,7 @@ function Footer() {
               <div className="col-12 col-md-6 text-center text-md-end mt-2 mt-md-0">
                 <p className="mb-0">
                   © Copyright <span id="copyright"> 2025</span>{" "}
-                  <Link to="/"> SpotsBall Global PVT. LTD. </Link> All Rights
-                  Reserved
+                  <a> SpotsBall Global PVT. LTD. </a> All Rights Reserved
                 </p>
               </div>
             </div>

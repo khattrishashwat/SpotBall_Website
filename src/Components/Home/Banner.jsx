@@ -189,7 +189,7 @@ function Banner({ data }) {
     speed: 500,
     slidesToShow: 2,
     slidesToScroll: 1,
-    autoplay: false,
+    autoplay: true,
     centerPadding: 10,
     responsive: [
       {
@@ -828,13 +828,13 @@ function Banner({ data }) {
                     alt=""
                   />
                 </div>
-                <div className="pattern-04 banner1">
+                {/* <div className="pattern-04 banner1">
                   <img
                     className=""
                     src={`${process.env.PUBLIC_URL}/images/Artboard 2@4x.png`}
                     alt=""
                   />
-                </div>
+                </div> */}
               </div>
 
               <div
@@ -1127,7 +1127,7 @@ function Banner({ data }) {
                       className="custom-close-btn"
                       onClick={() => setOpen(false)}
                     >
-                      {/* <CloseIcon /> */}
+                      <CloseIcon />
                     </IconButton>
 
                     {/* Embedded YouTube Video */}
@@ -1171,10 +1171,10 @@ function Banner({ data }) {
               </div>
 
               <div className="quantity_contest text-center mt-3">
-                <h3 className="text-white">
+                <h3 className="text-dark">
                   {t("The current gameplay has been closed.")}
                 </h3>
-                <h4 className="text-white">
+                <h4 className="text-dark">
                   {t(
                     "But don't worry, a new competition launches this Monday at 12:00 HRS!"
                   )}

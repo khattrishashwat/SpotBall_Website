@@ -86,14 +86,21 @@ function Account() {
 
   const handleFileChange = (event, setFieldValue) => {
     const file = event.currentTarget.files[0];
-    setFieldValue("profile", file);
 
-    // Update profile image preview
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setProfileImagePreview(reader.result);
-    };
     if (file) {
+      const allowedTypes = ["image/jpeg", "image/png"];
+      if (!allowedTypes.includes(file.type)) {
+        alert("Only JPEG and PNG files are allowed.");
+        return;
+      }
+
+      setFieldValue("profile", file);
+
+      // Update profile image preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfileImagePreview(reader.result);
+      };
       reader.readAsDataURL(file);
     }
   };
@@ -177,10 +184,12 @@ function Account() {
                           id="file"
                           name="profile"
                           type="file"
+                          accept="image/png, image/jpeg"
                           onChange={(event) =>
                             handleFileChange(event, setFieldValue)
                           }
                         />
+
                         <img
                           src={
                             profileImagePreview ||

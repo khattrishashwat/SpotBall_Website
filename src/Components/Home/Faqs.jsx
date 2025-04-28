@@ -145,7 +145,7 @@ function Faqs({ data }) {
                     <div className="image ">
                       <div className="circle b-round" />
                       <img
-                        src={`${process.env.PUBLIC_URL}/images/Frame-1 (2).png`}
+                        src={`${process.env.PUBLIC_URL}/images/Frame 3573.png`}
                         alt=""
                         className="img-fluid blur-up lazyloaded"
                       />

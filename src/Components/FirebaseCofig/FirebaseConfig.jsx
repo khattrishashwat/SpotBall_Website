@@ -549,16 +549,124 @@ export const signInWithFacebook = async (setFieldValue) => {
 //   }
 // };
 
+// export const LoginWithFacebook = async () => {
+//   try {
+//     facebookProvider.addScope("email"); // Email scope add karna zaruri hai
+
+//     let result;
+//     try {
+//       result = await signInWithPopup(auth, facebookProvider);
+//     } catch (popupError) {
+//       console.warn("Popup sign-in failed, trying fallback:", popupError);
+//     }
+
+//     if (!result || !result.user) {
+//       throw new Error("Facebook sign-in failed. No user found.");
+//     }
+
+//     let user = result.user;
+//     console.log("User first time:", user);
+
+//     // Check if important fields are missing
+//     if (!user.displayName) {
+//       console.log("Incomplete data. Trying to reload user...");
+
+//       await user.reload(); // Refresh user data
+//       user = auth.currentUser; // Get updated user
+
+//       console.log("User after reload:", user);
+
+//       // Still missing? Alert user
+//       if (!user.displayName) {
+//         throw new Error(
+//           "Failed to fetch complete profile. Please re-login and allow permissions."
+//         );
+//       }
+//     }
+
+//     const { uid, displayName, email, photoURL } = user;
+//     const nameParts = displayName ? displayName.split(" ") : [];
+//     const firstName = nameParts[0] || "";
+//     const lastName = nameParts.slice(1).join(" ") || "";
+
+//     const userData = {
+//       uid,
+//       displayName,
+//       email,
+//       photoURL,
+//       signup_method: "facebook",
+//       first_name: firstName,
+//       last_name: lastName,
+//     };
+
+//     console.log("Final Facebook user data:", userData);
+
+//     try {
+//       const checkUIDResponse = await axios.get(
+//         `app/auth/check-uid-exists/${uid}`
+//       );
+
+//       if (checkUIDResponse.data.message === "Uid found") {
+//         const response = await axios.post("app/auth/social-login", {
+//           signup_method: "facebook",
+//           uid,
+//           device_type: "website",
+//           device_token: localStorage.getItem("device_token") || "",
+//         });
+
+//         localStorage.setItem("Web-token", response.data.data.token);
+
+//         Swal.fire({
+//           icon: "success",
+//           title: "Login Successful",
+//           showConfirmButton: false,
+//           timer: 2000,
+//         });
+
+//         window.location.href = "/";
+//       }
+//     } catch (apiError) {
+//       if (apiError.response?.data?.message === "Uid Not Found") {
+//         localStorage.setItem("UIDNotFound", JSON.stringify(userData));
+//         window.location.href = "/socialsignup";
+//       } else {
+//         console.error("API Error:", apiError);
+//         Swal.fire({
+//           icon: "error",
+//           title: "Login Failed",
+//           text:
+//             apiError.response?.data?.message || "An unexpected error occurred.",
+//         });
+//       }
+//     }
+//   } catch (error) {
+//     console.error("Facebook Login Error:", error);
+//     Swal.fire({
+//       icon: "error",
+//       title: "Login Failed",
+//       text: error.message,
+//     });
+//   }
+// };
 export const LoginWithFacebook = async () => {
   try {
-    facebookProvider.addScope("email"); // Email scope add karna zaruri hai
+    facebookProvider.addScope("email");
 
     let result;
     try {
       result = await signInWithPopup(auth, facebookProvider);
     } catch (popupError) {
-      console.warn("Popup sign-in failed, trying fallback:", popupError);
-      throw new Error("Facebook login popup blocked. Please allow popups.");
+      console.warn("Popup sign-in failed:", popupError);
+
+      if (popupError.code === "auth/popup-closed-by-user") {
+        throw new Error("Popup was closed before completing login.");
+      } else if (popupError.code === "auth/cancelled-popup-request") {
+        throw new Error("Multiple popups opened. Please try again.");
+      } else {
+        console.log("Trying redirect login as fallback...");
+        await signInWithRedirect(auth, facebookProvider);
+        return; // Important: Stop further code execution, redirect flow will handle
+      }
     }
 
     if (!result || !result.user) {
@@ -568,17 +676,15 @@ export const LoginWithFacebook = async () => {
     let user = result.user;
     console.log("User first time:", user);
 
-    // Check if important fields are missing
-    if (!user.email || !user.displayName) {
+    if (!user.displayName) {
       console.log("Incomplete data. Trying to reload user...");
 
-      await user.reload(); // Refresh user data
-      user = auth.currentUser; // Get updated user
+      await user.reload();
+      user = auth.currentUser;
 
       console.log("User after reload:", user);
 
-      // Still missing? Alert user
-      if (!user.email || !user.displayName) {
+      if (!user.displayName) {
         throw new Error(
           "Failed to fetch complete profile. Please re-login and allow permissions."
         );
@@ -624,7 +730,9 @@ export const LoginWithFacebook = async () => {
           timer: 2000,
         });
 
-        window.location.href = "/";
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 2000);
       }
     } catch (apiError) {
       if (apiError.response?.data?.message === "Uid Not Found") {
@@ -636,7 +744,8 @@ export const LoginWithFacebook = async () => {
           icon: "error",
           title: "Login Failed",
           text:
-            apiError.response?.data?.message || "An unexpected error occurred.",
+            apiError.response?.data?.message ||
+            "An unexpected error occurred while contacting server.",
         });
       }
     }
@@ -645,7 +754,7 @@ export const LoginWithFacebook = async () => {
     Swal.fire({
       icon: "error",
       title: "Login Failed",
-      text: error.message,
+      text: error.message || "An unexpected error occurred.",
     });
   }
 };
