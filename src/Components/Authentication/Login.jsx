@@ -9,6 +9,7 @@ import {
   getToken,
   LoginWithGoogle,
   LoginWithFacebook,
+  handleFacebookRedirectResult,
 } from "../FirebaseCofig/FirebaseConfig";
 import { useTranslation } from "react-i18next";
 
@@ -163,6 +164,9 @@ function Login() {
   };
   useEffect(() => {
     requestFirebaseToken();
+  }, []);
+  useEffect(() => {
+    handleFacebookRedirectResult();
   }, []);
   return (
     <>
@@ -321,6 +325,7 @@ function Login() {
                                 <a
                                   style={{ cursor: "pointer" }}
                                   onClick={() => {
+                                    // handleFacebookRedirectResult();
                                     LoginWithFacebook();
                                   }}
                                 >

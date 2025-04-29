@@ -11,7 +11,7 @@ function Screen() {
 
   const [colorIndex, setColorIndex] = useState("");
   const { t } = useTranslation();
-
+  const [zoom, setZoom] = useState(1);
   const location = useLocation();
   const { responseData, leftticket } = location.state.payload || {};
   const quantity = parseInt(localStorage.getItem("quantity"), 10);
@@ -528,6 +528,13 @@ function Screen() {
   const handleContextMenu = (event) => {
     event.preventDefault(); // Prevent right-click menu
   };
+  const handleZoomIn = () => {
+    setZoom((prevZoom) => Math.min(prevZoom + 0.1, 3)); // Max zoom 3x
+  };
+
+  const handleZoomOut = () => {
+    setZoom((prevZoom) => Math.max(prevZoom - 0.1, 1)); // Min zoom 1x
+  };
   return (
     <>
       <section className="playgame_section">
@@ -535,10 +542,12 @@ function Screen() {
           <div className="row rowmain_playgame">
             <div className="col-sm-12 col-lg-8 col9playgame_mainscreen">
               <div
-                className="gamescreenimg_right"
-                style={{ position: "relative" }}
+                style={{
+                  position: "relative",
+                  overflow: "auto",
+                }}
               >
-                {/* Protected Image */}
+                {/* Image inside */}
                 <img
                   ref={imgRef}
                   src={responseData?.player_image?.file_url || ""}
@@ -548,7 +557,6 @@ function Screen() {
                   onLoad={handleImageLoad}
                   onMouseEnter={handleMouseEnter}
                   onMouseLeave={handleMouseLeave}
-                  // Disable right-click and drag
                   onContextMenu={(e) => {
                     e.preventDefault();
                     return false;
@@ -557,26 +565,14 @@ function Screen() {
                   style={{
                     cursor: "crosshair",
                     display: "block",
-                    position: "relative",
                     userSelect: "none",
+                    maxWidth: "100%", // important: keep it responsive
+                    height: "auto", // maintain aspect ratio
+                    transform: `scale(${zoom})`,
+                    transformOrigin: "top left",
+                    transition: "transform 0.3s ease",
                   }}
                 />
-
-                {/* Watermark Overlay */}
-                <div
-                  style={{
-                    position: "absolute",
-                    bottom: "10px",
-                    right: "10px",
-                    backgroundColor: "rgba(0, 0, 0, 0.5)",
-                    color: "white",
-                    padding: "5px",
-                    fontSize: "14px",
-                    pointerEvents: "none",
-                  }}
-                >
-                  © SpotsBall
-                </div>
 
                 {/* Clicked Points */}
                 {imgRef.current &&
@@ -587,18 +583,23 @@ function Screen() {
                         position: "absolute",
                         left: `${
                           (point.x / imgRef.current.naturalWidth) *
-                          imgRef.current.clientWidth
+                          imgRef.current.clientWidth *
+                          zoom
                         }px`,
                         top: `${
                           (point.y / imgRef.current.naturalHeight) *
-                          imgRef.current.clientHeight
+                          imgRef.current.clientHeight *
+                          zoom
                         }px`,
                         transform: "translate(-50%, -50%)",
                         pointerEvents: "none",
                       }}
                     >
                       <RxCross2
-                        style={{ color: colorIndex, fontSize: "40px" }}
+                        style={{
+                          color: colorIndex,
+                          fontSize: `${40 * zoom}px`, // scale the cross size also
+                        }}
                       />
                     </div>
                   ))}
@@ -610,23 +611,60 @@ function Screen() {
                       position: "absolute",
                       left: `${
                         (coordinates.x / imgRef.current.naturalWidth) *
-                        imgRef.current.clientWidth
+                        imgRef.current.clientWidth *
+                        zoom
                       }px`,
                       top: `${
                         (coordinates.y / imgRef.current.naturalHeight) *
-                        imgRef.current.clientHeight
+                        imgRef.current.clientHeight *
+                        zoom
                       }px`,
                       backgroundColor: "rgba(0, 0, 0, 0.7)",
                       color: "#fff",
                       pointerEvents: "none",
                       transform: "translate(-50%, -100%)",
                       padding: "2px 5px",
-                      fontSize: "12px",
+                      fontSize: `${12 * zoom}px`, // scale tooltip font size too
                     }}
                   >
                     (X: {coordinates.x}, Y: {coordinates.y})
                   </div>
                 )}
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: "45px",
+                    right: "10px",
+                    backgroundColor: "rgba(0, 0, 0, 0.5)",
+                    color: "white",
+                    padding: "5px",
+                    fontSize: "14px",
+                    borderRadius: "5px",
+                    display: "flex",
+                    gap: "5px",
+                    zIndex: 10,
+                  }}
+                >
+                  <button onClick={handleZoomIn}>+</button>
+                  <button onClick={handleZoomOut}>-</button>
+                </div>
+
+                {/* 💧 Watermark - Fixed */}
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: "5px",
+                    right: "5px",
+                    backgroundColor: "rgba(0, 0, 0, 0.5)",
+                    color: "white",
+                    padding: "5px",
+                    fontSize: "14px",
+                    pointerEvents: "none",
+                    zIndex: 10,
+                  }}
+                >
+                  © SpotsBall
+                </div>
               </div>
             </div>
             <div className="col-sm-12 col-lg-4 col3ticketscontest">

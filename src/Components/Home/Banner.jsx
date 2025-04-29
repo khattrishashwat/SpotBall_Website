@@ -1003,24 +1003,24 @@ function Banner({ data }) {
                       <img
                         src={`${process.env.PUBLIC_URL}/images/barcode-1.png`}
                         alt=""
-                        className="d-sm-flex d-none"
+                        className="d-md-flex d-none"
                       />
                       <img
                         src={`${process.env.PUBLIC_URL}/images/barcode-2.png`}
                         alt=""
-                        className="d-sm-none d-block"
+                        className="d-md-none d-block"
                       />
                     </div>
                     <div className="ticket-line">
                       <img
                         src={`${process.env.PUBLIC_URL}/images/ticket-line.png`}
                         alt=""
-                        className="d-sm-flex d-none"
+                        className="d-md-flex d-none"
                       />
                       <img
                         src={`${process.env.PUBLIC_URL}/images/ticket-line-2.png`}
                         alt=""
-                        className="d-sm-none d-block"
+                        className="d-md-none d-block"
                       />
                     </div>
 
@@ -1196,7 +1196,7 @@ function Banner({ data }) {
                       borderRadius: "50%",
                     }}
                   ></i>{" "}
-                  <h2 className="text-white ">
+                  <h2 className="text-dark">
                     {t("Mark your calendars and get ready to join the fun!")}
                   </h2>
                 </div>
@@ -1215,7 +1215,7 @@ function Banner({ data }) {
                       borderRadius: "50%",
                     }}
                   ></i>
-                  <h2 className="text-white">
+                  <h2 className="text-dark">
                     {t(
                       "Don’t forget to tune in to our live streaming every Monday at 21:00 HRS to catch all the excitement."
                     )}
