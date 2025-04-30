@@ -14752,11 +14752,3 @@ header.header.header-sticky.default.header-style-02.bg-blue {
   }
 }
 
-.gamescreenimg_right {
-  position: relative;
-  overflow: hidden;
-  /* Add scrolling if zoomed image is bigger */
-  /* width: 100%;
-  height: auto;
-  max-height: 80vh; */
-}
