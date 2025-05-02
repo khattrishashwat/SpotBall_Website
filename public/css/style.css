@@ -5274,7 +5274,7 @@ span.fs-1.fw-800 {
   justify-content: center;
   align-items: center;
   position: fixed;
-  bottom: 86px;
+  bottom: 96px;
   right: 30px;
   width: 50px;
   height: 50px;
@@ -14751,4 +14751,3 @@ header.header.header-sticky.default.header-style-02.bg-blue {
     padding-bottom: 140px;
   }
 }
-

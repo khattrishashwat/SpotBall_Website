@@ -112,7 +112,9 @@ function Home() {
   useEffect(() => {
     fetchVideoData();
   }, []);
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <>
       <Banner

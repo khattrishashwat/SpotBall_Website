@@ -26,19 +26,20 @@ function Account() {
   const validationSchema = Yup.object({
     first_name: Yup.string()
       .matches(
-        /^[A-Za-z]+$/,
-        "First name should only contain alphabetic characters (no spaces or numbers)"
+        /^[A-Za-z\s]+$/,
+        "First name should only contain letters and spaces (no numbers or special characters)"
       )
       .max(25, "First name cannot be longer than 25 characters")
       .required("First name is required"),
 
     last_name: Yup.string()
       .matches(
-        /^[A-Za-z]+$/,
-        "Last name should only contain alphabetic characters (no spaces or numbers)"
+        /^[A-Za-z\s]+$/,
+        "Last name should only contain letters and spaces (no numbers or special characters)"
       )
       .max(25, "Last name cannot be longer than 25 characters")
       .required("Last name is required"),
+
     email: Yup.string()
       .email("Invalid email format")
       .required("Email is required"),

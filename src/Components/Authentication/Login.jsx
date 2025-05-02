@@ -9,7 +9,6 @@ import {
   getToken,
   LoginWithGoogle,
   LoginWithFacebook,
-  handleFacebookRedirectResult,
 } from "../FirebaseCofig/FirebaseConfig";
 import { useTranslation } from "react-i18next";
 
@@ -165,9 +164,7 @@ function Login() {
   useEffect(() => {
     requestFirebaseToken();
   }, []);
-  useEffect(() => {
-    handleFacebookRedirectResult();
-  }, []);
+
   return (
     <>
       <section className="adminloginsection" style={{ height: "100svh" }}>

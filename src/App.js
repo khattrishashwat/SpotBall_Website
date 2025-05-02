@@ -251,6 +251,7 @@ const useInactivityLogout = () => {
   }, [resetTimer]);
 };
 
+
 // **Wrapper to include Header & Footer**
 const WithLayout = ({ component: Component }) => (
   <>
