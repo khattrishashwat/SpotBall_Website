@@ -127,8 +127,6 @@ const GeolocationPopup = ({ Area, onClose }) => {
             "location",
             JSON.stringify({ stateName, countryName })
           );
-          console.log("Location saved:", { stateName, countryName });
-
           // Close the popup if present
           onClose && onClose();
         } catch (error) {

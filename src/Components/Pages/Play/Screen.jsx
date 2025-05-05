@@ -630,41 +630,23 @@ function Screen() {
                     (X: {coordinates.x}, Y: {coordinates.y})
                   </div>
                 )}
-                <div
-                  style={{
-                    position: "absolute",
-                    bottom: "45px",
-                    right: "10px",
-                    backgroundColor: "rgba(0, 0, 0, 0.5)",
-                    color: "white",
-                    padding: "5px",
-                    fontSize: "14px",
-                    borderRadius: "5px",
-                    display: "flex",
-                    gap: "5px",
-                    zIndex: 10,
-                  }}
-                >
-                  <button onClick={handleZoomIn}>+</button>
-                  <button onClick={handleZoomOut}>-</button>
-                </div>
 
                 {/* 💧 Watermark - Fixed */}
-                <div
-                  style={{
-                    position: "absolute",
-                    bottom: "5px",
-                    right: "5px",
-                    backgroundColor: "rgba(0, 0, 0, 0.5)",
-                    color: "white",
-                    padding: "5px",
-                    fontSize: "14px",
-                    pointerEvents: "none",
-                    zIndex: 10,
-                  }}
-                >
-                  © SpotsBall
-                </div>
+              </div>
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: "9px",
+                  right: "23px",
+                  backgroundColor: "rgba(0, 0, 0, 0.5)",
+                  color: "white",
+                  padding: "5px",
+                  fontSize: "14px",
+                  pointerEvents: "none",
+                  zIndex: 10,
+                }}
+              >
+                © SpotsBall
               </div>
             </div>
             <div className="col-sm-12 col-lg-4 col3ticketscontest">
@@ -803,6 +785,14 @@ function Screen() {
               </div>
             </div>
           </div>
+        </div>
+        <div className="plussub">
+          <button className="plusbtn" onClick={handleZoomIn}>
+            +
+          </button>
+          <button className="subbtn" onClick={handleZoomOut}>
+            -
+          </button>
         </div>
       </section>
 

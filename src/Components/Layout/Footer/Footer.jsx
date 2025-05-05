@@ -201,7 +201,7 @@ function Footer() {
                   <ul className="mb-0 justify-content-center justify-content-md-start list-unstyled">
                     <li>
                       <Link to="/terms">
-                        {t("Terms")} &amp; {t("Conditions")}
+                        {t("Terms")} &amp;{t("Conditions")}
                       </Link>
                     </li>
                     <li>
@@ -209,7 +209,7 @@ function Footer() {
                     </li>
                     <li>
                       <Link to="/rules">
-                        {t("Rules of Play")} &amp; {t("FAQs")}
+                        {t("Rules of Play")} &amp;{t("FAQs")}
                       </Link>
                     </li>
                     <li>

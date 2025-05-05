@@ -318,11 +318,10 @@ function Login() {
                                   />
                                 </a>
                               </li>
-                              <li>
+                              {/* <li>
                                 <a
                                   style={{ cursor: "pointer" }}
                                   onClick={() => {
-                                    // handleFacebookRedirectResult();
                                     LoginWithFacebook();
                                   }}
                                 >
@@ -331,7 +330,7 @@ function Login() {
                                     alt="Facebook"
                                   />
                                 </a>
-                              </li>
+                              </li> */}
                             </ul>
                           </div>
                         </div>

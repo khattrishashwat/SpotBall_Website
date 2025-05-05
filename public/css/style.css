@@ -693,6 +693,25 @@ ul.list li:last-child {
   .space-pb {
     padding: 0 0 60px;
   }
+
+  .plussub {
+    bottom: 45.7%;
+    right: 41%;
+  }
+
+  .plusbtn {
+    width: 20px;
+    height: 20px;
+  }
+
+  .subbtn {
+    width: 20px;
+    height: 20px;
+  }
+
+  .col-sm-12.col-lg-8.col9playgame_mainscreen {
+    margin-bottom: 25px;
+  }
 }
 
 @media (max-width: 767px) {
@@ -706,6 +725,25 @@ ul.list li:last-child {
 
   .space-pb {
     padding: 0 0 50px;
+  }
+
+  .col-sm-12.col-lg-8.col9playgame_mainscreen {
+    margin-bottom: 25px;
+  }
+
+  .plussub {
+    bottom: 60%;
+    right: 36%;
+  }
+
+  .plusbtn {
+    width: 20px;
+    height: 20px;
+  }
+
+  .subbtn {
+    width: 20px;
+    height: 20px;
   }
 }
 
@@ -9968,6 +10006,11 @@ img.hori-move {
     height: 35px;
   }
 
+  .plussub {
+    bottom: 48%;
+    right: 41%;
+  }
+
   .footer .footer-bottom {
     padding: 30px 0;
   }
@@ -13440,6 +13483,11 @@ header.header.header-sticky.default.header-style-02.bg-blue {
     font-size: 70px;
   }
 
+  .plussub {
+    bottom: 46%;
+    right: 41%;
+  }
+
   /*Banner 03*/
   .banner.banner-03 {
     margin: 0px;
@@ -13950,6 +13998,11 @@ header.header.header-sticky.default.header-style-02.bg-blue {
   .app_icons {
 
     justify-content: center;
+  }
+
+  .plussub {
+    bottom: 48%;
+    right: 41%;
   }
 
   .container,
@@ -14616,6 +14669,11 @@ header.header.header-sticky.default.header-style-02.bg-blue {
     gap: 5px;
   }
 
+  .plussub {
+    bottom: 58%;
+    right: 36%;
+  }
+
   .team-block .pattern-01 {
     display: none;
   }
@@ -14734,7 +14792,20 @@ header.header.header-sticky.default.header-style-02.bg-blue {
     height: 100svh;
   }
 
+  .plussub {
+    bottom: 61%;
+    right: 35%;
+  }
 
+  .plusbtn {
+    width: 20px;
+    height: 20px;
+  }
+
+  .subbtn {
+    width: 20px;
+    height: 20px;
+  }
 
 
 

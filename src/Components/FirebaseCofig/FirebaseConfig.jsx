@@ -53,7 +53,6 @@ function detectIncognitoMode() {
   });
 }
 
-
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker
     // .register("/spotsball/landing/firebase-messaging-sw.js")
@@ -71,7 +70,7 @@ if ("serviceWorker" in navigator) {
           if (currentToken) {
             console.log("Current token:", currentToken);
             localStorage.setItem("device_token", currentToken);
-          } 
+          }
         })
         .catch((err) => {
           console.error("Error getting token:", err);
@@ -191,10 +190,14 @@ export const LoginWithGoogle = async () => {
     }
   } catch (error) {
     console.error("Google Sign-In Error:", error);
+    let errorMessage = "Google Login Failed";
+
+    if (error.code === "auth/popup-closed-by-user") {
+      errorMessage = "Google sign-in was cancelled. Please try again.";
+    }
     Swal.fire({
       icon: "error",
-      title: "Google Login Failed",
-      text: error.message,
+      text: errorMessage,
     });
   }
 };
@@ -411,7 +414,6 @@ export const signInWithFacebook = async (setFieldValue) => {
 //   }
 // };
 
-
 // export const LoginWithFacebook = async () => {
 //   try {
 //     facebookProvider.addScope("email");
@@ -525,18 +527,14 @@ export const signInWithFacebook = async (setFieldValue) => {
 
 export const LoginWithFacebook = async () => {
   try {
-    // Step 1: Ensure FB SDK is loaded and initialized
     await loadFacebookSdk();
 
-    // Step 2: Prompt login
     const fbLoginResponse = await new Promise((resolve, reject) => {
       window.FB.login(
         (response) => {
-          if (response.authResponse) {
-            resolve(response);
-          } else {
-            reject(new Error("Facebook login was cancelled or failed."));
-          }
+          response.authResponse
+            ? resolve(response)
+            : reject(new Error("Facebook login was cancelled or failed."));
         },
         { scope: "email,public_profile" }
       );
@@ -544,32 +542,26 @@ export const LoginWithFacebook = async () => {
 
     const accessToken = fbLoginResponse.authResponse.accessToken;
 
-    // Step 3: Fetch user profile
     const fbUser = await new Promise((resolve, reject) => {
       window.FB.api(
         "/me",
         { fields: "id,name,email,picture", access_token: accessToken },
         (response) => {
-          if (!response || response.error) {
-            reject(new Error("Failed to fetch Facebook user profile."));
-          } else {
-            resolve(response);
-          }
+          response && !response.error
+            ? resolve(response)
+            : reject(new Error("Failed to fetch Facebook user profile."));
         }
       );
     });
 
-    const displayName = fbUser.name;
-    const email = fbUser.email || "";
-    const photoURL = fbUser.picture?.data?.url || "";
-    const nameParts = displayName.split(" ");
-    const firstName = nameParts[0] || "";
-    const lastName = nameParts.slice(1).join(" ") || "";
+    const { name: displayName = "", email = "", picture } = fbUser;
+    const photoURL = picture?.data?.url || "";
+    const [firstName, ...rest] = displayName.split(" ");
+    const lastName = rest.join(" ");
 
-    // Step 4: Firebase auth
+    // Firebase sign-in
     const credential = FacebookAuthProvider.credential(accessToken);
-    const result = await signInWithCredential(auth, credential);
-    const firebaseUser = result.user;
+    const { user: firebaseUser } = await signInWithCredential(auth, credential);
     const uid = firebaseUser.uid;
 
     const userData = {
@@ -582,13 +574,11 @@ export const LoginWithFacebook = async () => {
       last_name: lastName,
     };
 
-    // Step 5: Backend check
+    // Check UID and proceed accordingly
     try {
-      const checkUIDResponse = await axios.get(
-        `app/auth/check-uid-exists/${uid}`
-      );
+      const { data } = await axios.get(`app/auth/check-uid-exists/${uid}`);
 
-      if (checkUIDResponse.data.message === "Uid found") {
+      if (data.message === "Uid found") {
         const loginRes = await axios.post("app/auth/social-login", {
           signup_method: "facebook",
           uid,
@@ -607,7 +597,7 @@ export const LoginWithFacebook = async () => {
 
         setTimeout(() => {
           window.location.href = "/";
-        }, 2000);
+        }, 1500);
       }
     } catch (apiError) {
       if (apiError.response?.data?.message === "Uid Not Found") {
@@ -623,13 +613,19 @@ export const LoginWithFacebook = async () => {
     }
   } catch (error) {
     console.error("Facebook Login Error:", error);
+
+    let errorMessage = "Facebook Login Failed";
+    if (error.code === "auth/popup-closed-by-user") {
+      errorMessage = "Facebook sign-in was cancelled. Please try again.";
+    }
+
     Swal.fire({
       icon: "error",
-      title: "Facebook Login Failed",
-      text: error.message,
+      text: errorMessage,
     });
   }
 };
+
 {
   /*------Twitter--------*/
 }

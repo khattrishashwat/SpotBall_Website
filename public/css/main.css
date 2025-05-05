@@ -5140,6 +5140,7 @@ a.seefullarticle_btn {
 
 .playgame_section {
   padding: 120px;
+  position: relative;
 }
 
 .playgame_section .contfld_playgame {
@@ -7466,3 +7467,41 @@ a.resend-btn {
 .card.first.dis_card .content h2 {
     font-size: 14px;
 } */
+
+.plussub {
+  position: absolute;
+  bottom: 7% !important;
+  right: 59% !important;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  padding: 5px;
+  font-size: 14px;
+  border-radius: 5px;
+  display: flex;
+  gap: 6px;
+}
+
+.plusbtn {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: unset;
+  font-size: 19px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: white;
+}
+
+.subbtn {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: unset;
+  font-size: 27px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: white;
+}

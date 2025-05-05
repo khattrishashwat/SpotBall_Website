@@ -523,18 +523,12 @@ function Checkout() {
       throw new Error("Cart data is missing or incomplete.");
     }
 
-    // const cart = carts[0];
     const calculatedCart = calculatedCarts[0];
 
     const contestId = calculatedCart?.contest_id?._id;
     const coordinates = calculatedCart?.user_coordinates || [];
     const tickets = calculatedCart.tickets_count;
-    // const contestId = cart?.contest_id?._id;
-    // const coordinates = cart?.user_coordinates || [];
-    // const tickets = carts.reduce(
-    //   (total, cart) => total + (cart.tickets_count || 0),
-    //   0
-    // );
+ 
 
     const discount = calculatedCart?.discount || {};
     const discountPercentage = discount.discountPercentage || 0;

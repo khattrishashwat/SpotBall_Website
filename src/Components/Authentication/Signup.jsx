@@ -441,7 +441,9 @@ function Signup() {
                                 htmlFor="rememebrbtn2"
                                 className="labelrememebrme"
                               >
-                                {("I hereby confirm and acknowledge that I am not a minor, and that I am least 18 years old as of today’s date.")}
+                                {
+                                  "I hereby confirm and acknowledge that I am not a minor, and that I am least 18 years old as of today’s date."
+                                }
                               </label>
                               <ErrorMessage
                                 name={t("agreeAge")}
@@ -486,7 +488,7 @@ function Signup() {
                               />
                             </a>
                           </li>
-                          <li>
+                          {/* <li>
                             <a
                               style={{ cursor: "pointer" }}
                               onClick={() => {
@@ -498,7 +500,7 @@ function Signup() {
                                 alt="Facebook"
                               />
                             </a>
-                          </li>
+                          </li> */}
                         </ul>
                       </div>
                     </div>

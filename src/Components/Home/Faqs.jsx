@@ -35,18 +35,7 @@ function Faqs({ data }) {
                 height: "auto",
               }}
             >
-              <source
-                src={`${process.env.PUBLIC_URL}/images/Untitled design (25).mp4`}
-                type="video/mp4"
-              />
-              <source
-                src={`${process.env.PUBLIC_URL}/images/flight.webm`}
-                type="video/webm"
-              />
-              <source
-                src={`${process.env.PUBLIC_URL}/images/flight.ogv`}
-                type="video/ogg"
-              />
+              <source src="/images/play.mp4" type="video/mp4" />
             </video>
           </div>
           <div className="container">
