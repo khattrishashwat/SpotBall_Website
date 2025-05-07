@@ -2,7 +2,7 @@
 export const loadFacebookSdk = () => {
   return new Promise((resolve) => {
     if (window.FB) {
-      resolve(); // Already initialized
+      resolve(); 
       return;
     }
 

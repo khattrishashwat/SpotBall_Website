@@ -7,6 +7,7 @@ import {
   signInWithPopup,
   signInWithRedirect,
   getRedirectResult,
+  fetchSignInMethodsForEmail,
   OAuthProvider,
   signInWithCredential,
 } from "firebase/auth";
@@ -148,13 +149,11 @@ export const LoginWithGoogle = async () => {
     };
 
     try {
-      // Check if UID exists in backend
       const checkUIDResponse = await axios.get(
         `app/auth/check-uid-exists/${uid}`
       );
 
       if (checkUIDResponse.data.message === "Uid found") {
-        // Perform social login
         const response = await axios.post("app/auth/social-login", {
           signup_method: "google",
           uid,
@@ -171,30 +170,55 @@ export const LoginWithGoogle = async () => {
           timer: 2000,
         });
 
-        // window.location.href = "/spotsball/landing/"; // Redirect after login
         window.location.href = "/";
       }
     } catch (error) {
       if (error.response?.data?.message === "Uid Not Found") {
         localStorage.setItem("UIDNotFound", JSON.stringify(userData));
-        // window.location.href = "/spotsball/landing/socialsignup";
         window.location.href = "/socialsignup";
       } else {
-        console.error("API Error:", error);
         Swal.fire({
           icon: "error",
           title: "Login Failed",
-          text: error.response?.data?.message,
+          text: error.response?.data?.message || "Server error",
         });
       }
     }
   } catch (error) {
     console.error("Google Sign-In Error:", error);
-    let errorMessage = "Google Login Failed";
 
+    const getProviderName = (methods) => {
+      if (methods.includes("password")) return "Email & Password";
+      if (methods.includes("google.com")) return "Google";
+      if (methods.includes("facebook.com")) return "Facebook";
+      if (methods.includes("twitter.com")) return "Twitter";
+      if (methods.includes("apple.com")) return "Apple";
+      return "another provider";
+    };
+    if (error.code === "auth/account-exists-with-different-credential") {
+      const email = error.customData?.email;
+      if (email) {
+        try {
+          const methods = await fetchSignInMethodsForEmail(auth, email);
+          const providerName = getProviderName(methods);
+
+          Swal.fire({
+            icon: "error",
+            title: "Account Already Exists",
+            text: `This email is already registered using ${providerName}. Please log in using that method.`,
+          });
+        } catch (fetchError) {
+          console.error("Error fetching sign-in methods:", fetchError);
+        }
+      }
+      return;
+    }
+
+    let errorMessage = "Google Login Failed";
     if (error.code === "auth/popup-closed-by-user") {
       errorMessage = "Google sign-in was cancelled. Please try again.";
     }
+
     Swal.fire({
       icon: "error",
       text: errorMessage,
@@ -559,7 +583,6 @@ export const LoginWithFacebook = async () => {
     const [firstName, ...rest] = displayName.split(" ");
     const lastName = rest.join(" ");
 
-    // Firebase sign-in
     const credential = FacebookAuthProvider.credential(accessToken);
     const { user: firebaseUser } = await signInWithCredential(auth, credential);
     const uid = firebaseUser.uid;
@@ -574,7 +597,6 @@ export const LoginWithFacebook = async () => {
       last_name: lastName,
     };
 
-    // Check UID and proceed accordingly
     try {
       const { data } = await axios.get(`app/auth/check-uid-exists/${uid}`);
 
@@ -613,6 +635,33 @@ export const LoginWithFacebook = async () => {
     }
   } catch (error) {
     console.error("Facebook Login Error:", error);
+
+    if (error.code === "auth/account-exists-with-different-credential") {
+      const email = error.customData?.email;
+      if (email) {
+        try {
+          const methods = await fetchSignInMethodsForEmail(auth, email);
+          const providerName = getProviderName(methods);
+          const getProviderName = (methods) => {
+            if (methods.includes("password")) return "Email & Password";
+            if (methods.includes("google.com")) return "Google";
+            if (methods.includes("facebook.com")) return "Facebook";
+            if (methods.includes("twitter.com")) return "Twitter";
+            if (methods.includes("apple.com")) return "Apple";
+            return "another provider";
+          };
+
+          Swal.fire({
+            icon: "error",
+            title: "Account Already Exists",
+            text: `This email is already registered using ${providerName}. Please log in using that method.`,
+          });
+        } catch (fetchError) {
+          console.error("Error fetching sign-in methods:", fetchError);
+        }
+      }
+      return;
+    }
 
     let errorMessage = "Facebook Login Failed";
     if (error.code === "auth/popup-closed-by-user") {
