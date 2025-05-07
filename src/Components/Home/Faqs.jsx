@@ -35,7 +35,11 @@ function Faqs({ data }) {
                 height: "auto",
               }}
             >
-              <source src="/images/play.mp4" type="video/mp4" />
+              {/* <source src="/images/play.mp4" type="video/mp4" /> */}
+              <source
+                src="https://blr1.digitaloceanspaces.com/spotsball/file/play.mp4"
+                type="video/mp4"
+              />
             </video>
           </div>
           <div className="container">

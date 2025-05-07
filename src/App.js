@@ -22,7 +22,7 @@ import { LanguageProvider } from "./LanguageContext";
 
 // Import components
 import PageNot from "./Components/PageNot/PageNot";
-import TawkScriptLoader from "./TawkScriptLoader";
+// import TawkScriptLoader from "./TawkScriptLoader";
 import Loader from "./Components/Loader/Loader";
 import Socialsignup from "./Components/Authentication/Socialsignup";
 
@@ -88,7 +88,7 @@ const App = () => {
         <title>{loading ? "SpotsBall..." : "SpotsBall"}</title>
       </Helmet>
       <Router basename="/">
-        <TawkScriptLoader />
+        {/* <TawkScriptLoader /> */}
         <RoutesWithInterceptors />
       </Router>
     </>
