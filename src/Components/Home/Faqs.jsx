@@ -201,10 +201,7 @@ function Faqs({ data }) {
               </div>
 
               <div className="d-flex flex-wrap gap-16 justify-content-center align-items-center mt-5">
-                <Link
-                  to="/rules"
-                  className="btn btn-primary text-uppercase rounded-2"
-                >
+                <Link to="/rules" className="btn btn-primary rounded-2">
                   {t("View All")}
                 </Link>
               </div>

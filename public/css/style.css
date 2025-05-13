@@ -1319,13 +1319,13 @@ textarea.form-control {
 .btn-white {
 
   color: #000 !important;
-  border-radius: 5px;
+  border-radius: 10px;
   background: #FFF;
   z-index: 1;
   position: relative;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
-  padding: 10px 30px;
+  padding: 8px 24px;
   overflow: hidden;
 }
 
@@ -5057,11 +5057,11 @@ span.vert-move {
   width: 38px;
 }
 
-h2.text-start {
-  font-size: 22px;
-  margin-top: 18px;
-  margin-bottom: 25px;
-  line-height: 33px;
+h6.text-start {
+  font-size: 22px !important;
+  margin-top: 18px !important;
+  margin-bottom: 25px !important;
+  line-height: 33px !important;
 }
 
 .banner .pagination-button .swiper-button-prev {
@@ -5285,7 +5285,7 @@ h2.text-start {
   animation: upmover 1.5s infinite alternate;
 }
 
-.banner .swiper-slide1 h1 {
+.banner .swiper-slide1 h4 {
   font-size: 35px;
   color: white;
   font-weight: 600;
@@ -10689,10 +10689,9 @@ img.img-fluid.vert-move.side-pattern-height {
 .app-section .app-content .title {
   color: #fff;
   text-transform: unset;
-  line-height: 1.2;
   margin-bottom: 20px;
 
-  font-size: 44px;
+  font-size: 45px;
   font-weight: 800;
   text-shadow: 0px 0px 0px #fff;
 }
@@ -10725,9 +10724,10 @@ img.img-fluid.vert-move.side-pattern-height {
 .app-section .app-content .app-buttons a {
   text-transform: capitalize;
   padding: 10px 16px;
-  font-size: 14px;
+  font-size: 16px;
   transition: .5s all ease;
   border: 1px solid #009e49;
+  border-radius: 10px !important;
 }
 
 .btn.btn-curve {
@@ -11556,10 +11556,15 @@ p.eyebrow.mb-8 {
   font-size: 20px;
 }
 
-.d-flex.flex-wrap.gap-16.align-items-center.justify-content-between h3 {
+.d-flex.flex-wrap.gap-16.align-items-center.justify-content-between h2 {
   color: black;
-  font-size: 44px;
-  font-weight: 700;
+  font-size: 45px;
+  font-weight: 800;
+}
+
+.d-flex.flex-wrap.gap-16.align-items-center.justify-content-between h2 span {
+  color: white;
+
 }
 
 
@@ -11576,10 +11581,11 @@ p.eyebrow.mb-8 {
   font-weight: 600;
 }
 
-a.btn.btn-primary.text-uppercase.rounded-2 {
-  font-size: 14px;
+a.btn.btn-primary.rounded-2 {
+  font-size: 16px;
   padding: 8px 24px;
   border: 1px solid #009f52;
+  border-radius: 10px !important;
 }
 
 .contesttickeprice p {
@@ -11803,7 +11809,7 @@ p.eyebrow.mb-8 {
   color: #fff;
 }
 
-.d-flex.flex-wrap.gap-16.align-items-center.justify-content-between h3 {
+.d-flex.flex-wrap.gap-16.align-items-center.justify-content-between h2 {
   color: #fff;
 }
 
@@ -12457,7 +12463,9 @@ h5.title.mb-3.d-block.download {
   padding-bottom: 70px;
 }
 
-.section-title.short h2 {
+.section-title.short h4 {
+  color: black;
+  margin-bottom: 10px;
   font-size: 30px;
   font-weight: 700;
 }
@@ -13438,8 +13446,8 @@ header.header.header-sticky.default.header-style-02.bg-blue {
     padding: 0px 40px;
   }
 
-  .banner .swiper-slide1 h1 {
-    font-size: 34px;
+  .banner .swiper-slide1 h4 {
+    font-size: 35px;
   }
 
   .banner .swiper-slide1 .pattern-01 {
@@ -13526,7 +13534,7 @@ header.header.header-sticky.default.header-style-02.bg-blue {
     padding-bottom: 50px;
   }
 
-  .banner .swiper-slide1 h1 {
+  .banner .swiper-slide1 h4 {
     font-size: 37px;
   }
 
@@ -14077,7 +14085,7 @@ header.header.header-sticky.default.header-style-02.bg-blue {
     padding: 0 12px;
   }
 
-  h2.text-start {
+  p.text-start {
     font-size: 18px;
     margin-bottom: 18px;
     line-height: 28px;
@@ -14279,7 +14287,7 @@ header.header.header-sticky.default.header-style-02.bg-blue {
     height: 350px;
   }
 
-  .banner .swiper-slide1 h1 {
+  .banner .swiper-slide1 h4 {
     font-size: 28px;
     line-height: 37px;
   }
@@ -14477,7 +14485,7 @@ header.header.header-sticky.default.header-style-02.bg-blue {
     font-size: 16px;
   }
 
-  h2.text-start.fadeInUp.animated {
+  p.text-start.fadeInUp.animated {
     font-size: 18px;
     line-height: 27px;
   }

@@ -488,7 +488,7 @@ function Signup() {
                               />
                             </a>
                           </li>
-                          {/* <li>
+                          <li>
                             <a
                               style={{ cursor: "pointer" }}
                               onClick={() => {
@@ -500,7 +500,7 @@ function Signup() {
                                 alt="Facebook"
                               />
                             </a>
-                          </li> */}
+                          </li>
                         </ul>
                       </div>
                     </div>

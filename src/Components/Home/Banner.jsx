@@ -511,7 +511,7 @@ function Banner({ data }) {
                       <div className="col-md-7 col-lg-7 position-relative">
                         {banner.length > 0 && (
                           <>
-                            <h1
+                            <h4
                               className="text-start"
                               data-swiper-animation="fadeInUp"
                               data-duration="1.5s"
@@ -529,9 +529,9 @@ function Banner({ data }) {
                                   )
                                 )}
                               !
-                            </h1>
+                            </h4>
 
-                            <h2
+                            <h6
                               className="text-start"
                               data-swiper-animation="fadeInUp"
                               data-duration="1.5s"
@@ -539,7 +539,7 @@ function Banner({ data }) {
                             >
                               {banner[0].title.split("?")[0]}? <br />
                               {banner[0].title.split("?")[1]}
-                            </h2>
+                            </h6>
                           </>
                         )}
 
@@ -939,7 +939,7 @@ function Banner({ data }) {
             <div className="discount-coupons1">
               <div className="container">
                 <div className="section-title short mb-3 d-flex justify-content-center">
-                  <h2 className="title">{t("Discounts Available")}</h2>
+                  <h4 className="title">{t("Discounts Available")}</h4>
                 </div>
                 <div className="discount-coupons">
                   {discounts?.map((discount, index) => (
@@ -988,10 +988,10 @@ function Banner({ data }) {
         >
           <div className="container">
             <div className="heading mb-3">
-              <div className="d-flex flex-wrap gap-16 align-items-center justify-content-between">
-                <h3 className=" ">
+              <div className="d-flex flex-wrap gap-16 align-items-center justify-content-between section-title">
+                <h2 className="title">
                   {t("Tickets")} <span>{t("Available")}</span>
-                </h3>
+                </h2>
               </div>
             </div>
 
@@ -1066,7 +1066,7 @@ function Banner({ data }) {
                       <div className="d-flex flex-wrap gap-16 align-items-center mt-3 ">
                         <a
                           onClick={handleAskToPaly}
-                          className="btn btn-primary text-uppercase rounded-2"
+                          className="btn btn-primary rounded-2"
                         >
                           {t("Play Now")}
                         </a>
